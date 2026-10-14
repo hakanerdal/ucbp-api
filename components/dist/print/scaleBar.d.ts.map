@@ -1,0 +1,1 @@
+{"version":3,"file":"scaleBar.d.ts","sourceRoot":"","sources":["../../src/print/scaleBar.ts"],"names":[],"mappings":"AAAA,0CAA0C;AAC1C,MAAM,WAAW,gBAAgB;IAC/B,sDAAsD;IACtD,QAAQ,CAAC,KAAK,EAAE,MAAM,CAAC;IACvB,oCAAoC;IACpC,QAAQ,CAAC,WAAW,EAAE,MAAM,CAAC;CAC9B;AAED;;;;;;;;;;;GAWG;AACH,wBAAgB,mBAAmB,CAAC,oBAAoB,EAAE,MAAM,EAAE,mBAAmB,EAAE,MAAM,GAAG,gBAAgB,CAG/G"}

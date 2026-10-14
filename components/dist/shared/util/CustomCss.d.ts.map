@@ -1,0 +1,1 @@
+{"version":3,"file":"CustomCss.d.ts","sourceRoot":"","sources":["../../../src/shared/util/CustomCss.ts"],"names":[],"mappings":"AAeA,gGAAgG;AAChG,MAAM,WAAW,cAAc;IAC7B,sEAAsE;IACtE,KAAK,EAAE,aAAa,GAAG,IAAI,CAAC;CAC7B;AAED;;;;;;;;;;GAUG;AACH,wBAAgB,cAAc,CAC5B,UAAU,EAAE,UAAU,GAAG,IAAI,EAC7B,OAAO,EAAE,MAAM,EACf,KAAK,EAAE,cAAc,EACrB,WAAW,EAAE,MAAM,GAClB,IAAI,CA0BN"}

@@ -1,0 +1,64 @@
+{
+  "name": "@tucbs/core",
+  "version": "0.1.0",
+  "description": "TUCBS Core Map API — Cesium tabanlı harita, katman ve çizim yönetimi",
+  "type": "module",
+  "main": "./dist/tucbs-core.cjs",
+  "module": "./dist/tucbs-core.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/tucbs-core.js",
+      "require": "./dist/tucbs-core.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build --config vite.config.lib.ts && cp src/map/assets/blue-marble-fallback.jpg dist/blue-marble-fallback.jpg",
+    "build:dev": "vite build --config vite.config.lib.ts --mode dev && cp src/map/assets/blue-marble-fallback.jpg dist/blue-marble-fallback.jpg",
+    "dev": "vite build --config vite.config.lib.ts --watch",
+    "pretypecheck": "pnpm --dir ../.. run lint && pnpm --dir ../.. run check:imports && pnpm --dir ../.. run check:duplication && pnpm --dir ../.. run check:file-length",
+    "typecheck": "tsc --project tsconfig.build.json --noEmit",
+    "schema:generate": "node scripts/generate-schema.mjs",
+    "docs:generate": "typedoc",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "cesium": "^1.142.0",
+    "ol": "^10.0.0",
+    "papaparse": "^5.5.3",
+    "proj4": "^2.20.9",
+    "shpjs": "^6.2.0"
+  },
+  "peerDependenciesMeta": {
+    "shpjs": {
+      "optional": true
+    },
+    "papaparse": {
+      "optional": true
+    },
+    "ol": {
+      "optional": true
+    },
+    "proj4": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/geojson": "^7946.0.16",
+    "cesium": "^1.142.0",
+    "jsdom": "^30.1.1",
+    "ol": "^10.10.0",
+    "proj4": "^2.20.9",
+    "ts-json-schema-generator": "^2.9.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-plugin-bundle-obfuscator": "^1.13.1",
+    "vite-plugin-cesium": "1.2.23",
+    "vite-plugin-dts": "^4.3.0",
+    "vitest": "^2.1.9"
+  }
+}

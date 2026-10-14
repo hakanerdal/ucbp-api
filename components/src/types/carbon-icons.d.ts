@@ -1,0 +1,52 @@
+declare module "@carbon/icons" {
+  interface CarbonIconNode {
+    elem: string;
+    attrs?: Record<string, string | number>;
+    content?: CarbonIconNode[];
+  }
+  export const Close16: CarbonIconNode;
+  export const Shapes16: CarbonIconNode;
+  export const Link16: CarbonIconNode;
+  export const AddAlt20: CarbonIconNode;
+  export const ChevronRight16: CarbonIconNode;
+  export const OverflowMenuVertical16: CarbonIconNode;
+  export const Draggable16: CarbonIconNode;
+  export const TrashCan16: CarbonIconNode;
+  export const UpToTop16: CarbonIconNode;
+  export const ZoomIn16: CarbonIconNode;
+  export const ZoomIn20: CarbonIconNode;
+  export const ZoomOut16: CarbonIconNode;
+  export const DocumentBlank20: CarbonIconNode;
+  export const CloudDownload20: CarbonIconNode;
+  export const ColorPalette16: CarbonIconNode;
+  export const ColorPalette20: CarbonIconNode;
+  export const Download16: CarbonIconNode;
+  export const Renew16: CarbonIconNode;
+  export const Legend16: CarbonIconNode;
+  export const DocumentExport16: CarbonIconNode;
+  export const Location16: CarbonIconNode;
+  export const LocationFilled32: CarbonIconNode;
+  export const Information20: CarbonIconNode;
+  export const SquareOutline16: CarbonIconNode;
+  export const CircleOutline16: CarbonIconNode;
+  export const Pen16: CarbonIconNode;
+  export const Ruler16: CarbonIconNode;
+  export const Area16: CarbonIconNode;
+  export const RulerAlt16: CarbonIconNode;
+  export const View16: CarbonIconNode;
+  export const ViewOff16: CarbonIconNode;
+  export const DotMark16: CarbonIconNode;
+  export const ChartLine16: CarbonIconNode;
+  export const LassoPolygon16: CarbonIconNode;
+  export const Home16: CarbonIconNode;
+  export const ApiKey20: CarbonIconNode;
+  export const Settings16: CarbonIconNode;
+  export const Checkmark16: CarbonIconNode;
+  export const Printer16: CarbonIconNode;
+  export const WarningAltFilled16: CarbonIconNode;
+  export const Map16: CarbonIconNode;
+  export const DocumentAdd16: CarbonIconNode;
+  export const Layers16: CarbonIconNode;
+  export const Meter16: CarbonIconNode;
+  export const CloudDownload16: CarbonIconNode;
+}

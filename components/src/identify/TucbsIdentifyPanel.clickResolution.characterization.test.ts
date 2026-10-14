@@ -214,4 +214,24 @@ describe("TucbsIdentifyPanel entity/imagery click yaris cozumlemesi", () => {
 
     expect(state()._basicOpen).toBe(false);
   });
+  it("interaction:suspend (cizim/olcum basladi) acik koordinat kartini kapatir, tabloya dokunmaz", () => {
+    im.emit("map:click", mapClick([29, 41]));
+    // runAllTimers kartin kendiliginden kapanma zamanlayicisini da calistirirdi.
+    vi.advanceTimersByTime(1);
+    expect(state()._basicOpen).toBe(true);
+
+    im.emit("interaction:suspend", {});
+
+    expect(state()._basicOpen).toBe(false);
+  });
+
+  it("interaction:suspend acik oznitelik tablosunu KAPATMAZ", () => {
+    im.emit("entity:click", entityClick([29, 41], { il: "Ankara" }));
+    vi.runAllTimers();
+    expect(state()._tableOpen).toBe(true);
+
+    im.emit("interaction:suspend", {});
+
+    expect(state()._tableOpen).toBe(true);
+  });
 });

@@ -3,6 +3,7 @@ import {
   Cartesian3,
   Cartographic,
   HorizontalOrigin,
+  ConstantProperty,
   Math as CesiumMath,
   PolygonHierarchy,
   ScreenSpaceEventHandler,
@@ -304,7 +305,9 @@ export class TucbsClipTool extends LitElement {
   private _paintPolygon(box: Bbox): void {
     const polygon = this._shapeEntity?.polygon;
     if (!polygon) return;
-    polygon.hierarchy = new PolygonHierarchy(Cartesian3.fromDegreesArray(flatRing(box)));
+    polygon.hierarchy = new ConstantProperty(
+      new PolygonHierarchy(Cartesian3.fromDegreesArray(flatRing(box))),
+    );
     this._bind.current()?.viewer.scene.requestRender();
   }
 
@@ -643,11 +646,8 @@ function maskFromBox(box: Bbox): SelectedFeature {
     [box.west, box.north],
     [box.west, box.south],
   ];
-  return {
-    type: "Feature",
-    properties: {},
-    geometry: { type: "Polygon", coordinates: [ring] },
-  };
+  const geometry = { type: "Polygon", coordinates: [ring] };
+  return { type: "Feature", properties: {}, geometry };
 }
 
 /** En ve boyu km cinsinden yazar; enlem kosinüsü boylamı kısaltır. */

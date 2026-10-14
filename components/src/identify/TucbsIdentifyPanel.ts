@@ -190,6 +190,13 @@ export class TucbsIdentifyPanel extends LitElement {
     }, 0);
   };
 
+  // Bir arac (cizim/olcum) etkilesimi devraldiginda koordinat karti, aracin
+  // yonlendirme paneliyle ust uste binmesin diye kapanir (oznitelik tablosu
+  // ayri bir diyalog; ona dokunulmaz).
+  private readonly _onInteractionSuspend = (): void => {
+    this._closeBasic();
+  };
+
   private readonly _onImageryQuerying = (): void => {
     if (this.interactionManager?.isIdentifySuspended()) return;
     this._imageryPending = true;
@@ -663,6 +670,7 @@ export class TucbsIdentifyPanel extends LitElement {
 
   private _bind(interactionManager: InteractionManager): void {
     interactionManager.on("map:click", this._onMapClick);
+    interactionManager.on("interaction:suspend", this._onInteractionSuspend);
     interactionManager.on("entity:click", this._onEntityClick);
     interactionManager.on("imagery:click", this._onImageryClick);
     interactionManager.on("imagery:querying", this._onImageryQuerying);
@@ -670,6 +678,7 @@ export class TucbsIdentifyPanel extends LitElement {
 
   private _unbind(interactionManager: InteractionManager): void {
     interactionManager.off("map:click", this._onMapClick);
+    interactionManager.off("interaction:suspend", this._onInteractionSuspend);
     interactionManager.off("entity:click", this._onEntityClick);
     interactionManager.off("imagery:click", this._onImageryClick);
     interactionManager.off("imagery:querying", this._onImageryQuerying);

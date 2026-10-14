@@ -41,6 +41,7 @@ export declare class TucbsIdentifyPanel extends LitElement {
     private _basicDismissTimer;
     private readonly _drag;
     private readonly _onMapClick;
+    private readonly _onInteractionSuspend;
     private readonly _onImageryQuerying;
     private get _accordionPageCount();
     private get _isCompactPanel();

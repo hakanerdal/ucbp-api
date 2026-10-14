@@ -239,7 +239,11 @@ export class InteractionManager extends EventEmitter<InteractionManagerEventMap>
 
   /** Tıklama/pick event grubunu (`entity:*`/`map:*`/`imagery:*`) geçici olarak durdurur (bkz `DrawingManager`). */
   suspend(): void {
+    if (this.suspended) return;
     this.suspended = true;
+    // Tuketiciler (orn. TucbsIdentifyPanel koordinat karti) arac devraldiginda
+    // kendi gecici UI'larini kapatabilsin diye -- sadece durum DEGISTIGINDE.
+    this.emit("interaction:suspend", {});
   }
 
   /** `suspend()` ile durdurulan tıklama/pick event grubunu devam ettirir. */

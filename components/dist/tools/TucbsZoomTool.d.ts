@@ -6,20 +6,21 @@ import { Map as TucbsMapInstance, MapExtent } from '@tucbs/core';
  * kullanilabildigi gibi, toolbar disinda tek basina da embed edilebilir
  * (bkz. tucbs-taslak-web-component-metod-ihtiyac-analizi-v14 SS4.5).
  *
+ * Yakinlastir/Uzaklastir, fare tekerleginin bir centigiyle ayni sekilde bir
+ * olcek basamagi (1/100, 1/250, 1/500, ...) animasyonlu ilerler.
+ *
  * `mapElementId`, sayfadaki `<tucbs-map>` elementinin `id`'siyle eşleşmelidir;
  * bileşen bu sayede haritaya otomatik bağlanır (Senaryo 2).
  *
  * @example
  * ```html
- * <tucbs-zoom-tool mapElementId="map" step-ratio="0.5"></tucbs-zoom-tool>
+ * <tucbs-zoom-tool mapElementId="map"></tucbs-zoom-tool>
  * ```
  */
 export declare class TucbsZoomTool extends LitElement {
     static readonly styles: (import('lit').CSSResult | import('lit').CSSResult[])[];
     /** Baglanacak `tucbs-map` elementinin DOM ID'si. */
     mapElementId: string;
-    /** Her tiklamada kameranin mevcut yuksekligine oranla ne kadar hareket edecegini belirleyen adim orani. */
-    stepRatio: number;
     /** "Varsayilan Sinir" butonuna tiklandiginda kameranin donecegi hedef bolge. */
     defaultExtent: MapExtent | undefined;
     /** Shadow DOM'a enjekte edilecek serbest metin CSS. */

@@ -15,6 +15,8 @@ import { iconNodeToString, type CarbonIconNode } from "../shared/util/CarbonIcon
 import { applyCustomCss, type CustomCssState } from "../shared/util/CustomCss.js";
 import { bindMapByElementId, standardMapBindingMessages } from "../shared/util/bindTucbsMap.js";
 import { leftTooltipStyles } from "../shared/ui/TooltipStyles.js";
+import { hideGuide, showGuide } from "../shared/ui/guidePanel.js";
+import { drawGuide } from "./drawHints.js";
 
 const TOOL_ICON_NODES: Partial<Record<DrawTool, CarbonIconNode>> = {
   point: PointIcon,
@@ -23,15 +25,6 @@ const TOOL_ICON_NODES: Partial<Record<DrawTool, CarbonIconNode>> = {
   rectangle: RectangleIcon,
   circle: CircleIcon,
   freehand: FreehandIcon,
-};
-
-const TOOL_LABELS: Partial<Record<DrawTool, string>> = {
-  point: "Nokta Çiz",
-  polyline: "Çizgi Çiz",
-  polygon: "Alan Çiz",
-  rectangle: "Dikdörtgen Çiz",
-  circle: "Daire Çiz",
-  freehand: "Serbest Çizim",
 };
 
 // Hicbir arac aktif degilken ana (toolbar) butonunun ikonu: flyout'taki geometri ikonlarindan
@@ -200,6 +193,13 @@ export class TucbsDrawTool extends LitElement {
     // birbirini ONCEDEN OLDUGU GIBI mirror etmeye devam eder.
     this._activeTool =
       source === "draw" && this._toolIds().includes(tool) ? tool : null;
+    // Nasil cizilecegi/bitirilecegi/cikilacagi: oturum bitene (draw:cancel)
+    // kadar kalici panel; tekil panel oldugundan mirror eden instance'lar
+    // ayni paneli idempotent sekilde yeniden kurar.
+    if (source === "draw") {
+      const { title, steps } = drawGuide(tool, "draw");
+      showGuide(title, steps);
+    }
     this._flyoutOpen = false;
   };
 
@@ -211,11 +211,13 @@ export class TucbsDrawTool extends LitElement {
   // gorunume donerdi).
   private readonly _onDrawCancel = (): void => {
     this._activeTool = null;
+    hideGuide();
   };
 
   /** Bilesen DOM'dan kaldirilirken DrawingManager event aboneliklerini iptal eder. */
   override disconnectedCallback(): void {
     if (this.map) this._unbindDrawingManager(this.map.drawingManager);
+    if (this._activeTool !== null) hideGuide();
     super.disconnectedCallback();
   }
 
@@ -278,7 +280,7 @@ export class TucbsDrawTool extends LitElement {
   override render() {
     // Aktifken calisan aracin IKONU ve ETIKETI (ör. "Alan Çiz"), pasifken sabit ikon ve jenerik "Çizim".
     const mainIcon = this._activeTool !== null ? iconFor(this._activeTool) : MAIN_ICON;
-    const mainLabel = this._activeTool !== null ? (TOOL_LABELS[this._activeTool] ?? this._activeTool) : "Çizim";
+    const mainLabel = this._activeTool !== null ? drawGuide(this._activeTool, "draw").title : "Çizim";
 
     return html`
       <div class="draw-tool">
@@ -290,8 +292,8 @@ export class TucbsDrawTool extends LitElement {
                     <button
                       class="tool-button ${tool === this._activeTool ? "active" : ""}"
                       type="button"
-                      aria-label=${TOOL_LABELS[tool] ?? tool}
-                      data-tooltip=${TOOL_LABELS[tool] ?? tool}
+                      aria-label=${drawGuide(tool, "draw").title}
+                      data-tooltip=${drawGuide(tool, "draw").title}
                       @click=${() => this._selectTool(tool)}
                     >
                       ${iconFor(tool)}

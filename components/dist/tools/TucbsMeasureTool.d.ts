@@ -49,6 +49,7 @@ export declare class TucbsMeasureTool extends LitElement {
     private _isSessionOwner;
     private readonly _onDrawStart;
     private readonly _onDrawCancel;
+    private readonly _onAbort;
     private readonly _onVertex;
     private readonly _onMove;
     private readonly _onComplete;

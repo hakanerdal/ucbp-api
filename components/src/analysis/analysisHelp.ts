@@ -8,7 +8,7 @@ export type AnalysisHelp = {
 };
 
 /** Portal coğrafi işlem yardım metni. Menü yolu API analiz listesine göre. */
-export const COGRAFI_HELP: Record<string, AnalysisHelp> = {
+export const COGRAFI_HELP = {
   sinir: {
     ne: ["Seçilen geometrinin sınırını üretir: sınırlayıcı kutu veya dışbükey zarf."],
     girdiler: [
@@ -108,7 +108,7 @@ export const COGRAFI_HELP: Record<string, AnalysisHelp> = {
     ],
     ornek: ["Bir nokta seçin", "Örn. 200 m, 0°–90°", "Noktadan yayılan dilimi kontrol edin"],
   },
-};
+} satisfies Record<string, AnalysisHelp>;
 
 /** Yardım penceresi ve başlıktaki ? düğmesi. */
 export const analysisHelpStyles = css`

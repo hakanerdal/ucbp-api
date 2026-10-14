@@ -27,6 +27,9 @@ import { iconNodeToString, type CarbonIconNode } from "../shared/util/CarbonIcon
 import { applyCustomCss, type CustomCssState } from "../shared/util/CustomCss.js";
 import { bindMapByElementId, standardMapBindingMessages } from "../shared/util/bindTucbsMap.js";
 import { leftTooltipStyles } from "../shared/ui/TooltipStyles.js";
+import { hideGuide, showGuide } from "../shared/ui/guidePanel.js";
+import { drawGuide } from "./drawHints.js";
+import { metersToReadable, sqmToReadable } from "./measureFormat.js";
 
 type MeasureMode = "distance" | "area";
 
@@ -40,10 +43,10 @@ const MODE_ICON_NODES: Record<MeasureMode, CarbonIconNode> = {
   area: AreaIcon,
 };
 
-const MODE_LABELS: Record<MeasureMode, string> = {
-  distance: "Mesafe Ölç",
-  area: "Alan Ölç",
-};
+// Etiket, yonlendirme paneli basligiyla ayni kaynaktan (drawHints) gelir.
+function modeLabel(mode: MeasureMode): string {
+  return drawGuide(MODE_TOOL[mode], "measure").title;
+}
 
 // Hicbir mod aktif degilken ana butonun ikonu: flyout'taki Mesafe/Alan
 // ikonlarindan bilincli olarak farkli.
@@ -57,18 +60,6 @@ function iconFor(mode: MeasureMode) {
   const icon = unsafeSVG(iconNodeToString(MODE_ICON_NODES[mode]));
   iconCache.set(mode, icon);
   return icon;
-}
-
-// tucbs-react MeasureToolPanel.tsx'ten BIREBIR alinan format kurallari
-// (bkz project_ucbp_api_tucbstoolbar_mimarisi memory onaltinci tur).
-function metersToReadable(m: number): string {
-  if (!isFinite(m)) return "-";
-  return m < 1000 ? `${m.toFixed(2)} m` : `${(m / 1000).toFixed(2)} km`;
-}
-
-function sqmToReadable(a: number): string {
-  if (!isFinite(a)) return "-";
-  return a < 1_000_000 ? `${a.toFixed(2)} m²` : `${(a / 1_000_000).toFixed(2)} km²`;
 }
 
 // DrawingManager'in KENDI basit formulu (chord distance + equirectangular
@@ -298,6 +289,9 @@ export class TucbsMeasureTool extends LitElement {
     }
     this._activeMode = tool === "polyline" ? "distance" : "area";
     this._flyoutOpen = false;
+    // Oturum bitene (draw:cancel) kadar kalici yonlendirme paneli (bkz TucbsDrawTool).
+    const { title, steps } = drawGuide(tool, "measure");
+    showGuide(title, steps);
     this._isSessionOwner = this._claimingActivation;
     this._claimingActivation = false;
     if (this._isSessionOwner) {
@@ -319,6 +313,15 @@ export class TucbsMeasureTool extends LitElement {
     }
     this._activeMode = null;
     this._isSessionOwner = false;
+    hideGuide();
+  };
+
+  // Esc ile iptal edilen yarim kalmis olcumun segment etiketlerini ve canli
+  // onizleme durumunu temizler; arac aktif kalir, canli etiketler yeni olcum
+  // icin korunur (konum yok -> gizlenirler).
+  private readonly _onAbort = (): void => {
+    if (!this._isSessionOwner) return;
+    this._removePendingLabels();
   };
 
   private readonly _onVertex = ({
@@ -365,6 +368,7 @@ export class TucbsMeasureTool extends LitElement {
     ) {
       this._pendingLabels.push(this._addAreaSummaryLabel(shape));
     }
+
 
     this._shapeLabels.set(shape.id, this._pendingLabels);
     this._pendingLabels = [];
@@ -449,6 +453,7 @@ export class TucbsMeasureTool extends LitElement {
     }
     this._removeLiveLabels();
     this._removePendingLabels();
+    if (this._activeMode !== null) hideGuide();
     super.disconnectedCallback();
   }
 
@@ -481,6 +486,7 @@ export class TucbsMeasureTool extends LitElement {
   private _bindDrawingManager(drawingManager: DrawingManager): void {
     drawingManager.on("draw:start", this._onDrawStart);
     drawingManager.on("draw:cancel", this._onDrawCancel);
+    drawingManager.on("draw:abort", this._onAbort);
     drawingManager.on("draw:vertex", this._onVertex);
     drawingManager.on("draw:move", this._onMove);
     drawingManager.on("draw:complete", this._onComplete);
@@ -490,6 +496,7 @@ export class TucbsMeasureTool extends LitElement {
   private _unbindDrawingManager(drawingManager: DrawingManager): void {
     drawingManager.off("draw:start", this._onDrawStart);
     drawingManager.off("draw:cancel", this._onDrawCancel);
+    drawingManager.off("draw:abort", this._onAbort);
     drawingManager.off("draw:vertex", this._onVertex);
     drawingManager.off("draw:move", this._onMove);
     drawingManager.off("draw:complete", this._onComplete);
@@ -695,7 +702,7 @@ export class TucbsMeasureTool extends LitElement {
     // Aktifken calisan olcum modunun IKONU ve ETIKETI (ör. "Mesafe Ölç"),
     // pasifken sabit ikon ve jenerik "Ölçüm" (bkz TucbsDrawTool.ts ayni mantik).
     const mainIcon = this._activeMode !== null ? iconFor(this._activeMode) : MAIN_ICON;
-    const mainLabel = this._activeMode !== null ? MODE_LABELS[this._activeMode] : "Ölçüm";
+    const mainLabel = this._activeMode !== null ? modeLabel(this._activeMode) : "Ölçüm";
 
     return html`
       <div class="measure-tool">
@@ -707,8 +714,8 @@ export class TucbsMeasureTool extends LitElement {
                     <button
                       class="tool-button ${mode === this._activeMode ? "active" : ""}"
                       type="button"
-                      aria-label=${MODE_LABELS[mode]}
-                      data-tooltip=${MODE_LABELS[mode]}
+                      aria-label=${modeLabel(mode)}
+                      data-tooltip=${modeLabel(mode)}
                       @click=${() => this._selectMode(mode)}
                     >
                       ${iconFor(mode)}

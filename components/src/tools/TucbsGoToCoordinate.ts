@@ -11,7 +11,7 @@ import { leftTooltipStyles } from "../shared/ui/TooltipStyles.js";
 import { PanelLayoutController } from "../shared/ui/PanelLayoutController.js";
 import "../shared/ui/SlideOverPanel.js";
 import type { TucbsSlideOverPanel } from "../shared/ui/SlideOverPanel.js";
-import { GOTO_COORDINATE_PIN_URL, GOTO_COORDINATE_PIN_OPTIONS } from "../assets/gotoCoordinatePin.js";
+import { GOTO_COORDINATE_PIN_URL, GOTO_COORDINATE_PIN_OPTIONS } from "./gotoCoordinatePin.js";
 
 const ICON_LOCATION = unsafeSVG(iconNodeToString(LocationIcon));
 
@@ -316,7 +316,7 @@ export class TucbsGoToCoordinate extends LitElement {
     // hesapladigi varsayilan (~3sn'ye kadar) kullanici bildirimine gore
     // ("süreyi düşürelim") FAZLA uzun hissettiriyordu.
     // Pin: gri daire + beyaz halka icinde beyaz sivri uclu pin
-    // (ayri cizim) (bkz. assets/gotoCoordinatePin.ts) -- yuksek cozunurluklu PNG,
+    // (ayri cizim) (bkz. gotoCoordinatePin.ts) -- yuksek cozunurluklu PNG,
     // 32x32px'e kucultulerek gosterilir (yuksek DPI'da keskin).
     this.map.dropMarker(lon, lat, GOTO_COORDINATE_PIN_URL, GOTO_COORDINATE_PIN_OPTIONS);
     this.map.interactionManager.flyToPosition(lon, lat, { height: 1000, duration: 1.5 });

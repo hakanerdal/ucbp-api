@@ -39,7 +39,7 @@ export declare class TucbsAnalysisTool extends LitElement {
     updated(changed: PropertyValues): void;
     private _renderIntoPanel;
     private _toggle;
-    /** Toolbar'daki dairesel "Analiz" butonunu render eder. */
+    /** Toolbar'daki dairesel "Coğrafi Analiz" butonunu render eder. */
     render(): import('lit').TemplateResult<1>;
 }
 //# sourceMappingURL=TucbsAnalysisTool.d.ts.map

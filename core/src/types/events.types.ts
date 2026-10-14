@@ -179,6 +179,9 @@ export interface InteractionManagerEventMap {
   /** Dokunmatik pinch hareketi bittiğinde yayılır. */
   "map:pinchend": Record<string, never>;
 
+  /** `suspend()` ile tıklama/pick grubu durdurulduğunda (örn. çizim/ölçüm aracı etkinleşince) yayılır; zaten durdurulmuşken tekrar yayılmaz. */
+  "interaction:suspend": Record<string, never>;
+
   /** Kamera hareketi başladığında yayılır. */
   "camera:moveStart": Record<string, never>;
   /** Kamera hareketi bittiğinde yayılır. */
@@ -231,6 +234,8 @@ export interface DrawingManagerEventMap {
   "draw:complete": { readonly shape: DrawnShape };
   /** Aktif çizim iptal edildiğinde (araç tamamen kapatıldığında) yayılır. */
   "draw:cancel": { readonly tool: DrawTool; readonly source?: string };
+  /** Devam eden (tamamlanmamış) çizim Esc ile iptal edildiğinde yayılır; araç aktif kalır (çıkış için bkz. `draw:cancel`). */
+  "draw:abort": { readonly tool: DrawTool; readonly source?: string };
   /** Tamamlanmış bir şekil silindiğinde yayılır. */
   "draw:remove": { readonly id: string; readonly shape: DrawnShape };
 }

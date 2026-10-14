@@ -4,6 +4,27 @@ Bu dosyadaki kayıtlar [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/)
 biçimine uygundur; sürüm numaralandırması [SemVer](https://semver.org/lang/tr/)
 kurallarına göredir.
 
+## [0.1.1] — 2026-10-14
+
+Hata düzeltmesi (patch).
+
+### Düzeltilenler
+
+- **@tucbs/components** — `lit` artık paket içine gömülüyor (external değil).
+  Önceki sürümde bare `lit` dışarıda kalıp `lit/directives/...` alt yolları
+  bundle'a gömülünce, tüketici uygulamada (Vite/React) iki ayrı `lit-html`
+  kopyası oluşuyordu. Sonuç: araç çubuğu butonları `currentDirective._$initialize
+  is not a function` hatasıyla boş render ediliyordu. Artık `lit` tek kopya
+  hâlinde paketleniyor.
+
+### Bağımlılık / eşleme
+
+- **@tucbs/components** artık `lit`'i `peerDependencies` olarak istemez
+  (pakete gömülü). Kurulumda ayrıca `lit` yüklenmesine gerek yoktur.
+- **@tucbs/core** — `measureGround`, `snapScaleForDisplay` gibi yeni export'lar
+  eklendi; components 0.1.1 bu export'lara bağımlı olduğundan iki paket birlikte
+  yükseltildi. `@tucbs/components` 0.1.1, `@tucbs/core` `^0.1.1` ister.
+
 ## [0.1.0] — 2026-10-14
 
 İlk sürüm.

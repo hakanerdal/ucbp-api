@@ -29,10 +29,302 @@ var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read fr
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
-var _apiKey, _apiKey2, _AnalysisManager_instances, post_fn, _unregisterApiKeyRefresh, _apiKey3, _a;
+var _apiKey, _apiKey2, _AnalysisManager_instances, post_fn, _unregisterApiKeyRefresh, _removeLodSeamGuard, _removeMinZoomScale, _removeScaleWheelZoom, _apiKey3, _a;
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const cesium = require("cesium");
 var _documentCurrentScript = typeof document !== "undefined" ? document.currentScript : null;
+const MAX_LEVEL = 24;
+const EARTH_RADIUS = 6371e3;
+const CORNER_SAFETY = 1.15;
+function cornerDistanceRatio(fovy, aspectRatio, height) {
+  const tanY = Math.tan(fovy / 2);
+  const tanX = tanY * aspectRatio;
+  const theta = Math.atan(Math.hypot(tanX, tanY));
+  const center = EARTH_RADIUS + height;
+  const discriminant = EARTH_RADIUS * EARTH_RADIUS - center * center * Math.sin(theta) ** 2;
+  const distance = discriminant > 0 ? center * Math.cos(theta) - Math.sqrt(discriminant) : Math.sqrt(center * center - EARTH_RADIUS * EARTH_RADIUS);
+  return distance / height * CORNER_SAFETY;
+}
+function lodTransitionDistances(params) {
+  const { drawingBufferHeight, sseDenominator, maximumScreenSpaceError, pixelRatio } = params;
+  const out = [];
+  for (let level = 0; level <= MAX_LEVEL; level++) {
+    const d = params.geometricError(level) * drawingBufferHeight / (sseDenominator * maximumScreenSpaceError * pixelRatio);
+    if (Number.isFinite(d) && d > 0) out.push(d);
+  }
+  return out.sort((a, b) => a - b);
+}
+const SEAM_MARGIN = 1.01;
+function seamFreeScreenSpaceError(height, params) {
+  const base = params.maximumScreenSpaceError;
+  const ratio = cornerDistanceRatio(params.fovy, params.aspectRatio, height);
+  for (const threshold of lodTransitionDistances(params)) {
+    if (threshold > height && threshold < height * ratio) {
+      const coarser = base * (threshold / height) * SEAM_MARGIN;
+      const finer = base * threshold / (height * ratio * SEAM_MARGIN);
+      return Math.abs(Math.log(coarser / base)) <= Math.abs(Math.log(finer / base)) ? coarser : finer;
+    }
+  }
+  return base;
+}
+const NADIR_TOLERANCE_DEGREES = 3;
+function installLodSeamGuard(viewer) {
+  const scene = viewer.scene;
+  const globe = scene.globe;
+  if (!globe) return () => void 0;
+  let base = globe.maximumScreenSpaceError;
+  let applied = base;
+  const apply = (value) => {
+    if (globe.maximumScreenSpaceError !== value) globe.maximumScreenSpaceError = value;
+    applied = value;
+  };
+  const onPreRender = () => {
+    if (globe.maximumScreenSpaceError !== applied) base = globe.maximumScreenSpaceError;
+    const frustum = scene.camera.frustum;
+    const nadir = Math.abs(cesium.Math.toDegrees(scene.camera.pitch) + 90) <= NADIR_TOLERANCE_DEGREES;
+    if (scene.mode !== cesium.SceneMode.SCENE3D || !nadir || !(scene.terrainProvider instanceof cesium.EllipsoidTerrainProvider) || frustum.fovy === void 0 || frustum.aspectRatio === void 0 || frustum.sseDenominator === void 0) {
+      apply(base);
+      return;
+    }
+    const terrain = scene.terrainProvider;
+    const params = {
+      geometricError: (level) => terrain.getLevelMaximumGeometricError(level),
+      drawingBufferHeight: scene.drawingBufferHeight,
+      sseDenominator: frustum.sseDenominator,
+      maximumScreenSpaceError: base,
+      // Scene.pixelRatio calisma zamaninda public ama Cesium tip tanimlarinda yok.
+      pixelRatio: scene.pixelRatio ?? 1,
+      fovy: frustum.fovy,
+      aspectRatio: frustum.aspectRatio
+    };
+    apply(seamFreeScreenSpaceError(scene.camera.positionCartographic.height, params));
+  };
+  const remove = scene.preRender.addEventListener(onPreRender);
+  return () => {
+    remove();
+    if (!scene.isDestroyed() && globe.maximumScreenSpaceError === applied) {
+      globe.maximumScreenSpaceError = base;
+    }
+  };
+}
+const SCREEN_DPI$1 = 96;
+const METERS_PER_INCH$1 = 0.0254;
+const REWRITE_TOLERANCE = 5e-3;
+function minZoomDistanceForScale(scaleDenominator, canvasHeightPx, fovy) {
+  const tanHalf = Math.tan(fovy / 2);
+  const distance = scaleDenominator * METERS_PER_INCH$1 / SCREEN_DPI$1 * canvasHeightPx / (2 * tanHalf);
+  return Number.isFinite(distance) && distance > 0 ? distance : null;
+}
+const SNAP_WINDOW_RATIO = 1.06;
+const MIN_SNAP_GAP_METERS = 1e-3;
+const SNAP_DURATION_MS = 150;
+function snapToMinAmount(height, minDistance) {
+  const gap = height - minDistance;
+  if (!(gap > MIN_SNAP_GAP_METERS) || height > minDistance * SNAP_WINDOW_RATIO) return 0;
+  return gap;
+}
+function installMinZoomScale(viewer, scaleDenominator, maxScaleDenominator) {
+  const scene = viewer.scene;
+  const controller = scene.screenSpaceCameraController;
+  const onPreRender = () => {
+    const fovy = scene.camera.frustum.fovy;
+    if (fovy === void 0) return;
+    const height = scene.canvas.clientHeight;
+    const distance = minZoomDistanceForScale(scaleDenominator, height, fovy);
+    if (distance !== null) {
+      const current = controller.minimumZoomDistance;
+      if (Math.abs(current - distance) > current * REWRITE_TOLERANCE) {
+        controller.minimumZoomDistance = distance;
+      }
+    }
+    const maxDistance = minZoomDistanceForScale(maxScaleDenominator, height, fovy);
+    if (maxDistance === null) return;
+    const currentMax = controller.maximumZoomDistance;
+    if (Math.abs(currentMax - maxDistance) > currentMax * REWRITE_TOLERANCE) {
+      controller.maximumZoomDistance = maxDistance;
+    }
+  };
+  const camera = scene.camera;
+  const canvas = scene.canvas;
+  let frame;
+  const cancelSnap = () => {
+    if (frame !== void 0) cancelAnimationFrame(frame);
+    frame = void 0;
+  };
+  const onMoveEnd = () => {
+    if (frame !== void 0) return;
+    const total = snapToMinAmount(
+      camera.positionCartographic.height,
+      controller.minimumZoomDistance
+    );
+    if (total <= 0) return;
+    const start = performance.now();
+    let done = 0;
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / SNAP_DURATION_MS);
+      const target = total * (1 - (1 - t) * (1 - t));
+      if (target > done) camera.zoomIn(target - done);
+      done = target;
+      frame = t < 1 ? requestAnimationFrame(step) : void 0;
+    };
+    frame = requestAnimationFrame(step);
+  };
+  canvas.addEventListener("pointerdown", cancelSnap);
+  canvas.addEventListener("wheel", cancelSnap, { passive: true });
+  const removePreRender = scene.preRender.addEventListener(onPreRender);
+  const removeMoveEnd = camera.moveEnd.addEventListener(onMoveEnd);
+  return () => {
+    cancelSnap();
+    canvas.removeEventListener("pointerdown", cancelSnap);
+    canvas.removeEventListener("wheel", cancelSnap);
+    removePreRender();
+    removeMoveEnd();
+  };
+}
+const ZOOM_SCALE_STEPS = [
+  100,
+  250,
+  500,
+  1e3,
+  2500,
+  5e3,
+  1e4,
+  25e3,
+  5e4,
+  1e5,
+  25e4,
+  5e5,
+  1e6,
+  25e5,
+  5e6,
+  15e6,
+  25e6
+];
+const ON_STEP_TOLERANCE = 0.03;
+function nextScaleStep(current, direction) {
+  if (!(current > 0) || !Number.isFinite(current)) return null;
+  if (direction === 1) {
+    const limit2 = current / (1 + ON_STEP_TOLERANCE);
+    return [...ZOOM_SCALE_STEPS].reverse().find((s) => s < limit2) ?? null;
+  }
+  const limit = current * (1 + ON_STEP_TOLERANCE);
+  return ZOOM_SCALE_STEPS.find((s) => s > limit) ?? Infinity;
+}
+const SCREEN_DPI = 96;
+const METERS_PER_INCH = 0.0254;
+function measureGround(scene) {
+  const globe = scene.globe;
+  if (!globe) return null;
+  const camera = scene.camera;
+  const x = scene.canvas.clientWidth / 2;
+  const y = scene.canvas.clientHeight / 2;
+  const left = camera.getPickRay(new cesium.Cartesian2(x - 1, y));
+  const right = camera.getPickRay(new cesium.Cartesian2(x + 1, y));
+  const middle = camera.getPickRay(new cesium.Cartesian2(x, y));
+  if (!left || !right || !middle) return null;
+  const leftPos = globe.pick(left, scene);
+  const rightPos = globe.pick(right, scene);
+  const middlePos = globe.pick(middle, scene);
+  if (!leftPos || !rightPos || !middlePos) return null;
+  const metersPerPixel = cesium.Cartesian3.distance(leftPos, rightPos) / 2;
+  return {
+    scale: metersPerPixel * SCREEN_DPI / METERS_PER_INCH,
+    distance: cesium.Cartesian3.distance(camera.position, middlePos)
+  };
+}
+const DISPLAY_SNAP_TOLERANCE = 5e-3;
+function snapScaleForDisplay(scale) {
+  const near = ZOOM_SCALE_STEPS.find((s) => Math.abs(scale - s) <= s * DISPLAY_SNAP_TOLERANCE);
+  return near ?? scale;
+}
+const ZOOM_ANIMATION_SECONDS = 0.25;
+function easeOut(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+const pendingZooms = /* @__PURE__ */ new WeakMap();
+function planStepAmount(ground, direction, height, maxHeight) {
+  const next = nextScaleStep(ground.scale, direction);
+  if (next === null) return null;
+  let amount = next === Infinity ? Infinity : ground.distance * Math.abs(1 - next / ground.scale);
+  if (direction === -1) amount = Math.min(amount, maxHeight - height);
+  return amount > 0 && Number.isFinite(amount) ? amount : null;
+}
+function flyScaleStep(camera, direction, measure, maxHeight) {
+  const pending = pendingZooms.get(camera);
+  const ground = (pending == null ? void 0 : pending.ground) ?? measure();
+  if (!ground) return;
+  const height = (pending == null ? void 0 : pending.height) ?? camera.positionCartographic.height;
+  const amount = planStepAmount(ground, direction, height, maxHeight);
+  if (amount === null) return;
+  const from = (pending == null ? void 0 : pending.position) ?? camera.position;
+  const dir = camera.direction;
+  const destination = camera.position.clone();
+  destination.x = from.x + dir.x * amount * direction;
+  destination.y = from.y + dir.y * amount * direction;
+  destination.z = from.z + dir.z * amount * direction;
+  const distance = ground.distance - direction * amount;
+  const target = {
+    ground: { scale: ground.scale * distance / ground.distance, distance },
+    height: height - direction * amount,
+    position: destination
+  };
+  const clear = () => {
+    if (pendingZooms.get(camera) === target) pendingZooms.delete(camera);
+  };
+  camera.flyTo({
+    destination,
+    orientation: { direction: dir.clone(), up: camera.up.clone() },
+    duration: ZOOM_ANIMATION_SECONDS,
+    easingFunction: easeOut,
+    complete: clear,
+    cancel: clear
+  });
+  pendingZooms.set(camera, target);
+}
+function scaleZoomStep(viewer, direction) {
+  const { camera, scene } = viewer;
+  flyScaleStep(
+    camera,
+    direction,
+    () => measureGround(scene),
+    scene.screenSpaceCameraController.maximumZoomDistance
+  );
+}
+const WHEEL_STEP_THRESHOLD_PX = 40;
+const WHEEL_SMALL_DELTA_LOCK_MS = 200;
+const LINE_HEIGHT_PX = 16;
+const PAGE_HEIGHT_PX = 400;
+function wheelDeltaPixels(deltaY, deltaMode) {
+  if (deltaMode === 1) return deltaY * LINE_HEIGHT_PX;
+  if (deltaMode === 2) return deltaY * PAGE_HEIGHT_PX;
+  return deltaY;
+}
+function installScaleWheelZoom(viewer) {
+  const canvas = viewer.scene.canvas;
+  const controller = viewer.scene.screenSpaceCameraController;
+  const previousZoomTypes = controller.zoomEventTypes;
+  controller.zoomEventTypes = [cesium.CameraEventType.MIDDLE_DRAG, cesium.CameraEventType.PINCH];
+  let accumulated = 0;
+  let lockedUntil = 0;
+  const onWheel = (event) => {
+    event.preventDefault();
+    const delta = wheelDeltaPixels(event.deltaY, event.deltaMode);
+    if (delta === 0) return;
+    const now = performance.now();
+    if (Math.abs(delta) < WHEEL_STEP_THRESHOLD_PX && now < lockedUntil) return;
+    if (Math.sign(delta) !== Math.sign(accumulated)) accumulated = 0;
+    accumulated += delta;
+    if (Math.abs(accumulated) < WHEEL_STEP_THRESHOLD_PX) return;
+    scaleZoomStep(viewer, accumulated < 0 ? 1 : -1);
+    accumulated = 0;
+    lockedUntil = now + WHEEL_SMALL_DELTA_LOCK_MS;
+  };
+  canvas.addEventListener("wheel", onWheel, { passive: false });
+  return () => {
+    canvas.removeEventListener("wheel", onWheel);
+    controller.zoomEventTypes = previousZoomTypes;
+  };
+}
 function createMarkerOverlay(viewer, longitude, latitude, iconUrl, options = {}) {
   const position = cesium.Cartesian3.fromDegrees(longitude, latitude);
   const normal = cesium.Ellipsoid.WGS84.geodeticSurfaceNormal(position, new cesium.Cartesian3());
@@ -198,7 +490,7 @@ function configureTucbs(config) {
     }
     return;
   }
-  if (state.configured && config.apiKey !== state.apiKey) {
+  if (state.apiKey !== void 0 && config.apiKey !== state.apiKey) {
     console.warn(
       "[@tucbs/core] configureTucbs() daha once farkli bir apiKey ile cagrilmisti; deger degistirildi. Bu beklenmiyorsa sayfada birden fazla script'in ayni fonksiyonu cagirdigini kontrol edin."
     );
@@ -221,7 +513,7 @@ function registerApiKeyRefresh(fn) {
   refreshers.add(fn);
   return () => refreshers.delete(fn);
 }
-const DEFAULT_UCBP_API_BASE = ("https://dev-ucbp-api.turksat.com.tr/ucbp-api" == null ? void 0 : "https://dev-ucbp-api.turksat.com.tr/ucbp-api".trim()) || "/ucbp-api";
+const DEFAULT_UCBP_API_BASE = ("http://localhost:8094/ucbp-api" == null ? void 0 : "http://localhost:8094/ucbp-api".trim()) || "/ucbp-api";
 function trimSlash$2(url) {
   return url.replace(/\/+$/, "");
 }
@@ -2318,6 +2610,7 @@ class LayerStyleEngine {
         if (range === null) return void 0;
         const value = this.readNumericProperty(entity, fill.column, time);
         if (value === null) return void 0;
+        if (value < range.min || value > range.max) return void 0;
         const t = range.max === range.min ? 0.5 : cesium.Math.clamp((value - range.min) / (range.max - range.min), 0, 1);
         return LayerStyleEngine.sampleFromPalette(fill.palette, t, fill.paletteKind).withAlpha(
           fill.opacity
@@ -5119,7 +5412,9 @@ class InteractionManager extends EventEmitter {
   }
   /** Tıklama/pick event grubunu (`entity:*`/`map:*`/`imagery:*`) geçici olarak durdurur (bkz `DrawingManager`). */
   suspend() {
+    if (this.suspended) return;
     this.suspended = true;
+    this.emit("interaction:suspend", {});
   }
   /** `suspend()` ile durdurulan tıklama/pick event grubunu devam ettirir. */
   resume() {
@@ -5495,7 +5790,7 @@ class DrawingManager extends EventEmitter {
     this.freehandDragging = false;
     this.onEscapeKey = (event) => {
       if (event.key !== "Escape") return;
-      this.finishMultiVertex();
+      this.abortCurrentShape();
     };
     this.viewer = viewer;
     this.interactionManager = interactionManager;
@@ -5523,6 +5818,7 @@ class DrawingManager extends EventEmitter {
     this.previewPosition = void 0;
     this.interactionManager.suspend();
     this.resetTrackedEntity();
+    this.suspendBuiltInDoubleClick();
     if (tool === "freehand") this.lockCamera();
     this.setCursor("crosshair");
     this.bindToolHandlers(tool);
@@ -5613,6 +5909,7 @@ class DrawingManager extends EventEmitter {
   // ── Arac baglama ─────────────────────────────────────────────────────────
   bindToolHandlers(tool) {
     this.handler.setInputAction(() => this.deactivate(), cesium.ScreenSpaceEventType.RIGHT_CLICK);
+    document.addEventListener("keydown", this.onEscapeKey);
     if (tool === "freehand") {
       this.handler.setInputAction(
         (e) => this.onFreehandDown(e.position),
@@ -5641,7 +5938,6 @@ class DrawingManager extends EventEmitter {
         () => this.finishMultiVertexViaDoubleClick(),
         cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
       );
-      document.addEventListener("keydown", this.onEscapeKey);
     }
   }
   unbindToolHandlers() {
@@ -5652,6 +5948,18 @@ class DrawingManager extends EventEmitter {
     this.handler.removeInputAction(cesium.ScreenSpaceEventType.RIGHT_CLICK);
     this.handler.removeInputAction(cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
     document.removeEventListener("keydown", this.onEscapeKey);
+  }
+  // Devam eden (en az 1 vertex'i konmus) cizimi atar; tamamlanmis sekillere ve
+  // araç durumuna (handler'lar, kamera/interaction suspend) dokunmaz -- araç
+  // hemen yeni bir cizime hazir kalir. Cizim yoksa no-op (Esc aracı kapatmaz).
+  abortCurrentShape() {
+    if (this.activeTool === void 0 || this.positions.length === 0) return;
+    const tool = this.activeTool;
+    const source = this.activeSource;
+    this.clearTempEntity();
+    this.resetSessionForContinuousDrawing();
+    this.resetTrackedEntity();
+    this.emit("draw:abort", source === void 0 ? { tool } : { tool, source });
   }
   // ── Vertex-tabanli araclar (point/polyline/polygon/rectangle/circle) ──────
   onVertexClick(screenPos) {
@@ -5766,6 +6074,7 @@ class DrawingManager extends EventEmitter {
     this.unlockCamera();
     this.setCursor("default");
     this.resetTrackedEntity();
+    this.restoreBuiltInDoubleClick();
     this.interactionManager.resume();
   }
   // ── Gecici onizleme entity'si ────────────────────────────────────────────
@@ -5881,6 +6190,29 @@ class DrawingManager extends EventEmitter {
     if (this.viewer.trackedEntity !== void 0) {
       this.viewer.trackedEntity = void 0;
     }
+  }
+  // Ayni dahili handler, cift-tiklanan entity'nin position'i YOKSA (ör.
+  // yuklenmis GeoJSON poligonu) trackedEntity yerine viewer.zoomTo(entity)
+  // cagirir; bu varsayilan HeadingPitchRange ile ~45 derece egimli bir ucus
+  // baslatir -- vektor veri uzerinde cizimi cift-tikla bitirince harita
+  // aniden tilt oluyordu. resetTrackedEntity() bunu yakalayamaz (ucus
+  // asenkron), bu yuzden cizim suresince dahili LEFT_DOUBLE_CLICK handler'i
+  // kaldirilir, oturum bitince geri konur.
+  suspendBuiltInDoubleClick() {
+    if (this.builtInDoubleClickAction !== void 0) return;
+    const cesiumHandler = this.viewer.screenSpaceEventHandler;
+    const action = cesiumHandler.getInputAction(cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+    if (action === void 0) return;
+    this.builtInDoubleClickAction = action;
+    cesiumHandler.removeInputAction(cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+  }
+  restoreBuiltInDoubleClick() {
+    if (this.builtInDoubleClickAction === void 0) return;
+    this.viewer.screenSpaceEventHandler.setInputAction(
+      this.builtInDoubleClickAction,
+      cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+    );
+    this.builtInDoubleClickAction = void 0;
   }
   // Cizim/olcum suresince imlec crosshair; cikista tekrar standart ok (default).
   setCursor(cursor) {
@@ -6617,6 +6949,8 @@ const DRAWING_LAYER_TITLE = "Çizim Katmanı";
 const MEASURE_LAYER_ID = "__tucbs_measure_layer__";
 const MEASURE_LAYER_TITLE = "Ölçü Katmanı";
 const MAX_ZOOM_DISTANCE_METERS = 25e6;
+const MAX_ZOOM_OUT_SCALE_DENOMINATOR = 25e6;
+const MAX_ZOOM_SCALE_DENOMINATOR = 100;
 const MIN_ZOOM_DISTANCE_METERS = 10;
 const DEFAULT_INITIAL_EXTENT = {
   west: 22.94,
@@ -6645,6 +6979,9 @@ let Map$1 = (_a = class {
     // project_ucbp_api_configuretucbs_4risk_kapatma_arastirma). destroy()
     // icinde cagrilmali, aksi halde registry'de sonsuza dek tutulur.
     __privateAdd(this, _unregisterApiKeyRefresh);
+    __privateAdd(this, _removeLodSeamGuard);
+    __privateAdd(this, _removeMinZoomScale);
+    __privateAdd(this, _removeScaleWheelZoom);
     __privateAdd(this, _apiKey3);
     const hiddenCreditContainer = document.createElement("div");
     hiddenCreditContainer.style.display = "none";
@@ -6704,6 +7041,13 @@ let Map$1 = (_a = class {
     } else {
       this.setExtent(options.initialExtent ?? DEFAULT_INITIAL_EXTENT);
     }
+    __privateSet(this, _removeLodSeamGuard, installLodSeamGuard(this.viewer));
+    __privateSet(this, _removeMinZoomScale, installMinZoomScale(
+      this.viewer,
+      MAX_ZOOM_SCALE_DENOMINATOR,
+      MAX_ZOOM_OUT_SCALE_DENOMINATOR
+    ));
+    __privateSet(this, _removeScaleWheelZoom, installScaleWheelZoom(this.viewer));
     this.setBasemap(options.basemap);
   }
   /**
@@ -6883,6 +7227,14 @@ let Map$1 = (_a = class {
    */
   zoomTo(longitude, latitude, height) {
     zoomTo(this.viewer, longitude, latitude, height);
+  }
+  /** Kamerayı bir sonraki olcek basamağına (ör. 1/5.000 → 1/2.500) animasyonlu yaklaştırır; fare tekerleğinin bir çentiğiyle aynıdır. */
+  zoomInStep() {
+    scaleZoomStep(this.viewer, 1);
+  }
+  /** Kamerayı bir sonraki olcek basamağına (ör. 1/2.500 → 1/5.000) animasyonlu uzaklaştırır; fare tekerleğinin bir çentiğiyle aynıdır. */
+  zoomOutStep() {
+    scaleZoomStep(this.viewer, -1);
   }
   /** Kamerayı verilen katmanın kapsama alanına (extent'ine) top-down yaklaştırır. */
   async zoomToLayer(layer) {
@@ -7107,17 +7459,20 @@ let Map$1 = (_a = class {
   }
   /** Tüm alt sistemleri (drawing/interaction/layer manager) ve Cesium `Viewer`'ı yok eder. */
   destroy() {
-    var _a2;
+    var _a2, _b, _c, _d;
     this.clearMarker();
     this.selectionHighlight.clear();
     this.basemapController.stop();
     (_a2 = __privateGet(this, _unregisterApiKeyRefresh)) == null ? void 0 : _a2.call(this);
+    (_b = __privateGet(this, _removeLodSeamGuard)) == null ? void 0 : _b.call(this);
+    (_c = __privateGet(this, _removeMinZoomScale)) == null ? void 0 : _c.call(this);
+    (_d = __privateGet(this, _removeScaleWheelZoom)) == null ? void 0 : _d.call(this);
     this.drawingManager.destroy();
     this.interactionManager.destroy();
     this.layerManager.destroy();
     this.viewer.destroy();
   }
-}, _unregisterApiKeyRefresh = new WeakMap(), _apiKey3 = new WeakMap(), _a);
+}, _unregisterApiKeyRefresh = new WeakMap(), _removeLodSeamGuard = new WeakMap(), _removeMinZoomScale = new WeakMap(), _removeScaleWheelZoom = new WeakMap(), _apiKey3 = new WeakMap(), _a);
 const HGM_BASEMAP_IDS = [
   "hgm-temel",
   "hgm-ortofoto",
@@ -7151,9 +7506,11 @@ exports.getCapabilities = getCapabilities;
 exports.getErrorCodes = getErrorCodes;
 exports.getProxyBase = getProxyBase;
 exports.getUcbpApiBase = getUcbpApiBase;
+exports.measureGround = measureGround;
 exports.parseCapabilities = parseCapabilities;
 exports.parseWcsTiffFormat = parseWcsTiffFormat;
 exports.parseWmsTiffFormat = parseWmsTiffFormat;
 exports.registerApiKeyRefresh = registerApiKeyRefresh;
+exports.snapScaleForDisplay = snapScaleForDisplay;
 exports.validateApiKey = validateApiKey;
 exports.wcsRectangleFor = wcsRectangleFor;

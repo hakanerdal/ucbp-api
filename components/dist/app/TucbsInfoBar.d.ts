@@ -55,6 +55,9 @@ export declare class TucbsInfoBar extends LitElement {
     updated(changed: PropertyValues): void;
     /** Baglanti kesildiginde olay dinleyicilerini ve bekleyen animation frame'leri temizler. */
     disconnectedCallback(): void;
+    private _lastCameraPosition;
+    private _removePostRender;
+    private readonly _onPostRender;
     private _bind;
     private _unbind;
     private _sampleHeight;

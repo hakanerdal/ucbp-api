@@ -228,6 +228,14 @@ export class DrawingManager extends EventEmitter<DrawingManagerEventMap> {
     // suspend/resume).
     this.handler.setInputAction(() => this.deactivate(), ScreenSpaceEventType.RIGHT_CLICK);
 
+    // ESC = devam eden cizimi IPTAL ET -- TUM araclarda (polyline/polygon/
+    // rectangle/circle/freehand; point tek tikla bittiginden no-op). Tamamlanmaz,
+    // sekil kaydedilmez, arac AKTIF kalir (cift-tik tamamlar, sag-tik araçtan
+    // cikar). ScreenSpaceEventHandler klavye event'i tanimadigindan (sadece
+    // canvas mouse/touch), document seviyesinde ayri bir keydown dinleyicisi
+    // kullanilir; unbindToolHandlers() kaldirir.
+    document.addEventListener("keydown", this.onEscapeKey);
+
     if (tool === "freehand") {
       this.handler.setInputAction(
         (e: ScreenSpaceEventHandler.PositionedEvent) => this.onFreehandDown(e.position),
@@ -257,11 +265,6 @@ export class DrawingManager extends EventEmitter<DrawingManagerEventMap> {
         () => this.finishMultiVertexViaDoubleClick(),
         ScreenSpaceEventType.LEFT_DOUBLE_CLICK
       );
-      // ESC = TAMAMLA (mevcut vertex'lerle bitir), IPTAL DEGIL — cift-tik ile
-      // ayni sonuca goturur (sag-tik ARTIK farkli: tamamen cikis, bkz yukarida).
-      // ScreenSpaceEventHandler klavye event'i tanimadigindan (sadece canvas
-      // mouse/touch), document seviyesinde ayri bir keydown dinleyicisi kullanilir.
-      document.addEventListener("keydown", this.onEscapeKey);
     }
   }
 
@@ -277,8 +280,21 @@ export class DrawingManager extends EventEmitter<DrawingManagerEventMap> {
 
   private readonly onEscapeKey = (event: KeyboardEvent): void => {
     if (event.key !== "Escape") return;
-    this.finishMultiVertex();
+    this.abortCurrentShape();
   };
+
+  // Devam eden (en az 1 vertex'i konmus) cizimi atar; tamamlanmis sekillere ve
+  // araç durumuna (handler'lar, kamera/interaction suspend) dokunmaz -- araç
+  // hemen yeni bir cizime hazir kalir. Cizim yoksa no-op (Esc aracı kapatmaz).
+  private abortCurrentShape(): void {
+    if (this.activeTool === undefined || this.positions.length === 0) return;
+    const tool = this.activeTool;
+    const source = this.activeSource;
+    this.clearTempEntity();
+    this.resetSessionForContinuousDrawing();
+    this.resetTrackedEntity();
+    this.emit("draw:abort", source === undefined ? { tool } : { tool, source });
+  }
 
   // ── Vertex-tabanli araclar (point/polyline/polygon/rectangle/circle) ──────
 

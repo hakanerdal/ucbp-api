@@ -1,10 +1,11 @@
 import { LitElement, PropertyValues } from 'lit';
-import { Map as TucbsMapInstance, DrawTool } from '@tucbs/core';
+import { Map as TucbsMapInstance } from '@tucbs/core';
 /**
  * Birden fazla cizim geometrisini ("point"/"polyline"/"polygon" -- v1
  * kapsami) tek bir "grup" butonda toplayan bagimsiz cizim araci. Ana
  * butona tiklaninca SOLA acilan bir flyout ile hangi geometrinin
- * cizilecegi secilir; secilen aracin ikonu ana butonda gorunur kalir.
+ * cizilecegi secilir; pasifken ana butonda sabit bir ikon, aktifken secilen
+ * aracin ikonu gorunur. Varsayilan arac YOKTUR.
  * `tucbs-toolbar` icinde bir arac olarak kullanilabildigi gibi, toolbar
  * disinda tek basina da embed edilebilir.
  *
@@ -22,7 +23,6 @@ import { Map as TucbsMapInstance, DrawTool } from '@tucbs/core';
  * <tucbs-draw-tool
  *   mapElementId="map"
  *   tools="point,polyline,polygon,rectangle,circle,freehand"
- *   default-tool="polygon"
  * ></tucbs-draw-tool>
  * ```
  */
@@ -32,8 +32,6 @@ export declare class TucbsDrawTool extends LitElement {
     mapElementId: string;
     /** Flyout'ta gosterilecek geometri ID'leri, virgulle ayrilmis (DrawTool union'inin bir alt kumesi). */
     tools: string;
-    /** Hicbir arac aktif degilken ana butonda gosterilecek varsayilan arac. */
-    defaultTool: DrawTool;
     /** Tuketicinin, bilesen kaynagina dokunmadan shadow DOM'a enjekte edebilecegi keyfi CSS metni (bkz. `./internal/CustomCss.ts`). */
     customCss: string;
     /**
@@ -65,7 +63,7 @@ export declare class TucbsDrawTool extends LitElement {
     firstUpdated(): void;
     private _onMainButtonClick;
     private _selectTool;
-    /** Aktif/varsayilan araci gosteren ana butonu ve (aciksa) arac secim flyout'unu render eder. */
+    /** Ana butonu ve (aciksa) arac secim flyout'unu render eder. */
     render(): import('lit').TemplateResult<1>;
 }
 //# sourceMappingURL=TucbsDrawTool.d.ts.map

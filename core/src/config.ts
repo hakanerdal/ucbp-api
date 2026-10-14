@@ -101,7 +101,11 @@ export function configureTucbs(config: TucbsGlobalConfig): void {
     }
     return;
   }
-  if (state.configured && config.apiKey !== state.apiKey) {
+  // Uyari yalniz DAHA ONCE bir apiKey atanmissa ve yenisi farkliysa basilir.
+  // ESKIDEN kosul `state.configured` idi; apiBase/proxyBase dallari da bu
+  // bayragi true yaptigi icin apiKey'in ILK atamasi (ör. tek cagrida
+  // { apiBase, apiKey }, yukaridaki @example dahil) yanlislikla uyariyordu.
+  if (state.apiKey !== undefined && config.apiKey !== state.apiKey) {
     console.warn(
       '[@tucbs/core] configureTucbs() daha once farkli bir apiKey ile cagrilmisti; deger degistirildi. ' +
         "Bu beklenmiyorsa sayfada birden fazla script'in ayni fonksiyonu cagirdigini kontrol edin.",

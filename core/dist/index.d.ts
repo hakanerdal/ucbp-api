@@ -330,6 +330,7 @@ export declare class DrawingManager extends EventEmitter<DrawingManagerEventMap>
     private tempFillEntity;
     private tempVertexEntities;
     private freehandDragging;
+    private builtInDoubleClickAction;
     /** Cesium `Scene` nesnesi (`viewer.scene`). */
     get scene(): Scene;
     /**
@@ -393,6 +394,7 @@ export declare class DrawingManager extends EventEmitter<DrawingManagerEventMap>
     private bindToolHandlers;
     private unbindToolHandlers;
     private readonly onEscapeKey;
+    private abortCurrentShape;
     private onVertexClick;
     private onPreviewMove;
     private finishMultiVertex;
@@ -409,6 +411,8 @@ export declare class DrawingManager extends EventEmitter<DrawingManagerEventMap>
     private buildPositionsCallback;
     private clearTempEntity;
     private resetTrackedEntity;
+    private suspendBuiltInDoubleClick;
+    private restoreBuiltInDoubleClick;
     private setCursor;
     private lockCamera;
     private unlockCamera;
@@ -462,6 +466,11 @@ export declare interface DrawingManagerEventMap {
     };
     /** Aktif çizim iptal edildiğinde (araç tamamen kapatıldığında) yayılır. */
     "draw:cancel": {
+        readonly tool: DrawTool;
+        readonly source?: string;
+    };
+    /** Devam eden (tamamlanmamış) çizim Esc ile iptal edildiğinde yayılır; araç aktif kalır (çıkış için bkz. `draw:cancel`). */
+    "draw:abort": {
         readonly tool: DrawTool;
         readonly source?: string;
     };
@@ -716,6 +725,12 @@ export declare interface GradientFillStyle {
     readonly opacity: number;
 }
 
+/** Ekran merkezindeki zeminin olcegi (1/N paydasi) ve kameranin o noktaya uzakligi (m). */
+export declare interface GroundMeasure {
+    scale: number;
+    distance: number;
+}
+
 /** `BasemapId` union'ının, apiKey gerektiren HGM/Turksat proxy altlık haritalarının çalışma-zamanı karşılığı. */
 export declare const HGM_BASEMAP_IDS: readonly ["hgm-temel", "hgm-ortofoto", "hgm-siyasi", "hgm-yukseklik"];
 
@@ -902,6 +917,8 @@ export declare interface InteractionManagerEventMap {
     };
     /** Dokunmatik pinch hareketi bittiğinde yayılır. */
     "map:pinchend": Record<string, never>;
+    /** `suspend()` ile tıklama/pick grubu durdurulduğunda (örn. çizim/ölçüm aracı etkinleşince) yayılır; zaten durdurulmuşken tekrar yayılmaz. */
+    "interaction:suspend": Record<string, never>;
     /** Kamera hareketi başladığında yayılır. */
     "camera:moveStart": Record<string, never>;
     /** Kamera hareketi bittiğinde yayılır. */
@@ -1644,6 +1661,10 @@ declare class Map_2 {
      * ```
      */
     zoomTo(longitude: number, latitude: number, height: number): void;
+    /** Kamerayı bir sonraki olcek basamağına (ör. 1/5.000 → 1/2.500) animasyonlu yaklaştırır; fare tekerleğinin bir çentiğiyle aynıdır. */
+    zoomInStep(): void;
+    /** Kamerayı bir sonraki olcek basamağına (ör. 1/2.500 → 1/5.000) animasyonlu uzaklaştırır; fare tekerleğinin bir çentiğiyle aynıdır. */
+    zoomOutStep(): void;
     /** Kamerayı verilen katmanın kapsama alanına (extent'ine) top-down yaklaştırır. */
     zoomToLayer(layer: ManagedLayer): Promise<boolean>;
     /**
@@ -1815,6 +1836,14 @@ declare interface MarkerOverlayOptions {
 /** Ölçüm (measure) katmanının sabit id'si. */
 export declare const MEASURE_LAYER_ID = "__tucbs_measure_layer__";
 
+/**
+ * Ekran merkezinde 1 piksel araligindaki GERCEK dunya mesafesini (arazi ve
+ * kamera egimi dahil) olcup 1/N olcegini ve kameranin zemin noktasina
+ * uzakligini verir. Zemin secilemiyorsa `null`. Bilgi cubugu ve zoom adimi
+ * AYNI olcumu kullanir; yoksa adim hedefi ile gorunen olcek ayrisir.
+ */
+export declare function measureGround(scene: Scene): GroundMeasure | null;
+
 /** Dolgu kapalı — katman sadece dış hatla (outline) gösterilir. */
 export declare interface OffFillStyle {
     /** Stil modu ayırt edicisi. */
@@ -1898,6 +1927,9 @@ export declare interface ServiceStyleOption {
     /** Bu stile ait lejant görüntüsünün adresi. */
     readonly legendUrl: string;
 }
+
+/** Olcegi gosterim icin en yakin zoom basamagina (yakinsa) yuvarlar; degilse aynen doner. */
+export declare function snapScaleForDisplay(scale: number): number;
 
 /** Tek renkli (solid) katman dolgu stili. */
 export declare interface SolidFillStyle {

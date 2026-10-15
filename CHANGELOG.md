@@ -4,6 +4,20 @@ Bu dosyadaki kayıtlar [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/)
 biçimine uygundur; sürüm numaralandırması [SemVer](https://semver.org/lang/tr/)
 kurallarına göredir.
 
+## [0.2.0] — 2026-10-15
+
+`npm install` ile kuran bir projede ek Vite eklentisi ve elle bağımlılık gerekmez.
+
+### Düzeltilenler
+
+- **@tucbs/core** — `shpjs`, `papaparse`, `ol` ve `proj4` artık paketin normal bağımlılığı. Shapefile, CSV ve WFS ekleme, tüketici bunları ayrıca kurmasa da çalışır.
+- **@tucbs/components** — `lit` paketin içine gömülür. Araç çubuğu düğmelerinin boş gelmesine yol açan çift kopya oluşmaz.
+- Cesium worker adresi ve `widgets.css`, kullanıcı vermediyse kütüphane tarafından eklenir. Adres kurulu Cesium sürümünün CDN klasörüdür.
+
+### Yayın
+
+- Repoda `src/` yok. Yalnız derlenmiş `dist/` durur.
+
 ## [0.1.1] — 2026-10-14
 
 Hata düzeltmesi (patch).

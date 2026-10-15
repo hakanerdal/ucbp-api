@@ -23,7 +23,7 @@ Kütüphane GitHub Releases üzerinden dağıtılır; her paket kendi tarball
 Harita motorunu tek başına kullanacaksanız yalnız `@tucbs/core` yeter:
 
 ```bash
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.1.1/tucbs-core-0.1.1.tgz
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-core-0.2.0.tgz
 ```
 
 ### @tucbs/components
@@ -32,8 +32,8 @@ npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.1.1/tucb
 components'i kurun:
 
 ```bash
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.1.1/tucbs-core-0.1.1.tgz
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.1.1/tucbs-components-0.1.1.tgz
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-core-0.2.0.tgz
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-components-0.2.0.tgz
 ```
 
 Kurulumdan sonraki kullanım (`configureTucbs`, `apiBase`/`apiKey` ayarı, örnek

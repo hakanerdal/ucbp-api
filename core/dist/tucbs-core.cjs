@@ -33,6 +33,24 @@ var _apiKey, _apiKey2, _AnalysisManager_instances, post_fn, _unregisterApiKeyRef
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const cesium = require("cesium");
 var _documentCurrentScript = typeof document !== "undefined" ? document.currentScript : null;
+function ensureCesiumRuntime() {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+  const host = window;
+  if (!host.CESIUM_BASE_URL) {
+    host.CESIUM_BASE_URL = `https://cdn.jsdelivr.net/npm/cesium@${"1.143.0"}/Build/Cesium/`;
+    console.info("[gizLog] cesium base url atandi surum=1.143.0");
+  }
+  const base = host.CESIUM_BASE_URL.replace(/\/?$/, "/");
+  const already = Array.from(document.querySelectorAll("link")).some(
+    (link2) => (link2.getAttribute("href") || "").includes("Widgets/widgets.css")
+  );
+  if (already) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = `${base}Widgets/widgets.css`;
+  document.head.appendChild(link);
+  console.info("[gizLog] cesium widgets.css eklendi");
+}
 const MAX_LEVEL = 24;
 const EARTH_RADIUS = 6371e3;
 const CORNER_SAFETY = 1.15;
@@ -6983,6 +7001,7 @@ let Map$1 = (_a = class {
     __privateAdd(this, _removeMinZoomScale);
     __privateAdd(this, _removeScaleWheelZoom);
     __privateAdd(this, _apiKey3);
+    ensureCesiumRuntime();
     const hiddenCreditContainer = document.createElement("div");
     hiddenCreditContainer.style.display = "none";
     this.viewer = new cesium.Viewer(

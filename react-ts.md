@@ -1,15 +1,18 @@
 # React TypeScript ile kurulum
 
-React uygulaması yoksa önce o kurulur. Ardından `@tucbs/core` ve `@tucbs/components` kurulur.
+UCBP API'yi mevcut bir projeye eklemeyecekseniz önce React uygulaması kurulur. Ardından `@tucbs/core` ve `@tucbs/components` kurulur.
 
 ## 1. Uygulamayı kur
 
-React uygulaması olmayanlar bu adımı yapar. Uygulama varsa 2. adımdan devam edilir.
+Mevcut bir projeniz yoksa bu adımı yapın. Projeniz varsa 2. adımdan devam edin.
 
 Boş bir klasörde:
 
 ```powershell
 npm create vite@latest . -- --template react-ts
+```
+
+```powershell
 npm install
 ```
 

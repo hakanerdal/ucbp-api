@@ -15,28 +15,7 @@ tek başına kullanılabilir.
 
 ## Kurulum
 
-Kütüphane GitHub Releases üzerinden dağıtılır; her paket kendi tarball
-(`.tgz`) dosyasıyla kurulur.
-
-### Yalnız @tucbs/core
-
-Harita motorunu tek başına kullanacaksanız yalnız `@tucbs/core` yeter:
-
-```bash
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-core-0.2.0.tgz
-```
-
-### @tucbs/components
-
-`@tucbs/components`, `@tucbs/core`'a bağımlıdır — önce core'u, sonra
-components'i kurun:
-
-```bash
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-core-0.2.0.tgz
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-components-0.2.0.tgz
-```
-
-React ile sıfırdan kurulum: [`react.md`](./react.md).
+- **React kurulumu:** [`react.md`](./react.md)
 
 ## Dokümantasyon
 

@@ -1,8 +1,10 @@
 # React ile kurulum
 
-Boş bir klasörde React uygulaması kurulur, ardından `@tucbs/core` ve `@tucbs/components` kurulur.
+React uygulaması yoksa önce o kurulur. Ardından `@tucbs/core` ve `@tucbs/components` kurulur.
 
 ## 1. Uygulamayı kur
+
+React uygulaması olmayanlar bu adımı yapar. Uygulama varsa 2. adımdan devam edilir.
 
 Boş bir klasörde:
 
@@ -13,9 +15,27 @@ npm install
 
 ## 2. Paketleri kur
 
-[Buradaki](./README.md) `@tucbs/core` ve `@tucbs/components` paketlerini kur.
+Kütüphane GitHub Releases üzerinden dağıtılır; her paket kendi tarball (`.tgz`) dosyasıyla kurulur.
 
-`node_modules/cesium` yoksa:
+### @tucbs/core
+
+Harita motorunu tek başına kullanacaksanız yalnız `@tucbs/core` yeter:
+
+```powershell
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-core-0.2.0.tgz
+```
+
+### @tucbs/components
+
+`@tucbs/components`, `@tucbs/core`'a bağımlıdır. Önce core'u, sonra components'i kurun:
+
+```powershell
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-components-0.2.0.tgz
+```
+
+### Cesium
+
+İki paketi kurduktan sonra `node_modules/cesium` klasörüne bak. Klasör yoksa:
 
 ```powershell
 npm install cesium
@@ -23,11 +43,7 @@ npm install cesium
 
 ## 3. Haritayı bağla
 
-`src/App.tsx` içeriğini değiştir. Anahtarı kodun içine yazma. Proje klasöründe `.env` aç:
-
-```
-VITE_TUCBS_API_KEY=API_ANAHTARI
-```
+`src/App.tsx` içeriğini değiştir. `API_ANAHTARI` yerine kendi API anahtarını yaz.
 
 ```tsx
 import "@tucbs/components";
@@ -35,7 +51,7 @@ import { configureTucbs } from "@tucbs/core";
 
 configureTucbs({
   apiBase: "https://ucbp-api.tucbs.gov.tr/ucbp-api",
-  apiKey: import.meta.env.VITE_TUCBS_API_KEY,
+  apiKey: "API_ANAHTARI",
   proxyBase: "https://ucbp-api.tucbs.gov.tr/proxyservice/proxyservice/getByUrl?url=",
 });
 

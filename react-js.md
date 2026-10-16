@@ -1,4 +1,4 @@
-# React ile kurulum
+# React JavaScript ile kurulum
 
 React uygulaması yoksa önce o kurulur. Ardından `@tucbs/core` ve `@tucbs/components` kurulur.
 
@@ -9,7 +9,7 @@ React uygulaması olmayanlar bu adımı yapar. Uygulama varsa 2. adımdan devam 
 Boş bir klasörde:
 
 ```powershell
-npm create vite@latest . -- --template react-ts
+npm create vite@latest . -- --template react
 npm install
 ```
 
@@ -22,7 +22,7 @@ Kütüphane GitHub Releases üzerinden dağıtılır; her paket kendi tarball (`
 Harita motorunu tek başına kullanacaksanız yalnız `@tucbs/core` yeter:
 
 ```powershell
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-core-0.2.0.tgz
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.1/tucbs-core-0.2.1.tgz
 ```
 
 ### @tucbs/components
@@ -30,7 +30,7 @@ npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucb
 `@tucbs/components`, `@tucbs/core`'a bağımlıdır. Önce core'u, sonra components'i kurun:
 
 ```powershell
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-components-0.2.0.tgz
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.1/tucbs-components-0.2.1.tgz
 ```
 
 ### Cesium
@@ -43,9 +43,9 @@ npm install cesium
 
 ## 3. Haritayı bağla
 
-`src/App.tsx` içeriğini değiştir. `API_ANAHTARI` yerine kendi API anahtarını yaz.
+`src/App.jsx` içeriğini değiştir. `API_ANAHTARI` yerine kendi API anahtarını yaz.
 
-```tsx
+```jsx
 import "@tucbs/components";
 import { configureTucbs } from "@tucbs/core";
 
@@ -66,21 +66,6 @@ export default function App() {
       />
     </>
   );
-}
-```
-
-TypeScript `tucbs-map` tanımıyorsa `src/tucbs-elements.d.ts` ekle:
-
-```ts
-import type { TucbsMap, TucbsToolbar } from "@tucbs/components";
-
-declare module "react" {
-  namespace JSX {
-    interface IntrinsicElements {
-      "tucbs-map": React.DetailedHTMLProps<React.HTMLAttributes<TucbsMap>, TucbsMap>;
-      "tucbs-toolbar": React.DetailedHTMLProps<React.HTMLAttributes<TucbsToolbar>, TucbsToolbar>;
-    }
-  }
 }
 ```
 

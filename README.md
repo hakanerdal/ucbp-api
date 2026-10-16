@@ -15,7 +15,8 @@ tek başına kullanılabilir.
 
 ## Kurulum
 
-- **React kurulumu:** [`react.md`](./react.md)
+- **React JavaScript:** [`react-js.md`](./react-js.md)
+- **React TypeScript:** [`react-ts.md`](./react-ts.md)
 
 ## Dokümantasyon
 

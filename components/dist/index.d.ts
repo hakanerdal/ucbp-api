@@ -1,3 +1,5 @@
+/** React'te tucbs etiketlerinin tipi paketle birlikte gelsin. */
+export type { TucbsJsxTags } from './react-jsx.js';
 export { TucbsMap } from './map/TucbsMap.js';
 export { TucbsMapPreview, type PreviewLayerSpec } from './map/TucbsMapPreview.js';
 export { TucbsLayerList } from './layer-list/TucbsLayerList.js';

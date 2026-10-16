@@ -2,6 +2,8 @@
  * React'te tucbs etiketlerinin tipini bildirir.
  * Paket kurulunca gelir; kullanıcı ayrı bildirim dosyası yazmaz.
  */
+/** Paket kurulunca React bu etiketleri tanısın diye dışa açılır. */
+export type TucbsJsxTags = "tucbs-analysis-panel" | "tucbs-analysis-tool" | "tucbs-app" | "tucbs-authorized-layers" | "tucbs-basemap-picker" | "tucbs-boundary-tool" | "tucbs-buffer-tool" | "tucbs-busy-overlay" | "tucbs-clip-tool" | "tucbs-delete-tool" | "tucbs-difference-tool" | "tucbs-draw-tool" | "tucbs-file-upload" | "tucbs-goto-coordinate" | "tucbs-identify-panel" | "tucbs-info-bar" | "tucbs-intersection-tool" | "tucbs-layer-export" | "tucbs-layer-list" | "tucbs-layer-menu-portal" | "tucbs-legend-panel" | "tucbs-map" | "tucbs-map-export" | "tucbs-map-preview" | "tucbs-measure-tool" | "tucbs-print-panel-content" | "tucbs-print-tool" | "tucbs-quality-bar" | "tucbs-service-style-card" | "tucbs-service-upload" | "tucbs-settings-tool" | "tucbs-slide-over-panel" | "tucbs-style-editor" | "tucbs-subtract-tool" | "tucbs-toolbar" | "tucbs-tooltip-portal" | "tucbs-union-tool" | "tucbs-wedge-buffer-tool" | "tucbs-zoom-tool";
 export {};
 type TucbsTagProps = {
     children?: unknown;

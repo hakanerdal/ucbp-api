@@ -22,7 +22,7 @@ Kütüphane GitHub Releases üzerinden dağıtılır; her paket kendi tarball (`
 Harita motorunu tek başına kullanacaksanız yalnız `@tucbs/core` yeter:
 
 ```powershell
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.1/tucbs-core-0.2.1.tgz
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.2/tucbs-core-0.2.2.tgz
 ```
 
 ### @tucbs/components
@@ -30,7 +30,7 @@ npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.1/tucb
 `@tucbs/components`, `@tucbs/core`'a bağımlıdır. Önce core'u, sonra components'i kurun:
 
 ```powershell
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.1/tucbs-components-0.2.1.tgz
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.2/tucbs-components-0.2.2.tgz
 ```
 
 ### Cesium
@@ -66,21 +66,6 @@ export default function App() {
       />
     </>
   );
-}
-```
-
-TypeScript `tucbs-map` tanımıyorsa `src/tucbs-elements.d.ts` ekle:
-
-```ts
-import type { TucbsMap, TucbsToolbar } from "@tucbs/components";
-
-declare module "react" {
-  namespace JSX {
-    interface IntrinsicElements {
-      "tucbs-map": React.DetailedHTMLProps<React.HTMLAttributes<TucbsMap>, TucbsMap>;
-      "tucbs-toolbar": React.DetailedHTMLProps<React.HTMLAttributes<TucbsToolbar>, TucbsToolbar>;
-    }
-  }
 }
 ```
 

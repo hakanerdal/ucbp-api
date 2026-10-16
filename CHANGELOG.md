@@ -4,6 +4,12 @@ Bu dosyadaki kayıtlar [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/)
 biçimine uygundur; sürüm numaralandırması [SemVer](https://semver.org/lang/tr/)
 kurallarına göredir.
 
+## [0.2.2] — 2026-10-16
+
+### Düzeltilenler
+
+- **@tucbs/components** — React etiket bildirimi paket girişine bağlandı. `<tucbs-map>` ve diğer tucbs etiketleri `import "@tucbs/components"` ile tanınır. Ayrı `tucbs-elements.d.ts` gerekmez.
+
 ## [0.2.1] — 2026-10-16
 
 ### Düzeltilenler

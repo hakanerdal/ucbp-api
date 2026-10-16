@@ -1,6 +1,6 @@
 {
   "name": "@tucbs/components",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "main": "./dist/tucbs-components.es.js",
   "module": "./dist/tucbs-components.es.js",
@@ -16,7 +16,7 @@
   ],
   "peerDependencies": {
     "cesium": "^1.142.0",
-    "@tucbs/core": "^0.2.1"
+    "@tucbs/core": "^0.2.2"
   },
   "dependencies": {
     "@carbon/icons": "^11.84.0",

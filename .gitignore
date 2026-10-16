@@ -10,9 +10,6 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# Yerel yayın notları — repoya gitmez, geliştiricide kalır
-publish-notes.md
-
 # Build artıkları (dist bilerek yayınlanır; buraya girmez)
 *.log
 *.tsbuildinfo

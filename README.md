@@ -36,8 +36,7 @@ npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucb
 npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.0/tucbs-components-0.2.0.tgz
 ```
 
-Kurulumdan sonraki kullanım (`configureTucbs`, `apiBase`/`apiKey` ayarı, örnek
-kodlar) için yardım dokümanına bakın.
+React ile sıfırdan kurulum: [`react.md`](./react.md).
 
 ## Dokümantasyon
 

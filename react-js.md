@@ -38,7 +38,8 @@ npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.2/tucb
 
 ### Cesium
 
-İki paketi kurduktan sonra `node_modules/cesium` klasörüne bak. Klasör yoksa:
+> [!IMPORTANT]
+> **Komuta geçmeden önce `node_modules/cesium` klasörüne bak.** Klasör varsa Cesium zaten kuruludur; aşağıdaki komutu çalıştırma. Klasör yoksa:
 
 ```powershell
 npm install cesium

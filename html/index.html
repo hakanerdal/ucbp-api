@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>UCBP API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="./importmap.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.143.0/Build/Cesium/Widgets/widgets.css" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      tucbs-map {
+        display: block;
+        width: 100%;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <tucbs-map id="map" mode="3D" mapWidth="100%" mapHeight="100vh"></tucbs-map>
+    <tucbs-toolbar
+      mapElementId="map"
+      position="right-center"
+      tools="zoom,goto-coordinate,draw,measure,delete,analysis,settings,print"
+    ></tucbs-toolbar>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

@@ -7,266 +7,266 @@ var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
 var _apiKey, _apiKey2, _AnalysisManager_instances, post_fn, _unregisterApiKeyRefresh, _removeLodSeamGuard, _removeMinZoomScale, _removeScaleWheelZoom, _apiKey3, _a;
-import { Math as _0x318bcf, SceneMode, EllipsoidTerrainProvider, Cartesian2, Cartesian3, CameraEventType, Ellipsoid, JulianDate, Cartographic, ConstantProperty, PropertyBag, PolygonHierarchy, ColorMaterialProperty, Color, CallbackProperty, HeadingPitchRange, BoundingSphere, Entity, PolylineGraphics, ConstantPositionProperty, PointGraphics, CustomDataSource, GeoJsonDataSource, KmlDataSource, Rectangle, WebMapServiceImageryProvider, GetFeatureInfoFormat, Resource, WebMapTileServiceImageryProvider, WebMercatorTilingScheme, ImageryLayer, SingleTileImageryProvider, HeightReference, ScreenSpaceEventHandler, ScreenSpaceEventType, UrlTemplateImageryProvider, Viewer } from "cesium";
+import { Math as _0x584e42, SceneMode, EllipsoidTerrainProvider, Cartesian2, Cartesian3, CameraEventType, Ellipsoid, JulianDate, Cartographic, ConstantProperty, PropertyBag, PolygonHierarchy, ColorMaterialProperty, Color, CallbackProperty, HeadingPitchRange, BoundingSphere, Entity, PolylineGraphics, ConstantPositionProperty, PointGraphics, CustomDataSource, GeoJsonDataSource, KmlDataSource, Rectangle, WebMapServiceImageryProvider, GetFeatureInfoFormat, Resource, WebMapTileServiceImageryProvider, WebMercatorTilingScheme, ImageryLayer, SingleTileImageryProvider, HeightReference, ScreenSpaceEventHandler, ScreenSpaceEventType, UrlTemplateImageryProvider, Viewer } from "cesium";
 function ensureCesiumRuntime() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
-  const _0xa0a9b9 = window;
-  !_0xa0a9b9["CESIUM_BASE_URL"] && (_0xa0a9b9["CESIUM_BASE_URL"] = "https://cdn.jsdelivr.net/npm/cesium@1.143.0/Build/Cesium/", console["info"]("[gizLog] cesium base url atandi surum=1.143.0"));
-  const _0x1fdee6 = _0xa0a9b9["CESIUM_BASE_URL"]["replace"](/\/?$/, "/"), _0x440490 = Array["from"](document["querySelectorAll"]("link"))["some"]((_0x4b1b7f) => (_0x4b1b7f["getAttribute"]("href") || "")["includes"]("Widgets/widgets.css"));
-  if (_0x440490) return;
-  const _0x1b427f = document["createElement"]("link");
-  _0x1b427f["rel"] = "stylesheet", _0x1b427f["href"] = _0x1fdee6 + "Widgets/widgets.css", document["head"]["appendChild"](_0x1b427f), console["info"]("[gizLog] cesium widgets.css eklendi");
+  const _0x5064c4 = window;
+  !_0x5064c4["CESIUM_BASE_URL"] && (_0x5064c4["CESIUM_BASE_URL"] = "https://cdn.jsdelivr.net/npm/cesium@1.143.0/Build/Cesium/", console["info"]("[gizLog] cesium base url atandi surum=1.143.0"));
+  const _0x429ad4 = _0x5064c4["CESIUM_BASE_URL"]["replace"](/\/?$/, "/"), _0x1fcd6e = Array["from"](document["querySelectorAll"]("link"))["some"]((_0x3094b6) => (_0x3094b6["getAttribute"]("href") || "")["includes"]("Widgets/widgets.css"));
+  if (_0x1fcd6e) return;
+  const _0x34db8b = document["createElement"]("link");
+  _0x34db8b["rel"] = "stylesheet", _0x34db8b["href"] = _0x429ad4 + "Widgets/widgets.css", document["head"]["appendChild"](_0x34db8b), console["info"]("[gizLog] cesium widgets.css eklendi");
 }
 const MAX_LEVEL = 24, EARTH_RADIUS = 6371e3, CORNER_SAFETY = 1.15;
-function cornerDistanceRatio(_0x4806d6, _0x47389b, _0x6df074) {
-  const _0x14ab88 = Math["tan"](_0x4806d6 / 2), _0x564127 = _0x14ab88 * _0x47389b, _0x30bc43 = Math["atan"](Math["hypot"](_0x564127, _0x14ab88)), _0x4c78dd = EARTH_RADIUS + _0x6df074, _0x2512ef = EARTH_RADIUS * EARTH_RADIUS - _0x4c78dd * _0x4c78dd * Math["sin"](_0x30bc43) ** 2, _0x41e8ca = _0x2512ef > 0 ? _0x4c78dd * Math["cos"](_0x30bc43) - Math["sqrt"](_0x2512ef) : Math["sqrt"](_0x4c78dd * _0x4c78dd - EARTH_RADIUS * EARTH_RADIUS);
-  return _0x41e8ca / _0x6df074 * CORNER_SAFETY;
+function cornerDistanceRatio(_0x197b83, _0x36119e, _0x4819be) {
+  const _0x2f1d66 = Math["tan"](_0x197b83 / 2), _0x26d60f = _0x2f1d66 * _0x36119e, _0x3f19b7 = Math["atan"](Math["hypot"](_0x26d60f, _0x2f1d66)), _0x3a777c = EARTH_RADIUS + _0x4819be, _0x5b0dcd = EARTH_RADIUS * EARTH_RADIUS - _0x3a777c * _0x3a777c * Math["sin"](_0x3f19b7) ** 2, _0x3dc6e8 = _0x5b0dcd > 0 ? _0x3a777c * Math["cos"](_0x3f19b7) - Math["sqrt"](_0x5b0dcd) : Math["sqrt"](_0x3a777c * _0x3a777c - EARTH_RADIUS * EARTH_RADIUS);
+  return _0x3dc6e8 / _0x4819be * CORNER_SAFETY;
 }
-function lodTransitionDistances(_0x530a5d) {
-  const { drawingBufferHeight: _0x24739f, sseDenominator: _0x4294a9, maximumScreenSpaceError: _0x1caf19, pixelRatio: _0x50d05f } = _0x530a5d, _0x19be96 = [];
-  for (let _0x337956 = 0; _0x337956 <= MAX_LEVEL; _0x337956++) {
-    const _0x2d4873 = _0x530a5d["geometricError"](_0x337956) * _0x24739f / (_0x4294a9 * _0x1caf19 * _0x50d05f);
-    if (Number["isFinite"](_0x2d4873) && _0x2d4873 > 0) _0x19be96["push"](_0x2d4873);
+function lodTransitionDistances(_0x300860) {
+  const { drawingBufferHeight: _0x256642, sseDenominator: _0x15616f, maximumScreenSpaceError: _0xb90017, pixelRatio: _0x1f3463 } = _0x300860, _0x453983 = [];
+  for (let _0x3f7f85 = 0; _0x3f7f85 <= MAX_LEVEL; _0x3f7f85++) {
+    const _0x4c8b2d = _0x300860["geometricError"](_0x3f7f85) * _0x256642 / (_0x15616f * _0xb90017 * _0x1f3463);
+    if (Number["isFinite"](_0x4c8b2d) && _0x4c8b2d > 0) _0x453983["push"](_0x4c8b2d);
   }
-  return _0x19be96["sort"]((_0x2d2f7e, _0x358dbf) => _0x2d2f7e - _0x358dbf);
+  return _0x453983["sort"]((_0x12b361, _0x353294) => _0x12b361 - _0x353294);
 }
 const SEAM_MARGIN = 1.01;
-function seamFreeScreenSpaceError(_0x382f90, _0x279405) {
-  const _0x26ae00 = _0x279405["maximumScreenSpaceError"], _0x4c5738 = cornerDistanceRatio(_0x279405["fovy"], _0x279405["aspectRatio"], _0x382f90);
-  for (const _0x162afb of lodTransitionDistances(_0x279405)) {
-    if (_0x162afb > _0x382f90 && _0x162afb < _0x382f90 * _0x4c5738) {
-      const _0x1a72fa = _0x26ae00 * (_0x162afb / _0x382f90) * SEAM_MARGIN, _0x43f62a = _0x26ae00 * _0x162afb / (_0x382f90 * _0x4c5738 * SEAM_MARGIN);
-      return Math["abs"](Math["log"](_0x1a72fa / _0x26ae00)) <= Math["abs"](Math["log"](_0x43f62a / _0x26ae00)) ? _0x1a72fa : _0x43f62a;
+function seamFreeScreenSpaceError(_0x33ecb3, _0x347a92) {
+  const _0x3b4950 = _0x347a92["maximumScreenSpaceError"], _0x27b8e4 = cornerDistanceRatio(_0x347a92["fovy"], _0x347a92["aspectRatio"], _0x33ecb3);
+  for (const _0x5b1870 of lodTransitionDistances(_0x347a92)) {
+    if (_0x5b1870 > _0x33ecb3 && _0x5b1870 < _0x33ecb3 * _0x27b8e4) {
+      const _0x32b1df = _0x3b4950 * (_0x5b1870 / _0x33ecb3) * SEAM_MARGIN, _0x90b745 = _0x3b4950 * _0x5b1870 / (_0x33ecb3 * _0x27b8e4 * SEAM_MARGIN);
+      return Math["abs"](Math["log"](_0x32b1df / _0x3b4950)) <= Math["abs"](Math["log"](_0x90b745 / _0x3b4950)) ? _0x32b1df : _0x90b745;
     }
   }
-  return _0x26ae00;
+  return _0x3b4950;
 }
 const NADIR_TOLERANCE_DEGREES = 3;
-function installLodSeamGuard(_0x4489e2) {
-  const _0x79984f = _0x4489e2["scene"], _0x3474d9 = _0x79984f["globe"];
-  if (!_0x3474d9) return () => void 0;
-  let _0x254ce8 = _0x3474d9["maximumScreenSpaceError"], _0xfb7834 = _0x254ce8;
-  const _0x19fa11 = (_0x123b87) => {
-    if (_0x3474d9["maximumScreenSpaceError"] !== _0x123b87) _0x3474d9["maximumScreenSpaceError"] = _0x123b87;
-    _0xfb7834 = _0x123b87;
-  }, _0x2ac8af = () => {
-    if (_0x3474d9["maximumScreenSpaceError"] !== _0xfb7834) _0x254ce8 = _0x3474d9["maximumScreenSpaceError"];
-    const _0x2712ae = _0x79984f["camera"]["frustum"], _0x2357e7 = Math["abs"](_0x318bcf["toDegrees"](_0x79984f["camera"]["pitch"]) + 90) <= NADIR_TOLERANCE_DEGREES;
-    if (_0x79984f["mode"] !== SceneMode["SCENE3D"] || !_0x2357e7 || !(_0x79984f["terrainProvider"] instanceof EllipsoidTerrainProvider) || _0x2712ae["fovy"] === void 0 || _0x2712ae["aspectRatio"] === void 0 || _0x2712ae["sseDenominator"] === void 0) {
-      _0x19fa11(_0x254ce8);
+function installLodSeamGuard(_0x1b3349) {
+  const _0x47f37e = _0x1b3349["scene"], _0xd9685a = _0x47f37e["globe"];
+  if (!_0xd9685a) return () => void 0;
+  let _0xeafe9 = _0xd9685a["maximumScreenSpaceError"], _0x226d1d = _0xeafe9;
+  const _0x578d4e = (_0xda0daa) => {
+    if (_0xd9685a["maximumScreenSpaceError"] !== _0xda0daa) _0xd9685a["maximumScreenSpaceError"] = _0xda0daa;
+    _0x226d1d = _0xda0daa;
+  }, _0x2c7ab6 = () => {
+    if (_0xd9685a["maximumScreenSpaceError"] !== _0x226d1d) _0xeafe9 = _0xd9685a["maximumScreenSpaceError"];
+    const _0x1c27bf = _0x47f37e["camera"]["frustum"], _0x5b9723 = Math["abs"](_0x584e42["toDegrees"](_0x47f37e["camera"]["pitch"]) + 90) <= NADIR_TOLERANCE_DEGREES;
+    if (_0x47f37e["mode"] !== SceneMode["SCENE3D"] || !_0x5b9723 || !(_0x47f37e["terrainProvider"] instanceof EllipsoidTerrainProvider) || _0x1c27bf["fovy"] === void 0 || _0x1c27bf["aspectRatio"] === void 0 || _0x1c27bf["sseDenominator"] === void 0) {
+      _0x578d4e(_0xeafe9);
       return;
     }
-    const _0x1a0159 = _0x79984f["terrainProvider"], _0x342642 = { "geometricError": (_0x258f05) => _0x1a0159["getLevelMaximumGeometricError"](_0x258f05), "drawingBufferHeight": _0x79984f["drawingBufferHeight"], "sseDenominator": _0x2712ae["sseDenominator"], "maximumScreenSpaceError": _0x254ce8, "pixelRatio": _0x79984f["pixelRatio"] ?? 1, "fovy": _0x2712ae["fovy"], "aspectRatio": _0x2712ae["aspectRatio"] };
-    _0x19fa11(seamFreeScreenSpaceError(_0x79984f["camera"]["positionCartographic"]["height"], _0x342642));
-  }, _0x2a694a = _0x79984f["preRender"]["addEventListener"](_0x2ac8af);
+    const _0x534372 = _0x47f37e["terrainProvider"], _0x7eb56c = { "geometricError": (_0x77112e) => _0x534372["getLevelMaximumGeometricError"](_0x77112e), "drawingBufferHeight": _0x47f37e["drawingBufferHeight"], "sseDenominator": _0x1c27bf["sseDenominator"], "maximumScreenSpaceError": _0xeafe9, "pixelRatio": _0x47f37e["pixelRatio"] ?? 1, "fovy": _0x1c27bf["fovy"], "aspectRatio": _0x1c27bf["aspectRatio"] };
+    _0x578d4e(seamFreeScreenSpaceError(_0x47f37e["camera"]["positionCartographic"]["height"], _0x7eb56c));
+  }, _0x5bb00c = _0x47f37e["preRender"]["addEventListener"](_0x2c7ab6);
   return () => {
-    _0x2a694a(), !_0x79984f["isDestroyed"]() && _0x3474d9["maximumScreenSpaceError"] === _0xfb7834 && (_0x3474d9["maximumScreenSpaceError"] = _0x254ce8);
+    _0x5bb00c(), !_0x47f37e["isDestroyed"]() && _0xd9685a["maximumScreenSpaceError"] === _0x226d1d && (_0xd9685a["maximumScreenSpaceError"] = _0xeafe9);
   };
 }
 const SCREEN_DPI$1 = 96, METERS_PER_INCH$1 = 0.0254, REWRITE_TOLERANCE = 5e-3;
-function minZoomDistanceForScale(_0x186a7d, _0x1c5b31, _0x4b944f) {
-  const _0x5886a5 = Math["tan"](_0x4b944f / 2), _0x4ab536 = _0x186a7d * METERS_PER_INCH$1 / SCREEN_DPI$1 * _0x1c5b31 / (2 * _0x5886a5);
-  return Number["isFinite"](_0x4ab536) && _0x4ab536 > 0 ? _0x4ab536 : null;
+function minZoomDistanceForScale(_0x4c09cf, _0x1a04e3, _0x277c72) {
+  const _0x2e4587 = Math["tan"](_0x277c72 / 2), _0x3ec49c = _0x4c09cf * METERS_PER_INCH$1 / SCREEN_DPI$1 * _0x1a04e3 / (2 * _0x2e4587);
+  return Number["isFinite"](_0x3ec49c) && _0x3ec49c > 0 ? _0x3ec49c : null;
 }
 const SNAP_WINDOW_RATIO = 1.06, MIN_SNAP_GAP_METERS = 1e-3, SNAP_DURATION_MS = 150;
-function snapToMinAmount(_0x3c853f, _0x14ccb3) {
-  const _0x415fbf = _0x3c853f - _0x14ccb3;
-  if (!(_0x415fbf > MIN_SNAP_GAP_METERS) || _0x3c853f > _0x14ccb3 * SNAP_WINDOW_RATIO) return 0;
-  return _0x415fbf;
+function snapToMinAmount(_0x976a70, _0x47984d) {
+  const _0x27e348 = _0x976a70 - _0x47984d;
+  if (!(_0x27e348 > MIN_SNAP_GAP_METERS) || _0x976a70 > _0x47984d * SNAP_WINDOW_RATIO) return 0;
+  return _0x27e348;
 }
-function installMinZoomScale(_0x31bf41, _0x880e50, _0x229efb) {
-  const _0x452728 = _0x31bf41["scene"], _0x510f36 = _0x452728["screenSpaceCameraController"], _0x15e9d3 = () => {
-    const _0x334351 = _0x452728["camera"]["frustum"]["fovy"];
-    if (_0x334351 === void 0) return;
-    const _0x1589dd = _0x452728["canvas"]["clientHeight"], _0x2388ec = minZoomDistanceForScale(_0x880e50, _0x1589dd, _0x334351);
-    if (_0x2388ec !== null) {
-      const _0x1f84b9 = _0x510f36["minimumZoomDistance"];
-      Math["abs"](_0x1f84b9 - _0x2388ec) > _0x1f84b9 * REWRITE_TOLERANCE && (_0x510f36["minimumZoomDistance"] = _0x2388ec);
+function installMinZoomScale(_0x4643e6, _0x2a5a35, _0x43435b) {
+  const _0x3d4176 = _0x4643e6["scene"], _0x40594d = _0x3d4176["screenSpaceCameraController"], _0x354b40 = () => {
+    const _0x39aa4a = _0x3d4176["camera"]["frustum"]["fovy"];
+    if (_0x39aa4a === void 0) return;
+    const _0xf81010 = _0x3d4176["canvas"]["clientHeight"], _0x3f1950 = minZoomDistanceForScale(_0x2a5a35, _0xf81010, _0x39aa4a);
+    if (_0x3f1950 !== null) {
+      const _0xede56a = _0x40594d["minimumZoomDistance"];
+      Math["abs"](_0xede56a - _0x3f1950) > _0xede56a * REWRITE_TOLERANCE && (_0x40594d["minimumZoomDistance"] = _0x3f1950);
     }
-    const _0x223ddf = minZoomDistanceForScale(_0x229efb, _0x1589dd, _0x334351);
-    if (_0x223ddf === null) return;
-    const _0x24ad66 = _0x510f36["maximumZoomDistance"];
-    Math["abs"](_0x24ad66 - _0x223ddf) > _0x24ad66 * REWRITE_TOLERANCE && (_0x510f36["maximumZoomDistance"] = _0x223ddf);
-  }, _0x5e1174 = _0x452728["camera"], _0x321e8b = _0x452728["canvas"];
-  let _0x4efa50;
-  const _0x2575ba = () => {
-    if (_0x4efa50 !== void 0) cancelAnimationFrame(_0x4efa50);
-    _0x4efa50 = void 0;
-  }, _0x1ecdf1 = () => {
-    if (_0x4efa50 !== void 0) return;
-    const _0x32e1a1 = snapToMinAmount(_0x5e1174["positionCartographic"]["height"], _0x510f36["minimumZoomDistance"]);
-    if (_0x32e1a1 <= 0) return;
-    const _0x1a8593 = performance["now"]();
-    let _0xa08cff = 0;
-    const _0x4180b3 = (_0x56995) => {
-      const _0x10a3fe = Math["min"](1, (_0x56995 - _0x1a8593) / SNAP_DURATION_MS), _0x553f53 = _0x32e1a1 * (1 - (1 - _0x10a3fe) * (1 - _0x10a3fe));
-      if (_0x553f53 > _0xa08cff) _0x5e1174["zoomIn"](_0x553f53 - _0xa08cff);
-      _0xa08cff = _0x553f53, _0x4efa50 = _0x10a3fe < 1 ? requestAnimationFrame(_0x4180b3) : void 0;
+    const _0x3ea63a = minZoomDistanceForScale(_0x43435b, _0xf81010, _0x39aa4a);
+    if (_0x3ea63a === null) return;
+    const _0x565a66 = _0x40594d["maximumZoomDistance"];
+    Math["abs"](_0x565a66 - _0x3ea63a) > _0x565a66 * REWRITE_TOLERANCE && (_0x40594d["maximumZoomDistance"] = _0x3ea63a);
+  }, _0x5f102e = _0x3d4176["camera"], _0x55783a = _0x3d4176["canvas"];
+  let _0x2a2ed7;
+  const _0x437b94 = () => {
+    if (_0x2a2ed7 !== void 0) cancelAnimationFrame(_0x2a2ed7);
+    _0x2a2ed7 = void 0;
+  }, _0x4dc8d2 = () => {
+    if (_0x2a2ed7 !== void 0) return;
+    const _0x5c2a6d = snapToMinAmount(_0x5f102e["positionCartographic"]["height"], _0x40594d["minimumZoomDistance"]);
+    if (_0x5c2a6d <= 0) return;
+    const _0x1183aa = performance["now"]();
+    let _0x2cb2a1 = 0;
+    const _0x52962b = (_0x3742bd) => {
+      const _0x57066d = Math["min"](1, (_0x3742bd - _0x1183aa) / SNAP_DURATION_MS), _0x513f43 = _0x5c2a6d * (1 - (1 - _0x57066d) * (1 - _0x57066d));
+      if (_0x513f43 > _0x2cb2a1) _0x5f102e["zoomIn"](_0x513f43 - _0x2cb2a1);
+      _0x2cb2a1 = _0x513f43, _0x2a2ed7 = _0x57066d < 1 ? requestAnimationFrame(_0x52962b) : void 0;
     };
-    _0x4efa50 = requestAnimationFrame(_0x4180b3);
+    _0x2a2ed7 = requestAnimationFrame(_0x52962b);
   };
-  _0x321e8b["addEventListener"]("pointerdown", _0x2575ba), _0x321e8b["addEventListener"]("wheel", _0x2575ba, { "passive": !![] });
-  const _0x5effee = _0x452728["preRender"]["addEventListener"](_0x15e9d3), _0x558aed = _0x5e1174["moveEnd"]["addEventListener"](_0x1ecdf1);
+  _0x55783a["addEventListener"]("pointerdown", _0x437b94), _0x55783a["addEventListener"]("wheel", _0x437b94, { "passive": !![] });
+  const _0x19d422 = _0x3d4176["preRender"]["addEventListener"](_0x354b40), _0x5dd17d = _0x5f102e["moveEnd"]["addEventListener"](_0x4dc8d2);
   return () => {
-    _0x2575ba(), _0x321e8b["removeEventListener"]("pointerdown", _0x2575ba), _0x321e8b["removeEventListener"]("wheel", _0x2575ba), _0x5effee(), _0x558aed();
+    _0x437b94(), _0x55783a["removeEventListener"]("pointerdown", _0x437b94), _0x55783a["removeEventListener"]("wheel", _0x437b94), _0x19d422(), _0x5dd17d();
   };
 }
 const ZOOM_SCALE_STEPS = [100, 250, 500, 1e3, 2500, 5e3, 1e4, 25e3, 5e4, 1e5, 25e4, 5e5, 1e6, 25e5, 5e6, 15e6, 25e6], ON_STEP_TOLERANCE = 0.03;
-function nextScaleStep(_0x23e223, _0x364c95) {
-  if (!(_0x23e223 > 0) || !Number["isFinite"](_0x23e223)) return null;
-  if (_0x364c95 === 1) {
-    const _0x50c96e = _0x23e223 / (1 + ON_STEP_TOLERANCE);
-    return [...ZOOM_SCALE_STEPS]["reverse"]()["find"]((_0x4cef4b) => _0x4cef4b < _0x50c96e) ?? null;
+function nextScaleStep(_0x410d18, _0x542a54) {
+  if (!(_0x410d18 > 0) || !Number["isFinite"](_0x410d18)) return null;
+  if (_0x542a54 === 1) {
+    const _0x1ea78b = _0x410d18 / (1 + ON_STEP_TOLERANCE);
+    return [...ZOOM_SCALE_STEPS]["reverse"]()["find"]((_0x56b7ed) => _0x56b7ed < _0x1ea78b) ?? null;
   }
-  const _0x1571bf = _0x23e223 * (1 + ON_STEP_TOLERANCE);
-  return ZOOM_SCALE_STEPS["find"]((_0x4cfadc) => _0x4cfadc > _0x1571bf) ?? Infinity;
+  const _0x4a40c5 = _0x410d18 * (1 + ON_STEP_TOLERANCE);
+  return ZOOM_SCALE_STEPS["find"]((_0x4ff9bf) => _0x4ff9bf > _0x4a40c5) ?? Infinity;
 }
 const SCREEN_DPI = 96, METERS_PER_INCH = 0.0254;
-function measureGround(_0x39c46c) {
-  const _0x4950de = _0x39c46c["globe"];
-  if (!_0x4950de) return null;
-  const _0x5a5dd9 = _0x39c46c["camera"], _0x14e37f = _0x39c46c["canvas"]["clientWidth"] / 2, _0x22f601 = _0x39c46c["canvas"]["clientHeight"] / 2, _0x16b1f6 = _0x5a5dd9["getPickRay"](new Cartesian2(_0x14e37f - 1, _0x22f601)), _0x3ccfe2 = _0x5a5dd9["getPickRay"](new Cartesian2(_0x14e37f + 1, _0x22f601)), _0x47a0ac = _0x5a5dd9["getPickRay"](new Cartesian2(_0x14e37f, _0x22f601));
-  if (!_0x16b1f6 || !_0x3ccfe2 || !_0x47a0ac) return null;
-  const _0x553b68 = _0x4950de["pick"](_0x16b1f6, _0x39c46c), _0x154407 = _0x4950de["pick"](_0x3ccfe2, _0x39c46c), _0x4eb32a = _0x4950de["pick"](_0x47a0ac, _0x39c46c);
-  if (!_0x553b68 || !_0x154407 || !_0x4eb32a) return null;
-  const _0x130350 = Cartesian3["distance"](_0x553b68, _0x154407) / 2;
-  return { "scale": _0x130350 * SCREEN_DPI / METERS_PER_INCH, "distance": Cartesian3["distance"](_0x5a5dd9["position"], _0x4eb32a) };
+function measureGround(_0x4e7709) {
+  const _0x5f5992 = _0x4e7709["globe"];
+  if (!_0x5f5992) return null;
+  const _0x1d5f25 = _0x4e7709["camera"], _0x14b31a = _0x4e7709["canvas"]["clientWidth"] / 2, _0x2fe46f = _0x4e7709["canvas"]["clientHeight"] / 2, _0x1bad48 = _0x1d5f25["getPickRay"](new Cartesian2(_0x14b31a - 1, _0x2fe46f)), _0x3bd595 = _0x1d5f25["getPickRay"](new Cartesian2(_0x14b31a + 1, _0x2fe46f)), _0x5ed55c = _0x1d5f25["getPickRay"](new Cartesian2(_0x14b31a, _0x2fe46f));
+  if (!_0x1bad48 || !_0x3bd595 || !_0x5ed55c) return null;
+  const _0x49d697 = _0x5f5992["pick"](_0x1bad48, _0x4e7709), _0x559c7e = _0x5f5992["pick"](_0x3bd595, _0x4e7709), _0x111435 = _0x5f5992["pick"](_0x5ed55c, _0x4e7709);
+  if (!_0x49d697 || !_0x559c7e || !_0x111435) return null;
+  const _0x5c7cf0 = Cartesian3["distance"](_0x49d697, _0x559c7e) / 2;
+  return { "scale": _0x5c7cf0 * SCREEN_DPI / METERS_PER_INCH, "distance": Cartesian3["distance"](_0x1d5f25["position"], _0x111435) };
 }
 const DISPLAY_SNAP_TOLERANCE = 5e-3;
-function snapScaleForDisplay(_0x241074) {
-  const _0x420b49 = ZOOM_SCALE_STEPS["find"]((_0x534204) => Math["abs"](_0x241074 - _0x534204) <= _0x534204 * DISPLAY_SNAP_TOLERANCE);
-  return _0x420b49 ?? _0x241074;
+function snapScaleForDisplay(_0x79c8e8) {
+  const _0x1b5bb6 = ZOOM_SCALE_STEPS["find"]((_0x10840d) => Math["abs"](_0x79c8e8 - _0x10840d) <= _0x10840d * DISPLAY_SNAP_TOLERANCE);
+  return _0x1b5bb6 ?? _0x79c8e8;
 }
 const ZOOM_ANIMATION_SECONDS = 0.25;
-function easeOut(_0x4e58ee) {
-  return 1 - Math["pow"](1 - _0x4e58ee, 3);
+function easeOut(_0x1595bc) {
+  return 1 - Math["pow"](1 - _0x1595bc, 3);
 }
 const pendingZooms = /* @__PURE__ */ new WeakMap();
-function planStepAmount(_0xbd76a6, _0x50485c, _0x2233b1, _0x52986c) {
-  const _0x25005e = nextScaleStep(_0xbd76a6["scale"], _0x50485c);
-  if (_0x25005e === null) return null;
-  let _0x3fd6c3 = _0x25005e === Infinity ? Infinity : _0xbd76a6["distance"] * Math["abs"](1 - _0x25005e / _0xbd76a6["scale"]);
-  if (_0x50485c === -1) _0x3fd6c3 = Math["min"](_0x3fd6c3, _0x52986c - _0x2233b1);
-  return _0x3fd6c3 > 0 && Number["isFinite"](_0x3fd6c3) ? _0x3fd6c3 : null;
+function planStepAmount(_0x2d0a89, _0x19d6e3, _0x350b90, _0x4945f2) {
+  const _0x1af315 = nextScaleStep(_0x2d0a89["scale"], _0x19d6e3);
+  if (_0x1af315 === null) return null;
+  let _0x25b5ae = _0x1af315 === Infinity ? Infinity : _0x2d0a89["distance"] * Math["abs"](1 - _0x1af315 / _0x2d0a89["scale"]);
+  if (_0x19d6e3 === -1) _0x25b5ae = Math["min"](_0x25b5ae, _0x4945f2 - _0x350b90);
+  return _0x25b5ae > 0 && Number["isFinite"](_0x25b5ae) ? _0x25b5ae : null;
 }
-function flyScaleStep(_0x55ed80, _0x2f4b34, _0x1a01bc, _0x2c6373) {
-  const _0x68812f = pendingZooms["get"](_0x55ed80), _0x54e828 = (_0x68812f == null ? void 0 : _0x68812f["ground"]) ?? _0x1a01bc();
-  if (!_0x54e828) return;
-  const _0x36187f = (_0x68812f == null ? void 0 : _0x68812f["height"]) ?? _0x55ed80["positionCartographic"]["height"], _0x4b7e25 = planStepAmount(_0x54e828, _0x2f4b34, _0x36187f, _0x2c6373);
-  if (_0x4b7e25 === null) return;
-  const _0x33dc3d = (_0x68812f == null ? void 0 : _0x68812f["position"]) ?? _0x55ed80["position"], _0x43ccd9 = _0x55ed80["direction"], _0x173b5e = _0x55ed80["position"]["clone"]();
-  _0x173b5e["x"] = _0x33dc3d["x"] + _0x43ccd9["x"] * _0x4b7e25 * _0x2f4b34, _0x173b5e["y"] = _0x33dc3d["y"] + _0x43ccd9["y"] * _0x4b7e25 * _0x2f4b34, _0x173b5e["z"] = _0x33dc3d["z"] + _0x43ccd9["z"] * _0x4b7e25 * _0x2f4b34;
-  const _0xc34424 = _0x54e828["distance"] - _0x2f4b34 * _0x4b7e25, _0x305e33 = { "ground": { "scale": _0x54e828["scale"] * _0xc34424 / _0x54e828["distance"], "distance": _0xc34424 }, "height": _0x36187f - _0x2f4b34 * _0x4b7e25, "position": _0x173b5e }, _0x4b001a = () => {
-    if (pendingZooms["get"](_0x55ed80) === _0x305e33) pendingZooms["delete"](_0x55ed80);
+function flyScaleStep(_0x4853be, _0x320fe1, _0xc260f9, _0x36912f) {
+  const _0x49a847 = pendingZooms["get"](_0x4853be), _0x38d107 = (_0x49a847 == null ? void 0 : _0x49a847["ground"]) ?? _0xc260f9();
+  if (!_0x38d107) return;
+  const _0x2c5eea = (_0x49a847 == null ? void 0 : _0x49a847["height"]) ?? _0x4853be["positionCartographic"]["height"], _0x41ff1e = planStepAmount(_0x38d107, _0x320fe1, _0x2c5eea, _0x36912f);
+  if (_0x41ff1e === null) return;
+  const _0x4ca58e = (_0x49a847 == null ? void 0 : _0x49a847["position"]) ?? _0x4853be["position"], _0x3ddeca = _0x4853be["direction"], _0x18fcfa = _0x4853be["position"]["clone"]();
+  _0x18fcfa["x"] = _0x4ca58e["x"] + _0x3ddeca["x"] * _0x41ff1e * _0x320fe1, _0x18fcfa["y"] = _0x4ca58e["y"] + _0x3ddeca["y"] * _0x41ff1e * _0x320fe1, _0x18fcfa["z"] = _0x4ca58e["z"] + _0x3ddeca["z"] * _0x41ff1e * _0x320fe1;
+  const _0x1993fa = _0x38d107["distance"] - _0x320fe1 * _0x41ff1e, _0x19b47b = { "ground": { "scale": _0x38d107["scale"] * _0x1993fa / _0x38d107["distance"], "distance": _0x1993fa }, "height": _0x2c5eea - _0x320fe1 * _0x41ff1e, "position": _0x18fcfa }, _0x5e3a0e = () => {
+    if (pendingZooms["get"](_0x4853be) === _0x19b47b) pendingZooms["delete"](_0x4853be);
   };
-  _0x55ed80["flyTo"]({ "destination": _0x173b5e, "orientation": { "direction": _0x43ccd9["clone"](), "up": _0x55ed80["up"]["clone"]() }, "duration": ZOOM_ANIMATION_SECONDS, "easingFunction": easeOut, "complete": _0x4b001a, "cancel": _0x4b001a }), pendingZooms["set"](_0x55ed80, _0x305e33);
+  _0x4853be["flyTo"]({ "destination": _0x18fcfa, "orientation": { "direction": _0x3ddeca["clone"](), "up": _0x4853be["up"]["clone"]() }, "duration": ZOOM_ANIMATION_SECONDS, "easingFunction": easeOut, "complete": _0x5e3a0e, "cancel": _0x5e3a0e }), pendingZooms["set"](_0x4853be, _0x19b47b);
 }
-function scaleZoomStep(_0x25611d, _0x46ac37) {
-  const { camera: _0x46c1da, scene: _0x2e0e20 } = _0x25611d;
-  flyScaleStep(_0x46c1da, _0x46ac37, () => measureGround(_0x2e0e20), _0x2e0e20["screenSpaceCameraController"]["maximumZoomDistance"]);
+function scaleZoomStep(_0x1f2735, _0x40996e) {
+  const { camera: _0x45ae6c, scene: _0x4205c3 } = _0x1f2735;
+  flyScaleStep(_0x45ae6c, _0x40996e, () => measureGround(_0x4205c3), _0x4205c3["screenSpaceCameraController"]["maximumZoomDistance"]);
 }
 const WHEEL_STEP_THRESHOLD_PX = 40, WHEEL_SMALL_DELTA_LOCK_MS = 200, LINE_HEIGHT_PX = 16, PAGE_HEIGHT_PX = 400;
-function wheelDeltaPixels(_0x10e781, _0x2c3393) {
-  if (_0x2c3393 === 1) return _0x10e781 * LINE_HEIGHT_PX;
-  if (_0x2c3393 === 2) return _0x10e781 * PAGE_HEIGHT_PX;
-  return _0x10e781;
+function wheelDeltaPixels(_0x5db271, _0x37448a) {
+  if (_0x37448a === 1) return _0x5db271 * LINE_HEIGHT_PX;
+  if (_0x37448a === 2) return _0x5db271 * PAGE_HEIGHT_PX;
+  return _0x5db271;
 }
-function installScaleWheelZoom(_0x2f143b) {
-  const _0x311791 = _0x2f143b["scene"]["canvas"], _0x2148cd = _0x2f143b["scene"]["screenSpaceCameraController"], _0x537ba4 = _0x2148cd["zoomEventTypes"];
-  _0x2148cd["zoomEventTypes"] = [CameraEventType["MIDDLE_DRAG"], CameraEventType["PINCH"]];
-  let _0x4f3d49 = 0, _0x14f4c8 = 0;
-  const _0xb536ae = (_0x1e2873) => {
-    _0x1e2873["preventDefault"]();
-    const _0x565773 = wheelDeltaPixels(_0x1e2873["deltaY"], _0x1e2873["deltaMode"]);
-    if (_0x565773 === 0) return;
-    const _0x3af5c8 = performance["now"]();
-    if (Math["abs"](_0x565773) < WHEEL_STEP_THRESHOLD_PX && _0x3af5c8 < _0x14f4c8) return;
-    if (Math["sign"](_0x565773) !== Math["sign"](_0x4f3d49)) _0x4f3d49 = 0;
-    _0x4f3d49 += _0x565773;
-    if (Math["abs"](_0x4f3d49) < WHEEL_STEP_THRESHOLD_PX) return;
-    scaleZoomStep(_0x2f143b, _0x4f3d49 < 0 ? 1 : -1), _0x4f3d49 = 0, _0x14f4c8 = _0x3af5c8 + WHEEL_SMALL_DELTA_LOCK_MS;
+function installScaleWheelZoom(_0x4c2f5a) {
+  const _0x6c7e56 = _0x4c2f5a["scene"]["canvas"], _0x29cb20 = _0x4c2f5a["scene"]["screenSpaceCameraController"], _0x52aa54 = _0x29cb20["zoomEventTypes"];
+  _0x29cb20["zoomEventTypes"] = [CameraEventType["MIDDLE_DRAG"], CameraEventType["PINCH"]];
+  let _0x15e1aa = 0, _0x336c23 = 0;
+  const _0x381d5a = (_0x11314f) => {
+    _0x11314f["preventDefault"]();
+    const _0x16d1e8 = wheelDeltaPixels(_0x11314f["deltaY"], _0x11314f["deltaMode"]);
+    if (_0x16d1e8 === 0) return;
+    const _0x4db6d5 = performance["now"]();
+    if (Math["abs"](_0x16d1e8) < WHEEL_STEP_THRESHOLD_PX && _0x4db6d5 < _0x336c23) return;
+    if (Math["sign"](_0x16d1e8) !== Math["sign"](_0x15e1aa)) _0x15e1aa = 0;
+    _0x15e1aa += _0x16d1e8;
+    if (Math["abs"](_0x15e1aa) < WHEEL_STEP_THRESHOLD_PX) return;
+    scaleZoomStep(_0x4c2f5a, _0x15e1aa < 0 ? 1 : -1), _0x15e1aa = 0, _0x336c23 = _0x4db6d5 + WHEEL_SMALL_DELTA_LOCK_MS;
   };
-  return _0x311791["addEventListener"]("wheel", _0xb536ae, { "passive": ![] }), () => {
-    _0x311791["removeEventListener"]("wheel", _0xb536ae), _0x2148cd["zoomEventTypes"] = _0x537ba4;
+  return _0x6c7e56["addEventListener"]("wheel", _0x381d5a, { "passive": ![] }), () => {
+    _0x6c7e56["removeEventListener"]("wheel", _0x381d5a), _0x29cb20["zoomEventTypes"] = _0x52aa54;
   };
 }
-function createMarkerOverlay(_0xb9d075, _0x5e545f, _0x5e526d, _0x12bd37, _0x1fce64 = {}) {
-  const _0x140ebd = Cartesian3["fromDegrees"](_0x5e545f, _0x5e526d), _0x313822 = Ellipsoid["WGS84"]["geodeticSurfaceNormal"](_0x140ebd, new Cartesian3()), _0x394012 = new Cartesian3(), _0x5b1491 = new Cartesian2(), _0x94f3d9 = document["createElement"]("img");
-  _0x94f3d9["src"] = _0x12bd37, _0x94f3d9["alt"] = "", _0x94f3d9["draggable"] = ![], Object["assign"](_0x94f3d9["style"], { "position": "absolute", "left": "0", "top": "0", "display": "none", "pointerEvents": "none", "userSelect": "none", "zIndex": "1", "willChange": "transform", ..._0x1fce64["width"] === void 0 ? {} : { "width": _0x1fce64["width"] + "px" }, ..._0x1fce64["height"] === void 0 ? {} : { "height": _0x1fce64["height"] + "px" } }), _0xb9d075["container"]["appendChild"](_0x94f3d9);
-  const _0x386699 = () => {
-    const { scene: _0x58c8fa } = _0xb9d075;
-    let _0x4ccaf6 = !![];
-    _0x58c8fa["mode"] === SceneMode["SCENE3D"] && (Cartesian3["subtract"](_0x58c8fa["camera"]["positionWC"], _0x140ebd, _0x394012), _0x4ccaf6 = Cartesian3["dot"](_0x313822, _0x394012) > 0);
-    const _0x282643 = _0x4ccaf6 ? _0x58c8fa["cartesianToCanvasCoordinates"](_0x140ebd, _0x5b1491) : void 0;
-    if (!_0x282643) {
-      _0x94f3d9["style"]["display"] = "none";
+function createMarkerOverlay(_0x5909c8, _0x1df8a6, _0x52c7ce, _0x2c096a, _0x408a1d = {}) {
+  const _0x162cd4 = Cartesian3["fromDegrees"](_0x1df8a6, _0x52c7ce), _0x50719c = Ellipsoid["WGS84"]["geodeticSurfaceNormal"](_0x162cd4, new Cartesian3()), _0x9ee336 = new Cartesian3(), _0x21b488 = new Cartesian2(), _0x510ef9 = document["createElement"]("img");
+  _0x510ef9["src"] = _0x2c096a, _0x510ef9["alt"] = "", _0x510ef9["draggable"] = ![], Object["assign"](_0x510ef9["style"], { "position": "absolute", "left": "0", "top": "0", "display": "none", "pointerEvents": "none", "userSelect": "none", "zIndex": "1", "willChange": "transform", ..._0x408a1d["width"] === void 0 ? {} : { "width": _0x408a1d["width"] + "px" }, ..._0x408a1d["height"] === void 0 ? {} : { "height": _0x408a1d["height"] + "px" } }), _0x5909c8["container"]["appendChild"](_0x510ef9);
+  const _0x46770f = () => {
+    const { scene: _0x45156e } = _0x5909c8;
+    let _0x397505 = !![];
+    _0x45156e["mode"] === SceneMode["SCENE3D"] && (Cartesian3["subtract"](_0x45156e["camera"]["positionWC"], _0x162cd4, _0x9ee336), _0x397505 = Cartesian3["dot"](_0x50719c, _0x9ee336) > 0);
+    const _0x4fb502 = _0x397505 ? _0x45156e["cartesianToCanvasCoordinates"](_0x162cd4, _0x21b488) : void 0;
+    if (!_0x4fb502) {
+      _0x510ef9["style"]["display"] = "none";
       return;
     }
-    _0x94f3d9["style"]["display"] = "block";
-    const _0x4cc316 = Math["round"](_0x282643["x"] - _0x94f3d9["offsetWidth"] / 2), _0x6e0674 = Math["round"](_0x282643["y"] - (_0x1fce64["anchor"] === "center" ? _0x94f3d9["offsetHeight"] / 2 : _0x94f3d9["offsetHeight"]));
-    _0x94f3d9["style"]["transform"] = "translate(" + _0x4cc316 + "px, " + _0x6e0674 + "px)";
-  }, _0x6c7643 = _0xb9d075["scene"]["postRender"]["addEventListener"](_0x386699);
-  return _0x94f3d9["addEventListener"]("load", _0x386699), _0x386699(), () => {
-    _0x6c7643(), _0x94f3d9["remove"]();
+    _0x510ef9["style"]["display"] = "block";
+    const _0x23d1ac = Math["round"](_0x4fb502["x"] - _0x510ef9["offsetWidth"] / 2), _0x1a01b5 = Math["round"](_0x4fb502["y"] - (_0x408a1d["anchor"] === "center" ? _0x510ef9["offsetHeight"] / 2 : _0x510ef9["offsetHeight"]));
+    _0x510ef9["style"]["transform"] = "translate(" + _0x23d1ac + "px, " + _0x1a01b5 + "px)";
+  }, _0xd94ebb = _0x5909c8["scene"]["postRender"]["addEventListener"](_0x46770f);
+  return _0x510ef9["addEventListener"]("load", _0x46770f), _0x46770f(), () => {
+    _0xd94ebb(), _0x510ef9["remove"]();
   };
 }
 class EventEmitter {
   constructor() {
     this["listeners"] = {};
   }
-  ["on"](_0x1ca18e, _0x264aa9) {
-    const _0x3a08a3 = this["listeners"][_0x1ca18e];
-    return _0x3a08a3 !== void 0 ? _0x3a08a3["add"](_0x264aa9) : this["listeners"][_0x1ca18e] = /* @__PURE__ */ new Set([_0x264aa9]), this;
+  ["on"](_0x488dff, _0x3aa221) {
+    const _0x5999f6 = this["listeners"][_0x488dff];
+    return _0x5999f6 !== void 0 ? _0x5999f6["add"](_0x3aa221) : this["listeners"][_0x488dff] = /* @__PURE__ */ new Set([_0x3aa221]), this;
   }
-  ["off"](_0x12dd6d, _0x2cfc5a) {
+  ["off"](_0xfcb12c, _0x2a6025) {
     var _a2;
-    return (_a2 = this["listeners"][_0x12dd6d]) == null ? void 0 : _a2["delete"](_0x2cfc5a), this;
+    return (_a2 = this["listeners"][_0xfcb12c]) == null ? void 0 : _a2["delete"](_0x2a6025), this;
   }
-  ["once"](_0x222777, _0x169ebc) {
-    const _0x2e54d7 = (_0xc949bc) => {
-      _0x169ebc(_0xc949bc), this["off"](_0x222777, _0x2e54d7);
+  ["once"](_0x1e164a, _0xc53b65) {
+    const _0x1dfbde = (_0x407341) => {
+      _0xc53b65(_0x407341), this["off"](_0x1e164a, _0x1dfbde);
     };
-    return this["on"](_0x222777, _0x2e54d7);
+    return this["on"](_0x1e164a, _0x1dfbde);
   }
-  ["emit"](_0x2532bc, _0x55235b) {
-    const _0x522b65 = this["listeners"][_0x2532bc];
-    if (_0x522b65 === void 0) return;
-    for (const _0x17c12c of _0x522b65) {
-      _0x17c12c(_0x55235b);
+  ["emit"](_0x3473af, _0x8737b5) {
+    const _0x213fba = this["listeners"][_0x3473af];
+    if (_0x213fba === void 0) return;
+    for (const _0x50cf5d of _0x213fba) {
+      _0x50cf5d(_0x8737b5);
     }
   }
-  ["removeAllListeners"](_0x57170d) {
-    if (_0x57170d !== void 0) delete this["listeners"][_0x57170d];
-    else for (const _0x4e2b70 of Object["keys"](this["listeners"])) {
-      delete this["listeners"][_0x4e2b70];
+  ["removeAllListeners"](_0x1ecf31) {
+    if (_0x1ecf31 !== void 0) delete this["listeners"][_0x1ecf31];
+    else for (const _0x22e623 of Object["keys"](this["listeners"])) {
+      delete this["listeners"][_0x22e623];
     }
   }
-  ["listenerCount"](_0x5f0d77) {
+  ["listenerCount"](_0x2b5d8d) {
     var _a2;
-    return ((_a2 = this["listeners"][_0x5f0d77]) == null ? void 0 : _a2["size"]) ?? 0;
+    return ((_a2 = this["listeners"][_0x2b5d8d]) == null ? void 0 : _a2["size"]) ?? 0;
   }
 }
 const GLOBAL_STATE_SLOT = Symbol["for"]("@tucbs/core/globalConfigState");
 function getState() {
-  const _0x458129 = globalThis;
-  let _0x403c34 = _0x458129[GLOBAL_STATE_SLOT];
-  return !_0x403c34 && (_0x403c34 = { "apiKey": void 0, "apiBase": void 0, "proxyBase": void 0, "configured": ![], "refreshers": /* @__PURE__ */ new Set() }, Object["defineProperty"](globalThis, GLOBAL_STATE_SLOT, { "value": _0x403c34, "enumerable": ![], "configurable": ![], "writable": ![] })), _0x403c34;
+  const _0x314c12 = globalThis;
+  let _0x4e64d8 = _0x314c12[GLOBAL_STATE_SLOT];
+  return !_0x4e64d8 && (_0x4e64d8 = { "apiKey": void 0, "apiBase": void 0, "proxyBase": void 0, "configured": ![], "refreshers": /* @__PURE__ */ new Set() }, Object["defineProperty"](globalThis, GLOBAL_STATE_SLOT, { "value": _0x4e64d8, "enumerable": ![], "configurable": ![], "writable": ![] })), _0x4e64d8;
 }
-function configureTucbs(_0x5c882a) {
-  const _0x29922e = getState();
-  if (_0x5c882a["apiBase"] !== void 0) {
-    const _0x5b6fa2 = _0x5c882a["apiBase"]["trim"]()["replace"](/\/+$/, "");
-    _0x29922e["apiBase"] = _0x5b6fa2 || void 0, _0x29922e["configured"] = !![];
+function configureTucbs(_0x119eb2) {
+  const _0x52d8e6 = getState();
+  if (_0x119eb2["apiBase"] !== void 0) {
+    const _0x2e15a8 = _0x119eb2["apiBase"]["trim"]()["replace"](/\/+$/, "");
+    _0x52d8e6["apiBase"] = _0x2e15a8 || void 0, _0x52d8e6["configured"] = !![];
   }
-  if (_0x5c882a["proxyBase"] !== void 0) {
-    const _0x4cace7 = _0x5c882a["proxyBase"]["trim"]();
-    _0x29922e["proxyBase"] = _0x4cace7 || void 0, _0x29922e["configured"] = !![];
+  if (_0x119eb2["proxyBase"] !== void 0) {
+    const _0xb1bcfc = _0x119eb2["proxyBase"]["trim"]();
+    _0x52d8e6["proxyBase"] = _0xb1bcfc || void 0, _0x52d8e6["configured"] = !![];
   }
-  if (_0x5c882a["apiKey"] === void 0) {
-    _0x29922e["configured"] && _0x29922e["refreshers"]["forEach"]((_0x1d2b4b) => _0x1d2b4b());
+  if (_0x119eb2["apiKey"] === void 0) {
+    _0x52d8e6["configured"] && _0x52d8e6["refreshers"]["forEach"]((_0x595257) => _0x595257());
     return;
   }
-  _0x29922e["apiKey"] !== void 0 && _0x5c882a["apiKey"] !== _0x29922e["apiKey"] && console["warn"]("[@tucbs/core] configureTucbs() daha once farkli bir apiKey ile cagrilmisti; deger degistirildi. Bu beklenmiyorsa sayfada birden fazla script'in ayni fonksiyonu cagirdigini kontrol edin."), _0x29922e["apiKey"] = _0x5c882a["apiKey"], _0x29922e["configured"] = !![], _0x29922e["refreshers"]["forEach"]((_0x13af44) => _0x13af44());
+  _0x52d8e6["apiKey"] !== void 0 && _0x119eb2["apiKey"] !== _0x52d8e6["apiKey"] && console["warn"]("[@tucbs/core] configureTucbs() daha once farkli bir apiKey ile cagrilmisti; deger degistirildi. Bu beklenmiyorsa sayfada birden fazla script'in ayni fonksiyonu cagirdigini kontrol edin."), _0x52d8e6["apiKey"] = _0x119eb2["apiKey"], _0x52d8e6["configured"] = !![], _0x52d8e6["refreshers"]["forEach"]((_0x1fef13) => _0x1fef13());
 }
 function getGlobalApiBase() {
   return getState()["apiBase"];
@@ -277,22 +277,22 @@ function getGlobalProxyBase() {
 function getGlobalApiKey() {
   return getState()["apiKey"];
 }
-function registerApiKeyRefresh(_0x557a47) {
-  const { refreshers: _0x2cdb7d } = getState();
-  return _0x2cdb7d["add"](_0x557a47), () => _0x2cdb7d["delete"](_0x557a47);
+function registerApiKeyRefresh(_0x3b07c1) {
+  const { refreshers: _0x5b2840 } = getState();
+  return _0x5b2840["add"](_0x3b07c1), () => _0x5b2840["delete"](_0x3b07c1);
 }
 const DEFAULT_UCBP_API_BASE = ("http://localhost:8094/ucbp-api" == null ? void 0 : "http://localhost:8094/ucbp-api"["trim"]()) || "/ucbp-api";
-function trimSlash$2(_0x36e341) {
-  return _0x36e341["replace"](/\/+$/, "");
+function trimSlash$2(_0x49725a) {
+  return _0x49725a["replace"](/\/+$/, "");
 }
 function getUcbpApiBase() {
-  const _0x491c3e = getGlobalApiBase();
-  if (_0x491c3e) return trimSlash$2(_0x491c3e);
+  const _0x432adb = getGlobalApiBase();
+  if (_0x432adb) return trimSlash$2(_0x432adb);
   return trimSlash$2(DEFAULT_UCBP_API_BASE);
 }
 function getProxyBase() {
-  const _0x4997d2 = getGlobalProxyBase();
-  if (_0x4997d2) return _0x4997d2;
+  const _0x430b7e = getGlobalProxyBase();
+  if (_0x430b7e) return _0x430b7e;
   return console["warn"]("proxyBase yok; configureTucbs({ proxyBase }) verilmedi. main.js'te verilmeli."), "";
 }
 const ERROR_REGISTRY = { "API_KEY_MISSING": { "code": "API_KEY_MISSING", "number": "E001", "title": "API Anahtarı Eksik", "description": "Ne instance ne configureTucbs() ile ayarlanmış global apiKey sağlanmış." }, "API_KEY_INVALID": { "code": "API_KEY_INVALID", "number": "E002", "title": "API Anahtarı Geçersiz", "description": "Sağlanan apiKey backend tarafından reddedildi veya doğrulama isteği başarısız oldu." }, "INTERNAL_INDEX_OUT_OF_RANGE": { "code": "INTERNAL_INDEX_OUT_OF_RANGE", "number": "E003", "title": "İç Durum Hatası", "description": "Beklenen bir dizi indeksi bulunamadı (iç tutarlılık hatası)." }, "OGC_CAPABILITIES_REQUEST_FAILED": { "code": "OGC_CAPABILITIES_REQUEST_FAILED", "number": "E201", "title": "GetCapabilities İsteği Başarısız", "description": "WFS GetCapabilities isteği HTTP hata koduyla döndü." }, "OGC_CAPABILITIES_EXCEPTION": { "code": "OGC_CAPABILITIES_EXCEPTION", "number": "E202", "title": "GetCapabilities OGC Exception", "description": "WFS GetCapabilities yanıtı bir OGC ExceptionReport/ServiceExceptionReport döndürdü." }, "OGC_CAPABILITIES_PARSE_FAILED": { "code": "OGC_CAPABILITIES_PARSE_FAILED", "number": "E203", "title": "GetCapabilities Ayrıştırma Hatası", "description": "WFS GetCapabilities yanıtı geçerli XML olarak ayrıştırılamadı." }, "OGC_FEATURE_TYPE_NOT_FOUND": { "code": "OGC_FEATURE_TYPE_NOT_FOUND", "number": "E204", "title": "FeatureType Bulunamadı", "description": "WFS GetCapabilities yanıtında hiç FeatureType bulunamadı." }, "CRS_UNRESOLVED_UNSUPPORTED": { "code": "CRS_UNRESOLVED_UNSUPPORTED", "number": "E401", "title": "Koordinat Sistemi Tanınamadı", "description": "GeoJSON'daki koordinat sistemi (CRS) çözülemedi ve koordinatlar WGS84 ile uyumlu değil." }, "CRS_CLAIMED_WGS84_INVALID": { "code": "CRS_CLAIMED_WGS84_INVALID", "number": "E402", "title": "Koordinatlar WGS84 İle Uyumsuz", "description": "GeoJSON WGS84/CRS84 olduğunu belirtiyor ama koordinatlar geçerli bir enlem/boylam aralığında değil." }, "CRS_MISSING_UNSUPPORTED": { "code": "CRS_MISSING_UNSUPPORTED", "number": "E403", "title": "Koordinat Sistemi Bilgisi Yok", "description": "GeoJSON'da CRS bilgisi yok ve koordinatlar geçerli bir enlem/boylam aralığında değil." }, "ANALYSIS_API_KEY_MISSING": { "code": "ANALYSIS_API_KEY_MISSING", "number": "E301", "title": "Analiz İçin API Anahtarı Eksik", "description": "AnalysisManager'a apiKey tanımlanmadan analiz isteği yapıldı." }, "ANALYSIS_NETWORK_ERROR": { "code": "ANALYSIS_NETWORK_ERROR", "number": "E302", "title": "Analiz Ağ Hatası", "description": "Analiz isteği ağ seviyesinde (fetch) başarısız oldu." }, "ANALYSIS_REQUEST_FAILED": { "code": "ANALYSIS_REQUEST_FAILED", "number": "E303", "title": "Analiz İsteği Başarısız", "description": "Analiz backend'i HTTP hata koduyla döndü." }, "ANALYSIS_UNSUCCESSFUL": { "code": "ANALYSIS_UNSUCCESSFUL", "number": "E304", "title": "Analiz Başarısız", "description": "Analiz backend'i HTTP 200 döndü ama isSuccess/success=false işaretledi." }, "ANALYSIS_RESPONSE_MISSING_GEOJSON": { "code": "ANALYSIS_RESPONSE_MISSING_GEOJSON", "number": "E305", "title": "Analiz Yanıtı Eksik", "description": "Analiz backend'i başarılı yanıt döndü ama sonuç geojson içermiyor." }, "LAYER_AUTHORIZED_LIST_API_KEY_MISSING": { "code": "LAYER_AUTHORIZED_LIST_API_KEY_MISSING", "number": "E101", "title": "Yetkili Katman Listesi İçin API Anahtarı Gerekli", "description": "getAuthorizedLayers() apiKey ayarlanmadan çağrıldı." }, "LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE": { "code": "LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE", "number": "E102", "title": "GeoTIFF Export Desteklenmiyor", "description": "GeoTIFF export sadece WMS/WCS katmanlarında desteklenir." }, "LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED": { "code": "LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED", "number": "E103", "title": "GeoTIFF Export Yapılandırılmamış", "description": "Katman GeoTIFF export için gerekli tiffFormat seçeneğine sahip değil." }, "LAYER_STYLE_NOT_VECTOR": { "code": "LAYER_STYLE_NOT_VECTOR", "number": "E104", "title": "Stil Sadece Vektör Katmanlarda", "description": "applyLayerStyle() sadece vektör (Entity tabanlı) katmanlarda kullanılabilir." }, "LAYER_TYPE_UNSUPPORTED_XYZ": { "code": "LAYER_TYPE_UNSUPPORTED_XYZ", "number": "E105", "title": "XYZ Katmanı add() İle Desteklenmiyor", "description": "XYZ katmanı add() ile eklenemez, Map.setBasemap() kullanılmalı." }, "LAYER_TYPE_UNSUPPORTED_DRAWING": { "code": "LAYER_TYPE_UNSUPPORTED_DRAWING", "number": "E106", "title": "DRAWING Katmanı add() İle Desteklenmiyor", "description": "DRAWING katmanı DrawingManager tarafından otomatik eklenir, add() ile eklenemez." }, "LAYER_TYPE_UNSUPPORTED_MEASURE": { "code": "LAYER_TYPE_UNSUPPORTED_MEASURE", "number": "E107", "title": "MEASURE Katmanı add() İle Desteklenmiyor", "description": "MEASURE katmanı DrawingManager tarafından otomatik eklenir, add() ile eklenemez." }, "LAYER_WMS_LAYERS_EMPTY": { "code": "LAYER_WMS_LAYERS_EMPTY", "number": "E108", "title": "WMS layers Parametresi Boş", "description": "WMS katmanı eklenirken layers (ogcLayerName) parametresi boş." }, "LAYER_GEOTIFF_UNSUPPORTED": { "code": "LAYER_GEOTIFF_UNSUPPORTED", "number": "E109", "title": "GeoTIFF Katmanı Desteklenmiyor", "description": "GeoTIFF katmanı mevcut Cesium sürümünde desteklenmiyor." }, "LAYER_SHP_PACKAGE_MISSING": { "code": "LAYER_SHP_PACKAGE_MISSING", "number": "E110", "title": "shpjs Paketi Eksik", "description": 'SHP katmanı için gereken "shpjs" paketi tüketici uygulamaya eklenmemiş.' }, "LAYER_CSV_PACKAGE_MISSING": { "code": "LAYER_CSV_PACKAGE_MISSING", "number": "E111", "title": "papaparse Paketi Eksik", "description": 'CSV katmanı için gereken "papaparse" paketi tüketici uygulamaya eklenmemiş.' }, "LAYER_CSV_LATLON_NOT_FOUND": { "code": "LAYER_CSV_LATLON_NOT_FOUND", "number": "E112", "title": "CSV'de lat/lon Sütunu Bulunamadı", "description": "CSV içinde lat/lon sütunları otomatik tespit edilemedi." }, "LAYER_NOT_FOUND": { "code": "LAYER_NOT_FOUND", "number": "E113", "title": "Katman Bulunamadı", "description": "Verilen id'ye sahip bir katman yönetimde kayıtlı değil." }, "LAYER_ID_ALREADY_EXISTS": { "code": "LAYER_ID_ALREADY_EXISTS", "number": "E114", "title": "Katman ID'si Zaten Kayıtlı", "description": "Verilen id ile zaten bir katman eklenmiş." }, "LAYER_TYPE_MISMATCH": { "code": "LAYER_TYPE_MISMATCH", "number": "E115", "title": "Katman Tipi Uyuşmuyor", "description": "Katman beklenen tipte (WMS/WMTS) değil." }, "LAYER_SERVICE_OPTIONS_NOT_FOUND": { "code": "LAYER_SERVICE_OPTIONS_NOT_FOUND", "number": "E116", "title": "Servis Seçenekleri Bulunamadı", "description": "Katman için orijinal servis seçenekleri (serviceLayerOptions) bulunamadı." }, "LAYER_NOT_RASTER": { "code": "LAYER_NOT_RASTER", "number": "E117", "title": "Katman Raster Değil", "description": "İşlem sadece raster (ImageryLayer) katmanlarda desteklenir." }, "OGC_AUTHORIZED_LAYERS_REQUEST_FAILED": { "code": "OGC_AUTHORIZED_LAYERS_REQUEST_FAILED", "number": "E205", "title": "Yetkili Katman Listesi Alınamadı", "description": "getAuthorizedLayers() isteği HTTP hata koduyla döndü." }, "OGC_GEOTIFF_DOWNLOAD_FAILED": { "code": "OGC_GEOTIFF_DOWNLOAD_FAILED", "number": "E206", "title": "GeoTIFF İndirilemedi", "description": "GeoTIFF export isteği HTTP hata koduyla döndü." }, "OGC_WFS_JSON_FORMAT_UNSUPPORTED": { "code": "OGC_WFS_JSON_FORMAT_UNSUPPORTED", "number": "E207", "title": "WFS JSON Format İlan Etmiyor", "description": "WFS sunucusu GetCapabilities yanıtında JSON çıktı formatı ilan etmiyor." }, "OGC_WFS_GEOJSON_REQUEST_FAILED": { "code": "OGC_WFS_GEOJSON_REQUEST_FAILED", "number": "E208", "title": "WFS GeoJSON İsteği Başarısız", "description": "WFS GetFeature (GeoJSON çıktı) isteği başarısız oldu." }, "OGC_WFS_REQUEST_FAILED": { "code": "OGC_WFS_REQUEST_FAILED", "number": "E209", "title": "WFS İsteği Başarısız", "description": "WFS GetFeature (GML çıktı) isteği HTTP hata koduyla döndü." }, "OGC_WFS_EXCEPTION": { "code": "OGC_WFS_EXCEPTION", "number": "E210", "title": "WFS OGC Exception", "description": "WFS GetFeature yanıtı bir OGC ExceptionReport döndürdü." }, "OGC_WFS_OL_PACKAGE_MISSING": { "code": "OGC_WFS_OL_PACKAGE_MISSING", "number": "E211", "title": "ol Paketi Eksik", "description": 'WFS GML yanıtını okumak için gereken "ol" paketi tüketici uygulamaya eklenmemiş.' }, "OGC_WCS_REQUEST_FAILED": { "code": "OGC_WCS_REQUEST_FAILED", "number": "E212", "title": "WCS İsteği Başarısız", "description": "WCS GetCoverage isteği HTTP hata koduyla döndü." }, "OGC_WCS_MULTIPART_IMAGE_NOT_FOUND": { "code": "OGC_WCS_MULTIPART_IMAGE_NOT_FOUND", "number": "E213", "title": "WCS Multipart Görsel Bulunamadı", "description": "Multipart WCS yanıtında görsel (image) parçası bulunamadı." }, "LAYER_PREVIEW_UNSUPPORTED_XYZ": { "code": "LAYER_PREVIEW_UNSUPPORTED_XYZ", "number": "E118", "title": "XYZ Katmanı Önizlemede Desteklenmiyor", "description": "TucbsMapPreview XYZ katman tipini önizlemede desteklemiyor." }, "LAYER_PREVIEW_UNSUPPORTED_DRAWING": { "code": "LAYER_PREVIEW_UNSUPPORTED_DRAWING", "number": "E119", "title": "DRAWING Katmanı Önizlemede Desteklenmiyor", "description": "TucbsMapPreview DRAWING katman tipini önizlemede desteklemiyor." }, "LAYER_PREVIEW_UNSUPPORTED_MEASURE": { "code": "LAYER_PREVIEW_UNSUPPORTED_MEASURE", "number": "E120", "title": "MEASURE Katmanı Önizlemede Desteklenmiyor", "description": "TucbsMapPreview MEASURE katman tipini önizlemede desteklemiyor." }, "LAYER_MANAGER_NOT_READY": { "code": "LAYER_MANAGER_NOT_READY", "number": "E121", "title": "Harita Hazır Değil", "description": "Katman eklenmeye çalışıldığında LayerManager henüz hazır değildi." }, "LAYER_AUTHORIZED_ADD_MISSING_INFO": { "code": "LAYER_AUTHORIZED_ADD_MISSING_INFO", "number": "E122", "title": "Yetkili Katman Eklenemedi", "description": "Yetkili katman için gerekli servis bilgisi (ör. WMTS TileMatrixSet) eksik." }, "OGC_SERVICE_DISCOVERY_PARSE_FAILED": { "code": "OGC_SERVICE_DISCOVERY_PARSE_FAILED", "number": "E214", "title": "Servis Keşfi Ayrıştırma Hatası", "description": "TucbsServiceUpload'da GetCapabilities yanıtı geçerli XML olarak ayrıştırılamadı." }, "LAYER_WMTS_TILEMATRIXSET_MISSING": { "code": "LAYER_WMTS_TILEMATRIXSET_MISSING", "number": "E123", "title": "TileMatrixSet Bilgisi Bulunamadı", "description": "Keşfedilen WMTS katmanı için TileMatrixSet bilgisi bulunamadı." } };
@@ -300,259 +300,259 @@ function getErrorCodes() {
   return ERROR_REGISTRY;
 }
 class TucbsError extends Error {
-  constructor(_0x2fbdf6, _0x4a4930, _0x29898a) {
-    const _0x3b7541 = ERROR_REGISTRY[_0x2fbdf6];
-    super(_0x4a4930 ?? _0x3b7541["description"]), this["name"] = "TucbsError", this["code"] = _0x2fbdf6, this["number"] = _0x3b7541["number"], this["title"] = _0x29898a ?? _0x3b7541["title"];
+  constructor(_0x53eda4, _0x30e01c, _0x5d2089) {
+    const _0x297c7d = ERROR_REGISTRY[_0x53eda4];
+    super(_0x30e01c ?? _0x297c7d["description"]), this["name"] = "TucbsError", this["code"] = _0x53eda4, this["number"] = _0x297c7d["number"], this["title"] = _0x5d2089 ?? _0x297c7d["title"];
   }
 }
 class LayerOperationError extends TucbsError {
-  constructor(_0x4983f5, _0x18a7fc, _0x1b1a6) {
-    super(_0x4983f5, _0x18a7fc, _0x1b1a6), this["name"] = "LayerOperationError";
+  constructor(_0x266a51, _0x29d6f6, _0x121bf0) {
+    super(_0x266a51, _0x29d6f6, _0x121bf0), this["name"] = "LayerOperationError";
   }
 }
 class OgcRequestError extends TucbsError {
-  constructor(_0x5ab86b, _0x3a89e5, _0x11dd21) {
-    super(_0x5ab86b, _0x3a89e5, _0x11dd21), this["name"] = "OgcRequestError";
+  constructor(_0x5441af, _0x3034ef, _0x568eef) {
+    super(_0x5441af, _0x3034ef, _0x568eef), this["name"] = "OgcRequestError";
   }
 }
 class AnalysisRequestError extends TucbsError {
-  constructor(_0x11d6d8, _0x3d083b, _0x3bec5f) {
-    super(_0x11d6d8, _0x3d083b, _0x3bec5f), this["name"] = "AnalysisRequestError";
+  constructor(_0xbd8bbe, _0x482101, _0x122f0e) {
+    super(_0xbd8bbe, _0x482101, _0x122f0e), this["name"] = "AnalysisRequestError";
   }
 }
 class GeometryError extends TucbsError {
-  constructor(_0x4a981c, _0x1369f6, _0x337f49) {
-    super(_0x4a981c, _0x1369f6, _0x337f49), this["name"] = "GeometryError";
+  constructor(_0x45fd88, _0x585c06, _0x3ae9ee) {
+    super(_0x45fd88, _0x585c06, _0x3ae9ee), this["name"] = "GeometryError";
   }
 }
 class ApiKeyValidationError extends TucbsError {
-  constructor(_0x408ec8, _0x2445a0) {
-    super((_0x2445a0 == null ? void 0 : _0x2445a0["code"]) ?? "API_KEY_INVALID", _0x408ec8, (_0x2445a0 == null ? void 0 : _0x2445a0["title"]) ?? "API Hatası"), this["name"] = "ApiKeyValidationError";
-    if ((_0x2445a0 == null ? void 0 : _0x2445a0["reason"]) !== void 0) this["reason"] = _0x2445a0["reason"];
-    if ((_0x2445a0 == null ? void 0 : _0x2445a0["detail"]) !== void 0) this["detail"] = _0x2445a0["detail"];
+  constructor(_0x39e404, _0x384881) {
+    super((_0x384881 == null ? void 0 : _0x384881["code"]) ?? "API_KEY_INVALID", _0x39e404, (_0x384881 == null ? void 0 : _0x384881["title"]) ?? "API Hatası"), this["name"] = "ApiKeyValidationError";
+    if ((_0x384881 == null ? void 0 : _0x384881["reason"]) !== void 0) this["reason"] = _0x384881["reason"];
+    if ((_0x384881 == null ? void 0 : _0x384881["detail"]) !== void 0) this["detail"] = _0x384881["detail"];
   }
 }
 const _ApiKeyPolicy = class _ApiKeyPolicy {
-  constructor(_0x2639fa) {
+  constructor(_0x54e3b7) {
     __privateAdd(this, _apiKey);
-    this["getApiBase"] = _0x2639fa["apiBase"];
+    this["getApiBase"] = _0x54e3b7["apiBase"];
   }
-  ["configure"](_0x30e4ac) {
-    _0x30e4ac["apiKey"] !== void 0 && __privateSet(this, _apiKey, _0x30e4ac["apiKey"]), _0x30e4ac["trustedApiKeyHosts"] !== void 0 && (this["trustedApiKeyHosts"] = _0x30e4ac["trustedApiKeyHosts"]), _0x30e4ac["apiKeyDiscoveryUrl"] !== void 0 && (this["apiKeyDiscoveryUrl"] = _0x30e4ac["apiKeyDiscoveryUrl"]);
+  ["configure"](_0x1a114f) {
+    _0x1a114f["apiKey"] !== void 0 && __privateSet(this, _apiKey, _0x1a114f["apiKey"]), _0x1a114f["trustedApiKeyHosts"] !== void 0 && (this["trustedApiKeyHosts"] = _0x1a114f["trustedApiKeyHosts"]), _0x1a114f["apiKeyDiscoveryUrl"] !== void 0 && (this["apiKeyDiscoveryUrl"] = _0x1a114f["apiKeyDiscoveryUrl"]);
   }
   get ["hasApiKey"]() {
     return __privateGet(this, _apiKey) !== void 0;
   }
   async ["getAuthorizedLayers"]() {
     if (__privateGet(this, _apiKey) === void 0) throw new LayerOperationError("LAYER_AUTHORIZED_LIST_API_KEY_MISSING", "getAuthorizedLayers() icin apiKey gerekli — Map/LayerManager.configure({apiKey}) ile atayin.");
-    const _0x4a7fb6 = this["apiKeyDiscoveryUrl"] ?? this["getApiBase"]()["replace"](/\/+$/, "") + "/layers", _0x497b7c = await fetch(_0x4a7fb6, { "headers": { [_ApiKeyPolicy["API_KEY_HEADER_NAME"]]: __privateGet(this, _apiKey) } });
-    if (!_0x497b7c["ok"]) throw new OgcRequestError("OGC_AUTHORIZED_LAYERS_REQUEST_FAILED", "Yetkili katman listesi alinamadi: " + _0x497b7c["status"] + " " + _0x497b7c["statusText"]);
-    const _0x220b05 = await _0x497b7c["json"](), _0x3eb37d = Array["isArray"](_0x220b05) ? _0x220b05 : _0x220b05["object"] ?? [];
-    return _0x3eb37d["map"]((_0x5144f8) => this["normalizeAuthorizedLayer"](_0x5144f8));
+    const _0x1c4f9e = this["apiKeyDiscoveryUrl"] ?? this["getApiBase"]()["replace"](/\/+$/, "") + "/layers", _0xcbde2 = await fetch(_0x1c4f9e, { "headers": { [_ApiKeyPolicy["API_KEY_HEADER_NAME"]]: __privateGet(this, _apiKey) } });
+    if (!_0xcbde2["ok"]) throw new OgcRequestError("OGC_AUTHORIZED_LAYERS_REQUEST_FAILED", "Yetkili katman listesi alinamadi: " + _0xcbde2["status"] + " " + _0xcbde2["statusText"]);
+    const _0x535c20 = await _0xcbde2["json"](), _0x1e5aa5 = Array["isArray"](_0x535c20) ? _0x535c20 : _0x535c20["object"] ?? [];
+    return _0x1e5aa5["map"]((_0x4daf12) => this["normalizeAuthorizedLayer"](_0x4daf12));
   }
   async ["getLayerList"]() {
     return this["getAuthorizedLayers"]();
   }
-  ["canAddAuthorizedLayer"](_0x1dadf1) {
+  ["canAddAuthorizedLayer"](_0x56ba3d) {
     var _a2, _b;
-    const _0xc5f171 = (_0x1dadf1["servisTuru"] || "")["toUpperCase"]();
-    if (!((_a2 = _0x1dadf1["servisUrl"]) == null ? void 0 : _a2["trim"]()) || !this["resolveOgcLayerName"](_0x1dadf1["ogcLayerName"], _0x1dadf1["katmanAdi"])) return ![];
-    if (_0xc5f171 === "WMTS") return !!((_b = _0x1dadf1["wmtsTileMatrixSet"]) == null ? void 0 : _b["trim"]());
-    return _0xc5f171 === "WMS" || _0xc5f171 === "WFS";
+    const _0x5d2c5e = (_0x56ba3d["servisTuru"] || "")["toUpperCase"]();
+    if (!((_a2 = _0x56ba3d["servisUrl"]) == null ? void 0 : _a2["trim"]()) || !this["resolveOgcLayerName"](_0x56ba3d["ogcLayerName"], _0x56ba3d["katmanAdi"])) return ![];
+    if (_0x5d2c5e === "WMTS") return !!((_b = _0x56ba3d["wmtsTileMatrixSet"]) == null ? void 0 : _b["trim"]());
+    return _0x5d2c5e === "WMS" || _0x5d2c5e === "WFS";
   }
-  ["resolveAddOptions"](_0x4facb5) {
+  ["resolveAddOptions"](_0x514724) {
     var _a2;
-    if (!this["canAddAuthorizedLayer"](_0x4facb5)) throw new LayerOperationError("LAYER_AUTHORIZED_ADD_MISSING_INFO", ((_a2 = _0x4facb5["servisTuru"]) == null ? void 0 : _a2["toUpperCase"]()) === "WMTS" ? "WMTS için TileMatrixSet eksik." : "Eksik servis bilgisi.");
-    const _0x99a652 = _0x4facb5["servisTuru"]["toUpperCase"](), _0x1142d2 = "authorized-" + this["authorizedLayerKey"](_0x4facb5) + "-" + Date["now"](), _0x377713 = this["resolveOgcLayerName"](_0x4facb5["ogcLayerName"], _0x4facb5["katmanAdi"]), _0xc36529 = _0x4facb5["katmanAdi"] || _0x377713;
-    if (_0x99a652 === "WMS") return { "layerType": "WMS", "options": { "id": _0x1142d2, "title": _0xc36529, "url": _0x4facb5["servisUrl"], "layers": _0x377713 } };
-    if (_0x99a652 === "WFS") return { "layerType": "WFS", "options": { "id": _0x1142d2, "title": _0xc36529, "url": _0x4facb5["servisUrl"], "typeName": _0x377713 } };
-    return { "layerType": "WMTS", "options": { "id": _0x1142d2, "title": _0xc36529, "url": _0x4facb5["servisUrl"], "layer": _0x377713, "tileMatrixSetID": _0x4facb5["wmtsTileMatrixSet"] } };
+    if (!this["canAddAuthorizedLayer"](_0x514724)) throw new LayerOperationError("LAYER_AUTHORIZED_ADD_MISSING_INFO", ((_a2 = _0x514724["servisTuru"]) == null ? void 0 : _a2["toUpperCase"]()) === "WMTS" ? "WMTS için TileMatrixSet eksik." : "Eksik servis bilgisi.");
+    const _0x5867fe = _0x514724["servisTuru"]["toUpperCase"](), _0x4d8eac = "authorized-" + this["authorizedLayerKey"](_0x514724) + "-" + Date["now"](), _0x33d470 = this["resolveOgcLayerName"](_0x514724["ogcLayerName"], _0x514724["katmanAdi"]), _0x5a7903 = _0x514724["katmanAdi"] || _0x33d470;
+    if (_0x5867fe === "WMS") return { "layerType": "WMS", "options": { "id": _0x4d8eac, "title": _0x5a7903, "url": _0x514724["servisUrl"], "layers": _0x33d470 } };
+    if (_0x5867fe === "WFS") return { "layerType": "WFS", "options": { "id": _0x4d8eac, "title": _0x5a7903, "url": _0x514724["servisUrl"], "typeName": _0x33d470 } };
+    return { "layerType": "WMTS", "options": { "id": _0x4d8eac, "title": _0x5a7903, "url": _0x514724["servisUrl"], "layer": _0x33d470, "tileMatrixSetID": _0x514724["wmtsTileMatrixSet"] } };
   }
-  ["authorizedLayerKey"](_0x5aaf64) {
-    return _0x5aaf64["id"] ?? _0x5aaf64["servisTuru"] + "|" + _0x5aaf64["servisUrl"] + "|" + _0x5aaf64["ogcLayerName"];
+  ["authorizedLayerKey"](_0x1a7360) {
+    return _0x1a7360["id"] ?? _0x1a7360["servisTuru"] + "|" + _0x1a7360["servisUrl"] + "|" + _0x1a7360["ogcLayerName"];
   }
-  ["normalizeAuthorizedLayer"](_0x2a58b3) {
-    const _0x46acff = this["resolveOgcLayerName"](_0x2a58b3["ogcLayerName"], _0x2a58b3["katmanAdi"]), _0x16f595 = this["rewriteOpaqueOgcUrl"](_0x2a58b3["servisUrl"]), _0xf4f270 = _0x2a58b3["servisTuru"]["toUpperCase"]();
-    return { ..._0x2a58b3, "servisTuru": _0xf4f270, ..._0x46acff && _0x46acff !== _0x2a58b3["ogcLayerName"] ? { "ogcLayerName": _0x46acff } : {}, ..._0x16f595 !== _0x2a58b3["servisUrl"] ? { "servisUrl": _0x16f595 } : {} };
+  ["normalizeAuthorizedLayer"](_0x3910f9) {
+    const _0x401a87 = this["resolveOgcLayerName"](_0x3910f9["ogcLayerName"], _0x3910f9["katmanAdi"]), _0x58a5b6 = this["rewriteOpaqueOgcUrl"](_0x3910f9["servisUrl"]), _0x4261fc = _0x3910f9["servisTuru"]["toUpperCase"]();
+    return { ..._0x3910f9, "servisTuru": _0x4261fc, ..._0x401a87 && _0x401a87 !== _0x3910f9["ogcLayerName"] ? { "ogcLayerName": _0x401a87 } : {}, ..._0x58a5b6 !== _0x3910f9["servisUrl"] ? { "servisUrl": _0x58a5b6 } : {} };
   }
-  ["resolveOgcLayerName"](_0x26c4d3, _0x21e7a8) {
-    for (const _0x391b54 of [_0x26c4d3, _0x21e7a8]) {
-      if (!_0x391b54) continue;
-      const _0x12044e = _0x391b54["trim"]();
-      if (!_0x12044e || _0x12044e["toLowerCase"]() === "undefined" || _0x12044e["toLowerCase"]() === "null") continue;
-      return _0x12044e;
+  ["resolveOgcLayerName"](_0x1970f3, _0x5f5b5f) {
+    for (const _0x996531 of [_0x1970f3, _0x5f5b5f]) {
+      if (!_0x996531) continue;
+      const _0x8c00b4 = _0x996531["trim"]();
+      if (!_0x8c00b4 || _0x8c00b4["toLowerCase"]() === "undefined" || _0x8c00b4["toLowerCase"]() === "null") continue;
+      return _0x8c00b4;
     }
     return "";
   }
-  ["isTrustedApiKeyHost"](_0x552b17) {
+  ["isTrustedApiKeyHost"](_0x15b4db) {
     if (__privateGet(this, _apiKey) === void 0) return ![];
-    return this["isKnownGatedUrl"](_0x552b17);
+    return this["isKnownGatedUrl"](_0x15b4db);
   }
-  ["layerRequiresApiKey"](_0x2ed8e6) {
-    return this["isKnownGatedUrl"](_0x2ed8e6);
+  ["layerRequiresApiKey"](_0x160f33) {
+    return this["isKnownGatedUrl"](_0x160f33);
   }
-  ["isKnownGatedUrl"](_0x402120) {
-    if (this["isOwnBackendUrl"](_0x402120)) return !![];
+  ["isKnownGatedUrl"](_0x4dd27a) {
+    if (this["isOwnBackendUrl"](_0x4dd27a)) return !![];
     if (this["trustedApiKeyHosts"] === void 0 || this["trustedApiKeyHosts"]["length"] === 0) return ![];
     try {
-      return this["trustedApiKeyHosts"]["includes"](new URL(_0x402120)["hostname"]);
+      return this["trustedApiKeyHosts"]["includes"](new URL(_0x4dd27a)["hostname"]);
     } catch {
       return ![];
     }
   }
-  ["isOwnBackendUrl"](_0x30e80a) {
+  ["isOwnBackendUrl"](_0x5ed5e6) {
     try {
-      const _0x540312 = new URL(_0x30e80a, window["location"]["origin"]), _0x1c2a45 = new URL(this["getApiBase"](), window["location"]["origin"]);
-      if (_0x540312["hostname"] !== _0x1c2a45["hostname"]) return ![];
-      return _0x540312["pathname"]["includes"]("/wms-proxy/") || _0x540312["pathname"]["includes"]("/ogc/");
+      const _0x3fc647 = new URL(_0x5ed5e6, window["location"]["origin"]), _0x451ae0 = new URL(this["getApiBase"](), window["location"]["origin"]);
+      if (_0x3fc647["hostname"] !== _0x451ae0["hostname"]) return ![];
+      return _0x3fc647["pathname"]["includes"]("/wms-proxy/") || _0x3fc647["pathname"]["includes"]("/ogc/");
     } catch {
       return ![];
     }
   }
-  ["rewriteOpaqueOgcUrl"](_0x318b05) {
-    if (!(_0x318b05 == null ? void 0 : _0x318b05["includes"]("/ogc/"))) return _0x318b05 ?? "";
-    const _0x389ffc = _0x318b05["indexOf"]("/ogc/"), _0x522b69 = _0x318b05["substring"](_0x389ffc), _0x4f8eee = this["getApiBase"]()["replace"](/\/+$/, "");
-    return "" + _0x4f8eee + _0x522b69;
+  ["rewriteOpaqueOgcUrl"](_0x179ccd) {
+    if (!(_0x179ccd == null ? void 0 : _0x179ccd["includes"]("/ogc/"))) return _0x179ccd ?? "";
+    const _0x5070bc = _0x179ccd["indexOf"]("/ogc/"), _0x1be1ad = _0x179ccd["substring"](_0x5070bc), _0xdf5744 = this["getApiBase"]()["replace"](/\/+$/, "");
+    return "" + _0xdf5744 + _0x1be1ad;
   }
-  ["resolveOgcProxyUrl"](_0x199fd5, _0x32e6e5) {
-    if (__privateGet(this, _apiKey) === void 0) return _0x32e6e5;
-    if (_0x32e6e5["includes"]("/ogc/")) return this["rewriteOpaqueOgcUrl"](_0x32e6e5);
-    if (_0x32e6e5["includes"]("/wms-proxy/")) return _0x32e6e5;
-    const _0x486800 = this["getApiBase"]()["replace"](/\/+$/, "") + "/wms-proxy/" + _0x199fd5, _0x1c5993 = _0x486800["includes"]("?") ? "&" : "?";
-    return "" + _0x486800 + _0x1c5993 + "url=" + encodeURIComponent(_0x32e6e5);
+  ["resolveOgcProxyUrl"](_0xd64194, _0xd843ec) {
+    if (__privateGet(this, _apiKey) === void 0) return _0xd843ec;
+    if (_0xd843ec["includes"]("/ogc/")) return this["rewriteOpaqueOgcUrl"](_0xd843ec);
+    if (_0xd843ec["includes"]("/wms-proxy/")) return _0xd843ec;
+    const _0xe36cc7 = this["getApiBase"]()["replace"](/\/+$/, "") + "/wms-proxy/" + _0xd64194, _0x5eaca3 = _0xe36cc7["includes"]("?") ? "&" : "?";
+    return "" + _0xe36cc7 + _0x5eaca3 + "url=" + encodeURIComponent(_0xd843ec);
   }
-  ["mergeApiKeyHeader"](_0x4356d9, _0x50f721) {
-    if (!this["isTrustedApiKeyHost"](_0x50f721)) return _0x4356d9;
-    return { ..._0x4356d9, [_ApiKeyPolicy["API_KEY_HEADER_NAME"]]: __privateGet(this, _apiKey) };
+  ["mergeApiKeyHeader"](_0x35ccf0, _0x1e51cd) {
+    if (!this["isTrustedApiKeyHost"](_0x1e51cd)) return _0x35ccf0;
+    return { ..._0x35ccf0, [_ApiKeyPolicy["API_KEY_HEADER_NAME"]]: __privateGet(this, _apiKey) };
   }
-  ["attachApiKeyToUrl"](_0x462d84) {
-    if (!this["isTrustedApiKeyHost"](_0x462d84)) return _0x462d84;
-    const _0x258eeb = _0x462d84["includes"]("?") ? "&" : "?";
-    return "" + _0x462d84 + _0x258eeb + _ApiKeyPolicy["API_KEY_QUERY_PARAM_NAME"] + "=" + encodeURIComponent(__privateGet(this, _apiKey));
+  ["attachApiKeyToUrl"](_0x33485b) {
+    if (!this["isTrustedApiKeyHost"](_0x33485b)) return _0x33485b;
+    const _0x5e5e5c = _0x33485b["includes"]("?") ? "&" : "?";
+    return "" + _0x33485b + _0x5e5e5c + _ApiKeyPolicy["API_KEY_QUERY_PARAM_NAME"] + "=" + encodeURIComponent(__privateGet(this, _apiKey));
   }
-  ["buildAuthHeaders"](_0x176502) {
-    if (_0x176502 === void 0) return void 0;
-    return { "Authorization": "Bearer " + _0x176502 };
+  ["buildAuthHeaders"](_0x10ab88) {
+    if (_0x10ab88 === void 0) return void 0;
+    return { "Authorization": "Bearer " + _0x10ab88 };
   }
 };
 _apiKey = new WeakMap();
 _ApiKeyPolicy["API_KEY_HEADER_NAME"] = "X-API-Key";
 _ApiKeyPolicy["API_KEY_QUERY_PARAM_NAME"] = "tucbsapikey";
 let ApiKeyPolicy = _ApiKeyPolicy;
-function cartesianToLonLat(_0x3f429f) {
-  const _0x22d3b6 = Cartographic["fromCartesian"](_0x3f429f);
-  return [_0x318bcf["toDegrees"](_0x22d3b6["longitude"]), _0x318bcf["toDegrees"](_0x22d3b6["latitude"])];
+function cartesianToLonLat(_0x25872d) {
+  const _0x38c4df = Cartographic["fromCartesian"](_0x25872d);
+  return [_0x584e42["toDegrees"](_0x38c4df["longitude"]), _0x584e42["toDegrees"](_0x38c4df["latitude"])];
 }
-function closeRing$1(_0xe14a43) {
-  if (_0xe14a43["length"] === 0) return _0xe14a43;
-  const _0x1e6e42 = _0xe14a43[0], _0x9d3915 = _0xe14a43[_0xe14a43["length"] - 1];
-  if (_0x1e6e42[0] === _0x9d3915[0] && _0x1e6e42[1] === _0x9d3915[1]) return _0xe14a43;
-  return [..._0xe14a43, _0x1e6e42];
+function closeRing$1(_0x425b97) {
+  if (_0x425b97["length"] === 0) return _0x425b97;
+  const _0x1fbb2f = _0x425b97[0], _0x3b1091 = _0x425b97[_0x425b97["length"] - 1];
+  if (_0x1fbb2f[0] === _0x3b1091[0] && _0x1fbb2f[1] === _0x3b1091[1]) return _0x425b97;
+  return [..._0x425b97, _0x1fbb2f];
 }
-function entityToGeoJSON(_0x8ccfe5, _0x2f874c = JulianDate["now"]()) {
+function entityToGeoJSON(_0x130868, _0x48925b = JulianDate["now"]()) {
   var _a2, _b, _c;
-  const _0x5a7f77 = ((_a2 = _0x8ccfe5["properties"]) == null ? void 0 : _a2["getValue"](_0x2f874c)) ?? {}, _0x75c358 = { ..._0x5a7f77 };
-  delete _0x75c358["layerId"], delete _0x75c358["featureId"];
-  let _0x5ab7e8 = null;
-  if ((_b = _0x8ccfe5["polygon"]) == null ? void 0 : _b["hierarchy"]) {
-    const _0x2be09f = _0x8ccfe5["polygon"]["hierarchy"]["getValue"](_0x2f874c), _0x16dfa1 = _0x2be09f == null ? void 0 : _0x2be09f["positions"];
-    if (_0x16dfa1 && _0x16dfa1["length"] >= 3) {
-      const _0x21f355 = closeRing$1(_0x16dfa1["map"](cartesianToLonLat));
-      _0x5ab7e8 = { "type": "Polygon", "coordinates": [_0x21f355] };
+  const _0x3822bd = ((_a2 = _0x130868["properties"]) == null ? void 0 : _a2["getValue"](_0x48925b)) ?? {}, _0x3033c5 = { ..._0x3822bd };
+  delete _0x3033c5["layerId"], delete _0x3033c5["featureId"];
+  let _0x36459e = null;
+  if ((_b = _0x130868["polygon"]) == null ? void 0 : _b["hierarchy"]) {
+    const _0x4ba92c = _0x130868["polygon"]["hierarchy"]["getValue"](_0x48925b), _0x53d71a = _0x4ba92c == null ? void 0 : _0x4ba92c["positions"];
+    if (_0x53d71a && _0x53d71a["length"] >= 3) {
+      const _0x3b3aec = closeRing$1(_0x53d71a["map"](cartesianToLonLat));
+      _0x36459e = { "type": "Polygon", "coordinates": [_0x3b3aec] };
     }
   } else {
-    if ((_c = _0x8ccfe5["polyline"]) == null ? void 0 : _c["positions"]) {
-      const _0x33f0b5 = _0x8ccfe5["polyline"]["positions"]["getValue"](_0x2f874c);
-      _0x33f0b5 && _0x33f0b5["length"] >= 2 && (_0x5ab7e8 = { "type": "LineString", "coordinates": _0x33f0b5["map"](cartesianToLonLat) });
+    if ((_c = _0x130868["polyline"]) == null ? void 0 : _c["positions"]) {
+      const _0x2e8f5b = _0x130868["polyline"]["positions"]["getValue"](_0x48925b);
+      _0x2e8f5b && _0x2e8f5b["length"] >= 2 && (_0x36459e = { "type": "LineString", "coordinates": _0x2e8f5b["map"](cartesianToLonLat) });
     } else {
-      if (_0x8ccfe5["position"]) {
-        const _0x4d3a44 = _0x8ccfe5["position"]["getValue"](_0x2f874c);
-        _0x4d3a44 && (_0x5ab7e8 = { "type": "Point", "coordinates": cartesianToLonLat(_0x4d3a44) });
+      if (_0x130868["position"]) {
+        const _0x4404ae = _0x130868["position"]["getValue"](_0x48925b);
+        _0x4404ae && (_0x36459e = { "type": "Point", "coordinates": cartesianToLonLat(_0x4404ae) });
       }
     }
   }
-  if (!_0x5ab7e8) return null;
-  return { "type": "Feature", "id": _0x8ccfe5["id"], "properties": _0x75c358, "geometry": _0x5ab7e8 };
+  if (!_0x36459e) return null;
+  return { "type": "Feature", "id": _0x130868["id"], "properties": _0x3033c5, "geometry": _0x36459e };
 }
-function featureLabel(_0x257673) {
+function featureLabel(_0x54a342) {
   var _a2;
-  const _0x2a09f1 = ((_a2 = _0x257673["geometry"]) == null ? void 0 : _a2["type"]) ?? "Feature", _0x2f00fd = _0x257673["id"] != null ? String(_0x257673["id"]) : "";
-  return _0x2f00fd ? _0x2a09f1 + " " + _0x2f00fd : _0x2a09f1;
+  const _0x3e0c9f = ((_a2 = _0x54a342["geometry"]) == null ? void 0 : _a2["type"]) ?? "Feature", _0x1fa97d = _0x54a342["id"] != null ? String(_0x54a342["id"]) : "";
+  return _0x1fa97d ? _0x3e0c9f + " " + _0x1fa97d : _0x3e0c9f;
 }
-function triggerDownload(_0x3655f0, _0x29abca) {
-  const _0x18e8b7 = URL["createObjectURL"](_0x3655f0), _0x36f279 = document["createElement"]("a");
-  _0x36f279["href"] = _0x18e8b7, _0x36f279["download"] = _0x29abca, document["body"]["appendChild"](_0x36f279), _0x36f279["click"](), _0x36f279["remove"](), setTimeout(() => URL["revokeObjectURL"](_0x18e8b7), 1e3);
+function triggerDownload(_0x5837ac, _0x338984) {
+  const _0x41d3f4 = URL["createObjectURL"](_0x5837ac), _0x31aea5 = document["createElement"]("a");
+  _0x31aea5["href"] = _0x41d3f4, _0x31aea5["download"] = _0x338984, document["body"]["appendChild"](_0x31aea5), _0x31aea5["click"](), _0x31aea5["remove"](), setTimeout(() => URL["revokeObjectURL"](_0x41d3f4), 1e3);
 }
-function featureCollectionToKml(_0x431a72) {
-  const _0x526fb1 = _0x431a72["features"]["map"]((_0x4645c0, _0x5c2197) => featureToKml(_0x4645c0, _0x5c2197))["join"]("");
-  return '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document>' + _0x526fb1 + "</Document></kml>";
+function featureCollectionToKml(_0x452cf8) {
+  const _0xd9b236 = _0x452cf8["features"]["map"]((_0x13db77, _0x2f5ace) => featureToKml(_0x13db77, _0x2f5ace))["join"]("");
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document>' + _0xd9b236 + "</Document></kml>";
 }
-function featureCollectionToShapefileZip(_0x2804db) {
-  const _0xe709f4 = collectShpRecords(_0x2804db), _0x547e18 = writeShp(_0xe709f4), _0x490751 = writeShx(_0xe709f4), _0x302e35 = writeDbf(_0xe709f4["map"]((_0x39bf6d) => _0x39bf6d["name"]));
-  return zipStore([{ "name": "export.shp", "data": _0x547e18 }, { "name": "export.shx", "data": _0x490751 }, { "name": "export.dbf", "data": _0x302e35 }]);
+function featureCollectionToShapefileZip(_0x597121) {
+  const _0x21cba5 = collectShpRecords(_0x597121), _0x4b39c7 = writeShp(_0x21cba5), _0x4a3f3c = writeShx(_0x21cba5), _0x57711d = writeDbf(_0x21cba5["map"]((_0x26e0ec) => _0x26e0ec["name"]));
+  return zipStore([{ "name": "export.shp", "data": _0x4b39c7 }, { "name": "export.shx", "data": _0x4a3f3c }, { "name": "export.dbf", "data": _0x57711d }]);
 }
-function featureToKml(_0x1baacb, _0x4e9b46) {
-  const _0x57f7de = xmlEscape(featureName(_0x1baacb, _0x4e9b46)), _0xb37bf5 = geometryToKml(_0x1baacb["geometry"]);
-  if (!_0xb37bf5) return "";
-  return "<Placemark><name>" + _0x57f7de + "</name>" + _0xb37bf5 + "</Placemark>";
+function featureToKml(_0x4ea659, _0x1ca42d) {
+  const _0x670bfb = xmlEscape(featureName(_0x4ea659, _0x1ca42d)), _0x29ba44 = geometryToKml(_0x4ea659["geometry"]);
+  if (!_0x29ba44) return "";
+  return "<Placemark><name>" + _0x670bfb + "</name>" + _0x29ba44 + "</Placemark>";
 }
-function geometryToKml(_0x52b39c) {
-  if (!_0x52b39c) return "";
-  switch (_0x52b39c["type"]) {
+function geometryToKml(_0x584b16) {
+  if (!_0x584b16) return "";
+  switch (_0x584b16["type"]) {
     case "Point":
-      return "<Point><coordinates>" + coord(_0x52b39c["coordinates"]) + "</coordinates></Point>";
+      return "<Point><coordinates>" + coord(_0x584b16["coordinates"]) + "</coordinates></Point>";
     case "MultiPoint":
-      return "<MultiGeometry>" + _0x52b39c["coordinates"]["map"]((_0x547a24) => "<Point><coordinates>" + coord(_0x547a24) + "</coordinates></Point>")["join"]("") + "</MultiGeometry>";
+      return "<MultiGeometry>" + _0x584b16["coordinates"]["map"]((_0x18159e) => "<Point><coordinates>" + coord(_0x18159e) + "</coordinates></Point>")["join"]("") + "</MultiGeometry>";
     case "LineString":
-      return "<LineString><coordinates>" + line(_0x52b39c["coordinates"]) + "</coordinates></LineString>";
+      return "<LineString><coordinates>" + line(_0x584b16["coordinates"]) + "</coordinates></LineString>";
     case "MultiLineString":
-      return "<MultiGeometry>" + _0x52b39c["coordinates"]["map"]((_0x34ffb0) => "<LineString><coordinates>" + line(_0x34ffb0) + "</coordinates></LineString>")["join"]("") + "</MultiGeometry>";
+      return "<MultiGeometry>" + _0x584b16["coordinates"]["map"]((_0x477034) => "<LineString><coordinates>" + line(_0x477034) + "</coordinates></LineString>")["join"]("") + "</MultiGeometry>";
     case "Polygon":
-      return polygonKml(_0x52b39c["coordinates"]);
+      return polygonKml(_0x584b16["coordinates"]);
     case "MultiPolygon":
-      return "<MultiGeometry>" + _0x52b39c["coordinates"]["map"]((_0x1cd3e4) => polygonKml(_0x1cd3e4))["join"]("") + "</MultiGeometry>";
+      return "<MultiGeometry>" + _0x584b16["coordinates"]["map"]((_0x54dfb8) => polygonKml(_0x54dfb8))["join"]("") + "</MultiGeometry>";
     case "GeometryCollection":
-      return "<MultiGeometry>" + _0x52b39c["geometries"]["map"]((_0x570e3b) => geometryToKml(_0x570e3b))["join"]("") + "</MultiGeometry>";
+      return "<MultiGeometry>" + _0x584b16["geometries"]["map"]((_0x44fe0f) => geometryToKml(_0x44fe0f))["join"]("") + "</MultiGeometry>";
     default:
       return "";
   }
 }
-function polygonKml(_0x136c8f) {
-  const [_0x484d46, ..._0x33340e] = _0x136c8f;
-  if (!_0x484d46) return "";
-  const _0x4c725b = _0x33340e["map"]((_0x4be24a) => "<innerBoundaryIs><LinearRing><coordinates>" + line(_0x4be24a) + "</coordinates></LinearRing></innerBoundaryIs>")["join"]("");
-  return "<Polygon><outerBoundaryIs><LinearRing><coordinates>" + line(_0x484d46) + "</coordinates></LinearRing></outerBoundaryIs>" + _0x4c725b + "</Polygon>";
+function polygonKml(_0x279983) {
+  const [_0x408ded, ..._0x3488e3] = _0x279983;
+  if (!_0x408ded) return "";
+  const _0x4dc79d = _0x3488e3["map"]((_0x22d074) => "<innerBoundaryIs><LinearRing><coordinates>" + line(_0x22d074) + "</coordinates></LinearRing></innerBoundaryIs>")["join"]("");
+  return "<Polygon><outerBoundaryIs><LinearRing><coordinates>" + line(_0x408ded) + "</coordinates></LinearRing></outerBoundaryIs>" + _0x4dc79d + "</Polygon>";
 }
-function coord(_0xa9998f) {
-  return _0xa9998f[0] + "," + _0xa9998f[1] + ",0";
+function coord(_0x41bb15) {
+  return _0x41bb15[0] + "," + _0x41bb15[1] + ",0";
 }
-function line(_0x965bc7) {
-  return _0x965bc7["map"](coord)["join"](" ");
+function line(_0x337715) {
+  return _0x337715["map"](coord)["join"](" ");
 }
-function xmlEscape(_0x12d4f9) {
-  return _0x12d4f9["replaceAll"]("&", "&amp;")["replaceAll"]("<", "&lt;")["replaceAll"](">", "&gt;")["replaceAll"]('"', "&quot;");
+function xmlEscape(_0x568fac) {
+  return _0x568fac["replaceAll"]("&", "&amp;")["replaceAll"]("<", "&lt;")["replaceAll"](">", "&gt;")["replaceAll"]('"', "&quot;");
 }
-function collectShpRecords(_0x5a48c9) {
-  const _0xd31948 = firstKind(_0x5a48c9);
-  if (!_0xd31948) return [];
-  const _0xe160f7 = [];
-  return _0x5a48c9["features"]["forEach"]((_0x2311b4, _0x2cef3e) => {
-    for (const _0x65de3b of ringsForKind(_0x2311b4["geometry"], _0xd31948)) {
-      const _0x29d5f3 = _0x65de3b["map"](closeRing), _0x319eab = _0xd31948 === 5 ? orientPolygon(_0x29d5f3) : _0x29d5f3;
-      _0xe160f7["push"]({ "kind": _0xd31948, "name": featureName(_0x2311b4, _0x2cef3e), "rings": _0x319eab, "bbox": bboxOf(_0x319eab) });
+function collectShpRecords(_0x3c1d9b) {
+  const _0x5a5afc = firstKind(_0x3c1d9b);
+  if (!_0x5a5afc) return [];
+  const _0x2d4576 = [];
+  return _0x3c1d9b["features"]["forEach"]((_0x532834, _0x5374df) => {
+    for (const _0x84cec4 of ringsForKind(_0x532834["geometry"], _0x5a5afc)) {
+      const _0x1dab0b = _0x84cec4["map"](closeRing), _0x31caa7 = _0x5a5afc === 5 ? orientPolygon(_0x1dab0b) : _0x1dab0b;
+      _0x2d4576["push"]({ "kind": _0x5a5afc, "name": featureName(_0x532834, _0x5374df), "rings": _0x31caa7, "bbox": bboxOf(_0x31caa7) });
     }
-  }), _0xe160f7;
+  }), _0x2d4576;
 }
-function firstKind(_0x14d6cf) {
-  for (const _0x45c42c of _0x14d6cf["features"]) {
-    const _0xd8264f = kindOf(_0x45c42c["geometry"]);
-    if (_0xd8264f) return _0xd8264f;
+function firstKind(_0x5ac2cd) {
+  for (const _0x216013 of _0x5ac2cd["features"]) {
+    const _0x4482ac = kindOf(_0x216013["geometry"]);
+    if (_0x4482ac) return _0x4482ac;
   }
   return null;
 }
-function kindOf(_0x3f3616) {
-  if (!_0x3f3616) return null;
-  switch (_0x3f3616["type"]) {
+function kindOf(_0x2876b5) {
+  if (!_0x2876b5) return null;
+  switch (_0x2876b5["type"]) {
     case "Point":
     case "MultiPoint":
       return 1;
@@ -563,423 +563,423 @@ function kindOf(_0x3f3616) {
     case "MultiPolygon":
       return 5;
     case "GeometryCollection":
-      for (const _0x17914e of _0x3f3616["geometries"]) {
-        const _0x1e201d = kindOf(_0x17914e);
-        if (_0x1e201d) return _0x1e201d;
+      for (const _0x5c5a53 of _0x2876b5["geometries"]) {
+        const _0x13faf3 = kindOf(_0x5c5a53);
+        if (_0x13faf3) return _0x13faf3;
       }
       return null;
     default:
       return null;
   }
 }
-function ringsForKind(_0x1b57af, _0x1bf9c0) {
-  if (!_0x1b57af || kindOf(_0x1b57af) !== _0x1bf9c0) {
-    if ((_0x1b57af == null ? void 0 : _0x1b57af["type"]) === "GeometryCollection") return _0x1b57af["geometries"]["flatMap"]((_0x32b9ec) => ringsForKind(_0x32b9ec, _0x1bf9c0));
+function ringsForKind(_0x457a49, _0x5973b2) {
+  if (!_0x457a49 || kindOf(_0x457a49) !== _0x5973b2) {
+    if ((_0x457a49 == null ? void 0 : _0x457a49["type"]) === "GeometryCollection") return _0x457a49["geometries"]["flatMap"]((_0x53bba0) => ringsForKind(_0x53bba0, _0x5973b2));
     return [];
   }
-  switch (_0x1b57af["type"]) {
+  switch (_0x457a49["type"]) {
     case "Point":
-      return [[[_0x1b57af["coordinates"]]]];
+      return [[[_0x457a49["coordinates"]]]];
     case "MultiPoint":
-      return _0x1b57af["coordinates"]["map"]((_0x5d7caa) => [[_0x5d7caa]]);
+      return _0x457a49["coordinates"]["map"]((_0x47684c) => [[_0x47684c]]);
     case "LineString":
-      return [[_0x1b57af["coordinates"]]];
+      return [[_0x457a49["coordinates"]]];
     case "MultiLineString":
-      return [_0x1b57af["coordinates"]];
+      return [_0x457a49["coordinates"]];
     case "Polygon":
-      return [_0x1b57af["coordinates"]];
+      return [_0x457a49["coordinates"]];
     case "MultiPolygon":
-      return _0x1b57af["coordinates"];
+      return _0x457a49["coordinates"];
     default:
       return [];
   }
 }
-function closeRing(_0x5b1dea) {
-  const _0x5a3f36 = _0x5b1dea[0], _0x1bbf33 = _0x5b1dea[_0x5b1dea["length"] - 1];
-  if (!_0x5a3f36 || !_0x1bbf33) return _0x5b1dea;
-  if (_0x5a3f36[0] === _0x1bbf33[0] && _0x5a3f36[1] === _0x1bbf33[1]) return _0x5b1dea;
-  return [..._0x5b1dea, _0x5a3f36];
+function closeRing(_0x3530d0) {
+  const _0x5a9676 = _0x3530d0[0], _0x4c6202 = _0x3530d0[_0x3530d0["length"] - 1];
+  if (!_0x5a9676 || !_0x4c6202) return _0x3530d0;
+  if (_0x5a9676[0] === _0x4c6202[0] && _0x5a9676[1] === _0x4c6202[1]) return _0x3530d0;
+  return [..._0x3530d0, _0x5a9676];
 }
-function orientPolygon(_0x468108) {
-  return _0x468108["map"]((_0xd965e3, _0x1c0580) => {
-    const _0xe8f45b = signedArea(_0xd965e3), _0x3518ce = _0x1c0580 === 0, _0x1a3085 = _0xe8f45b < 0;
-    if (_0x3518ce === _0x1a3085) return _0xd965e3;
-    return [..._0xd965e3]["reverse"]();
+function orientPolygon(_0x3e07e5) {
+  return _0x3e07e5["map"]((_0x1c658b, _0x3fd0e0) => {
+    const _0x40154b = signedArea(_0x1c658b), _0x3df57e = _0x3fd0e0 === 0, _0x1804b6 = _0x40154b < 0;
+    if (_0x3df57e === _0x1804b6) return _0x1c658b;
+    return [..._0x1c658b]["reverse"]();
   });
 }
-function signedArea(_0x57156f) {
-  let _0x3bb8a6 = 0;
-  for (let _0x549621 = 0; _0x549621 < _0x57156f["length"] - 1; _0x549621++) {
-    const _0xc7ccb1 = _0x57156f[_0x549621], _0x370a88 = _0x57156f[_0x549621 + 1], _0x1ac4e2 = _0xc7ccb1 == null ? void 0 : _0xc7ccb1[0], _0x39a4ee = _0xc7ccb1 == null ? void 0 : _0xc7ccb1[1], _0x45d93b = _0x370a88 == null ? void 0 : _0x370a88[0], _0x13fc60 = _0x370a88 == null ? void 0 : _0x370a88[1];
-    if (_0x1ac4e2 === void 0 || _0x39a4ee === void 0 || _0x45d93b === void 0 || _0x13fc60 === void 0) continue;
-    _0x3bb8a6 += _0x1ac4e2 * _0x13fc60 - _0x45d93b * _0x39a4ee;
+function signedArea(_0x202d89) {
+  let _0x171a16 = 0;
+  for (let _0x30f91c = 0; _0x30f91c < _0x202d89["length"] - 1; _0x30f91c++) {
+    const _0x1fe2ef = _0x202d89[_0x30f91c], _0x28fccb = _0x202d89[_0x30f91c + 1], _0x21d519 = _0x1fe2ef == null ? void 0 : _0x1fe2ef[0], _0x1f6cfb = _0x1fe2ef == null ? void 0 : _0x1fe2ef[1], _0x1c993e = _0x28fccb == null ? void 0 : _0x28fccb[0], _0xef78b = _0x28fccb == null ? void 0 : _0x28fccb[1];
+    if (_0x21d519 === void 0 || _0x1f6cfb === void 0 || _0x1c993e === void 0 || _0xef78b === void 0) continue;
+    _0x171a16 += _0x21d519 * _0xef78b - _0x1c993e * _0x1f6cfb;
   }
-  return _0x3bb8a6 / 2;
+  return _0x171a16 / 2;
 }
-function bboxOf(_0x35282c) {
-  let _0x2176d5 = Infinity, _0x268853 = Infinity, _0x3d1ec0 = -Infinity, _0x3fd7c8 = -Infinity;
-  for (const _0x56ccf8 of _0x35282c) {
-    for (const _0x3c56a3 of _0x56ccf8) {
-      const [_0x1c1d1c, _0x19a955] = xy(_0x3c56a3);
-      _0x2176d5 = Math["min"](_0x2176d5, _0x1c1d1c), _0x268853 = Math["min"](_0x268853, _0x19a955), _0x3d1ec0 = Math["max"](_0x3d1ec0, _0x1c1d1c), _0x3fd7c8 = Math["max"](_0x3fd7c8, _0x19a955);
+function bboxOf(_0x3b9f66) {
+  let _0xb4096b = Infinity, _0x240630 = Infinity, _0x1df488 = -Infinity, _0x49ff15 = -Infinity;
+  for (const _0x136a1a of _0x3b9f66) {
+    for (const _0x29be51 of _0x136a1a) {
+      const [_0x2b7d10, _0x339489] = xy(_0x29be51);
+      _0xb4096b = Math["min"](_0xb4096b, _0x2b7d10), _0x240630 = Math["min"](_0x240630, _0x339489), _0x1df488 = Math["max"](_0x1df488, _0x2b7d10), _0x49ff15 = Math["max"](_0x49ff15, _0x339489);
     }
   }
-  if (!Number["isFinite"](_0x2176d5)) return [0, 0, 0, 0];
-  return [_0x2176d5, _0x268853, _0x3d1ec0, _0x3fd7c8];
+  if (!Number["isFinite"](_0xb4096b)) return [0, 0, 0, 0];
+  return [_0xb4096b, _0x240630, _0x1df488, _0x49ff15];
 }
-function featureName(_0x3d9225, _0x126d57) {
-  const _0x1416c2 = _0x3d9225["properties"], _0x5af9b7 = _0x1416c2 && typeof _0x1416c2["name"] === "string" ? _0x1416c2["name"] : "";
-  return _0x5af9b7 || "feature-" + (_0x126d57 + 1);
+function featureName(_0x27a9bc, _0xb8c283) {
+  const _0x11858f = _0x27a9bc["properties"], _0x335946 = _0x11858f && typeof _0x11858f["name"] === "string" ? _0x11858f["name"] : "";
+  return _0x335946 || "feature-" + (_0xb8c283 + 1);
 }
-function writeShp(_0x5862ea) {
-  const _0x5c6600 = _0x5862ea["map"](recordBody), _0x357f3f = _0x5c6600["reduce"]((_0x35cb6a, _0x4f5900) => _0x35cb6a + 8 + _0x4f5900["length"], 0), _0x344567 = new Uint8Array(100 + _0x357f3f), _0x11557f = new DataView(_0x344567["buffer"]);
-  writeHeader(_0x11557f, _0x344567["length"], _0x5862ea);
-  let _0xb9e3a5 = 100;
-  return _0x5c6600["forEach"]((_0x53b3eb, _0x45702d) => {
-    _0x11557f["setInt32"](_0xb9e3a5, _0x45702d + 1, ![]), _0x11557f["setInt32"](_0xb9e3a5 + 4, _0x53b3eb["length"] / 2, ![]), _0x344567["set"](_0x53b3eb, _0xb9e3a5 + 8), _0xb9e3a5 += 8 + _0x53b3eb["length"];
-  }), _0x344567;
+function writeShp(_0x2b1f19) {
+  const _0x184e10 = _0x2b1f19["map"](recordBody), _0x3eb336 = _0x184e10["reduce"]((_0x1c6cd8, _0x4fed04) => _0x1c6cd8 + 8 + _0x4fed04["length"], 0), _0x587c36 = new Uint8Array(100 + _0x3eb336), _0x70f8ea = new DataView(_0x587c36["buffer"]);
+  writeHeader(_0x70f8ea, _0x587c36["length"], _0x2b1f19);
+  let _0x2c1263 = 100;
+  return _0x184e10["forEach"]((_0x15b7a6, _0xbd93c3) => {
+    _0x70f8ea["setInt32"](_0x2c1263, _0xbd93c3 + 1, ![]), _0x70f8ea["setInt32"](_0x2c1263 + 4, _0x15b7a6["length"] / 2, ![]), _0x587c36["set"](_0x15b7a6, _0x2c1263 + 8), _0x2c1263 += 8 + _0x15b7a6["length"];
+  }), _0x587c36;
 }
-function writeShx(_0x550b05) {
-  const _0x1bb7c8 = new Uint8Array(100 + _0x550b05["length"] * 8), _0x3dd9a3 = new DataView(_0x1bb7c8["buffer"]);
-  writeHeader(_0x3dd9a3, _0x1bb7c8["length"], _0x550b05);
-  let _0x4d561a = 50;
-  return _0x550b05["forEach"]((_0x39d7e8, _0x799ee9) => {
-    const _0x25c39a = recordBody(_0x39d7e8)["length"] / 2;
-    _0x3dd9a3["setInt32"](100 + _0x799ee9 * 8, _0x4d561a, ![]), _0x3dd9a3["setInt32"](100 + _0x799ee9 * 8 + 4, _0x25c39a, ![]), _0x4d561a += 4 + _0x25c39a;
-  }), _0x1bb7c8;
+function writeShx(_0x2b8eec) {
+  const _0x38eaf0 = new Uint8Array(100 + _0x2b8eec["length"] * 8), _0x2c2654 = new DataView(_0x38eaf0["buffer"]);
+  writeHeader(_0x2c2654, _0x38eaf0["length"], _0x2b8eec);
+  let _0x19e224 = 50;
+  return _0x2b8eec["forEach"]((_0x5a0989, _0x208f83) => {
+    const _0x443223 = recordBody(_0x5a0989)["length"] / 2;
+    _0x2c2654["setInt32"](100 + _0x208f83 * 8, _0x19e224, ![]), _0x2c2654["setInt32"](100 + _0x208f83 * 8 + 4, _0x443223, ![]), _0x19e224 += 4 + _0x443223;
+  }), _0x38eaf0;
 }
-function writeHeader(_0x13a93d, _0x3f2135, _0x1438c4) {
+function writeHeader(_0x247ffe, _0x253859, _0x1c6743) {
   var _a2;
-  _0x13a93d["setInt32"](0, 9994, ![]), _0x13a93d["setInt32"](24, _0x3f2135 / 2, ![]), _0x13a93d["setInt32"](28, 1e3, !![]), _0x13a93d["setInt32"](32, ((_a2 = _0x1438c4[0]) == null ? void 0 : _a2["kind"]) ?? 5, !![]);
-  const _0x2170f5 = unionBbox(_0x1438c4);
-  _0x13a93d["setFloat64"](36, _0x2170f5[0], !![]), _0x13a93d["setFloat64"](44, _0x2170f5[1], !![]), _0x13a93d["setFloat64"](52, _0x2170f5[2], !![]), _0x13a93d["setFloat64"](60, _0x2170f5[3], !![]);
+  _0x247ffe["setInt32"](0, 9994, ![]), _0x247ffe["setInt32"](24, _0x253859 / 2, ![]), _0x247ffe["setInt32"](28, 1e3, !![]), _0x247ffe["setInt32"](32, ((_a2 = _0x1c6743[0]) == null ? void 0 : _a2["kind"]) ?? 5, !![]);
+  const _0x571b14 = unionBbox(_0x1c6743);
+  _0x247ffe["setFloat64"](36, _0x571b14[0], !![]), _0x247ffe["setFloat64"](44, _0x571b14[1], !![]), _0x247ffe["setFloat64"](52, _0x571b14[2], !![]), _0x247ffe["setFloat64"](60, _0x571b14[3], !![]);
 }
-function unionBbox(_0xa9f366) {
-  if (_0xa9f366["length"] === 0) return [0, 0, 0, 0];
-  let _0x1247a8 = Infinity, _0x4d7cbd = Infinity, _0x4fe2d1 = -Infinity, _0x1f4e46 = -Infinity;
-  for (const _0x3509ff of _0xa9f366) {
-    _0x1247a8 = Math["min"](_0x1247a8, _0x3509ff["bbox"][0]), _0x4d7cbd = Math["min"](_0x4d7cbd, _0x3509ff["bbox"][1]), _0x4fe2d1 = Math["max"](_0x4fe2d1, _0x3509ff["bbox"][2]), _0x1f4e46 = Math["max"](_0x1f4e46, _0x3509ff["bbox"][3]);
+function unionBbox(_0x54bd47) {
+  if (_0x54bd47["length"] === 0) return [0, 0, 0, 0];
+  let _0x4e8ceb = Infinity, _0x3ea1bb = Infinity, _0x2778aa = -Infinity, _0x1825ad = -Infinity;
+  for (const _0x17982e of _0x54bd47) {
+    _0x4e8ceb = Math["min"](_0x4e8ceb, _0x17982e["bbox"][0]), _0x3ea1bb = Math["min"](_0x3ea1bb, _0x17982e["bbox"][1]), _0x2778aa = Math["max"](_0x2778aa, _0x17982e["bbox"][2]), _0x1825ad = Math["max"](_0x1825ad, _0x17982e["bbox"][3]);
   }
-  return [_0x1247a8, _0x4d7cbd, _0x4fe2d1, _0x1f4e46];
+  return [_0x4e8ceb, _0x3ea1bb, _0x2778aa, _0x1825ad];
 }
-function xy(_0x19394a) {
-  return [_0x19394a[0] ?? 0, _0x19394a[1] ?? 0];
+function xy(_0xc07606) {
+  return [_0xc07606[0] ?? 0, _0xc07606[1] ?? 0];
 }
-function recordBody(_0x300d4a) {
+function recordBody(_0x17c564) {
   var _a2;
-  if (_0x300d4a["kind"] === 1) {
-    const _0x5bf23b = new Uint8Array(20), _0x5b102b = new DataView(_0x5bf23b["buffer"]);
-    _0x5b102b["setInt32"](0, 1, !![]);
-    const [_0x760ef0, _0x2078c2] = xy(((_a2 = _0x300d4a["rings"][0]) == null ? void 0 : _a2[0]) ?? [0, 0]);
-    return _0x5b102b["setFloat64"](4, _0x760ef0, !![]), _0x5b102b["setFloat64"](12, _0x2078c2, !![]), _0x5bf23b;
+  if (_0x17c564["kind"] === 1) {
+    const _0x4efe03 = new Uint8Array(20), _0x1ce0ad = new DataView(_0x4efe03["buffer"]);
+    _0x1ce0ad["setInt32"](0, 1, !![]);
+    const [_0x832c97, _0x4f621e] = xy(((_a2 = _0x17c564["rings"][0]) == null ? void 0 : _a2[0]) ?? [0, 0]);
+    return _0x1ce0ad["setFloat64"](4, _0x832c97, !![]), _0x1ce0ad["setFloat64"](12, _0x4f621e, !![]), _0x4efe03;
   }
-  const _0x3976f4 = _0x300d4a["rings"]["reduce"]((_0x2bdfe8, _0x4b9696) => _0x2bdfe8 + _0x4b9696["length"], 0), _0xda8c7a = new Uint8Array(44 + _0x300d4a["rings"]["length"] * 4 + _0x3976f4 * 16), _0x56f9c1 = new DataView(_0xda8c7a["buffer"]);
-  _0x56f9c1["setInt32"](0, _0x300d4a["kind"], !![]), _0x56f9c1["setFloat64"](4, _0x300d4a["bbox"][0], !![]), _0x56f9c1["setFloat64"](12, _0x300d4a["bbox"][1], !![]), _0x56f9c1["setFloat64"](20, _0x300d4a["bbox"][2], !![]), _0x56f9c1["setFloat64"](28, _0x300d4a["bbox"][3], !![]), _0x56f9c1["setInt32"](36, _0x300d4a["rings"]["length"], !![]), _0x56f9c1["setInt32"](40, _0x3976f4, !![]);
-  let _0x5be5bf = 0;
-  _0x300d4a["rings"]["forEach"]((_0x2ba2de, _0x135774) => {
-    _0x56f9c1["setInt32"](44 + _0x135774 * 4, _0x5be5bf, !![]), _0x5be5bf += _0x2ba2de["length"];
+  const _0x1678fb = _0x17c564["rings"]["reduce"]((_0x5b87d4, _0x3b5524) => _0x5b87d4 + _0x3b5524["length"], 0), _0x19e834 = new Uint8Array(44 + _0x17c564["rings"]["length"] * 4 + _0x1678fb * 16), _0x595508 = new DataView(_0x19e834["buffer"]);
+  _0x595508["setInt32"](0, _0x17c564["kind"], !![]), _0x595508["setFloat64"](4, _0x17c564["bbox"][0], !![]), _0x595508["setFloat64"](12, _0x17c564["bbox"][1], !![]), _0x595508["setFloat64"](20, _0x17c564["bbox"][2], !![]), _0x595508["setFloat64"](28, _0x17c564["bbox"][3], !![]), _0x595508["setInt32"](36, _0x17c564["rings"]["length"], !![]), _0x595508["setInt32"](40, _0x1678fb, !![]);
+  let _0x3bc358 = 0;
+  _0x17c564["rings"]["forEach"]((_0x52997e, _0x6fa4fb) => {
+    _0x595508["setInt32"](44 + _0x6fa4fb * 4, _0x3bc358, !![]), _0x3bc358 += _0x52997e["length"];
   });
-  let _0x524fec = 44 + _0x300d4a["rings"]["length"] * 4;
-  for (const _0x195de1 of _0x300d4a["rings"]) {
-    for (const _0x538332 of _0x195de1) {
-      const [_0x4839d1, _0x4b3153] = xy(_0x538332);
-      _0x56f9c1["setFloat64"](_0x524fec, _0x4839d1, !![]), _0x56f9c1["setFloat64"](_0x524fec + 8, _0x4b3153, !![]), _0x524fec += 16;
+  let _0x1ab3a0 = 44 + _0x17c564["rings"]["length"] * 4;
+  for (const _0x30690e of _0x17c564["rings"]) {
+    for (const _0x3d6065 of _0x30690e) {
+      const [_0x3c3441, _0x2a6c2d] = xy(_0x3d6065);
+      _0x595508["setFloat64"](_0x1ab3a0, _0x3c3441, !![]), _0x595508["setFloat64"](_0x1ab3a0 + 8, _0x2a6c2d, !![]), _0x1ab3a0 += 16;
     }
   }
-  return _0xda8c7a;
+  return _0x19e834;
 }
-function writeDbf(_0x164dde) {
-  const _0x4dddb1 = 32 + 32 + 1, _0x35d34f = 1 + 80, _0x38b962 = new Uint8Array(_0x4dddb1 + _0x164dde["length"] * _0x35d34f + 1), _0x4967c9 = new DataView(_0x38b962["buffer"]);
-  _0x38b962[0] = 3, _0x4967c9["setUint32"](4, _0x164dde["length"], !![]), _0x4967c9["setUint16"](8, _0x4dddb1, !![]), _0x4967c9["setUint16"](10, _0x35d34f, !![]);
-  const _0x1443c4 = new TextEncoder()["encode"]("NAME");
-  _0x38b962["set"](_0x1443c4, 32), _0x38b962[32 + 11] = "C"["charCodeAt"](0), _0x38b962[32 + 16] = 80, _0x38b962[32 + 32] = 13;
-  const _0x15374a = new TextEncoder();
-  return _0x164dde["forEach"]((_0x59f4d8, _0x290d04) => {
-    const _0x377cd8 = _0x4dddb1 + _0x290d04 * _0x35d34f;
-    _0x38b962[_0x377cd8] = 32;
-    const _0x342e1f = _0x15374a["encode"](_0x59f4d8)["slice"](0, 80);
-    _0x38b962["set"](_0x342e1f, _0x377cd8 + 1);
-    for (let _0xe73a06 = 1 + _0x342e1f["length"]; _0xe73a06 < _0x35d34f; _0xe73a06++) _0x38b962[_0x377cd8 + _0xe73a06] = 32;
-  }), _0x38b962[_0x38b962["length"] - 1] = 26, _0x38b962;
+function writeDbf(_0x4fbf4f) {
+  const _0x3b458e = 32 + 32 + 1, _0x559f81 = 1 + 80, _0x41cb81 = new Uint8Array(_0x3b458e + _0x4fbf4f["length"] * _0x559f81 + 1), _0xae3a0b = new DataView(_0x41cb81["buffer"]);
+  _0x41cb81[0] = 3, _0xae3a0b["setUint32"](4, _0x4fbf4f["length"], !![]), _0xae3a0b["setUint16"](8, _0x3b458e, !![]), _0xae3a0b["setUint16"](10, _0x559f81, !![]);
+  const _0x42dd4d = new TextEncoder()["encode"]("NAME");
+  _0x41cb81["set"](_0x42dd4d, 32), _0x41cb81[32 + 11] = "C"["charCodeAt"](0), _0x41cb81[32 + 16] = 80, _0x41cb81[32 + 32] = 13;
+  const _0x1904a5 = new TextEncoder();
+  return _0x4fbf4f["forEach"]((_0x351419, _0x47b7d7) => {
+    const _0x2946ea = _0x3b458e + _0x47b7d7 * _0x559f81;
+    _0x41cb81[_0x2946ea] = 32;
+    const _0xe72fa7 = _0x1904a5["encode"](_0x351419)["slice"](0, 80);
+    _0x41cb81["set"](_0xe72fa7, _0x2946ea + 1);
+    for (let _0x400788 = 1 + _0xe72fa7["length"]; _0x400788 < _0x559f81; _0x400788++) _0x41cb81[_0x2946ea + _0x400788] = 32;
+  }), _0x41cb81[_0x41cb81["length"] - 1] = 26, _0x41cb81;
 }
-function zipStore(_0x1a66d2) {
-  const _0x206fe4 = new TextEncoder(), _0x1ef4bd = [], _0x3dd4fa = [];
-  let _0xc69370 = 0;
-  for (const _0x1f8fb8 of _0x1a66d2) {
-    const _0x1ddc05 = _0x206fe4["encode"](_0x1f8fb8["name"]), _0x3599ff = crc32(_0x1f8fb8["data"]), _0x4ad619 = new Uint8Array(30 + _0x1ddc05["length"] + _0x1f8fb8["data"]["length"]), _0x2a72b1 = new DataView(_0x4ad619["buffer"]);
-    _0x2a72b1["setUint32"](0, 67324752, !![]), _0x2a72b1["setUint16"](4, 20, !![]), _0x2a72b1["setUint16"](8, 0, !![]), _0x2a72b1["setUint32"](14, _0x3599ff, !![]), _0x2a72b1["setUint32"](18, _0x1f8fb8["data"]["length"], !![]), _0x2a72b1["setUint32"](22, _0x1f8fb8["data"]["length"], !![]), _0x2a72b1["setUint16"](26, _0x1ddc05["length"], !![]), _0x4ad619["set"](_0x1ddc05, 30), _0x4ad619["set"](_0x1f8fb8["data"], 30 + _0x1ddc05["length"]), _0x1ef4bd["push"](_0x4ad619);
-    const _0x2ac1f1 = new Uint8Array(46 + _0x1ddc05["length"]), _0x18cff7 = new DataView(_0x2ac1f1["buffer"]);
-    _0x18cff7["setUint32"](0, 33639248, !![]), _0x18cff7["setUint16"](4, 20, !![]), _0x18cff7["setUint16"](6, 20, !![]), _0x18cff7["setUint16"](10, 0, !![]), _0x18cff7["setUint32"](16, _0x3599ff, !![]), _0x18cff7["setUint32"](20, _0x1f8fb8["data"]["length"], !![]), _0x18cff7["setUint32"](24, _0x1f8fb8["data"]["length"], !![]), _0x18cff7["setUint16"](28, _0x1ddc05["length"], !![]), _0x18cff7["setUint32"](42, _0xc69370, !![]), _0x2ac1f1["set"](_0x1ddc05, 46), _0x3dd4fa["push"](_0x2ac1f1), _0xc69370 += _0x4ad619["length"];
+function zipStore(_0x916733) {
+  const _0x939149 = new TextEncoder(), _0x29d513 = [], _0x4dce30 = [];
+  let _0xef1bcd = 0;
+  for (const _0x1b4e6f of _0x916733) {
+    const _0x138780 = _0x939149["encode"](_0x1b4e6f["name"]), _0x30228e = crc32(_0x1b4e6f["data"]), _0x1e667f = new Uint8Array(30 + _0x138780["length"] + _0x1b4e6f["data"]["length"]), _0x562c84 = new DataView(_0x1e667f["buffer"]);
+    _0x562c84["setUint32"](0, 67324752, !![]), _0x562c84["setUint16"](4, 20, !![]), _0x562c84["setUint16"](8, 0, !![]), _0x562c84["setUint32"](14, _0x30228e, !![]), _0x562c84["setUint32"](18, _0x1b4e6f["data"]["length"], !![]), _0x562c84["setUint32"](22, _0x1b4e6f["data"]["length"], !![]), _0x562c84["setUint16"](26, _0x138780["length"], !![]), _0x1e667f["set"](_0x138780, 30), _0x1e667f["set"](_0x1b4e6f["data"], 30 + _0x138780["length"]), _0x29d513["push"](_0x1e667f);
+    const _0x1c82ad = new Uint8Array(46 + _0x138780["length"]), _0x4b77bb = new DataView(_0x1c82ad["buffer"]);
+    _0x4b77bb["setUint32"](0, 33639248, !![]), _0x4b77bb["setUint16"](4, 20, !![]), _0x4b77bb["setUint16"](6, 20, !![]), _0x4b77bb["setUint16"](10, 0, !![]), _0x4b77bb["setUint32"](16, _0x30228e, !![]), _0x4b77bb["setUint32"](20, _0x1b4e6f["data"]["length"], !![]), _0x4b77bb["setUint32"](24, _0x1b4e6f["data"]["length"], !![]), _0x4b77bb["setUint16"](28, _0x138780["length"], !![]), _0x4b77bb["setUint32"](42, _0xef1bcd, !![]), _0x1c82ad["set"](_0x138780, 46), _0x4dce30["push"](_0x1c82ad), _0xef1bcd += _0x1e667f["length"];
   }
-  const _0x53fc9a = _0x3dd4fa["reduce"]((_0x4b16b1, _0x138e48) => _0x4b16b1 + _0x138e48["length"], 0), _0x3bb4ff = new Uint8Array(22), _0x36c29c = new DataView(_0x3bb4ff["buffer"]);
-  return _0x36c29c["setUint32"](0, 101010256, !![]), _0x36c29c["setUint16"](8, _0x1a66d2["length"], !![]), _0x36c29c["setUint16"](10, _0x1a66d2["length"], !![]), _0x36c29c["setUint32"](12, _0x53fc9a, !![]), _0x36c29c["setUint32"](16, _0xc69370, !![]), concat([..._0x1ef4bd, ..._0x3dd4fa, _0x3bb4ff]);
+  const _0x2a34a9 = _0x4dce30["reduce"]((_0x3fb3d2, _0x3be24e) => _0x3fb3d2 + _0x3be24e["length"], 0), _0x190ae3 = new Uint8Array(22), _0x213127 = new DataView(_0x190ae3["buffer"]);
+  return _0x213127["setUint32"](0, 101010256, !![]), _0x213127["setUint16"](8, _0x916733["length"], !![]), _0x213127["setUint16"](10, _0x916733["length"], !![]), _0x213127["setUint32"](12, _0x2a34a9, !![]), _0x213127["setUint32"](16, _0xef1bcd, !![]), concat([..._0x29d513, ..._0x4dce30, _0x190ae3]);
 }
-function crc32(_0x3ee9b7) {
-  let _0x137c9f = 4294967295;
-  for (const _0x21470a of _0x3ee9b7) {
-    _0x137c9f ^= _0x21470a;
-    for (let _0x13ddf4 = 0; _0x13ddf4 < 8; _0x13ddf4++) {
-      _0x137c9f = _0x137c9f >>> 1 ^ ((_0x137c9f & 1) === 1 ? 3988292384 : 0);
+function crc32(_0x170ad4) {
+  let _0x5d1e3f = 4294967295;
+  for (const _0x56f647 of _0x170ad4) {
+    _0x5d1e3f ^= _0x56f647;
+    for (let _0x158803 = 0; _0x158803 < 8; _0x158803++) {
+      _0x5d1e3f = _0x5d1e3f >>> 1 ^ ((_0x5d1e3f & 1) === 1 ? 3988292384 : 0);
     }
   }
-  return (_0x137c9f ^ 4294967295) >>> 0;
+  return (_0x5d1e3f ^ 4294967295) >>> 0;
 }
-function concat(_0x471aed) {
-  const _0x11551f = _0x471aed["reduce"]((_0x8e2f41, _0x5cd3e6) => _0x8e2f41 + _0x5cd3e6["length"], 0), _0x1d749c = new Uint8Array(_0x11551f);
-  let _0x1216bd = 0;
-  for (const _0x239134 of _0x471aed) {
-    _0x1d749c["set"](_0x239134, _0x1216bd), _0x1216bd += _0x239134["length"];
+function concat(_0x418bea) {
+  const _0xec4f04 = _0x418bea["reduce"]((_0x507a65, _0x2078a2) => _0x507a65 + _0x2078a2["length"], 0), _0x4b54c4 = new Uint8Array(_0xec4f04);
+  let _0x1061d6 = 0;
+  for (const _0xdb9f12 of _0x418bea) {
+    _0x4b54c4["set"](_0xdb9f12, _0x1061d6), _0x1061d6 += _0xdb9f12["length"];
   }
-  return _0x1d749c;
+  return _0x4b54c4;
 }
-function getLayerGeoJSON(_0x28940d, _0x3db5af, _0x22482e) {
-  if (!("entities" in _0x28940d["cesiumObject"])) return void 0;
-  const _0x3c8e3c = _0x28940d["cesiumObject"]["entities"]["values"]["filter"]((_0x17c4a4) => !_0x22482e(_0x17c4a4))["map"]((_0x151d86) => entityToGeoJSON(_0x151d86, _0x3db5af))["filter"]((_0x4093cd) => _0x4093cd !== null);
-  return { "type": "FeatureCollection", "features": _0x3c8e3c };
+function getLayerGeoJSON(_0x3579eb, _0x111c4f, _0x3f6f89) {
+  if (!("entities" in _0x3579eb["cesiumObject"])) return void 0;
+  const _0xf6035d = _0x3579eb["cesiumObject"]["entities"]["values"]["filter"]((_0x205b32) => !_0x3f6f89(_0x205b32))["map"]((_0x5df249) => entityToGeoJSON(_0x5df249, _0x111c4f))["filter"]((_0x322de2) => _0x322de2 !== null);
+  return { "type": "FeatureCollection", "features": _0xf6035d };
 }
-function exportLayerVector(_0x319ec3, _0x2fbdeb, _0x4a9815) {
-  if (!_0x319ec3) return;
-  const _0x659ad7 = vectorFile(_0x319ec3, _0x4a9815);
-  triggerDownload(_0x659ad7["blob"], _0x2fbdeb + "-" + Date["now"]() + "." + _0x659ad7["extension"]);
+function exportLayerVector(_0x40b82d, _0x5a2644, _0x4fb5a1) {
+  if (!_0x40b82d) return;
+  const _0x57155b = vectorFile(_0x40b82d, _0x4fb5a1);
+  triggerDownload(_0x57155b["blob"], _0x5a2644 + "-" + Date["now"]() + "." + _0x57155b["extension"]);
 }
-function exportLayerGeoJSON(_0x142eb1, _0x197cb3) {
-  exportLayerVector(_0x142eb1, _0x197cb3, "geojson");
+function exportLayerGeoJSON(_0x5110a7, _0x2b6c12) {
+  exportLayerVector(_0x5110a7, _0x2b6c12, "geojson");
 }
-function exportLayerKml(_0x57eff2, _0x18c4b0) {
-  exportLayerVector(_0x57eff2, _0x18c4b0, "kml");
+function exportLayerKml(_0x21040c, _0xbb7c5c) {
+  exportLayerVector(_0x21040c, _0xbb7c5c, "kml");
 }
-function exportLayerShapefile(_0xcb3694, _0xe4d283) {
-  exportLayerVector(_0xcb3694, _0xe4d283, "shp");
+function exportLayerShapefile(_0x41336b, _0x538daf) {
+  exportLayerVector(_0x41336b, _0x538daf, "shp");
 }
-function bytesAsBuffer(_0x57d6b4) {
-  return _0x57d6b4["buffer"]["slice"](_0x57d6b4["byteOffset"], _0x57d6b4["byteOffset"] + _0x57d6b4["byteLength"]);
+function bytesAsBuffer(_0x4adac5) {
+  return _0x4adac5["buffer"]["slice"](_0x4adac5["byteOffset"], _0x4adac5["byteOffset"] + _0x4adac5["byteLength"]);
 }
-function vectorFile(_0x6cb2b3, _0x3b1ee4) {
-  if (_0x3b1ee4 === "kml") return { "blob": new Blob([featureCollectionToKml(_0x6cb2b3)], { "type": "application/vnd.google-earth.kml+xml" }), "extension": "kml" };
-  if (_0x3b1ee4 === "shp") return { "blob": new Blob([bytesAsBuffer(featureCollectionToShapefileZip(_0x6cb2b3))], { "type": "application/zip" }), "extension": "zip" };
-  return { "blob": new Blob([JSON["stringify"](_0x6cb2b3, null, 2)], { "type": "application/geo+json" }), "extension": "geojson" };
+function vectorFile(_0x433054, _0x27474f) {
+  if (_0x27474f === "kml") return { "blob": new Blob([featureCollectionToKml(_0x433054)], { "type": "application/vnd.google-earth.kml+xml" }), "extension": "kml" };
+  if (_0x27474f === "shp") return { "blob": new Blob([bytesAsBuffer(featureCollectionToShapefileZip(_0x433054))], { "type": "application/zip" }), "extension": "zip" };
+  return { "blob": new Blob([JSON["stringify"](_0x433054, null, 2)], { "type": "application/geo+json" }), "extension": "geojson" };
 }
 const GEOTIFF_EXPORT_MAX_WMS_DIMENSION = 2048;
-function geoTiffExportDimensions(_0x2a2e7f, _0x566fcf) {
-  if (!_0x2a2e7f) return { "width": _0x566fcf, "height": Math["round"](_0x566fcf / 2) };
-  const _0x4f4462 = Math["max"](_0x2a2e7f["east"] - _0x2a2e7f["west"], 1e-6), _0x46bb3e = Math["max"](_0x2a2e7f["north"] - _0x2a2e7f["south"], 1e-6), _0x10c8ba = _0x4f4462 >= _0x46bb3e ? _0x566fcf : Math["max"](64, Math["round"](_0x566fcf * _0x4f4462 / _0x46bb3e)), _0x26af73 = _0x46bb3e >= _0x4f4462 ? _0x566fcf : Math["max"](64, Math["round"](_0x566fcf * _0x46bb3e / _0x4f4462));
-  return { "width": _0x10c8ba, "height": _0x26af73 };
+function geoTiffExportDimensions(_0x3a6203, _0x477449) {
+  if (!_0x3a6203) return { "width": _0x477449, "height": Math["round"](_0x477449 / 2) };
+  const _0x1dd2c9 = Math["max"](_0x3a6203["east"] - _0x3a6203["west"], 1e-6), _0xa86bc1 = Math["max"](_0x3a6203["north"] - _0x3a6203["south"], 1e-6), _0x18b979 = _0x1dd2c9 >= _0xa86bc1 ? _0x477449 : Math["max"](64, Math["round"](_0x477449 * _0x1dd2c9 / _0xa86bc1)), _0xb2ee72 = _0xa86bc1 >= _0x1dd2c9 ? _0x477449 : Math["max"](64, Math["round"](_0x477449 * _0xa86bc1 / _0x1dd2c9));
+  return { "width": _0x18b979, "height": _0xb2ee72 };
 }
-function buildWmsGeoTiffExportUrl(_0x45e0a7, _0x34ebde) {
-  const _0x462441 = _0x34ebde("wms", _0x45e0a7["url"]), { width: _0x1b023a, height: _0x46ffb0 } = geoTiffExportDimensions(_0x45e0a7["geographicBoundingBox"], GEOTIFF_EXPORT_MAX_WMS_DIMENSION), _0x4c2ca5 = _0x45e0a7["geographicBoundingBox"], _0x5adac1 = new URLSearchParams({ "SERVICE": "WMS", "REQUEST": "GetMap", "VERSION": "1.3.0", "LAYERS": _0x45e0a7["layers"], "STYLES": "", "FORMAT": _0x45e0a7["tiffFormat"], "TRANSPARENT": "false", "WIDTH": String(_0x1b023a), "HEIGHT": String(_0x46ffb0), "CRS": "CRS:84", "BBOX": _0x4c2ca5 ? _0x4c2ca5["west"] + "," + _0x4c2ca5["south"] + "," + _0x4c2ca5["east"] + "," + _0x4c2ca5["north"] : "-180,-90,180,90" }), _0x4743ea = _0x462441["includes"]("?") ? "&" : "?";
-  return "" + _0x462441 + _0x4743ea + _0x5adac1["toString"]();
+function buildWmsGeoTiffExportUrl(_0x3e37bf, _0x41f7d0) {
+  const _0x4164dd = _0x41f7d0("wms", _0x3e37bf["url"]), { width: _0x196cef, height: _0x1cd83b } = geoTiffExportDimensions(_0x3e37bf["geographicBoundingBox"], GEOTIFF_EXPORT_MAX_WMS_DIMENSION), _0x275097 = _0x3e37bf["geographicBoundingBox"], _0x1360e6 = new URLSearchParams({ "SERVICE": "WMS", "REQUEST": "GetMap", "VERSION": "1.3.0", "LAYERS": _0x3e37bf["layers"], "STYLES": "", "FORMAT": _0x3e37bf["tiffFormat"], "TRANSPARENT": "false", "WIDTH": String(_0x196cef), "HEIGHT": String(_0x1cd83b), "CRS": "CRS:84", "BBOX": _0x275097 ? _0x275097["west"] + "," + _0x275097["south"] + "," + _0x275097["east"] + "," + _0x275097["north"] : "-180,-90,180,90" }), _0x4fdf18 = _0x4164dd["includes"]("?") ? "&" : "?";
+  return "" + _0x4164dd + _0x4fdf18 + _0x1360e6["toString"]();
 }
-function buildWcsGeoTiffExportUrl(_0x275db0, _0xdf3340) {
-  const _0x32e862 = _0xdf3340("wcs", _0x275db0["url"]), _0xe61aee = _0x275db0["version"] ?? "2.0.1", _0x39ecf5 = { "service": "WCS", "version": _0xe61aee, "request": "GetCoverage", "coverageId": _0x275db0["coverageId"], "format": _0x275db0["tiffFormat"] };
-  if (_0xe61aee["startsWith"]("2.")) {
-    const _0x39113b = _0x275db0["maxSize"] ?? 2048;
-    if (Number["isFinite"](_0x39113b)) _0x39ecf5["SCALESIZE"] = "x(" + _0x39113b + "),y(" + _0x39113b + ")";
+function buildWcsGeoTiffExportUrl(_0x49906e, _0x447e20) {
+  const _0x51806c = _0x447e20("wcs", _0x49906e["url"]), _0x1a9676 = _0x49906e["version"] ?? "2.0.1", _0x30176c = { "service": "WCS", "version": _0x1a9676, "request": "GetCoverage", "coverageId": _0x49906e["coverageId"], "format": _0x49906e["tiffFormat"] };
+  if (_0x1a9676["startsWith"]("2.")) {
+    const _0x3718fd = _0x49906e["maxSize"] ?? 2048;
+    if (Number["isFinite"](_0x3718fd)) _0x30176c["SCALESIZE"] = "x(" + _0x3718fd + "),y(" + _0x3718fd + ")";
   }
-  const _0xa4700e = _0x32e862["includes"]("?") ? "&" : "?";
-  return "" + _0x32e862 + _0xa4700e + new URLSearchParams(_0x39ecf5)["toString"]();
+  const _0x18acec = _0x51806c["includes"]("?") ? "&" : "?";
+  return "" + _0x51806c + _0x18acec + new URLSearchParams(_0x30176c)["toString"]();
 }
-function isGeoTiffExportAvailable(_0x25f8d0, _0x359ea3) {
-  if (!_0x25f8d0 || _0x25f8d0["layerType"] !== "WMS" && _0x25f8d0["layerType"] !== "WCS") return ![];
-  return !!_0x359ea3 && "tiffFormat" in _0x359ea3 && !!_0x359ea3["tiffFormat"];
+function isGeoTiffExportAvailable(_0xf4242a, _0x45046f) {
+  if (!_0xf4242a || _0xf4242a["layerType"] !== "WMS" && _0xf4242a["layerType"] !== "WCS") return ![];
+  return !!_0x45046f && "tiffFormat" in _0x45046f && !!_0x45046f["tiffFormat"];
 }
-async function exportLayerAsGeoTiff(_0x16f15c, _0x5f288c, _0x576b26, _0x285867, _0x24bf3c) {
-  if (_0x16f15c["layerType"] !== "WMS" && _0x16f15c["layerType"] !== "WCS") throw new LayerOperationError("LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE", 'Katman WMS/WCS değil, GeoTIFF export desteklenmiyor: "' + _0x16f15c["id"] + '"');
-  if (!_0x5f288c || !("tiffFormat" in _0x5f288c) || !_0x5f288c["tiffFormat"]) throw new LayerOperationError("LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED", 'Katman GeoTIFF export desteklemiyor: "' + _0x16f15c["id"] + '"');
-  const _0x4dd8cb = _0x16f15c["layerType"] === "WMS" ? buildWmsGeoTiffExportUrl(_0x5f288c, _0x285867) : buildWcsGeoTiffExportUrl(_0x5f288c, _0x285867), _0x155dea = _0x24bf3c["mergeApiKeyHeader"](_0x24bf3c["buildAuthHeaders"](_0x5f288c["authToken"]), _0x4dd8cb), _0x5f0dcb = await fetch(_0x4dd8cb, _0x155dea ? { "headers": _0x155dea } : void 0);
-  if (!_0x5f0dcb["ok"]) throw new OgcRequestError("OGC_GEOTIFF_DOWNLOAD_FAILED", "GeoTIFF indirilemedi: " + _0x5f0dcb["status"] + " " + _0x5f0dcb["statusText"]);
-  const _0x5b214e = _0x5f0dcb["headers"]["get"]("content-type") ?? "", _0xbbf8a7 = await _0x5f0dcb["arrayBuffer"](), _0x5bf8bc = /boundary="?([^";]+)"?/i["exec"](_0x5b214e);
-  let _0x46451;
-  if (_0x5b214e["includes"]("multipart/") && _0x5bf8bc) {
-    const { bytes: _0x3f276d, mimeType: _0x2dbdde } = extractMultipartImage(new Uint8Array(_0xbbf8a7), _0x5bf8bc[1]), _0x2fbc1f = _0x3f276d["buffer"]["slice"](_0x3f276d["byteOffset"], _0x3f276d["byteOffset"] + _0x3f276d["byteLength"]);
-    _0x46451 = new Blob([_0x2fbc1f], { "type": _0x2dbdde });
-  } else _0x46451 = new Blob([_0xbbf8a7], { "type": _0x5b214e || _0x5f288c["tiffFormat"] });
-  triggerDownload(_0x46451, _0x576b26 + "-" + Date["now"]() + ".tif");
+async function exportLayerAsGeoTiff(_0xa099be, _0x357929, _0x2791d3, _0x184ea4, _0x8f9681) {
+  if (_0xa099be["layerType"] !== "WMS" && _0xa099be["layerType"] !== "WCS") throw new LayerOperationError("LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE", 'Katman WMS/WCS değil, GeoTIFF export desteklenmiyor: "' + _0xa099be["id"] + '"');
+  if (!_0x357929 || !("tiffFormat" in _0x357929) || !_0x357929["tiffFormat"]) throw new LayerOperationError("LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED", 'Katman GeoTIFF export desteklemiyor: "' + _0xa099be["id"] + '"');
+  const _0x290fd1 = _0xa099be["layerType"] === "WMS" ? buildWmsGeoTiffExportUrl(_0x357929, _0x184ea4) : buildWcsGeoTiffExportUrl(_0x357929, _0x184ea4), _0x143fd9 = _0x8f9681["mergeApiKeyHeader"](_0x8f9681["buildAuthHeaders"](_0x357929["authToken"]), _0x290fd1), _0x5167d2 = await fetch(_0x290fd1, _0x143fd9 ? { "headers": _0x143fd9 } : void 0);
+  if (!_0x5167d2["ok"]) throw new OgcRequestError("OGC_GEOTIFF_DOWNLOAD_FAILED", "GeoTIFF indirilemedi: " + _0x5167d2["status"] + " " + _0x5167d2["statusText"]);
+  const _0x2d4566 = _0x5167d2["headers"]["get"]("content-type") ?? "", _0x3e0952 = await _0x5167d2["arrayBuffer"](), _0xc65409 = /boundary="?([^";]+)"?/i["exec"](_0x2d4566);
+  let _0x5b0fc7;
+  if (_0x2d4566["includes"]("multipart/") && _0xc65409) {
+    const { bytes: _0x22e800, mimeType: _0x11d744 } = extractMultipartImage(new Uint8Array(_0x3e0952), _0xc65409[1]), _0x12c8dc = _0x22e800["buffer"]["slice"](_0x22e800["byteOffset"], _0x22e800["byteOffset"] + _0x22e800["byteLength"]);
+    _0x5b0fc7 = new Blob([_0x12c8dc], { "type": _0x11d744 });
+  } else _0x5b0fc7 = new Blob([_0x3e0952], { "type": _0x2d4566 || _0x357929["tiffFormat"] });
+  triggerDownload(_0x5b0fc7, _0x2791d3 + "-" + Date["now"]() + ".tif");
 }
-function extractMultipartImage(_0xfd299, _0x145312) {
+function extractMultipartImage(_0x1dce09, _0x19ad94) {
   var _a2;
-  const _0x58a597 = new TextDecoder("iso-8859-1")["decode"](_0xfd299), _0x406ec4 = "--" + _0x145312;
-  let _0xaefa60 = 0;
-  while (_0xaefa60 < _0x58a597["length"]) {
-    const _0x429c69 = _0x58a597["indexOf"](_0x406ec4, _0xaefa60);
-    if (_0x429c69 === -1) break;
-    const _0x350d9b = _0x429c69 + _0x406ec4["length"], _0x2cc5b0 = _0x58a597["indexOf"](_0x406ec4, _0x350d9b);
-    if (_0x2cc5b0 === -1) break;
-    const _0x3fbf27 = _0x58a597["indexOf"]("\r\n\r\n", _0x350d9b), _0x47f710 = _0x58a597["indexOf"]("\n\n", _0x350d9b), _0x4e5c10 = _0x3fbf27 !== -1 && (_0x47f710 === -1 || _0x3fbf27 <= _0x47f710) ? _0x3fbf27 : _0x47f710, _0x1c35ad = _0x4e5c10 === _0x3fbf27 ? 4 : 2;
-    if (_0x4e5c10 === -1 || _0x4e5c10 >= _0x2cc5b0) {
-      _0xaefa60 = _0x2cc5b0;
+  const _0x4bb28a = new TextDecoder("iso-8859-1")["decode"](_0x1dce09), _0x549e86 = "--" + _0x19ad94;
+  let _0x3f4e0e = 0;
+  while (_0x3f4e0e < _0x4bb28a["length"]) {
+    const _0x3adf01 = _0x4bb28a["indexOf"](_0x549e86, _0x3f4e0e);
+    if (_0x3adf01 === -1) break;
+    const _0x3a2d3a = _0x3adf01 + _0x549e86["length"], _0x21cbd0 = _0x4bb28a["indexOf"](_0x549e86, _0x3a2d3a);
+    if (_0x21cbd0 === -1) break;
+    const _0x251a1e = _0x4bb28a["indexOf"]("\r\n\r\n", _0x3a2d3a), _0x518967 = _0x4bb28a["indexOf"]("\n\n", _0x3a2d3a), _0x2b6234 = _0x251a1e !== -1 && (_0x518967 === -1 || _0x251a1e <= _0x518967) ? _0x251a1e : _0x518967, _0x14956c = _0x2b6234 === _0x251a1e ? 4 : 2;
+    if (_0x2b6234 === -1 || _0x2b6234 >= _0x21cbd0) {
+      _0x3f4e0e = _0x21cbd0;
       continue;
     }
-    const _0x4bd2ff = /content-type:\s*([^\r\n;]+)/i["exec"](_0x58a597["slice"](_0x350d9b, _0x4e5c10)), _0x36e77d = (_a2 = _0x4bd2ff == null ? void 0 : _0x4bd2ff[1]) == null ? void 0 : _a2["trim"]();
-    if (_0x36e77d == null ? void 0 : _0x36e77d["startsWith"]("image/")) {
-      const _0x3ea58e = _0x4e5c10 + _0x1c35ad;
-      let _0x367545 = _0x2cc5b0;
-      if (_0x58a597[_0x367545 - 2] === "\r" && _0x58a597[_0x367545 - 1] === "\n") _0x367545 -= 2;
+    const _0x12a743 = /content-type:\s*([^\r\n;]+)/i["exec"](_0x4bb28a["slice"](_0x3a2d3a, _0x2b6234)), _0x2f7e59 = (_a2 = _0x12a743 == null ? void 0 : _0x12a743[1]) == null ? void 0 : _a2["trim"]();
+    if (_0x2f7e59 == null ? void 0 : _0x2f7e59["startsWith"]("image/")) {
+      const _0x1aa3a5 = _0x2b6234 + _0x14956c;
+      let _0x25bbd8 = _0x21cbd0;
+      if (_0x4bb28a[_0x25bbd8 - 2] === "\r" && _0x4bb28a[_0x25bbd8 - 1] === "\n") _0x25bbd8 -= 2;
       else {
-        if (_0x58a597[_0x367545 - 1] === "\n") _0x367545 -= 1;
+        if (_0x4bb28a[_0x25bbd8 - 1] === "\n") _0x25bbd8 -= 1;
       }
-      return { "bytes": _0xfd299["slice"](_0x3ea58e, _0x367545), "mimeType": _0x36e77d };
+      return { "bytes": _0x1dce09["slice"](_0x1aa3a5, _0x25bbd8), "mimeType": _0x2f7e59 };
     }
-    _0xaefa60 = _0x2cc5b0;
+    _0x3f4e0e = _0x21cbd0;
   }
   throw new OgcRequestError("OGC_WCS_MULTIPART_IMAGE_NOT_FOUND", "Multipart WCS yanıtında görsel parçası bulunamadı.");
 }
 const POLE_SLICE_DEGREES = 90, POLE_LATITUDE_LIMIT = 89.9;
-function clipRingToLongitude(_0x12cdf6, _0x16358a, _0x3ccaf7) {
-  const _0x4434e9 = (_0x31d92a) => _0x3ccaf7 * (_0x31d92a[0] - _0x16358a) >= 0, _0x42272b = [], _0x4f2e74 = (_0x1d13c2) => {
-    const _0x49c928 = _0x42272b[_0x42272b["length"] - 1];
-    if (_0x49c928 === void 0 || _0x49c928[0] !== _0x1d13c2[0] || _0x49c928[1] !== _0x1d13c2[1]) _0x42272b["push"]([_0x1d13c2[0], _0x1d13c2[1]]);
+function clipRingToLongitude(_0x59f686, _0x5bb037, _0x34f2a0) {
+  const _0x34442b = (_0x76fa) => _0x34f2a0 * (_0x76fa[0] - _0x5bb037) >= 0, _0x56a344 = [], _0xc5beb1 = (_0x4c4d36) => {
+    const _0x2ffdeb = _0x56a344[_0x56a344["length"] - 1];
+    if (_0x2ffdeb === void 0 || _0x2ffdeb[0] !== _0x4c4d36[0] || _0x2ffdeb[1] !== _0x4c4d36[1]) _0x56a344["push"]([_0x4c4d36[0], _0x4c4d36[1]]);
   };
-  for (let _0x507dda = 0; _0x507dda < _0x12cdf6["length"] - 1; _0x507dda++) {
-    const _0x40b637 = _0x12cdf6[_0x507dda], _0x39c38e = _0x12cdf6[_0x507dda + 1];
-    if (_0x4434e9(_0x40b637)) _0x4f2e74(_0x40b637);
-    if (_0x4434e9(_0x40b637) !== _0x4434e9(_0x39c38e)) {
-      const _0x43f26d = (_0x16358a - _0x40b637[0]) / (_0x39c38e[0] - _0x40b637[0]);
-      _0x4f2e74([_0x16358a, _0x40b637[1] + _0x43f26d * (_0x39c38e[1] - _0x40b637[1])]);
+  for (let _0x3b1992 = 0; _0x3b1992 < _0x59f686["length"] - 1; _0x3b1992++) {
+    const _0x3f0ed0 = _0x59f686[_0x3b1992], _0x5b0f73 = _0x59f686[_0x3b1992 + 1];
+    if (_0x34442b(_0x3f0ed0)) _0xc5beb1(_0x3f0ed0);
+    if (_0x34442b(_0x3f0ed0) !== _0x34442b(_0x5b0f73)) {
+      const _0x995302 = (_0x5bb037 - _0x3f0ed0[0]) / (_0x5b0f73[0] - _0x3f0ed0[0]);
+      _0xc5beb1([_0x5bb037, _0x3f0ed0[1] + _0x995302 * (_0x5b0f73[1] - _0x3f0ed0[1])]);
     }
   }
-  if (_0x42272b["length"] > 0) _0x4f2e74(_0x42272b[0]);
-  return _0x42272b;
+  if (_0x56a344["length"] > 0) _0xc5beb1(_0x56a344[0]);
+  return _0x56a344;
 }
 const _OutlineGeometry = class _OutlineGeometry {
-  constructor(_0x4bdb15) {
-    this["outlineCompanionEntities"] = /* @__PURE__ */ new WeakSet(), this["entitiesWithOutlineCompanion"] = /* @__PURE__ */ new WeakSet(), this["entitiesWithRiskyOutline"] = /* @__PURE__ */ new WeakSet(), this["getCurrentTime"] = _0x4bdb15["getCurrentTime"];
+  constructor(_0x23ac31) {
+    this["outlineCompanionEntities"] = /* @__PURE__ */ new WeakSet(), this["entitiesWithOutlineCompanion"] = /* @__PURE__ */ new WeakSet(), this["entitiesWithRiskyOutline"] = /* @__PURE__ */ new WeakSet(), this["getCurrentTime"] = _0x23ac31["getCurrentTime"];
   }
-  ["isOutlineCompanion"](_0x2cd348) {
-    return this["outlineCompanionEntities"]["has"](_0x2cd348);
+  ["isOutlineCompanion"](_0x405732) {
+    return this["outlineCompanionEntities"]["has"](_0x405732);
   }
-  ["hasOutlineCompanion"](_0x22ff41) {
-    return this["entitiesWithOutlineCompanion"]["has"](_0x22ff41);
+  ["hasOutlineCompanion"](_0x1d46bc) {
+    return this["entitiesWithOutlineCompanion"]["has"](_0x1d46bc);
   }
-  ["hasRiskyOutline"](_0x5cea3d) {
-    return this["entitiesWithRiskyOutline"]["has"](_0x5cea3d);
+  ["hasRiskyOutline"](_0x28407b) {
+    return this["entitiesWithRiskyOutline"]["has"](_0x28407b);
   }
-  ["addPolygonOutlines"](_0x5a5926, _0x3f3766, _0x2d4439) {
-    const _0x39f6a9 = _0x5a5926["entities"]["values"]["filter"]((_0x3064a0) => _0x3064a0["polygon"] !== void 0 && !this["entitiesWithRiskyOutline"]["has"](_0x3064a0));
-    _0x5a5926["entities"]["suspendEvents"]();
-    for (const _0x53fad7 of _0x39f6a9) {
-      this["addPolygonOutlineCompanion"](_0x5a5926, _0x53fad7, _0x3f3766, _0x2d4439, !![]);
+  ["addPolygonOutlines"](_0x419a24, _0x540da7, _0x1398f6) {
+    const _0xd02470 = _0x419a24["entities"]["values"]["filter"]((_0x40ed64) => _0x40ed64["polygon"] !== void 0 && !this["entitiesWithRiskyOutline"]["has"](_0x40ed64));
+    _0x419a24["entities"]["suspendEvents"]();
+    for (const _0x45adb8 of _0xd02470) {
+      this["addPolygonOutlineCompanion"](_0x419a24, _0x45adb8, _0x540da7, _0x1398f6, !![]);
     }
-    _0x5a5926["entities"]["resumeEvents"]();
+    _0x419a24["entities"]["resumeEvents"]();
   }
-  ["addPolygonOutlineCompanion"](_0x4e580f, _0x48ef3b, _0x627d8d, _0x20d53f, _0x522919) {
+  ["addPolygonOutlineCompanion"](_0x231886, _0x2e6288, _0x52d6f6, _0x11c4c6, _0xaf85bc) {
     var _a2;
-    const _0x2c6250 = this["getCurrentTime"](), _0x27c84d = (_a2 = _0x48ef3b["polygon"]["hierarchy"]) == null ? void 0 : _a2["getValue"](_0x2c6250), _0x42620d = _0x27c84d == null ? void 0 : _0x27c84d["positions"], _0x194140 = _0x42620d == null ? void 0 : _0x42620d[0];
-    if (_0x42620d === void 0 || _0x42620d["length"] < 2 || _0x194140 === void 0) return;
-    _0x48ef3b["polygon"]["outline"] = new ConstantProperty(![]), this["entitiesWithOutlineCompanion"]["add"](_0x48ef3b);
-    const _0x5c9a24 = _OutlineGeometry["simplifyOutlinePositions"]([..._0x42620d, _0x194140]), _0x4b0f14 = _0x4e580f["entities"]["add"]({ "id": _0x48ef3b["id"] + "::outline", "polyline": { "positions": _0x5c9a24, "clampToGround": _0x522919, "width": _0x20d53f, "material": _0x627d8d } });
-    this["outlineCompanionEntities"]["add"](_0x4b0f14), _0x4b0f14["properties"] = new PropertyBag({ "__tucbsOutlineOf": _0x48ef3b["id"] });
+    const _0x2d3695 = this["getCurrentTime"](), _0x359461 = (_a2 = _0x2e6288["polygon"]["hierarchy"]) == null ? void 0 : _a2["getValue"](_0x2d3695), _0x266342 = _0x359461 == null ? void 0 : _0x359461["positions"], _0x58c8bd = _0x266342 == null ? void 0 : _0x266342[0];
+    if (_0x266342 === void 0 || _0x266342["length"] < 2 || _0x58c8bd === void 0) return;
+    _0x2e6288["polygon"]["outline"] = new ConstantProperty(![]), this["entitiesWithOutlineCompanion"]["add"](_0x2e6288);
+    const _0x4eab11 = _OutlineGeometry["simplifyOutlinePositions"]([..._0x266342, _0x58c8bd]), _0x9e7f8d = _0x231886["entities"]["add"]({ "id": _0x2e6288["id"] + "::outline", "polyline": { "positions": _0x4eab11, "clampToGround": _0xaf85bc, "width": _0x11c4c6, "material": _0x52d6f6 } });
+    this["outlineCompanionEntities"]["add"](_0x9e7f8d), _0x9e7f8d["properties"] = new PropertyBag({ "__tucbsOutlineOf": _0x2e6288["id"] });
   }
-  ["disableRiskyPolygonOutlines"](_0x2972c6) {
+  ["disableRiskyPolygonOutlines"](_0x22a715) {
     var _a2, _b;
-    const _0x7a6ae6 = JulianDate["now"]();
-    _0x2972c6["entities"]["suspendEvents"]();
-    for (const _0x577cd5 of [..._0x2972c6["entities"]["values"]]) {
-      const _0x505480 = _0x577cd5["polygon"], _0x5696c6 = (_a2 = _0x505480 == null ? void 0 : _0x505480["hierarchy"]) == null ? void 0 : _a2["getValue"](_0x7a6ae6);
-      if (_0x505480 !== void 0 && this["risksAntimeridianOrPoleBug"](_0x5696c6 == null ? void 0 : _0x5696c6["positions"])) {
-        _0x505480["outline"] = new ConstantProperty(![]), this["entitiesWithRiskyOutline"]["add"](_0x577cd5);
-        if (_0x5696c6 !== void 0 && this["splitPoleEnclosingPolygon"](_0x2972c6, _0x577cd5, _0x5696c6, _0x7a6ae6)) continue;
-        _0x505480["height"] === void 0 && ((_b = _0x505480["perPositionHeight"]) == null ? void 0 : _b["getValue"](_0x7a6ae6)) !== !![] && (_0x505480["height"] = new ConstantProperty(0));
+    const _0x69c604 = JulianDate["now"]();
+    _0x22a715["entities"]["suspendEvents"]();
+    for (const _0x2807ac of [..._0x22a715["entities"]["values"]]) {
+      const _0x3b4ed9 = _0x2807ac["polygon"], _0x5874f9 = (_a2 = _0x3b4ed9 == null ? void 0 : _0x3b4ed9["hierarchy"]) == null ? void 0 : _a2["getValue"](_0x69c604);
+      if (_0x3b4ed9 !== void 0 && this["risksAntimeridianOrPoleBug"](_0x5874f9 == null ? void 0 : _0x5874f9["positions"])) {
+        _0x3b4ed9["outline"] = new ConstantProperty(![]), this["entitiesWithRiskyOutline"]["add"](_0x2807ac);
+        if (_0x5874f9 !== void 0 && this["splitPoleEnclosingPolygon"](_0x22a715, _0x2807ac, _0x5874f9, _0x69c604)) continue;
+        _0x3b4ed9["height"] === void 0 && ((_b = _0x3b4ed9["perPositionHeight"]) == null ? void 0 : _b["getValue"](_0x69c604)) !== !![] && (_0x3b4ed9["height"] = new ConstantProperty(0));
       }
     }
-    _0x2972c6["entities"]["resumeEvents"]();
+    _0x22a715["entities"]["resumeEvents"]();
   }
-  ["splitPoleEnclosingPolygon"](_0x285407, _0x406ad7, _0x5d8909, _0x441736) {
+  ["splitPoleEnclosingPolygon"](_0x51e521, _0x16c3e6, _0x1afccb, _0xcd49dd) {
     var _a2;
-    const _0x2b1e65 = _0x406ad7["polygon"];
-    if (_0x2b1e65 === void 0 || _0x5d8909["holes"]["length"] > 0) return ![];
-    const _0x168e53 = _0x5d8909["positions"]["map"]((_0x2a3574) => {
-      const _0x16c715 = Cartographic["fromCartesian"](_0x2a3574);
-      return [_0x318bcf["toDegrees"](_0x16c715["longitude"]), _0x318bcf["toDegrees"](_0x16c715["latitude"])];
+    const _0x26973b = _0x16c3e6["polygon"];
+    if (_0x26973b === void 0 || _0x1afccb["holes"]["length"] > 0) return ![];
+    const _0x8ff487 = _0x1afccb["positions"]["map"]((_0x9947eb) => {
+      const _0x3ca5c6 = Cartographic["fromCartesian"](_0x9947eb);
+      return [_0x584e42["toDegrees"](_0x3ca5c6["longitude"]), _0x584e42["toDegrees"](_0x3ca5c6["latitude"])];
     });
-    let _0x5d7d22 = Infinity, _0x37e5c9 = -Infinity;
-    for (let _0x3ff371 = 0; _0x3ff371 < _0x168e53["length"]; _0x3ff371++) {
-      const [_0x1c0ef5] = _0x168e53[_0x3ff371];
-      if (_0x3ff371 > 0 && Math["abs"](_0x1c0ef5 - _0x168e53[_0x3ff371 - 1][0]) > 180) return ![];
-      _0x5d7d22 = Math["min"](_0x5d7d22, _0x1c0ef5), _0x37e5c9 = Math["max"](_0x37e5c9, _0x1c0ef5);
+    let _0x1bf136 = Infinity, _0x22dd46 = -Infinity;
+    for (let _0x5158e5 = 0; _0x5158e5 < _0x8ff487["length"]; _0x5158e5++) {
+      const [_0x3dbf4f] = _0x8ff487[_0x5158e5];
+      if (_0x5158e5 > 0 && Math["abs"](_0x3dbf4f - _0x8ff487[_0x5158e5 - 1][0]) > 180) return ![];
+      _0x1bf136 = Math["min"](_0x1bf136, _0x3dbf4f), _0x22dd46 = Math["max"](_0x22dd46, _0x3dbf4f);
     }
-    if (_0x37e5c9 - _0x5d7d22 < 359) return ![];
-    const _0x8fd95b = [..._0x168e53, _0x168e53[0]]["map"](([_0x3e4eb8, _0x59205b]) => [_0x3e4eb8, Math["max"](-POLE_LATITUDE_LIMIT, Math["min"](POLE_LATITUDE_LIMIT, _0x59205b))]), _0x2642c9 = [];
-    for (let _0x46a06b = -180; _0x46a06b < 180; _0x46a06b += POLE_SLICE_DEGREES) {
-      const _0x400e03 = clipRingToLongitude(clipRingToLongitude(_0x8fd95b, _0x46a06b, 1), _0x46a06b + POLE_SLICE_DEGREES, -1)["slice"](0, -1);
-      if (_0x400e03["length"] >= 3) _0x2642c9["push"](Cartesian3["fromDegreesArray"](_0x400e03["flat"]()));
+    if (_0x22dd46 - _0x1bf136 < 359) return ![];
+    const _0x4d891e = [..._0x8ff487, _0x8ff487[0]]["map"](([_0x1aaef1, _0x3ae8ae]) => [_0x1aaef1, Math["max"](-POLE_LATITUDE_LIMIT, Math["min"](POLE_LATITUDE_LIMIT, _0x3ae8ae))]), _0x243abc = [];
+    for (let _0x103752 = -180; _0x103752 < 180; _0x103752 += POLE_SLICE_DEGREES) {
+      const _0x2448ee = clipRingToLongitude(clipRingToLongitude(_0x4d891e, _0x103752, 1), _0x103752 + POLE_SLICE_DEGREES, -1)["slice"](0, -1);
+      if (_0x2448ee["length"] >= 3) _0x243abc["push"](Cartesian3["fromDegreesArray"](_0x2448ee["flat"]()));
     }
-    if (_0x2642c9["length"] === 0) return ![];
-    const _0x593634 = (_a2 = _0x406ad7["properties"]) == null ? void 0 : _a2["getValue"](_0x441736);
-    return _0x2642c9["forEach"]((_0x4c4cb3, _0x29ea7c) => {
-      const _0x30e2f0 = new ConstantProperty(new PolygonHierarchy(_0x4c4cb3));
-      if (_0x29ea7c === 0) {
-        _0x2b1e65["hierarchy"] = _0x30e2f0;
+    if (_0x243abc["length"] === 0) return ![];
+    const _0x5efd48 = (_a2 = _0x16c3e6["properties"]) == null ? void 0 : _a2["getValue"](_0xcd49dd);
+    return _0x243abc["forEach"]((_0x4477bf, _0x42a126) => {
+      const _0x1d41f8 = new ConstantProperty(new PolygonHierarchy(_0x4477bf));
+      if (_0x42a126 === 0) {
+        _0x26973b["hierarchy"] = _0x1d41f8;
         return;
       }
-      const _0x361fdd = _0x2b1e65["clone"]();
-      _0x361fdd["hierarchy"] = _0x30e2f0;
-      const _0x56f4e2 = _0x285407["entities"]["add"]({ "id": _0x406ad7["id"] + "::part-" + _0x29ea7c, ..._0x406ad7["name"] !== void 0 ? { "name": _0x406ad7["name"] } : {}, "polygon": _0x361fdd });
-      if (_0x593634 !== void 0) _0x56f4e2["properties"] = new PropertyBag(_0x593634);
-      this["entitiesWithRiskyOutline"]["add"](_0x56f4e2);
+      const _0x538206 = _0x26973b["clone"]();
+      _0x538206["hierarchy"] = _0x1d41f8;
+      const _0x34e5cf = _0x51e521["entities"]["add"]({ "id": _0x16c3e6["id"] + "::part-" + _0x42a126, ..._0x16c3e6["name"] !== void 0 ? { "name": _0x16c3e6["name"] } : {}, "polygon": _0x538206 });
+      if (_0x5efd48 !== void 0) _0x34e5cf["properties"] = new PropertyBag(_0x5efd48);
+      this["entitiesWithRiskyOutline"]["add"](_0x34e5cf);
     }), !![];
   }
-  ["risksAntimeridianOrPoleBug"](_0xc703c4) {
-    if (!_0xc703c4 || _0xc703c4["length"] < 2) return ![];
-    let _0x22fc56;
-    for (const _0x583ef1 of _0xc703c4) {
-      const _0x26a3ac = Cartographic["fromCartesian"](_0x583ef1), _0x16302f = _0x318bcf["toDegrees"](_0x26a3ac["latitude"]);
-      if (Math["abs"](_0x16302f) > 89) return !![];
-      const _0x31751b = _0x318bcf["toDegrees"](_0x26a3ac["longitude"]);
-      if (_0x22fc56 !== void 0 && Math["abs"](_0x31751b - _0x22fc56) > 180) return !![];
-      _0x22fc56 = _0x31751b;
+  ["risksAntimeridianOrPoleBug"](_0xc2ab58) {
+    if (!_0xc2ab58 || _0xc2ab58["length"] < 2) return ![];
+    let _0x5b3935;
+    for (const _0x204504 of _0xc2ab58) {
+      const _0x4461e7 = Cartographic["fromCartesian"](_0x204504), _0x5af9c7 = _0x584e42["toDegrees"](_0x4461e7["latitude"]);
+      if (Math["abs"](_0x5af9c7) > 89) return !![];
+      const _0x436ea9 = _0x584e42["toDegrees"](_0x4461e7["longitude"]);
+      if (_0x5b3935 !== void 0 && Math["abs"](_0x436ea9 - _0x5b3935) > 180) return !![];
+      _0x5b3935 = _0x436ea9;
     }
     return ![];
   }
-  ["flattenSuspiciousGeometry"](_0x50e09d) {
-    _0x50e09d["entities"]["suspendEvents"]();
-    for (const _0x480bb9 of _0x50e09d["entities"]["values"]) {
-      if (_0x480bb9["polygon"] !== void 0) _0x480bb9["polygon"]["granularity"] = new ConstantProperty(Math["PI"]);
-      if (_0x480bb9["polyline"] !== void 0) _0x480bb9["polyline"]["granularity"] = new ConstantProperty(Math["PI"]);
+  ["flattenSuspiciousGeometry"](_0x3a2d0a) {
+    _0x3a2d0a["entities"]["suspendEvents"]();
+    for (const _0x4ba153 of _0x3a2d0a["entities"]["values"]) {
+      if (_0x4ba153["polygon"] !== void 0) _0x4ba153["polygon"]["granularity"] = new ConstantProperty(Math["PI"]);
+      if (_0x4ba153["polyline"] !== void 0) _0x4ba153["polyline"]["granularity"] = new ConstantProperty(Math["PI"]);
     }
-    _0x50e09d["entities"]["resumeEvents"]();
+    _0x3a2d0a["entities"]["resumeEvents"]();
   }
-  static ["douglasPeucker"](_0x3e758f, _0x29b010) {
-    const _0x5cb5c9 = new Array(_0x3e758f["length"])["fill"](![]);
-    _0x5cb5c9[0] = !![], _0x5cb5c9[_0x3e758f["length"] - 1] = !![];
-    const _0xcb8e60 = [[0, _0x3e758f["length"] - 1]];
-    while (_0xcb8e60["length"] > 0) {
-      const [_0x489beb, _0x3cc68a] = _0xcb8e60["pop"]();
-      if (_0x3cc68a <= _0x489beb + 1) continue;
-      let _0x3f5fab = -1, _0x730f6d = -1;
-      for (let _0x2f60a5 = _0x489beb + 1; _0x2f60a5 < _0x3cc68a; _0x2f60a5++) {
-        const _0x51a0ef = _OutlineGeometry["perpendicularDistance"](_0x3e758f[_0x2f60a5], _0x3e758f[_0x489beb], _0x3e758f[_0x3cc68a]);
-        _0x51a0ef > _0x3f5fab && (_0x3f5fab = _0x51a0ef, _0x730f6d = _0x2f60a5);
+  static ["douglasPeucker"](_0x53dcdb, _0x4898ff) {
+    const _0x1c38dd = new Array(_0x53dcdb["length"])["fill"](![]);
+    _0x1c38dd[0] = !![], _0x1c38dd[_0x53dcdb["length"] - 1] = !![];
+    const _0x2970dd = [[0, _0x53dcdb["length"] - 1]];
+    while (_0x2970dd["length"] > 0) {
+      const [_0x44fa62, _0x246d51] = _0x2970dd["pop"]();
+      if (_0x246d51 <= _0x44fa62 + 1) continue;
+      let _0x949f53 = -1, _0x26c1f0 = -1;
+      for (let _0x29a7c4 = _0x44fa62 + 1; _0x29a7c4 < _0x246d51; _0x29a7c4++) {
+        const _0xaccb71 = _OutlineGeometry["perpendicularDistance"](_0x53dcdb[_0x29a7c4], _0x53dcdb[_0x44fa62], _0x53dcdb[_0x246d51]);
+        _0xaccb71 > _0x949f53 && (_0x949f53 = _0xaccb71, _0x26c1f0 = _0x29a7c4);
       }
-      _0x3f5fab > _0x29b010 && (_0x5cb5c9[_0x730f6d] = !![], _0xcb8e60["push"]([_0x489beb, _0x730f6d], [_0x730f6d, _0x3cc68a]));
+      _0x949f53 > _0x4898ff && (_0x1c38dd[_0x26c1f0] = !![], _0x2970dd["push"]([_0x44fa62, _0x26c1f0], [_0x26c1f0, _0x246d51]));
     }
-    return _0x3e758f["filter"]((_0x49bcb8, _0x373786) => _0x5cb5c9[_0x373786]);
+    return _0x53dcdb["filter"]((_0x17847c, _0x4ece69) => _0x1c38dd[_0x4ece69]);
   }
-  static ["perpendicularDistance"](_0x45a402, _0x4ebef9, _0x29d671) {
-    const _0x3a03b5 = Cartesian3["subtract"](_0x29d671, _0x4ebef9, new Cartesian3()), _0xbffd36 = Cartesian3["magnitudeSquared"](_0x3a03b5);
-    if (_0xbffd36 === 0) return Cartesian3["distance"](_0x45a402, _0x4ebef9);
-    const _0x3501a3 = Cartesian3["subtract"](_0x45a402, _0x4ebef9, new Cartesian3()), _0x311b21 = _0x318bcf["clamp"](Cartesian3["dot"](_0x3501a3, _0x3a03b5) / _0xbffd36, 0, 1), _0x6f6553 = Cartesian3["add"](_0x4ebef9, Cartesian3["multiplyByScalar"](_0x3a03b5, _0x311b21, _0x3a03b5), _0x3a03b5);
-    return Cartesian3["distance"](_0x45a402, _0x6f6553);
+  static ["perpendicularDistance"](_0x469a44, _0x104267, _0x547b05) {
+    const _0x57080c = Cartesian3["subtract"](_0x547b05, _0x104267, new Cartesian3()), _0xa65298 = Cartesian3["magnitudeSquared"](_0x57080c);
+    if (_0xa65298 === 0) return Cartesian3["distance"](_0x469a44, _0x104267);
+    const _0x446524 = Cartesian3["subtract"](_0x469a44, _0x104267, new Cartesian3()), _0x293bc4 = _0x584e42["clamp"](Cartesian3["dot"](_0x446524, _0x57080c) / _0xa65298, 0, 1), _0x31e1fc = Cartesian3["add"](_0x104267, Cartesian3["multiplyByScalar"](_0x57080c, _0x293bc4, _0x57080c), _0x57080c);
+    return Cartesian3["distance"](_0x469a44, _0x31e1fc);
   }
-  static ["uniformDecimate"](_0x59a728, _0x2a9d56) {
-    if (_0x59a728["length"] <= _0x2a9d56) return [..._0x59a728];
-    const _0x371d59 = (_0x59a728["length"] - 1) / (_0x2a9d56 - 1);
-    return Array["from"]({ "length": _0x2a9d56 }, (_0x31916b, _0x3dd687) => _0x59a728[Math["round"](_0x3dd687 * _0x371d59)]);
+  static ["uniformDecimate"](_0x1a84f6, _0x1aca4b) {
+    if (_0x1a84f6["length"] <= _0x1aca4b) return [..._0x1a84f6];
+    const _0x4b61f5 = (_0x1a84f6["length"] - 1) / (_0x1aca4b - 1);
+    return Array["from"]({ "length": _0x1aca4b }, (_0x42a72e, _0x101a69) => _0x1a84f6[Math["round"](_0x101a69 * _0x4b61f5)]);
   }
-  static ["polygonExtentMeters"](_0x2c0f3f) {
-    let _0x1be0a2 = Infinity, _0x3c9ffd = Infinity, _0x256f51 = Infinity, _0x17d01c = -Infinity, _0x2173ef = -Infinity, _0x563042 = -Infinity;
-    for (const _0x2f9715 of _0x2c0f3f) {
-      if (_0x2f9715["x"] < _0x1be0a2) _0x1be0a2 = _0x2f9715["x"];
-      if (_0x2f9715["x"] > _0x17d01c) _0x17d01c = _0x2f9715["x"];
-      if (_0x2f9715["y"] < _0x3c9ffd) _0x3c9ffd = _0x2f9715["y"];
-      if (_0x2f9715["y"] > _0x2173ef) _0x2173ef = _0x2f9715["y"];
-      if (_0x2f9715["z"] < _0x256f51) _0x256f51 = _0x2f9715["z"];
-      if (_0x2f9715["z"] > _0x563042) _0x563042 = _0x2f9715["z"];
+  static ["polygonExtentMeters"](_0x586a1a) {
+    let _0x8062bb = Infinity, _0x1889de = Infinity, _0x4d9b4e = Infinity, _0x1938f9 = -Infinity, _0x4229c0 = -Infinity, _0x3288db = -Infinity;
+    for (const _0x1fe027 of _0x586a1a) {
+      if (_0x1fe027["x"] < _0x8062bb) _0x8062bb = _0x1fe027["x"];
+      if (_0x1fe027["x"] > _0x1938f9) _0x1938f9 = _0x1fe027["x"];
+      if (_0x1fe027["y"] < _0x1889de) _0x1889de = _0x1fe027["y"];
+      if (_0x1fe027["y"] > _0x4229c0) _0x4229c0 = _0x1fe027["y"];
+      if (_0x1fe027["z"] < _0x4d9b4e) _0x4d9b4e = _0x1fe027["z"];
+      if (_0x1fe027["z"] > _0x3288db) _0x3288db = _0x1fe027["z"];
     }
-    return Math["sqrt"]((_0x17d01c - _0x1be0a2) ** 2 + (_0x2173ef - _0x3c9ffd) ** 2 + (_0x563042 - _0x256f51) ** 2);
+    return Math["sqrt"]((_0x1938f9 - _0x8062bb) ** 2 + (_0x4229c0 - _0x1889de) ** 2 + (_0x3288db - _0x4d9b4e) ** 2);
   }
-  static ["simplifyOutlinePositions"](_0x3a76ee) {
-    const _0x7a74de = _OutlineGeometry["polygonExtentMeters"](_0x3a76ee), _0x4c0f06 = _0x318bcf["clamp"](_0x7a74de * _OutlineGeometry["OUTLINE_SIMPLIFY_TOLERANCE_FACTOR"], _OutlineGeometry["OUTLINE_SIMPLIFY_MIN_TOLERANCE_METERS"], _OutlineGeometry["OUTLINE_SIMPLIFY_MAX_TOLERANCE_METERS"]), _0x482e51 = _OutlineGeometry["douglasPeucker"](_0x3a76ee, _0x4c0f06);
-    return _0x482e51["length"] > _OutlineGeometry["OUTLINE_MAX_VERTICES"] ? _OutlineGeometry["uniformDecimate"](_0x482e51, _OutlineGeometry["OUTLINE_MAX_VERTICES"]) : _0x482e51;
+  static ["simplifyOutlinePositions"](_0x2988f3) {
+    const _0x9b36ac = _OutlineGeometry["polygonExtentMeters"](_0x2988f3), _0x30ef33 = _0x584e42["clamp"](_0x9b36ac * _OutlineGeometry["OUTLINE_SIMPLIFY_TOLERANCE_FACTOR"], _OutlineGeometry["OUTLINE_SIMPLIFY_MIN_TOLERANCE_METERS"], _OutlineGeometry["OUTLINE_SIMPLIFY_MAX_TOLERANCE_METERS"]), _0x5ed2f8 = _OutlineGeometry["douglasPeucker"](_0x2988f3, _0x30ef33);
+    return _0x5ed2f8["length"] > _OutlineGeometry["OUTLINE_MAX_VERTICES"] ? _OutlineGeometry["uniformDecimate"](_0x5ed2f8, _OutlineGeometry["OUTLINE_MAX_VERTICES"]) : _0x5ed2f8;
   }
 };
 _OutlineGeometry["OUTLINE_SIMPLIFY_TOLERANCE_FACTOR"] = 7e-5;
@@ -988,113 +988,113 @@ _OutlineGeometry["OUTLINE_SIMPLIFY_MAX_TOLERANCE_METERS"] = 150;
 _OutlineGeometry["OUTLINE_MAX_VERTICES"] = 1200;
 let OutlineGeometry = _OutlineGeometry;
 class OpacityController {
-  constructor(_0x395441) {
-    this["dataSourceOpacityStates"] = /* @__PURE__ */ new WeakMap(), this["dataSourceOpacityProperties"] = /* @__PURE__ */ new WeakMap(), this["requestRender"] = _0x395441["requestRender"];
+  constructor(_0x289593) {
+    this["dataSourceOpacityStates"] = /* @__PURE__ */ new WeakMap(), this["dataSourceOpacityProperties"] = /* @__PURE__ */ new WeakMap(), this["requestRender"] = _0x289593["requestRender"];
   }
-  ["getWrappedBaseColor"](_0x4799e9) {
-    return this["dataSourceOpacityProperties"]["get"](_0x4799e9);
+  ["getWrappedBaseColor"](_0x74ff68) {
+    return this["dataSourceOpacityProperties"]["get"](_0x74ff68);
   }
-  ["prepareDataSourceOpacity"](_0xdf6219) {
+  ["prepareDataSourceOpacity"](_0x22dd73) {
     var _a2, _b;
-    const _0x317e87 = this["getDataSourceOpacityState"](_0xdf6219), _0x326127 = JulianDate["now"]();
-    _0xdf6219["entities"]["suspendEvents"]();
-    for (const _0x244b8a of _0xdf6219["entities"]["values"]) {
-      if (((_a2 = _0x244b8a["polygon"]) == null ? void 0 : _a2["material"]) instanceof ColorMaterialProperty) {
-        const _0x1c5850 = _0x244b8a["polygon"]["material"];
-        this["installOpacityColorProperty"](_0x1c5850["color"], _0x317e87, _0x326127, new Color(1, 1, 1, 0.5), (_0x246671) => _0x1c5850["color"] = _0x246671);
+    const _0x455b42 = this["getDataSourceOpacityState"](_0x22dd73), _0x273b8d = JulianDate["now"]();
+    _0x22dd73["entities"]["suspendEvents"]();
+    for (const _0xac7182 of _0x22dd73["entities"]["values"]) {
+      if (((_a2 = _0xac7182["polygon"]) == null ? void 0 : _a2["material"]) instanceof ColorMaterialProperty) {
+        const _0x2073f2 = _0xac7182["polygon"]["material"];
+        this["installOpacityColorProperty"](_0x2073f2["color"], _0x455b42, _0x273b8d, new Color(1, 1, 1, 0.5), (_0x132b22) => _0x2073f2["color"] = _0x132b22);
       }
-      if (((_b = _0x244b8a["polyline"]) == null ? void 0 : _b["material"]) instanceof ColorMaterialProperty) {
-        const _0x3cb2e9 = _0x244b8a["polyline"]["material"];
-        this["installOpacityColorProperty"](_0x3cb2e9["color"], _0x317e87, _0x326127, Color["WHITE"], (_0x553e86) => _0x3cb2e9["color"] = _0x553e86);
+      if (((_b = _0xac7182["polyline"]) == null ? void 0 : _b["material"]) instanceof ColorMaterialProperty) {
+        const _0x29e04b = _0xac7182["polyline"]["material"];
+        this["installOpacityColorProperty"](_0x29e04b["color"], _0x455b42, _0x273b8d, Color["WHITE"], (_0x4816be) => _0x29e04b["color"] = _0x4816be);
       }
-      _0x244b8a["point"] !== void 0 && this["installOpacityColorProperty"](_0x244b8a["point"]["color"], _0x317e87, _0x326127, Color["WHITE"], (_0x5d415e) => _0x244b8a["point"]["color"] = _0x5d415e), _0x244b8a["billboard"] !== void 0 && this["installOpacityColorProperty"](_0x244b8a["billboard"]["color"], _0x317e87, _0x326127, Color["WHITE"], (_0x534233) => _0x244b8a["billboard"]["color"] = _0x534233);
+      _0xac7182["point"] !== void 0 && this["installOpacityColorProperty"](_0xac7182["point"]["color"], _0x455b42, _0x273b8d, Color["WHITE"], (_0x15cbdd) => _0xac7182["point"]["color"] = _0x15cbdd), _0xac7182["billboard"] !== void 0 && this["installOpacityColorProperty"](_0xac7182["billboard"]["color"], _0x455b42, _0x273b8d, Color["WHITE"], (_0x5a839d) => _0xac7182["billboard"]["color"] = _0x5a839d);
     }
-    _0xdf6219["entities"]["resumeEvents"]();
+    _0x22dd73["entities"]["resumeEvents"]();
   }
-  ["ensureDynamicFillColor"](_0x50ebe7, _0x5cb09b) {
+  ["ensureDynamicFillColor"](_0x54b0fc, _0x1ecd53) {
     var _a2;
-    if (!(((_a2 = _0x5cb09b["polygon"]) == null ? void 0 : _a2["material"]) instanceof ColorMaterialProperty)) return;
-    const _0x167555 = this["getDataSourceOpacityState"](_0x50ebe7), _0x512e57 = _0x5cb09b["polygon"]["material"];
-    this["installOpacityColorProperty"](_0x512e57["color"], _0x167555, JulianDate["now"](), new Color(1, 1, 1, 0.5), (_0x4c63bb) => _0x512e57["color"] = _0x4c63bb);
+    if (!(((_a2 = _0x1ecd53["polygon"]) == null ? void 0 : _a2["material"]) instanceof ColorMaterialProperty)) return;
+    const _0x17dddf = this["getDataSourceOpacityState"](_0x54b0fc), _0x1772d1 = _0x1ecd53["polygon"]["material"];
+    this["installOpacityColorProperty"](_0x1772d1["color"], _0x17dddf, JulianDate["now"](), new Color(1, 1, 1, 0.5), (_0x13fd09) => _0x1772d1["color"] = _0x13fd09);
   }
-  ["setDataSourceOpacity"](_0x188e45, _0x25e588) {
-    const _0x2e306f = this["getDataSourceOpacityState"](_0x188e45);
-    if (_0x2e306f["opacity"] === _0x25e588) return;
-    _0x2e306f["opacity"] = _0x25e588, !_0x2e306f["wrapped"] && _0x25e588 !== 1 && (this["prepareDataSourceOpacity"](_0x188e45), _0x2e306f["wrapped"] = !![]), this["requestRender"]();
+  ["setDataSourceOpacity"](_0x125c2f, _0x104670) {
+    const _0x29496b = this["getDataSourceOpacityState"](_0x125c2f);
+    if (_0x29496b["opacity"] === _0x104670) return;
+    _0x29496b["opacity"] = _0x104670, !_0x29496b["wrapped"] && _0x104670 !== 1 && (this["prepareDataSourceOpacity"](_0x125c2f), _0x29496b["wrapped"] = !![]), this["requestRender"]();
   }
-  ["getDataSourceOpacityState"](_0x4d283b) {
-    let _0x31b89f = this["dataSourceOpacityStates"]["get"](_0x4d283b);
-    return _0x31b89f === void 0 && (_0x31b89f = { "opacity": 1, "wrapped": ![] }, this["dataSourceOpacityStates"]["set"](_0x4d283b, _0x31b89f)), _0x31b89f;
+  ["getDataSourceOpacityState"](_0x34d548) {
+    let _0x350a65 = this["dataSourceOpacityStates"]["get"](_0x34d548);
+    return _0x350a65 === void 0 && (_0x350a65 = { "opacity": 1, "wrapped": ![] }, this["dataSourceOpacityStates"]["set"](_0x34d548, _0x350a65)), _0x350a65;
   }
-  ["installOpacityColorProperty"](_0x1ea1c5, _0x2c8531, _0x1fa00f, _0x1fd82e, _0x78e1) {
-    if (_0x1ea1c5 !== void 0 && this["dataSourceOpacityProperties"]["has"](_0x1ea1c5)) return;
-    const _0x35b3fc = this["readColorProperty"](_0x1ea1c5, _0x1fa00f, _0x1fd82e), _0x43b764 = this["createOpacityColorProperty"](_0x35b3fc, _0x2c8531);
-    _0x78e1(_0x43b764);
+  ["installOpacityColorProperty"](_0x5976ac, _0x18b8e9, _0x2a9169, _0x5a32fc, _0x55e8cf) {
+    if (_0x5976ac !== void 0 && this["dataSourceOpacityProperties"]["has"](_0x5976ac)) return;
+    const _0x9f5ea6 = this["readColorProperty"](_0x5976ac, _0x2a9169, _0x5a32fc), _0x5aee06 = this["createOpacityColorProperty"](_0x9f5ea6, _0x18b8e9);
+    _0x55e8cf(_0x5aee06);
   }
-  ["readColorProperty"](_0x27c35f, _0x44beb6, _0x255fca) {
-    const _0x34f51a = _0x27c35f == null ? void 0 : _0x27c35f["getValue"](_0x44beb6);
-    return _0x34f51a instanceof Color ? Color["clone"](_0x34f51a, new Color()) : Color["clone"](_0x255fca, new Color());
+  ["readColorProperty"](_0xb065e5, _0x4abacd, _0x229bb7) {
+    const _0x28d74f = _0xb065e5 == null ? void 0 : _0xb065e5["getValue"](_0x4abacd);
+    return _0x28d74f instanceof Color ? Color["clone"](_0x28d74f, new Color()) : Color["clone"](_0x229bb7, new Color());
   }
-  ["createOpacityColorProperty"](_0x307e4b, _0x4dc866) {
-    const _0x301b46 = Color["clone"](_0x307e4b, new Color()), _0x594680 = new CallbackProperty((_0x58d0c6, _0x1a4219) => {
-      const _0x1b68b5 = _0x1a4219 instanceof Color ? _0x1a4219 : new Color();
-      return _0x1b68b5["red"] = _0x301b46["red"], _0x1b68b5["green"] = _0x301b46["green"], _0x1b68b5["blue"] = _0x301b46["blue"], _0x1b68b5["alpha"] = _0x301b46["alpha"] * _0x4dc866["opacity"], _0x1b68b5;
+  ["createOpacityColorProperty"](_0x5a12a3, _0x20b95b) {
+    const _0x2af2b2 = Color["clone"](_0x5a12a3, new Color()), _0x5362c1 = new CallbackProperty((_0x5cc9a7, _0x1ba4f7) => {
+      const _0x415a14 = _0x1ba4f7 instanceof Color ? _0x1ba4f7 : new Color();
+      return _0x415a14["red"] = _0x2af2b2["red"], _0x415a14["green"] = _0x2af2b2["green"], _0x415a14["blue"] = _0x2af2b2["blue"], _0x415a14["alpha"] = _0x2af2b2["alpha"] * _0x20b95b["opacity"], _0x415a14;
     }, ![]);
-    return this["dataSourceOpacityProperties"]["set"](_0x594680, _0x301b46), _0x594680;
+    return this["dataSourceOpacityProperties"]["set"](_0x5362c1, _0x2af2b2), _0x5362c1;
   }
 }
 const _CameraHighlight = class _CameraHighlight {
-  constructor(_0x361ee7, _0x3753f6) {
-    this["viewer"] = _0x361ee7, this["deps"] = _0x3753f6;
+  constructor(_0x286a18, _0x1868c0) {
+    this["viewer"] = _0x286a18, this["deps"] = _0x1868c0;
   }
-  async ["zoomToLayer"](_0x2e9411) {
-    const _0x4b3163 = this["deps"]["requireLayer"](_0x2e9411);
-    return this["viewer"]["zoomTo"](_0x4b3163["cesiumObject"], new HeadingPitchRange(0, -_0x318bcf["PI_OVER_TWO"], 0));
+  async ["zoomToLayer"](_0x301075) {
+    const _0x3e3889 = this["deps"]["requireLayer"](_0x301075);
+    return this["viewer"]["zoomTo"](_0x3e3889["cesiumObject"], new HeadingPitchRange(0, -_0x584e42["PI_OVER_TWO"], 0));
   }
-  async ["zoomToEntity"](_0x3d2659, _0x53baeb) {
+  async ["zoomToEntity"](_0x413712, _0xca93a) {
     var _a2, _b;
-    const _0x50711c = this["viewer"]["clock"]["currentTime"];
-    let _0x3a22e0;
-    if (((_a2 = _0x3d2659["polygon"]) == null ? void 0 : _a2["hierarchy"]) !== void 0) {
-      const _0x28862c = _0x3d2659["polygon"]["hierarchy"]["getValue"](_0x50711c);
-      _0x3a22e0 = _0x28862c == null ? void 0 : _0x28862c["positions"];
-    } else ((_b = _0x3d2659["polyline"]) == null ? void 0 : _b["positions"]) !== void 0 && (_0x3a22e0 = _0x3d2659["polyline"]["positions"]["getValue"](_0x50711c));
-    if (_0x3a22e0 !== void 0 && _0x3a22e0["length"] > 0) {
-      const _0x4706dc = BoundingSphere["fromPoints"](_0x3a22e0), _0x528299 = Math["max"](_0x4706dc["radius"] * 2, 50);
-      return new Promise((_0x564b4d) => {
-        this["viewer"]["camera"]["flyToBoundingSphere"](_0x4706dc, { "offset": new HeadingPitchRange(0, -_0x318bcf["PI_OVER_TWO"], _0x528299), ...(_0x53baeb == null ? void 0 : _0x53baeb["duration"]) !== void 0 ? { "duration": _0x53baeb["duration"] } : {}, "complete": () => _0x564b4d(!![]), "cancel": () => _0x564b4d(![]) });
+    const _0x482ae3 = this["viewer"]["clock"]["currentTime"];
+    let _0x48c2d6;
+    if (((_a2 = _0x413712["polygon"]) == null ? void 0 : _a2["hierarchy"]) !== void 0) {
+      const _0x3627ed = _0x413712["polygon"]["hierarchy"]["getValue"](_0x482ae3);
+      _0x48c2d6 = _0x3627ed == null ? void 0 : _0x3627ed["positions"];
+    } else ((_b = _0x413712["polyline"]) == null ? void 0 : _b["positions"]) !== void 0 && (_0x48c2d6 = _0x413712["polyline"]["positions"]["getValue"](_0x482ae3));
+    if (_0x48c2d6 !== void 0 && _0x48c2d6["length"] > 0) {
+      const _0x28c2ac = BoundingSphere["fromPoints"](_0x48c2d6), _0x47cec1 = Math["max"](_0x28c2ac["radius"] * 2, 50);
+      return new Promise((_0xc0ecde) => {
+        this["viewer"]["camera"]["flyToBoundingSphere"](_0x28c2ac, { "offset": new HeadingPitchRange(0, -_0x584e42["PI_OVER_TWO"], _0x47cec1), ...(_0xca93a == null ? void 0 : _0xca93a["duration"]) !== void 0 ? { "duration": _0xca93a["duration"] } : {}, "complete": () => _0xc0ecde(!![]), "cancel": () => _0xc0ecde(![]) });
       });
     }
-    return this["viewer"]["zoomTo"](_0x3d2659, new HeadingPitchRange(0, -_0x318bcf["PI_OVER_TWO"], 0));
+    return this["viewer"]["zoomTo"](_0x413712, new HeadingPitchRange(0, -_0x584e42["PI_OVER_TWO"], 0));
   }
-  static ["elevate"](_0x37f4a5, _0x3fa2d8) {
-    return _0x37f4a5["map"]((_0x417cdb) => {
-      const _0x65b3ad = Cartographic["fromCartesian"](_0x417cdb);
-      return Cartesian3["fromRadians"](_0x65b3ad["longitude"], _0x65b3ad["latitude"], _0x65b3ad["height"] + _0x3fa2d8);
+  static ["elevate"](_0x158d07, _0x4d3878) {
+    return _0x158d07["map"]((_0x1ad603) => {
+      const _0x527703 = Cartographic["fromCartesian"](_0x1ad603);
+      return Cartesian3["fromRadians"](_0x527703["longitude"], _0x527703["latitude"], _0x527703["height"] + _0x4d3878);
     });
   }
-  ["highlightEntity"](_0x7cba26) {
+  ["highlightEntity"](_0xd283bd) {
     var _a2, _b, _c;
-    const _0x5bd562 = this["viewer"]["clock"]["currentTime"], _0xfe4ee4 = (_a2 = _0x7cba26["properties"]) == null ? void 0 : _a2["getValue"](_0x5bd562), _0x1d0017 = _0xfe4ee4 == null ? void 0 : _0xfe4ee4["layerId"], _0x22b0fc = _0x1d0017 !== void 0 ? this["deps"]["getLayerStyle"](_0x1d0017) : void 0, _0x44d234 = _CameraHighlight["HIGHLIGHT_COLOR"], _0x528ad7 = ((_0x22b0fc == null ? void 0 : _0x22b0fc["outline"]["width"]) ?? 2) + 4, _0x87cb20 = new ColorMaterialProperty(_0x44d234), _0x5d2423 = new Entity();
-    if (((_b = _0x7cba26["polygon"]) == null ? void 0 : _b["hierarchy"]) !== void 0) {
-      const _0x486ff2 = _0x7cba26["polygon"]["hierarchy"]["getValue"](_0x5bd562), _0x399407 = _0x486ff2 == null ? void 0 : _0x486ff2["positions"];
-      if (_0x399407 === void 0 || _0x399407["length"] < 2) return;
-      const _0x93b908 = Cartesian3["equals"](_0x399407[0], _0x399407[_0x399407["length"] - 1]) ? _0x399407 : [..._0x399407, _0x399407[0]];
-      _0x5d2423["polyline"] = new PolylineGraphics({ "positions": _CameraHighlight["elevate"](_0x93b908, _CameraHighlight["HIGHLIGHT_ELEVATION_METERS"]), "width": _0x528ad7, "material": _0x87cb20, "depthFailMaterial": _0x87cb20 });
+    const _0x2325fe = this["viewer"]["clock"]["currentTime"], _0x146e43 = (_a2 = _0xd283bd["properties"]) == null ? void 0 : _a2["getValue"](_0x2325fe), _0x41b163 = _0x146e43 == null ? void 0 : _0x146e43["layerId"], _0x345437 = _0x41b163 !== void 0 ? this["deps"]["getLayerStyle"](_0x41b163) : void 0, _0x3740ca = _CameraHighlight["HIGHLIGHT_COLOR"], _0x14ce6a = ((_0x345437 == null ? void 0 : _0x345437["outline"]["width"]) ?? 2) + 4, _0x381852 = new ColorMaterialProperty(_0x3740ca), _0x480bdd = new Entity();
+    if (((_b = _0xd283bd["polygon"]) == null ? void 0 : _b["hierarchy"]) !== void 0) {
+      const _0x40c6f9 = _0xd283bd["polygon"]["hierarchy"]["getValue"](_0x2325fe), _0x24a9d1 = _0x40c6f9 == null ? void 0 : _0x40c6f9["positions"];
+      if (_0x24a9d1 === void 0 || _0x24a9d1["length"] < 2) return;
+      const _0x57467e = Cartesian3["equals"](_0x24a9d1[0], _0x24a9d1[_0x24a9d1["length"] - 1]) ? _0x24a9d1 : [..._0x24a9d1, _0x24a9d1[0]];
+      _0x480bdd["polyline"] = new PolylineGraphics({ "positions": _CameraHighlight["elevate"](_0x57467e, _CameraHighlight["HIGHLIGHT_ELEVATION_METERS"]), "width": _0x14ce6a, "material": _0x381852, "depthFailMaterial": _0x381852 });
     } else {
-      if (((_c = _0x7cba26["polyline"]) == null ? void 0 : _c["positions"]) !== void 0) {
-        const _0x3e00c3 = _0x7cba26["polyline"]["positions"]["getValue"](_0x5bd562);
-        if (_0x3e00c3 === void 0 || _0x3e00c3["length"] < 2) return;
-        _0x5d2423["polyline"] = new PolylineGraphics({ "positions": _CameraHighlight["elevate"](_0x3e00c3, _CameraHighlight["HIGHLIGHT_ELEVATION_METERS"]), "width": _0x528ad7, "material": _0x87cb20, "depthFailMaterial": _0x87cb20 });
+      if (((_c = _0xd283bd["polyline"]) == null ? void 0 : _c["positions"]) !== void 0) {
+        const _0x5757d1 = _0xd283bd["polyline"]["positions"]["getValue"](_0x2325fe);
+        if (_0x5757d1 === void 0 || _0x5757d1["length"] < 2) return;
+        _0x480bdd["polyline"] = new PolylineGraphics({ "positions": _CameraHighlight["elevate"](_0x5757d1, _CameraHighlight["HIGHLIGHT_ELEVATION_METERS"]), "width": _0x14ce6a, "material": _0x381852, "depthFailMaterial": _0x381852 });
       } else {
-        if (_0x7cba26["position"] !== void 0) {
-          const _0xaea1d1 = _0x7cba26["position"]["getValue"](_0x5bd562);
-          if (_0xaea1d1 === void 0) return;
-          _0x5d2423["position"] = new ConstantPositionProperty(_0xaea1d1), _0x5d2423["point"] = new PointGraphics({ "pixelSize": _0x528ad7 + 12, "color": _0x44d234, "disableDepthTestDistance": Number["POSITIVE_INFINITY"] });
+        if (_0xd283bd["position"] !== void 0) {
+          const _0xe15a58 = _0xd283bd["position"]["getValue"](_0x2325fe);
+          if (_0xe15a58 === void 0) return;
+          _0x480bdd["position"] = new ConstantPositionProperty(_0xe15a58), _0x480bdd["point"] = new PointGraphics({ "pixelSize": _0x14ce6a + 12, "color": _0x3740ca, "disableDepthTestDistance": Number["POSITIVE_INFINITY"] });
         } else return;
       }
     }
-    !this["highlightDataSource"] ? (this["highlightDataSource"] = new CustomDataSource("__tucbs_highlight__"), void this["viewer"]["dataSources"]["add"](this["highlightDataSource"])) : this["highlightDataSource"]["entities"]["removeAll"](), this["highlightDataSource"]["entities"]["add"](_0x5d2423);
+    !this["highlightDataSource"] ? (this["highlightDataSource"] = new CustomDataSource("__tucbs_highlight__"), void this["viewer"]["dataSources"]["add"](this["highlightDataSource"])) : this["highlightDataSource"]["entities"]["removeAll"](), this["highlightDataSource"]["entities"]["add"](_0x480bdd);
   }
   ["clearHighlight"]() {
     var _a2;
@@ -1106,971 +1106,971 @@ _CameraHighlight["HIGHLIGHT_ELEVATION_METERS"] = 0.5;
 let CameraHighlight = _CameraHighlight;
 const SEAM_COVER_WIDTH = 1, OUTLINE_ID_SUFFIX = "::outline";
 class LayerStyleEngine {
-  constructor(_0x273f74) {
-    this["appliedLayerStyles"] = /* @__PURE__ */ new Map(), this["appliedCompanionWidths"] = /* @__PURE__ */ new Map(), this["outlineGeometry"] = _0x273f74["outlineGeometry"], this["opacityController"] = _0x273f74["opacityController"], this["getCurrentTime"] = _0x273f74["getCurrentTime"], this["requestRender"] = _0x273f74["requestRender"], this["emitStyle"] = _0x273f74["emitStyle"], this["waitForRenderSettle"] = _0x273f74["waitForRenderSettle"];
+  constructor(_0xa0c6c1) {
+    this["appliedLayerStyles"] = /* @__PURE__ */ new Map(), this["appliedCompanionWidths"] = /* @__PURE__ */ new Map(), this["outlineGeometry"] = _0xa0c6c1["outlineGeometry"], this["opacityController"] = _0xa0c6c1["opacityController"], this["getCurrentTime"] = _0xa0c6c1["getCurrentTime"], this["requestRender"] = _0xa0c6c1["requestRender"], this["emitStyle"] = _0xa0c6c1["emitStyle"], this["waitForRenderSettle"] = _0xa0c6c1["waitForRenderSettle"];
   }
-  async ["applyLayerStyle"](_0x3286fb, _0x242777, _0x478476, _0x4ccd39) {
+  async ["applyLayerStyle"](_0x34259f, _0x559f6a, _0x5e7273, _0x19d9b3) {
     var _a2;
-    const _0x214414 = this["appliedCompanionWidths"]["get"](_0x3286fb) ?? ((_a2 = this["appliedLayerStyles"]["get"](_0x3286fb)) == null ? void 0 : _a2["outline"]["width"]), _0x2f1d0d = this["getCurrentTime"](), _0x41cda4 = this["resolveStyleRange"](_0x242777, _0x2f1d0d, _0x4ccd39["fill"]), _0x1139e3 = [], _0x466895 = /* @__PURE__ */ new Map();
-    _0x242777["entities"]["suspendEvents"]();
-    for (const _0x3adebb of _0x242777["entities"]["values"]) {
-      if (this["outlineGeometry"]["isOutlineCompanion"](_0x3adebb)) {
-        _0x1139e3["push"](_0x3adebb);
+    const _0x5c2fbd = this["appliedCompanionWidths"]["get"](_0x34259f) ?? ((_a2 = this["appliedLayerStyles"]["get"](_0x34259f)) == null ? void 0 : _a2["outline"]["width"]), _0x1ca8ad = this["getCurrentTime"](), _0x30e940 = this["resolveStyleRange"](_0x559f6a, _0x1ca8ad, _0x19d9b3["fill"]), _0x4b7f5f = [], _0x2db988 = /* @__PURE__ */ new Map();
+    _0x559f6a["entities"]["suspendEvents"]();
+    for (const _0x3b6e37 of _0x559f6a["entities"]["values"]) {
+      if (this["outlineGeometry"]["isOutlineCompanion"](_0x3b6e37)) {
+        _0x4b7f5f["push"](_0x3b6e37);
         continue;
       }
-      const _0x801fa = this["resolveFillColor"](_0x3adebb, _0x4ccd39["fill"], _0x41cda4, _0x2f1d0d);
-      if (_0x3adebb["polygon"] !== void 0 && _0x801fa !== void 0) _0x466895["set"](_0x3adebb["id"], _0x801fa);
-      this["applyEntityStyle"](_0x3adebb, _0x801fa, _0x4ccd39["outline"], _0x478476);
+      const _0x42aa75 = this["resolveFillColor"](_0x3b6e37, _0x19d9b3["fill"], _0x30e940, _0x1ca8ad);
+      if (_0x3b6e37["polygon"] !== void 0 && _0x42aa75 !== void 0) _0x2db988["set"](_0x3b6e37["id"], _0x42aa75);
+      this["applyEntityStyle"](_0x3b6e37, _0x42aa75, _0x19d9b3["outline"], _0x5e7273);
     }
-    const _0x1d81b3 = this["styleOutlineCompanions"](_0x1139e3, _0x4ccd39["outline"], _0x478476, _0x466895);
-    _0x242777["entities"]["resumeEvents"]();
-    const _0x3ab6f4 = _0x41cda4 !== null && (_0x4ccd39["fill"]["mode"] === "gradient" || _0x4ccd39["fill"]["mode"] === "bin") ? { ..._0x4ccd39, "fill": { ..._0x4ccd39["fill"], "min": _0x41cda4["min"], "max": _0x41cda4["max"] } } : _0x4ccd39;
-    this["appliedLayerStyles"]["set"](_0x3286fb, _0x3ab6f4), this["requestRender"](), this["emitStyle"](_0x3286fb, _0x3ab6f4), this["appliedCompanionWidths"]["set"](_0x3286fb, _0x1d81b3);
-    const _0x54eb04 = _0x214414 === void 0 || _0x214414 !== _0x1d81b3;
-    if (_0x54eb04) await this["waitForRenderSettle"]();
+    const _0x34acf4 = this["styleOutlineCompanions"](_0x4b7f5f, _0x19d9b3["outline"], _0x5e7273, _0x2db988);
+    _0x559f6a["entities"]["resumeEvents"]();
+    const _0x5dfae8 = _0x30e940 !== null && (_0x19d9b3["fill"]["mode"] === "gradient" || _0x19d9b3["fill"]["mode"] === "bin") ? { ..._0x19d9b3, "fill": { ..._0x19d9b3["fill"], "min": _0x30e940["min"], "max": _0x30e940["max"] } } : _0x19d9b3;
+    this["appliedLayerStyles"]["set"](_0x34259f, _0x5dfae8), this["requestRender"](), this["emitStyle"](_0x34259f, _0x5dfae8), this["appliedCompanionWidths"]["set"](_0x34259f, _0x34acf4);
+    const _0x16dd2a = _0x5c2fbd === void 0 || _0x5c2fbd !== _0x34acf4;
+    if (_0x16dd2a) await this["waitForRenderSettle"]();
   }
-  ["styleOutlineCompanions"](_0x2b1779, _0x1a6bd1, _0x36c4f8, _0x21c6c1) {
-    const _0x4a9658 = _0x1a6bd1["enabled"] ? Color["fromCssColorString"](_0x1a6bd1["color"]) : void 0, _0x3615be = _0x1a6bd1["enabled"] ? _0x1a6bd1["width"] : SEAM_COVER_WIDTH;
-    for (const _0x379c09 of _0x2b1779) {
-      const _0x246ff2 = _0x1a6bd1["enabled"] || _0x36c4f8 ? void 0 : _0x21c6c1["get"](LayerStyleEngine["outlineOwnerId"](_0x379c09)), _0x1b40d8 = _0x246ff2 !== void 0 && _0x246ff2["alpha"] >= 1;
-      _0x379c09["show"] = _0x1a6bd1["enabled"] || _0x1b40d8;
-      const _0x3ffa5d = _0x4a9658 ?? (_0x1b40d8 ? _0x246ff2 : void 0);
-      _0x3ffa5d !== void 0 && _0x379c09["polyline"] !== void 0 && (_0x379c09["polyline"]["material"] = this["updateColorMaterial"](_0x379c09["polyline"]["material"], _0x3ffa5d), _0x379c09["polyline"]["width"] = LayerStyleEngine["updateConstantProperty"](_0x379c09["polyline"]["width"], _0x3615be));
+  ["styleOutlineCompanions"](_0xd45fed, _0x31954d, _0xf85066, _0x52a7c2) {
+    const _0x14704f = _0x31954d["enabled"] ? Color["fromCssColorString"](_0x31954d["color"]) : void 0, _0x525081 = _0x31954d["enabled"] ? _0x31954d["width"] : SEAM_COVER_WIDTH;
+    for (const _0x4b56a8 of _0xd45fed) {
+      const _0x257dc1 = _0x31954d["enabled"] || _0xf85066 ? void 0 : _0x52a7c2["get"](LayerStyleEngine["outlineOwnerId"](_0x4b56a8)), _0x454a0a = _0x257dc1 !== void 0 && _0x257dc1["alpha"] >= 1;
+      _0x4b56a8["show"] = _0x31954d["enabled"] || _0x454a0a;
+      const _0x5716e1 = _0x14704f ?? (_0x454a0a ? _0x257dc1 : void 0);
+      _0x5716e1 !== void 0 && _0x4b56a8["polyline"] !== void 0 && (_0x4b56a8["polyline"]["material"] = this["updateColorMaterial"](_0x4b56a8["polyline"]["material"], _0x5716e1), _0x4b56a8["polyline"]["width"] = LayerStyleEngine["updateConstantProperty"](_0x4b56a8["polyline"]["width"], _0x525081));
     }
-    return _0x3615be;
+    return _0x525081;
   }
-  static ["outlineOwnerId"](_0x7c5ad3) {
-    return _0x7c5ad3["id"]["endsWith"](OUTLINE_ID_SUFFIX) ? _0x7c5ad3["id"]["slice"](0, -OUTLINE_ID_SUFFIX["length"]) : _0x7c5ad3["id"];
+  static ["outlineOwnerId"](_0x25535d) {
+    return _0x25535d["id"]["endsWith"](OUTLINE_ID_SUFFIX) ? _0x25535d["id"]["slice"](0, -OUTLINE_ID_SUFFIX["length"]) : _0x25535d["id"];
   }
-  ["getStyle"](_0x112845) {
-    return this["appliedLayerStyles"]["get"](_0x112845);
+  ["getStyle"](_0x1a117b) {
+    return this["appliedLayerStyles"]["get"](_0x1a117b);
   }
-  ["deleteStyle"](_0x2d3cc1) {
-    this["appliedLayerStyles"]["delete"](_0x2d3cc1), this["appliedCompanionWidths"]["delete"](_0x2d3cc1);
+  ["deleteStyle"](_0x383c78) {
+    this["appliedLayerStyles"]["delete"](_0x383c78), this["appliedCompanionWidths"]["delete"](_0x383c78);
   }
-  ["recordInitialStyle"](_0x5d7b35, _0x2ab423, _0x473022, _0x1ab25f) {
-    const _0x3b5005 = { "fill": { "mode": "solid", "color": _0x2ab423, "opacity": _0x473022 }, "outline": _0x1ab25f };
-    this["appliedLayerStyles"]["set"](_0x5d7b35, _0x3b5005), this["emitStyle"](_0x5d7b35, _0x3b5005);
+  ["recordInitialStyle"](_0x8d0769, _0x48c648, _0x419fb1, _0x1f8852) {
+    const _0x16cd08 = { "fill": { "mode": "solid", "color": _0x48c648, "opacity": _0x419fb1 }, "outline": _0x1f8852 };
+    this["appliedLayerStyles"]["set"](_0x8d0769, _0x16cd08), this["emitStyle"](_0x8d0769, _0x16cd08);
   }
   ["randomLayerColor"]() {
     return Color["fromRandom"]({ "alpha": 1 });
   }
-  ["applyEntityColor"](_0x3846c1, _0x1fbde9) {
-    _0x3846c1["entities"]["suspendEvents"]();
-    for (const _0x407ba3 of _0x3846c1["entities"]["values"]) {
-      _0x407ba3["polygon"] !== void 0 && (_0x407ba3["polygon"]["material"] = new ColorMaterialProperty(new ConstantProperty(_0x1fbde9["withAlpha"](0.5)))), _0x407ba3["polyline"] !== void 0 && (_0x407ba3["polyline"]["material"] = new ColorMaterialProperty(new ConstantProperty(_0x1fbde9))), _0x407ba3["point"] !== void 0 && (_0x407ba3["point"]["color"] = new ConstantProperty(_0x1fbde9)), _0x407ba3["billboard"] !== void 0 && (_0x407ba3["billboard"]["color"] = new ConstantProperty(_0x1fbde9));
+  ["applyEntityColor"](_0x4a7628, _0x4b0ace) {
+    _0x4a7628["entities"]["suspendEvents"]();
+    for (const _0x176908 of _0x4a7628["entities"]["values"]) {
+      _0x176908["polygon"] !== void 0 && (_0x176908["polygon"]["material"] = new ColorMaterialProperty(new ConstantProperty(_0x4b0ace["withAlpha"](0.5)))), _0x176908["polyline"] !== void 0 && (_0x176908["polyline"]["material"] = new ColorMaterialProperty(new ConstantProperty(_0x4b0ace))), _0x176908["point"] !== void 0 && (_0x176908["point"]["color"] = new ConstantProperty(_0x4b0ace)), _0x176908["billboard"] !== void 0 && (_0x176908["billboard"]["color"] = new ConstantProperty(_0x4b0ace));
     }
-    _0x3846c1["entities"]["resumeEvents"]();
+    _0x4a7628["entities"]["resumeEvents"]();
   }
-  ["convertMarkersToPoints"](_0x1b6519, _0x5ce9f7) {
-    _0x1b6519["entities"]["suspendEvents"]();
-    for (const _0x194025 of _0x1b6519["entities"]["values"]) {
-      if (_0x194025["billboard"] === void 0) continue;
-      const _0x2ce459 = _0x194025["billboard"]["heightReference"];
-      _0x194025["point"] = new PointGraphics({ "pixelSize": 8, "color": _0x5ce9f7, ..._0x2ce459 !== void 0 ? { "heightReference": _0x2ce459 } : {} }), _0x194025["billboard"] = void 0;
+  ["convertMarkersToPoints"](_0x175067, _0x4cde1d) {
+    _0x175067["entities"]["suspendEvents"]();
+    for (const _0x4a9fa0 of _0x175067["entities"]["values"]) {
+      if (_0x4a9fa0["billboard"] === void 0) continue;
+      const _0x46c3bf = _0x4a9fa0["billboard"]["heightReference"];
+      _0x4a9fa0["point"] = new PointGraphics({ "pixelSize": 8, "color": _0x4cde1d, ..._0x46c3bf !== void 0 ? { "heightReference": _0x46c3bf } : {} }), _0x4a9fa0["billboard"] = void 0;
     }
-    _0x1b6519["entities"]["resumeEvents"]();
+    _0x175067["entities"]["resumeEvents"]();
   }
-  ["applyEntityStyle"](_0x274b79, _0x16cb6d, _0x251f4b, _0x319bf6) {
-    const _0x341730 = _0x251f4b["enabled"] ? Color["fromCssColorString"](_0x251f4b["color"]) : void 0;
-    _0x274b79["polygon"] !== void 0 && (_0x274b79["polygon"]["material"] = this["updateColorMaterial"](_0x274b79["polygon"]["material"], _0x16cb6d ?? Color["WHITE"]["withAlpha"](0)), !this["outlineGeometry"]["hasOutlineCompanion"](_0x274b79) && !this["outlineGeometry"]["hasRiskyOutline"](_0x274b79) && (_0x274b79["polygon"]["outline"] = LayerStyleEngine["updateConstantProperty"](_0x274b79["polygon"]["outline"], _0x251f4b["enabled"]), _0x341730 !== void 0 && (_0x274b79["polygon"]["outlineColor"] = LayerStyleEngine["updateConstantProperty"](_0x274b79["polygon"]["outlineColor"], _0x341730), _0x274b79["polygon"]["outlineWidth"] = LayerStyleEngine["updateConstantProperty"](_0x274b79["polygon"]["outlineWidth"], _0x251f4b["width"]))));
-    if (_0x274b79["polyline"] !== void 0) {
-      let _0x1143a5;
-      _0x319bf6 ? _0x1143a5 = _0x341730 ?? Color["WHITE"]["withAlpha"](0) : _0x1143a5 = _0x251f4b["enabled"] ? _0x341730 : _0x16cb6d, _0x274b79["polyline"]["material"] = this["updateColorMaterial"](_0x274b79["polyline"]["material"], _0x1143a5 ?? Color["WHITE"]["withAlpha"](0)), _0x251f4b["enabled"] && (_0x274b79["polyline"]["width"] = LayerStyleEngine["updateConstantProperty"](_0x274b79["polyline"]["width"], _0x251f4b["width"]));
+  ["applyEntityStyle"](_0x3c5f0f, _0x9e904e, _0x380672, _0x1bdf73) {
+    const _0x159b8e = _0x380672["enabled"] ? Color["fromCssColorString"](_0x380672["color"]) : void 0;
+    _0x3c5f0f["polygon"] !== void 0 && (_0x3c5f0f["polygon"]["material"] = this["updateColorMaterial"](_0x3c5f0f["polygon"]["material"], _0x9e904e ?? Color["WHITE"]["withAlpha"](0)), !this["outlineGeometry"]["hasOutlineCompanion"](_0x3c5f0f) && !this["outlineGeometry"]["hasRiskyOutline"](_0x3c5f0f) && (_0x3c5f0f["polygon"]["outline"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["polygon"]["outline"], _0x380672["enabled"]), _0x159b8e !== void 0 && (_0x3c5f0f["polygon"]["outlineColor"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["polygon"]["outlineColor"], _0x159b8e), _0x3c5f0f["polygon"]["outlineWidth"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["polygon"]["outlineWidth"], _0x380672["width"]))));
+    if (_0x3c5f0f["polyline"] !== void 0) {
+      let _0x17607f;
+      _0x1bdf73 ? _0x17607f = _0x159b8e ?? Color["WHITE"]["withAlpha"](0) : _0x17607f = _0x380672["enabled"] ? _0x159b8e : _0x9e904e, _0x3c5f0f["polyline"]["material"] = this["updateColorMaterial"](_0x3c5f0f["polyline"]["material"], _0x17607f ?? Color["WHITE"]["withAlpha"](0)), _0x380672["enabled"] && (_0x3c5f0f["polyline"]["width"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["polyline"]["width"], _0x380672["width"]));
     }
-    _0x274b79["point"] !== void 0 && (_0x274b79["point"]["color"] = _0x16cb6d !== void 0 ? this["updateColorProperty"](_0x274b79["point"]["color"], _0x16cb6d) : void 0, _0x251f4b["enabled"] && _0x341730 !== void 0 && (_0x274b79["point"]["outlineColor"] = LayerStyleEngine["updateConstantProperty"](_0x274b79["point"]["outlineColor"], _0x341730), _0x274b79["point"]["outlineWidth"] = LayerStyleEngine["updateConstantProperty"](_0x274b79["point"]["outlineWidth"], _0x251f4b["width"]))), _0x274b79["billboard"] !== void 0 && _0x16cb6d !== void 0 && (_0x274b79["billboard"]["color"] = this["updateColorProperty"](_0x274b79["billboard"]["color"], _0x16cb6d));
+    _0x3c5f0f["point"] !== void 0 && (_0x3c5f0f["point"]["color"] = _0x9e904e !== void 0 ? this["updateColorProperty"](_0x3c5f0f["point"]["color"], _0x9e904e) : void 0, _0x380672["enabled"] && _0x159b8e !== void 0 && (_0x3c5f0f["point"]["outlineColor"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["point"]["outlineColor"], _0x159b8e), _0x3c5f0f["point"]["outlineWidth"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["point"]["outlineWidth"], _0x380672["width"]))), _0x3c5f0f["billboard"] !== void 0 && _0x9e904e !== void 0 && (_0x3c5f0f["billboard"]["color"] = this["updateColorProperty"](_0x3c5f0f["billboard"]["color"], _0x9e904e));
   }
-  ["resolveFillColor"](_0x374b00, _0x28aae9, _0x2aaead, _0x2048ae) {
-    switch (_0x28aae9["mode"]) {
+  ["resolveFillColor"](_0x7bf15a, _0x35022b, _0x45366b, _0x164153) {
+    switch (_0x35022b["mode"]) {
       case "off":
         return void 0;
       case "solid":
-        return Color["fromCssColorString"](_0x28aae9["color"])["withAlpha"](_0x28aae9["opacity"]);
+        return Color["fromCssColorString"](_0x35022b["color"])["withAlpha"](_0x35022b["opacity"]);
       case "gradient": {
-        if (_0x2aaead === null) return void 0;
-        const _0x91b58f = this["readNumericProperty"](_0x374b00, _0x28aae9["column"], _0x2048ae);
-        if (_0x91b58f === null) return void 0;
-        if (_0x91b58f < _0x2aaead["min"] || _0x91b58f > _0x2aaead["max"]) return void 0;
-        const _0x171515 = _0x2aaead["max"] === _0x2aaead["min"] ? 0.5 : _0x318bcf["clamp"]((_0x91b58f - _0x2aaead["min"]) / (_0x2aaead["max"] - _0x2aaead["min"]), 0, 1);
-        return LayerStyleEngine["sampleFromPalette"](_0x28aae9["palette"], _0x171515, _0x28aae9["paletteKind"])["withAlpha"](_0x28aae9["opacity"]);
+        if (_0x45366b === null) return void 0;
+        const _0x285a03 = this["readNumericProperty"](_0x7bf15a, _0x35022b["column"], _0x164153);
+        if (_0x285a03 === null) return void 0;
+        if (_0x285a03 < _0x45366b["min"] || _0x285a03 > _0x45366b["max"]) return void 0;
+        const _0x44fe58 = _0x45366b["max"] === _0x45366b["min"] ? 0.5 : _0x584e42["clamp"]((_0x285a03 - _0x45366b["min"]) / (_0x45366b["max"] - _0x45366b["min"]), 0, 1);
+        return LayerStyleEngine["sampleFromPalette"](_0x35022b["palette"], _0x44fe58, _0x35022b["paletteKind"])["withAlpha"](_0x35022b["opacity"]);
       }
       case "bin": {
-        if (_0x2aaead === null) return void 0;
-        const _0x1f907c = this["readNumericProperty"](_0x374b00, _0x28aae9["column"], _0x2048ae);
-        if (_0x1f907c === null) return void 0;
-        const _0x42431b = (_0x2aaead["max"] - _0x2aaead["min"]) / _0x28aae9["binCount"], _0x4865c5 = Array["from"]({ "length": _0x28aae9["binCount"] }, (_0x2d5283, _0x4104db) => _0x2aaead["min"] + _0x42431b * (_0x4104db + 1)), _0x54d54b = LayerStyleEngine["pickBin"](_0x1f907c, _0x4865c5), _0x1c5042 = _0x28aae9["binCount"] <= 1 ? 0.5 : _0x54d54b / (_0x28aae9["binCount"] - 1);
-        return LayerStyleEngine["sampleFromPalette"](_0x28aae9["palette"], _0x1c5042, _0x28aae9["paletteKind"])["withAlpha"](_0x28aae9["opacity"]);
+        if (_0x45366b === null) return void 0;
+        const _0x23e4bc = this["readNumericProperty"](_0x7bf15a, _0x35022b["column"], _0x164153);
+        if (_0x23e4bc === null) return void 0;
+        const _0x25eb2f = (_0x45366b["max"] - _0x45366b["min"]) / _0x35022b["binCount"], _0x462b60 = Array["from"]({ "length": _0x35022b["binCount"] }, (_0x40c931, _0x24356c) => _0x45366b["min"] + _0x25eb2f * (_0x24356c + 1)), _0x3897e7 = LayerStyleEngine["pickBin"](_0x23e4bc, _0x462b60), _0x59bb09 = _0x35022b["binCount"] <= 1 ? 0.5 : _0x3897e7 / (_0x35022b["binCount"] - 1);
+        return LayerStyleEngine["sampleFromPalette"](_0x35022b["palette"], _0x59bb09, _0x35022b["paletteKind"])["withAlpha"](_0x35022b["opacity"]);
       }
       case "enum": {
-        const _0x497f2b = this["readProperty"](_0x374b00, _0x28aae9["column"], _0x2048ae);
-        if (_0x497f2b === null) return void 0;
-        const _0x2b4808 = _0x28aae9["colors"][String(_0x497f2b)];
-        return _0x2b4808 !== void 0 ? Color["fromCssColorString"](_0x2b4808)["withAlpha"](_0x28aae9["opacity"]) : Color["LIGHTGRAY"]["withAlpha"](_0x28aae9["opacity"]);
+        const _0x1c63b6 = this["readProperty"](_0x7bf15a, _0x35022b["column"], _0x164153);
+        if (_0x1c63b6 === null) return void 0;
+        const _0x3a3ff4 = _0x35022b["colors"][String(_0x1c63b6)];
+        return _0x3a3ff4 !== void 0 ? Color["fromCssColorString"](_0x3a3ff4)["withAlpha"](_0x35022b["opacity"]) : Color["LIGHTGRAY"]["withAlpha"](_0x35022b["opacity"]);
       }
     }
   }
-  ["readProperty"](_0x23ccd0, _0x3ff176, _0x10b2c8) {
-    const _0x11a6fd = _0x23ccd0["properties"];
-    if (_0x11a6fd === void 0 || !_0x11a6fd["hasProperty"](_0x3ff176)) return null;
-    const _0xe83b7 = _0x11a6fd["getValue"](_0x10b2c8), _0x37d196 = _0xe83b7 == null ? void 0 : _0xe83b7[_0x3ff176];
-    if (_0x37d196 === void 0 || _0x37d196 === null) return null;
-    return typeof _0x37d196 === "number" ? _0x37d196 : String(_0x37d196);
+  ["readProperty"](_0x21506c, _0x203b22, _0x4b1d62) {
+    const _0x221a2c = _0x21506c["properties"];
+    if (_0x221a2c === void 0 || !_0x221a2c["hasProperty"](_0x203b22)) return null;
+    const _0x43e636 = _0x221a2c["getValue"](_0x4b1d62), _0x5a570b = _0x43e636 == null ? void 0 : _0x43e636[_0x203b22];
+    if (_0x5a570b === void 0 || _0x5a570b === null) return null;
+    return typeof _0x5a570b === "number" ? _0x5a570b : String(_0x5a570b);
   }
-  ["readNumericProperty"](_0x8026a6, _0x31d9bf, _0x2b2f29) {
-    const _0x24b52d = this["readProperty"](_0x8026a6, _0x31d9bf, _0x2b2f29);
-    if (_0x24b52d === null) return null;
-    const _0xa5b781 = typeof _0x24b52d === "number" ? _0x24b52d : Number(_0x24b52d);
-    return Number["isFinite"](_0xa5b781) ? _0xa5b781 : null;
+  ["readNumericProperty"](_0x3f6bf8, _0x224fb6, _0x44da8d) {
+    const _0x29b217 = this["readProperty"](_0x3f6bf8, _0x224fb6, _0x44da8d);
+    if (_0x29b217 === null) return null;
+    const _0x13d311 = typeof _0x29b217 === "number" ? _0x29b217 : Number(_0x29b217);
+    return Number["isFinite"](_0x13d311) ? _0x13d311 : null;
   }
-  ["resolveStyleRange"](_0x47bf6b, _0x289044, _0x59b409) {
-    if (_0x59b409["mode"] !== "gradient" && _0x59b409["mode"] !== "bin") return null;
-    if (_0x59b409["min"] !== void 0 && _0x59b409["max"] !== void 0) return { "min": _0x59b409["min"], "max": _0x59b409["max"] };
-    const _0x4e64b4 = this["getColumnRange"](_0x47bf6b, _0x289044, _0x59b409["column"]);
-    if (_0x4e64b4 === null) return null;
-    return { "min": _0x59b409["min"] ?? _0x4e64b4["min"], "max": _0x59b409["max"] ?? _0x4e64b4["max"] };
+  ["resolveStyleRange"](_0x3512f4, _0x2f169a, _0x2e05a3) {
+    if (_0x2e05a3["mode"] !== "gradient" && _0x2e05a3["mode"] !== "bin") return null;
+    if (_0x2e05a3["min"] !== void 0 && _0x2e05a3["max"] !== void 0) return { "min": _0x2e05a3["min"], "max": _0x2e05a3["max"] };
+    const _0x33cd86 = this["getColumnRange"](_0x3512f4, _0x2f169a, _0x2e05a3["column"]);
+    if (_0x33cd86 === null) return null;
+    return { "min": _0x2e05a3["min"] ?? _0x33cd86["min"], "max": _0x2e05a3["max"] ?? _0x33cd86["max"] };
   }
-  ["getColumnRange"](_0xf4c2e5, _0x434b27, _0x1f7b54) {
-    let _0xee9bda = Infinity, _0x3bcb1a = -Infinity;
-    for (const _0x2543fe of _0xf4c2e5["entities"]["values"]) {
-      const _0x3e7002 = this["readNumericProperty"](_0x2543fe, _0x1f7b54, _0x434b27);
-      if (_0x3e7002 === null) continue;
-      if (_0x3e7002 < _0xee9bda) _0xee9bda = _0x3e7002;
-      if (_0x3e7002 > _0x3bcb1a) _0x3bcb1a = _0x3e7002;
+  ["getColumnRange"](_0x331674, _0x231566, _0x95b4be) {
+    let _0x38d6e = Infinity, _0x1bf8ec = -Infinity;
+    for (const _0x1e3128 of _0x331674["entities"]["values"]) {
+      const _0x2112d8 = this["readNumericProperty"](_0x1e3128, _0x95b4be, _0x231566);
+      if (_0x2112d8 === null) continue;
+      if (_0x2112d8 < _0x38d6e) _0x38d6e = _0x2112d8;
+      if (_0x2112d8 > _0x1bf8ec) _0x1bf8ec = _0x2112d8;
     }
-    return Number["isFinite"](_0xee9bda) && Number["isFinite"](_0x3bcb1a) ? { "min": _0xee9bda, "max": _0x3bcb1a } : null;
+    return Number["isFinite"](_0x38d6e) && Number["isFinite"](_0x1bf8ec) ? { "min": _0x38d6e, "max": _0x1bf8ec } : null;
   }
-  static ["valueEquals"](_0x1bfc0d, _0x4f1cbf) {
-    if (_0x1bfc0d instanceof Color || _0x4f1cbf instanceof Color) return _0x1bfc0d instanceof Color && _0x4f1cbf instanceof Color && Color["equals"](_0x1bfc0d, _0x4f1cbf);
-    return _0x1bfc0d === _0x4f1cbf;
+  static ["valueEquals"](_0x5b54f1, _0x43b7b6) {
+    if (_0x5b54f1 instanceof Color || _0x43b7b6 instanceof Color) return _0x5b54f1 instanceof Color && _0x43b7b6 instanceof Color && Color["equals"](_0x5b54f1, _0x43b7b6);
+    return _0x5b54f1 === _0x43b7b6;
   }
-  static ["updateConstantProperty"](_0x5cc571, _0x1f6a4d) {
-    if (_0x5cc571 instanceof ConstantProperty) return !LayerStyleEngine["valueEquals"](_0x5cc571["getValue"](), _0x1f6a4d) && _0x5cc571["setValue"](_0x1f6a4d), _0x5cc571;
-    return new ConstantProperty(_0x1f6a4d);
+  static ["updateConstantProperty"](_0x3de759, _0x40ff43) {
+    if (_0x3de759 instanceof ConstantProperty) return !LayerStyleEngine["valueEquals"](_0x3de759["getValue"](), _0x40ff43) && _0x3de759["setValue"](_0x40ff43), _0x3de759;
+    return new ConstantProperty(_0x40ff43);
   }
-  ["updateColorProperty"](_0x42d32d, _0x1a195b) {
-    const _0xd4db66 = _0x42d32d !== void 0 ? this["opacityController"]["getWrappedBaseColor"](_0x42d32d) : void 0;
-    if (_0xd4db66 !== void 0) return Color["clone"](_0x1a195b, _0xd4db66), _0x42d32d;
-    if (_0x42d32d instanceof ConstantProperty) return !LayerStyleEngine["valueEquals"](_0x42d32d["getValue"](), _0x1a195b) && _0x42d32d["setValue"](_0x1a195b), _0x42d32d;
-    return new ConstantProperty(_0x1a195b);
+  ["updateColorProperty"](_0x114739, _0x57ebe9) {
+    const _0x5ec17d = _0x114739 !== void 0 ? this["opacityController"]["getWrappedBaseColor"](_0x114739) : void 0;
+    if (_0x5ec17d !== void 0) return Color["clone"](_0x57ebe9, _0x5ec17d), _0x114739;
+    if (_0x114739 instanceof ConstantProperty) return !LayerStyleEngine["valueEquals"](_0x114739["getValue"](), _0x57ebe9) && _0x114739["setValue"](_0x57ebe9), _0x114739;
+    return new ConstantProperty(_0x57ebe9);
   }
-  ["updateColorMaterial"](_0x589345, _0x2e2a6d) {
-    if (_0x589345 instanceof ColorMaterialProperty) return _0x589345["color"] = this["updateColorProperty"](_0x589345["color"], _0x2e2a6d), _0x589345;
-    return new ColorMaterialProperty(this["updateColorProperty"](void 0, _0x2e2a6d));
+  ["updateColorMaterial"](_0x174b59, _0x5b0b08) {
+    if (_0x174b59 instanceof ColorMaterialProperty) return _0x174b59["color"] = this["updateColorProperty"](_0x174b59["color"], _0x5b0b08), _0x174b59;
+    return new ColorMaterialProperty(this["updateColorProperty"](void 0, _0x5b0b08));
   }
-  static ["sampleFromPalette"](_0x57abe0, _0x51389e, _0x403d9b) {
-    return _0x403d9b === "qualitative" ? LayerStyleEngine["sampleDiscrete"](_0x57abe0, _0x51389e) : LayerStyleEngine["sampleGradient"](_0x57abe0, _0x51389e);
+  static ["sampleFromPalette"](_0x10c542, _0x23b215, _0x467268) {
+    return _0x467268 === "qualitative" ? LayerStyleEngine["sampleDiscrete"](_0x10c542, _0x23b215) : LayerStyleEngine["sampleGradient"](_0x10c542, _0x23b215);
   }
-  static ["sampleGradient"](_0x169a7e, _0x9aed89) {
-    if (_0x169a7e["length"] === 0) return Color["GRAY"];
-    if (_0x169a7e["length"] === 1) return Color["fromCssColorString"](_0x169a7e[0]);
-    const _0x287ddd = _0x318bcf["clamp"](_0x9aed89, 0, 1) * (_0x169a7e["length"] - 1), _0x5e8213 = Math["floor"](_0x287ddd), _0x3cda69 = Math["min"](_0x169a7e["length"] - 1, _0x5e8213 + 1), _0x3c14b3 = _0x287ddd - _0x5e8213, _0x4488b0 = Color["fromCssColorString"](_0x169a7e[_0x5e8213]), _0xa7163d = Color["fromCssColorString"](_0x169a7e[_0x3cda69]);
-    return Color["lerp"](_0x4488b0, _0xa7163d, _0x3c14b3, new Color());
+  static ["sampleGradient"](_0x562236, _0x26f523) {
+    if (_0x562236["length"] === 0) return Color["GRAY"];
+    if (_0x562236["length"] === 1) return Color["fromCssColorString"](_0x562236[0]);
+    const _0x45519a = _0x584e42["clamp"](_0x26f523, 0, 1) * (_0x562236["length"] - 1), _0x21134a = Math["floor"](_0x45519a), _0x2a3029 = Math["min"](_0x562236["length"] - 1, _0x21134a + 1), _0x410ee5 = _0x45519a - _0x21134a, _0x58b3cb = Color["fromCssColorString"](_0x562236[_0x21134a]), _0x3886af = Color["fromCssColorString"](_0x562236[_0x2a3029]);
+    return Color["lerp"](_0x58b3cb, _0x3886af, _0x410ee5, new Color());
   }
-  static ["sampleDiscrete"](_0x2997cb, _0xf62da2) {
-    if (_0x2997cb["length"] === 0) return Color["GRAY"];
-    const _0xf35783 = Math["round"](_0x318bcf["clamp"](_0xf62da2, 0, 1) * (_0x2997cb["length"] - 1));
-    return Color["fromCssColorString"](_0x2997cb[_0xf35783]);
+  static ["sampleDiscrete"](_0x5da9fe, _0x4f843c) {
+    if (_0x5da9fe["length"] === 0) return Color["GRAY"];
+    const _0xd8cc2e = Math["round"](_0x584e42["clamp"](_0x4f843c, 0, 1) * (_0x5da9fe["length"] - 1));
+    return Color["fromCssColorString"](_0x5da9fe[_0xd8cc2e]);
   }
-  static ["pickBin"](_0x380b14, _0x3bcb88) {
-    for (let _0x2bfb7d = 0; _0x2bfb7d < _0x3bcb88["length"]; _0x2bfb7d++) {
-      if (_0x380b14 <= _0x3bcb88[_0x2bfb7d]) return _0x2bfb7d;
+  static ["pickBin"](_0x336b2a, _0x2dd085) {
+    for (let _0x137e8b = 0; _0x137e8b < _0x2dd085["length"]; _0x137e8b++) {
+      if (_0x336b2a <= _0x2dd085[_0x137e8b]) return _0x137e8b;
     }
-    return _0x3bcb88["length"] - 1;
+    return _0x2dd085["length"] - 1;
   }
 }
-function extractEpsgCode(_0x50e538) {
-  if (!/EPSG/i["test"](_0x50e538)) return void 0;
-  const _0x5d9856 = _0x50e538["trim"]();
-  let _0x40fdb8 = _0x5d9856["length"];
-  while (_0x40fdb8 > 0 && _0x5d9856["charCodeAt"](_0x40fdb8 - 1) >= 48 && _0x5d9856["charCodeAt"](_0x40fdb8 - 1) <= 57) {
-    _0x40fdb8--;
+function extractEpsgCode(_0x4ea8e9) {
+  if (!/EPSG/i["test"](_0x4ea8e9)) return void 0;
+  const _0x1167ce = _0x4ea8e9["trim"]();
+  let _0x55a4d9 = _0x1167ce["length"];
+  while (_0x55a4d9 > 0 && _0x1167ce["charCodeAt"](_0x55a4d9 - 1) >= 48 && _0x1167ce["charCodeAt"](_0x55a4d9 - 1) <= 57) {
+    _0x55a4d9--;
   }
-  const _0x2e4a6a = _0x5d9856["slice"](_0x40fdb8);
-  return _0x2e4a6a["length"] > 0 ? _0x2e4a6a : void 0;
+  const _0x21977b = _0x1167ce["slice"](_0x55a4d9);
+  return _0x21977b["length"] > 0 ? _0x21977b : void 0;
 }
 const proj4DefRequests = /* @__PURE__ */ new Map();
-async function registerProj4Def(_0x53fb35, _0x5eeaf8) {
-  const _0x36f644 = "EPSG:" + _0x5eeaf8;
-  if (_0x53fb35["defs"](_0x36f644)) return !![];
-  let _0x138a35 = proj4DefRequests["get"](_0x5eeaf8);
-  !_0x138a35 && (_0x138a35 = (async () => {
+async function registerProj4Def(_0x4fccc2, _0x15f914) {
+  const _0x4c8fd2 = "EPSG:" + _0x15f914;
+  if (_0x4fccc2["defs"](_0x4c8fd2)) return !![];
+  let _0x117ef2 = proj4DefRequests["get"](_0x15f914);
+  !_0x117ef2 && (_0x117ef2 = (async () => {
     try {
-      const _0x580ad2 = await fetch("https://epsg.io/" + _0x5eeaf8 + ".proj4");
-      if (!_0x580ad2["ok"]) return _0x580ad2["status"] === 404 ? "missing" : "transient-failure";
-      const _0x3292d4 = (await _0x580ad2["text"]())["trim"]();
-      if (!_0x3292d4) return "missing";
-      return _0x53fb35["defs"](_0x36f644, _0x3292d4), "registered";
+      const _0x5c5c53 = await fetch("https://epsg.io/" + _0x15f914 + ".proj4");
+      if (!_0x5c5c53["ok"]) return _0x5c5c53["status"] === 404 ? "missing" : "transient-failure";
+      const _0x16c591 = (await _0x5c5c53["text"]())["trim"]();
+      if (!_0x16c591) return "missing";
+      return _0x4fccc2["defs"](_0x4c8fd2, _0x16c591), "registered";
     } catch {
       return "transient-failure";
     }
-  })(), proj4DefRequests["set"](_0x5eeaf8, _0x138a35));
-  const _0x352a6d = await _0x138a35;
-  return _0x352a6d === "transient-failure" && proj4DefRequests["get"](_0x5eeaf8) === _0x138a35 && proj4DefRequests["delete"](_0x5eeaf8), _0x352a6d === "registered";
+  })(), proj4DefRequests["set"](_0x15f914, _0x117ef2));
+  const _0x2a1d00 = await _0x117ef2;
+  return _0x2a1d00 === "transient-failure" && proj4DefRequests["get"](_0x15f914) === _0x117ef2 && proj4DefRequests["delete"](_0x15f914), _0x2a1d00 === "registered";
 }
-async function ensureProj4Def(_0x132d5f) {
-  let _0x3ca610;
+async function ensureProj4Def(_0x29cac3) {
+  let _0x5c5fc0;
   try {
-    ({ default: _0x3ca610 } = await import("proj4"));
+    ({ default: _0x5c5fc0 } = await import("proj4"));
   } catch {
-    return console["warn"]("[ogc/proj4Defs] EPSG:" + _0x132d5f + ' icin koordinat donusumu atlandi -- "proj4" paketi yuklu degil (peer dependency olarak eklenmemis). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir.'), void 0;
+    return console["warn"]("[ogc/proj4Defs] EPSG:" + _0x29cac3 + ' icin koordinat donusumu atlandi -- "proj4" paketi yuklu degil (peer dependency olarak eklenmemis). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir.'), void 0;
   }
-  if (!await registerProj4Def(_0x3ca610, _0x132d5f)) return console["warn"]("[ogc/proj4Defs] EPSG:" + _0x132d5f + " icin proj4 tanimi epsg.io'dan alinamadi (agsizlik veya gecersiz/desteklenmeyen kod olabilir). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir."), void 0;
-  return _0x3ca610;
+  if (!await registerProj4Def(_0x5c5fc0, _0x29cac3)) return console["warn"]("[ogc/proj4Defs] EPSG:" + _0x29cac3 + " icin proj4 tanimi epsg.io'dan alinamadi (agsizlik veya gecersiz/desteklenmeyen kod olabilir). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir."), void 0;
+  return _0x5c5fc0;
 }
 const CESIUM_BUILTIN_CRS_NAMES = /* @__PURE__ */ new Set(["urn:ogc:def:crs:OGC:1.3:CRS84", "EPSG:4326", "urn:ogc:def:crs:EPSG::4326"]);
-function defaultCrsFunction(_0x40ea23) {
-  return Cartesian3["fromDegrees"](_0x40ea23[0], _0x40ea23[1], _0x40ea23[2]);
+function defaultCrsFunction(_0x1f67c5) {
+  return Cartesian3["fromDegrees"](_0x1f67c5[0], _0x1f67c5[1], _0x1f67c5[2]);
 }
-function numericCodeString(_0x3a3088) {
-  if (_0x3a3088 === void 0) return void 0;
-  const _0x2a27b2 = String(_0x3a3088)["trim"]();
-  return /^\d+$/["test"](_0x2a27b2) ? _0x2a27b2 : void 0;
+function numericCodeString(_0x51e42b) {
+  if (_0x51e42b === void 0) return void 0;
+  const _0x211e9e = String(_0x51e42b)["trim"]();
+  return /^\d+$/["test"](_0x211e9e) ? _0x211e9e : void 0;
 }
-function isSuspiciousCrsResult(_0xf13b7d) {
-  return _0xf13b7d !== null && _0xf13b7d["kind"] !== "reprojected";
+function isSuspiciousCrsResult(_0x2a760e) {
+  return _0x2a760e !== null && _0x2a760e["kind"] !== "reprojected";
 }
-function firstCoordinatePair(_0x1b1b83) {
-  let _0x4cae52 = _0x1b1b83;
-  while (Array["isArray"](_0x4cae52) && _0x4cae52["length"] > 0 && Array["isArray"](_0x4cae52[0])) {
-    _0x4cae52 = _0x4cae52[0];
+function firstCoordinatePair(_0x4dedfd) {
+  let _0x4e10f5 = _0x4dedfd;
+  while (Array["isArray"](_0x4e10f5) && _0x4e10f5["length"] > 0 && Array["isArray"](_0x4e10f5[0])) {
+    _0x4e10f5 = _0x4e10f5[0];
   }
-  if (Array["isArray"](_0x4cae52) && _0x4cae52["length"] >= 2 && typeof _0x4cae52[0] === "number" && typeof _0x4cae52[1] === "number") return [_0x4cae52[0], _0x4cae52[1]];
+  if (Array["isArray"](_0x4e10f5) && _0x4e10f5["length"] >= 2 && typeof _0x4e10f5[0] === "number" && typeof _0x4e10f5[1] === "number") return [_0x4e10f5[0], _0x4e10f5[1]];
   return void 0;
 }
-function findFirstCoordinates(_0x579d42) {
-  if (typeof _0x579d42 !== "object" || _0x579d42 === null) return void 0;
-  const _0x40097d = _0x579d42;
-  if (_0x40097d["type"] === "FeatureCollection" && Array["isArray"](_0x40097d["features"])) {
-    for (const _0x334529 of _0x40097d["features"]) {
-      const _0x18e929 = findFirstCoordinates(_0x334529);
-      if (_0x18e929) return _0x18e929;
+function findFirstCoordinates(_0x53a514) {
+  if (typeof _0x53a514 !== "object" || _0x53a514 === null) return void 0;
+  const _0x15ea58 = _0x53a514;
+  if (_0x15ea58["type"] === "FeatureCollection" && Array["isArray"](_0x15ea58["features"])) {
+    for (const _0xbb5527 of _0x15ea58["features"]) {
+      const _0x4c906f = findFirstCoordinates(_0xbb5527);
+      if (_0x4c906f) return _0x4c906f;
     }
     return void 0;
   }
-  if (_0x40097d["type"] === "Feature") return findFirstCoordinates(_0x40097d["geometry"]);
-  if (_0x40097d["type"] === "GeometryCollection" && Array["isArray"](_0x40097d["geometries"])) {
-    for (const _0x38a584 of _0x40097d["geometries"]) {
-      const _0x115c62 = findFirstCoordinates(_0x38a584);
-      if (_0x115c62) return _0x115c62;
+  if (_0x15ea58["type"] === "Feature") return findFirstCoordinates(_0x15ea58["geometry"]);
+  if (_0x15ea58["type"] === "GeometryCollection" && Array["isArray"](_0x15ea58["geometries"])) {
+    for (const _0x30f18b of _0x15ea58["geometries"]) {
+      const _0x2306d7 = findFirstCoordinates(_0x30f18b);
+      if (_0x2306d7) return _0x2306d7;
     }
     return void 0;
   }
-  if ("coordinates" in _0x40097d) return firstCoordinatePair(_0x40097d["coordinates"]);
+  if ("coordinates" in _0x15ea58) return firstCoordinatePair(_0x15ea58["coordinates"]);
   return void 0;
 }
-function resolveOrRejectUnresolvedCrs(_0x6f41af, _0x4a615d, _0x2870cb) {
-  if (!_0x2870cb) throw new GeometryError("CRS_UNRESOLVED_UNSUPPORTED", "Koordinat sistemi tanınamadı ve WGS84 ile uyumlu değil.");
-  return GeoJsonDataSource["crsNames"][_0x6f41af] = defaultCrsFunction, { "kind": "suspicious-unresolved-crs", "crsName": _0x4a615d };
+function resolveOrRejectUnresolvedCrs(_0x383680, _0x2fd142, _0x45fc16) {
+  if (!_0x45fc16) throw new GeometryError("CRS_UNRESOLVED_UNSUPPORTED", "Koordinat sistemi tanınamadı ve WGS84 ile uyumlu değil.");
+  return GeoJsonDataSource["crsNames"][_0x383680] = defaultCrsFunction, { "kind": "suspicious-unresolved-crs", "crsName": _0x2fd142 };
 }
-function acceptClaimedWgs84(_0x49a8dc, _0x57dcc7, _0x12bcc3) {
-  if (!_0x57dcc7) throw new GeometryError("CRS_CLAIMED_WGS84_INVALID", "Koordinatlar WGS84 ile uyumlu değil.");
-  if (_0x12bcc3) GeoJsonDataSource["crsNames"][_0x49a8dc] = defaultCrsFunction;
+function acceptClaimedWgs84(_0x7845b9, _0x244c87, _0xd40b70) {
+  if (!_0x244c87) throw new GeometryError("CRS_CLAIMED_WGS84_INVALID", "Koordinatlar WGS84 ile uyumlu değil.");
+  if (_0xd40b70) GeoJsonDataSource["crsNames"][_0x7845b9] = defaultCrsFunction;
   return null;
 }
-function computeLooksLikeWgs84(_0x52b006) {
-  const _0x32cab7 = findFirstCoordinates(_0x52b006);
-  return !_0x32cab7 || Math["abs"](_0x32cab7[0]) <= 180 && Math["abs"](_0x32cab7[1]) <= 90;
+function computeLooksLikeWgs84(_0x5f5a04) {
+  const _0x523d0f = findFirstCoordinates(_0x5f5a04);
+  return !_0x523d0f || Math["abs"](_0x523d0f[0]) <= 180 && Math["abs"](_0x523d0f[1]) <= 90;
 }
-function resolveCrsFieldOrThrow(_0x22b590, _0x571943) {
-  const _0x1c1229 = "crs" in _0x22b590 ? _0x22b590["crs"] : void 0;
-  if (!_0x1c1229 || typeof _0x1c1229 !== "object") {
-    if (!_0x571943) throw new GeometryError("CRS_MISSING_UNSUPPORTED", "Bu dosyada geçerli koordinat sistemi (CRS) bilgisi yok.");
+function resolveCrsFieldOrThrow(_0xcf3d17, _0x23de1a) {
+  const _0x21ca4c = "crs" in _0xcf3d17 ? _0xcf3d17["crs"] : void 0;
+  if (!_0x21ca4c || typeof _0x21ca4c !== "object") {
+    if (!_0x23de1a) throw new GeometryError("CRS_MISSING_UNSUPPORTED", "Bu dosyada geçerli koordinat sistemi (CRS) bilgisi yok.");
     return null;
   }
-  return _0x1c1229;
+  return _0x21ca4c;
 }
-async function ensureGeoJsonCrsSupport(_0x9bf530) {
+async function ensureGeoJsonCrsSupport(_0x141f03) {
   var _a2, _b, _c;
-  if (typeof _0x9bf530 !== "object" || _0x9bf530 === null) return null;
-  const _0x22e32f = computeLooksLikeWgs84(_0x9bf530), _0x17f018 = resolveCrsFieldOrThrow(_0x9bf530, _0x22e32f);
-  if (!_0x17f018) return null;
-  const _0x3422a9 = _0x17f018["type"] === "EPSG", _0x51d070 = _0x3422a9 ? "EPSG:" + ((_a2 = _0x17f018["properties"]) == null ? void 0 : _a2["code"]) : (_b = _0x17f018["properties"]) == null ? void 0 : _b["name"];
-  if (!_0x51d070 || typeof _0x51d070 !== "string") return null;
-  if (CESIUM_BUILTIN_CRS_NAMES["has"](_0x51d070)) return acceptClaimedWgs84(_0x51d070, _0x22e32f, ![]);
-  const _0x35f22c = _0x3422a9 ? numericCodeString((_c = _0x17f018["properties"]) == null ? void 0 : _c["code"]) : extractEpsgCode(_0x51d070);
-  if (!_0x35f22c) return resolveOrRejectUnresolvedCrs(_0x51d070, _0x51d070, _0x22e32f);
-  if (_0x35f22c === "4326") return acceptClaimedWgs84(_0x51d070, _0x22e32f, !![]);
-  const _0x5ee17b = "EPSG:" + _0x35f22c;
-  let _0x59c55a;
+  if (typeof _0x141f03 !== "object" || _0x141f03 === null) return null;
+  const _0x115276 = computeLooksLikeWgs84(_0x141f03), _0x302ea4 = resolveCrsFieldOrThrow(_0x141f03, _0x115276);
+  if (!_0x302ea4) return null;
+  const _0x29d6b4 = _0x302ea4["type"] === "EPSG", _0x1806bf = _0x29d6b4 ? "EPSG:" + ((_a2 = _0x302ea4["properties"]) == null ? void 0 : _a2["code"]) : (_b = _0x302ea4["properties"]) == null ? void 0 : _b["name"];
+  if (!_0x1806bf || typeof _0x1806bf !== "string") return null;
+  if (CESIUM_BUILTIN_CRS_NAMES["has"](_0x1806bf)) return acceptClaimedWgs84(_0x1806bf, _0x115276, ![]);
+  const _0x323c53 = _0x29d6b4 ? numericCodeString((_c = _0x302ea4["properties"]) == null ? void 0 : _c["code"]) : extractEpsgCode(_0x1806bf);
+  if (!_0x323c53) return resolveOrRejectUnresolvedCrs(_0x1806bf, _0x1806bf, _0x115276);
+  if (_0x323c53 === "4326") return acceptClaimedWgs84(_0x1806bf, _0x115276, !![]);
+  const _0x96fa4d = "EPSG:" + _0x323c53;
+  let _0x4d281a;
   try {
-    ({ default: _0x59c55a } = await import("proj4"));
+    ({ default: _0x4d281a } = await import("proj4"));
   } catch {
-    return resolveOrRejectUnresolvedCrs(_0x51d070, _0x5ee17b, _0x22e32f);
+    return resolveOrRejectUnresolvedCrs(_0x1806bf, _0x96fa4d, _0x115276);
   }
-  if (!await registerProj4Def(_0x59c55a, _0x35f22c)) return resolveOrRejectUnresolvedCrs(_0x51d070, _0x5ee17b, _0x22e32f);
-  return GeoJsonDataSource["crsNames"][_0x51d070] = (_0x40cf32) => {
-    const [_0x20a232, _0xec14dd] = _0x59c55a(_0x5ee17b, "EPSG:4326", [_0x40cf32[0], _0x40cf32[1]]);
-    return Cartesian3["fromDegrees"](_0x20a232, _0xec14dd, _0x40cf32[2]);
-  }, { "kind": "reprojected", "fromEpsg": _0x5ee17b };
+  if (!await registerProj4Def(_0x4d281a, _0x323c53)) return resolveOrRejectUnresolvedCrs(_0x1806bf, _0x96fa4d, _0x115276);
+  return GeoJsonDataSource["crsNames"][_0x1806bf] = (_0x4b5b8e) => {
+    const [_0x393c18, _0x47f44b] = _0x4d281a(_0x96fa4d, "EPSG:4326", [_0x4b5b8e[0], _0x4b5b8e[1]]);
+    return Cartesian3["fromDegrees"](_0x393c18, _0x47f44b, _0x4b5b8e[2]);
+  }, { "kind": "reprojected", "fromEpsg": _0x96fa4d };
 }
 class LocalSourceLoader {
-  constructor(_0x4c8908, _0x3ba173) {
-    this["viewer"] = _0x4c8908, this["deps"] = _0x3ba173;
+  constructor(_0xd2fbd0, _0x67d4aa) {
+    this["viewer"] = _0xd2fbd0, this["deps"] = _0x67d4aa;
   }
-  async ["addLocalKmlGeoJson"](_0x58a0bc, _0x2c2910) {
-    let _0x3a70c8, _0x3dfbaa, _0xbab57 = null;
-    const _0x15f6ba = this["deps"]["styleEngine"]["randomLayerColor"]();
-    let _0x452a08 = _0x2c2910["clampToGround"] ?? !![];
-    if (_0x58a0bc === "GEOJSON") {
-      const _0x5d903c = _0x2c2910["data"] instanceof File ? JSON["parse"](await this["fileToText"](_0x2c2910["data"])) : _0x2c2910["data"];
-      _0xbab57 = await ensureGeoJsonCrsSupport(_0x5d903c);
-      if (isSuspiciousCrsResult(_0xbab57)) _0x452a08 = ![];
-      _0x3a70c8 = await GeoJsonDataSource["load"](_0x5d903c, { "clampToGround": _0x452a08, "fill": _0x15f6ba["withAlpha"](0.5), "stroke": _0x15f6ba, "strokeWidth": 2, "markerColor": _0x15f6ba }), this["deps"]["styleEngine"]["applyEntityColor"](_0x3a70c8, _0x15f6ba), this["deps"]["styleEngine"]["convertMarkersToPoints"](_0x3a70c8, _0x15f6ba);
-      if (isSuspiciousCrsResult(_0xbab57)) this["deps"]["outlineGeometry"]["flattenSuspiciousGeometry"](_0x3a70c8);
+  async ["addLocalKmlGeoJson"](_0x104eac, _0x3587a6) {
+    let _0x424973, _0x2bcc8b, _0x7adb4c = null;
+    const _0xcfcc1 = this["deps"]["styleEngine"]["randomLayerColor"]();
+    let _0x527b32 = _0x3587a6["clampToGround"] ?? !![];
+    if (_0x104eac === "GEOJSON") {
+      const _0x2ac1ac = _0x3587a6["data"] instanceof File ? JSON["parse"](await this["fileToText"](_0x3587a6["data"])) : _0x3587a6["data"];
+      _0x7adb4c = await ensureGeoJsonCrsSupport(_0x2ac1ac);
+      if (isSuspiciousCrsResult(_0x7adb4c)) _0x527b32 = ![];
+      _0x424973 = await GeoJsonDataSource["load"](_0x2ac1ac, { "clampToGround": _0x527b32, "fill": _0xcfcc1["withAlpha"](0.5), "stroke": _0xcfcc1, "strokeWidth": 2, "markerColor": _0xcfcc1 }), this["deps"]["styleEngine"]["applyEntityColor"](_0x424973, _0xcfcc1), this["deps"]["styleEngine"]["convertMarkersToPoints"](_0x424973, _0xcfcc1);
+      if (isSuspiciousCrsResult(_0x7adb4c)) this["deps"]["outlineGeometry"]["flattenSuspiciousGeometry"](_0x424973);
     } else {
-      let _0x42a7d5;
-      _0x2c2910["data"] instanceof File ? (_0x3dfbaa = this["fileToBlobUrl"](_0x2c2910["data"]), _0x42a7d5 = _0x3dfbaa) : _0x42a7d5 = _0x2c2910["data"], _0x3a70c8 = await KmlDataSource["load"](_0x42a7d5, { "camera": this["viewer"]["scene"]["camera"], "canvas": this["viewer"]["scene"]["canvas"], "clampToGround": _0x452a08 }), this["deps"]["styleEngine"]["applyEntityColor"](_0x3a70c8, _0x15f6ba);
+      let _0x12d922;
+      _0x3587a6["data"] instanceof File ? (_0x2bcc8b = this["fileToBlobUrl"](_0x3587a6["data"]), _0x12d922 = _0x2bcc8b) : _0x12d922 = _0x3587a6["data"], _0x424973 = await KmlDataSource["load"](_0x12d922, { "camera": this["viewer"]["scene"]["camera"], "canvas": this["viewer"]["scene"]["canvas"], "clampToGround": _0x527b32 }), this["deps"]["styleEngine"]["applyEntityColor"](_0x424973, _0xcfcc1);
     }
-    this["deps"]["outlineGeometry"]["disableRiskyPolygonOutlines"](_0x3a70c8);
-    _0x452a08 && this["deps"]["addPolygonOutlines"](_0x3a70c8, this["deps"]["defaultOutlineColor"], 2);
-    await this["viewer"]["dataSources"]["add"](_0x3a70c8);
-    _0x3dfbaa !== void 0 && URL["revokeObjectURL"](_0x3dfbaa);
-    const _0x2467a3 = _0x15f6ba["toCssHexString"](), _0x4bc1e1 = this["deps"]["register"](_0x2c2910["id"], _0x2c2910["title"], _0x58a0bc, _0x3a70c8, ![], _0x2467a3);
-    return this["deps"]["emitCrsCheckResult"](_0x4bc1e1["id"], _0xbab57), this["deps"]["styleEngine"]["recordInitialStyle"](_0x4bc1e1["id"], _0x2467a3, 0.5, { "enabled": !![], "color": this["deps"]["defaultOutlineColorHex"], "width": 2 }), await this["deps"]["waitForRenderSettle"](), _0x4bc1e1;
+    this["deps"]["outlineGeometry"]["disableRiskyPolygonOutlines"](_0x424973);
+    _0x527b32 && this["deps"]["addPolygonOutlines"](_0x424973, this["deps"]["defaultOutlineColor"], 2);
+    await this["viewer"]["dataSources"]["add"](_0x424973);
+    _0x2bcc8b !== void 0 && URL["revokeObjectURL"](_0x2bcc8b);
+    const _0xe20772 = _0xcfcc1["toCssHexString"](), _0x3648e4 = this["deps"]["register"](_0x3587a6["id"], _0x3587a6["title"], _0x104eac, _0x424973, ![], _0xe20772);
+    return this["deps"]["emitCrsCheckResult"](_0x3648e4["id"], _0x7adb4c), this["deps"]["styleEngine"]["recordInitialStyle"](_0x3648e4["id"], _0xe20772, 0.5, { "enabled": !![], "color": this["deps"]["defaultOutlineColorHex"], "width": 2 }), await this["deps"]["waitForRenderSettle"](), _0x3648e4;
   }
-  async ["addShp"](_0x43d360) {
-    let _0x582e52;
+  async ["addShp"](_0x425480) {
+    let _0x4d0af1;
     try {
-      ({ getShapefile: _0x582e52 } = await import("shpjs"));
+      ({ getShapefile: _0x4d0af1 } = await import("shpjs"));
     } catch {
       throw new LayerOperationError("LAYER_SHP_PACKAGE_MISSING", 'SHP katmanı için "shpjs" paketi gereklidir: shpjs kütüphanesini import etmelisiniz');
     }
-    const _0x47132b = _0x43d360["data"] instanceof File ? await this["fileToArrayBuffer"](_0x43d360["data"]) : _0x43d360["data"], _0x378f76 = await _0x582e52(_0x47132b), _0x280e6f = Array["isArray"](_0x378f76) ? { "type": "FeatureCollection", "features": _0x378f76["flatMap"]((_0x4adb28) => _0x4adb28["features"]) } : _0x378f76;
-    return loadVectorGeoJsonLayer(this["viewer"], this["deps"], _0x280e6f, { "id": _0x43d360["id"], "title": _0x43d360["title"], "layerType": "SHP", "clampToGround": _0x43d360["clampToGround"] ?? !![] });
+    const _0x3ca1af = _0x425480["data"] instanceof File ? await this["fileToArrayBuffer"](_0x425480["data"]) : _0x425480["data"], _0x437bec = await _0x4d0af1(_0x3ca1af), _0x3368ab = Array["isArray"](_0x437bec) ? { "type": "FeatureCollection", "features": _0x437bec["flatMap"]((_0x1a1bc8) => _0x1a1bc8["features"]) } : _0x437bec;
+    return loadVectorGeoJsonLayer(this["viewer"], this["deps"], _0x3368ab, { "id": _0x425480["id"], "title": _0x425480["title"], "layerType": "SHP", "clampToGround": _0x425480["clampToGround"] ?? !![] });
   }
-  async ["addCsv"](_0x13189c) {
-    let _0x1eb1db;
+  async ["addCsv"](_0x493f01) {
+    let _0x37dad8;
     try {
-      ({ default: _0x1eb1db } = await import("papaparse"));
+      ({ default: _0x37dad8 } = await import("papaparse"));
     } catch {
       throw new LayerOperationError("LAYER_CSV_PACKAGE_MISSING", 'CSV katmanı için "papaparse" paketi gereklidir: papaparse kütüphanesini import etmelisiniz');
     }
-    const _0x247ba9 = _0x13189c["data"] instanceof File ? await this["fileToText"](_0x13189c["data"]) : _0x13189c["data"], _0x4b65c6 = _0x1eb1db["parse"](_0x247ba9, { "header": !![], "dynamicTyping": !![] }), _0x4a2fe6 = _0x4b65c6["data"], _0x30562a = _0x4a2fe6["find"]((_0x133ef0) => _0x133ef0 && Object["keys"](_0x133ef0)["length"] > 0), _0x31267c = _0x30562a && this["detectLatLonKeys"](_0x30562a);
-    if (!_0x31267c) throw new LayerOperationError("LAYER_CSV_LATLON_NOT_FOUND", "CSV içinde lat/lon sütunlarını bulamadım (ör: lat, lon).");
-    const _0x5e70a0 = this["deps"]["styleEngine"]["randomLayerColor"](), _0x2c00b7 = new CustomDataSource(_0x13189c["title"]);
-    for (const _0x2dc679 of _0x4a2fe6) {
-      const _0x48f7fa = Number(_0x2dc679[_0x31267c["lat"]]), _0x32e296 = Number(_0x2dc679[_0x31267c["lon"]]);
-      Number["isFinite"](_0x48f7fa) && Number["isFinite"](_0x32e296) && _0x2c00b7["entities"]["add"]({ "position": Cartesian3["fromDegrees"](_0x32e296, _0x48f7fa), "point": { "pixelSize": 6, "color": _0x5e70a0 }, "properties": _0x2dc679 });
+    const _0x231458 = _0x493f01["data"] instanceof File ? await this["fileToText"](_0x493f01["data"]) : _0x493f01["data"], _0x4489d6 = _0x37dad8["parse"](_0x231458, { "header": !![], "dynamicTyping": !![] }), _0x449f91 = _0x4489d6["data"], _0x3a52ce = _0x449f91["find"]((_0x28f195) => _0x28f195 && Object["keys"](_0x28f195)["length"] > 0), _0x1cb2bb = _0x3a52ce && this["detectLatLonKeys"](_0x3a52ce);
+    if (!_0x1cb2bb) throw new LayerOperationError("LAYER_CSV_LATLON_NOT_FOUND", "CSV içinde lat/lon sütunlarını bulamadım (ör: lat, lon).");
+    const _0x597283 = this["deps"]["styleEngine"]["randomLayerColor"](), _0x2c5363 = new CustomDataSource(_0x493f01["title"]);
+    for (const _0x1d1607 of _0x449f91) {
+      const _0x50a6ed = Number(_0x1d1607[_0x1cb2bb["lat"]]), _0x197911 = Number(_0x1d1607[_0x1cb2bb["lon"]]);
+      Number["isFinite"](_0x50a6ed) && Number["isFinite"](_0x197911) && _0x2c5363["entities"]["add"]({ "position": Cartesian3["fromDegrees"](_0x197911, _0x50a6ed), "point": { "pixelSize": 6, "color": _0x597283 }, "properties": _0x1d1607 });
     }
-    await this["viewer"]["dataSources"]["add"](_0x2c00b7);
-    const _0x55a067 = _0x5e70a0["toCssHexString"](), _0xcc138a = this["deps"]["register"](_0x13189c["id"], _0x13189c["title"], "CSV", _0x2c00b7, ![], _0x55a067);
-    return this["deps"]["styleEngine"]["recordInitialStyle"](_0xcc138a["id"], _0x55a067, 1, { "enabled": ![], "color": _0x55a067, "width": 0 }), _0xcc138a;
+    await this["viewer"]["dataSources"]["add"](_0x2c5363);
+    const _0x20e7a2 = _0x597283["toCssHexString"](), _0x2ba5b9 = this["deps"]["register"](_0x493f01["id"], _0x493f01["title"], "CSV", _0x2c5363, ![], _0x20e7a2);
+    return this["deps"]["styleEngine"]["recordInitialStyle"](_0x2ba5b9["id"], _0x20e7a2, 1, { "enabled": ![], "color": _0x20e7a2, "width": 0 }), _0x2ba5b9;
   }
-  ["detectLatLonKeys"](_0x1612bc) {
-    const _0x5ae276 = Object["keys"](_0x1612bc)["reduce"]((_0x5313a4, _0x124472) => {
-      const _0x877bf7 = _0x124472["toLowerCase"]();
-      if (!_0x5313a4["lat"] && /^(lat|latitude|y)$/["test"](_0x877bf7)) _0x5313a4["lat"] = _0x124472;
-      if (!_0x5313a4["lon"] && /^(lon|lng|long|longitude|x)$/["test"](_0x877bf7)) _0x5313a4["lon"] = _0x124472;
-      return _0x5313a4;
+  ["detectLatLonKeys"](_0x470516) {
+    const _0x484b9d = Object["keys"](_0x470516)["reduce"]((_0x28239f, _0x6178b6) => {
+      const _0x1147bc = _0x6178b6["toLowerCase"]();
+      if (!_0x28239f["lat"] && /^(lat|latitude|y)$/["test"](_0x1147bc)) _0x28239f["lat"] = _0x6178b6;
+      if (!_0x28239f["lon"] && /^(lon|lng|long|longitude|x)$/["test"](_0x1147bc)) _0x28239f["lon"] = _0x6178b6;
+      return _0x28239f;
     }, { "lat": "", "lon": "" });
-    return _0x5ae276["lat"] && _0x5ae276["lon"] ? _0x5ae276 : null;
+    return _0x484b9d["lat"] && _0x484b9d["lon"] ? _0x484b9d : null;
   }
-  async ["fileToText"](_0x1864bf) {
-    return decodeTextBuffer(await _0x1864bf["arrayBuffer"]());
+  async ["fileToText"](_0x17918b) {
+    return decodeTextBuffer(await _0x17918b["arrayBuffer"]());
   }
-  ["fileToBlobUrl"](_0x15beea) {
-    return URL["createObjectURL"](_0x15beea);
+  ["fileToBlobUrl"](_0x3e4a06) {
+    return URL["createObjectURL"](_0x3e4a06);
   }
-  ["fileToArrayBuffer"](_0x52a8fb) {
-    return _0x52a8fb["arrayBuffer"]();
+  ["fileToArrayBuffer"](_0x1402ee) {
+    return _0x1402ee["arrayBuffer"]();
   }
 }
-async function loadVectorGeoJsonLayer(_0x18e00b, _0x421b7a, _0x1b7b6a, _0x1a1e3c, _0x5a0e66) {
-  const _0x4273ed = await ensureGeoJsonCrsSupport(_0x1b7b6a), _0x3041ed = _0x421b7a["styleEngine"]["randomLayerColor"](), _0xc96160 = isSuspiciousCrsResult(_0x4273ed) ? ![] : _0x1a1e3c["clampToGround"], _0x52ba9b = await GeoJsonDataSource["load"](_0x1b7b6a, { "clampToGround": _0xc96160, "fill": _0x3041ed["withAlpha"](0.5), "stroke": _0x3041ed, "strokeWidth": 2, "markerColor": _0x3041ed });
-  _0x421b7a["styleEngine"]["applyEntityColor"](_0x52ba9b, _0x3041ed), _0x421b7a["styleEngine"]["convertMarkersToPoints"](_0x52ba9b, _0x3041ed), _0x421b7a["outlineGeometry"]["disableRiskyPolygonOutlines"](_0x52ba9b);
-  if (isSuspiciousCrsResult(_0x4273ed)) _0x421b7a["outlineGeometry"]["flattenSuspiciousGeometry"](_0x52ba9b);
-  _0xc96160 && _0x421b7a["addPolygonOutlines"](_0x52ba9b, _0x421b7a["defaultOutlineColor"], 2);
-  await _0x18e00b["dataSources"]["add"](_0x52ba9b);
-  const _0x357031 = _0x3041ed["toCssHexString"](), _0x14530c = _0x421b7a["register"](_0x1a1e3c["id"], _0x1a1e3c["title"], _0x1a1e3c["layerType"], _0x52ba9b, ![], _0x357031);
-  return _0x421b7a["emitCrsCheckResult"](_0x14530c["id"], _0x4273ed), _0x5a0e66 == null ? void 0 : _0x5a0e66(_0x14530c), _0x421b7a["styleEngine"]["recordInitialStyle"](_0x14530c["id"], _0x357031, 0.5, { "enabled": !![], "color": _0x421b7a["defaultOutlineColorHex"], "width": 2 }), await _0x421b7a["waitForRenderSettle"](), _0x14530c;
+async function loadVectorGeoJsonLayer(_0x1485da, _0x3d5e55, _0x4c3746, _0x47a75b, _0x39b056) {
+  const _0x4841e3 = await ensureGeoJsonCrsSupport(_0x4c3746), _0x15f00f = _0x3d5e55["styleEngine"]["randomLayerColor"](), _0x4f0116 = isSuspiciousCrsResult(_0x4841e3) ? ![] : _0x47a75b["clampToGround"], _0x51f4cd = await GeoJsonDataSource["load"](_0x4c3746, { "clampToGround": _0x4f0116, "fill": _0x15f00f["withAlpha"](0.5), "stroke": _0x15f00f, "strokeWidth": 2, "markerColor": _0x15f00f });
+  _0x3d5e55["styleEngine"]["applyEntityColor"](_0x51f4cd, _0x15f00f), _0x3d5e55["styleEngine"]["convertMarkersToPoints"](_0x51f4cd, _0x15f00f), _0x3d5e55["outlineGeometry"]["disableRiskyPolygonOutlines"](_0x51f4cd);
+  if (isSuspiciousCrsResult(_0x4841e3)) _0x3d5e55["outlineGeometry"]["flattenSuspiciousGeometry"](_0x51f4cd);
+  _0x4f0116 && _0x3d5e55["addPolygonOutlines"](_0x51f4cd, _0x3d5e55["defaultOutlineColor"], 2);
+  await _0x1485da["dataSources"]["add"](_0x51f4cd);
+  const _0x45bb84 = _0x15f00f["toCssHexString"](), _0x3a3450 = _0x3d5e55["register"](_0x47a75b["id"], _0x47a75b["title"], _0x47a75b["layerType"], _0x51f4cd, ![], _0x45bb84);
+  return _0x3d5e55["emitCrsCheckResult"](_0x3a3450["id"], _0x4841e3), _0x39b056 == null ? void 0 : _0x39b056(_0x3a3450), _0x3d5e55["styleEngine"]["recordInitialStyle"](_0x3a3450["id"], _0x45bb84, 0.5, { "enabled": !![], "color": _0x3d5e55["defaultOutlineColorHex"], "width": 2 }), await _0x3d5e55["waitForRenderSettle"](), _0x3a3450;
 }
-function decodeTextBuffer(_0x2fcfbd) {
+function decodeTextBuffer(_0x1d7958) {
   try {
-    return new TextDecoder("utf-8", { "fatal": !![] })["decode"](_0x2fcfbd);
+    return new TextDecoder("utf-8", { "fatal": !![] })["decode"](_0x1d7958);
   } catch {
-    return new TextDecoder("windows-1254")["decode"](_0x2fcfbd);
+    return new TextDecoder("windows-1254")["decode"](_0x1d7958);
   }
 }
-const els = (_0x172bd3, _0x20daf0) => Array["from"](_0x172bd3["getElementsByTagNameNS"]("*", _0x20daf0)), el = (_0x4abe55, _0x35c8a8) => els(_0x4abe55, _0x35c8a8)[0], txt = (_0x15e6de, _0x28e16d) => {
+const els = (_0x2823a7, _0x12239e) => Array["from"](_0x2823a7["getElementsByTagNameNS"]("*", _0x12239e)), el = (_0x4957b5, _0x15fdf6) => els(_0x4957b5, _0x15fdf6)[0], txt = (_0x4b8195, _0x209e2d) => {
   var _a2, _b;
-  return (_b = (_a2 = el(_0x15e6de, _0x28e16d)) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"]();
+  return (_b = (_a2 = el(_0x4b8195, _0x209e2d)) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"]();
 };
-function buildWfsCapabilitiesUrl(_0x188335) {
-  const _0x2cb970 = new URL(_0x188335, window["location"]["origin"]), _0x5a4131 = new URL("" + _0x2cb970["origin"] + _0x2cb970["pathname"]);
-  for (const [_0x25a356, _0x296a14] of _0x2cb970["searchParams"]["entries"]()) {
-    const _0x16b30b = _0x25a356["toLowerCase"]();
-    (_0x16b30b === "url" || _0x16b30b === "tucbsapikey") && _0x5a4131["searchParams"]["set"](_0x25a356, _0x296a14);
+function buildWfsCapabilitiesUrl(_0x58963a) {
+  const _0x3405ab = new URL(_0x58963a, window["location"]["origin"]), _0x9a95f9 = new URL("" + _0x3405ab["origin"] + _0x3405ab["pathname"]);
+  for (const [_0x259125, _0x24aaa5] of _0x3405ab["searchParams"]["entries"]()) {
+    const _0x30ca9e = _0x259125["toLowerCase"]();
+    (_0x30ca9e === "url" || _0x30ca9e === "tucbsapikey") && _0x9a95f9["searchParams"]["set"](_0x259125, _0x24aaa5);
   }
-  return _0x5a4131["searchParams"]["set"]("service", "WFS"), _0x5a4131["searchParams"]["set"]("request", "GetCapabilities"), _0x5a4131["searchParams"]["set"]("acceptVersions", "2.0.0,1.1.0,1.0.0"), _0x5a4131["toString"]();
+  return _0x9a95f9["searchParams"]["set"]("service", "WFS"), _0x9a95f9["searchParams"]["set"]("request", "GetCapabilities"), _0x9a95f9["searchParams"]["set"]("acceptVersions", "2.0.0,1.1.0,1.0.0"), _0x9a95f9["toString"]();
 }
-function isOgcExceptionXml(_0x1f8657) {
-  const _0x25a8f6 = _0x1f8657["trimStart"]();
-  return _0x25a8f6["startsWith"]("<") && (_0x25a8f6["includes"]("ExceptionReport") || _0x25a8f6["includes"]("ServiceExceptionReport"));
+function isOgcExceptionXml(_0x2498c1) {
+  const _0x2563a6 = _0x2498c1["trimStart"]();
+  return _0x2563a6["startsWith"]("<") && (_0x2563a6["includes"]("ExceptionReport") || _0x2563a6["includes"]("ServiceExceptionReport"));
 }
-function repairBareAmpersands(_0x1a46fa) {
-  return _0x1a46fa["replace"](/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[\da-fA-F]+);)/gi, "&amp;");
+function repairBareAmpersands(_0x1c7416) {
+  return _0x1c7416["replace"](/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[\da-fA-F]+);)/gi, "&amp;");
 }
-async function fetchWfsCapabilities(_0x2fb6c1, _0x30fed1 = {}) {
-  const _0x5e52d6 = await fetch(buildWfsCapabilitiesUrl(_0x2fb6c1), _0x30fed1);
-  if (!_0x5e52d6["ok"]) throw new OgcRequestError("OGC_CAPABILITIES_REQUEST_FAILED", "WFS GetCapabilities başarısız: " + _0x5e52d6["status"] + " " + _0x5e52d6["statusText"]);
-  const _0x541f93 = await _0x5e52d6["text"]();
-  if (isOgcExceptionXml(_0x541f93)) throw new OgcRequestError("OGC_CAPABILITIES_EXCEPTION", "WFS GetCapabilities OGC Exception döndü.");
-  const _0x2005a6 = repairBareAmpersands(_0x541f93), _0x19028e = new DOMParser()["parseFromString"](_0x2005a6, "application/xml");
-  if (_0x19028e["querySelector"]("parsererror")) throw new OgcRequestError("OGC_CAPABILITIES_PARSE_FAILED", "WFS GetCapabilities XML parse edilemedi.");
-  const _0x347916 = _0x19028e["documentElement"]["getAttribute"]("version") || "2.0.0", _0x1f6df8 = [];
-  for (const _0x325ee2 of els(_0x19028e, "FeatureType")) {
-    const _0x2a6d08 = txt(_0x325ee2, "Name") || "";
-    if (!_0x2a6d08) continue;
-    const _0x6fd62 = els(_0x325ee2, "OutputFormats")["flatMap"]((_0x565e4f) => els(_0x565e4f, "Format")["map"]((_0x7e052c) => {
+async function fetchWfsCapabilities(_0x5d9d3e, _0x5800b1 = {}) {
+  const _0x2ff6c4 = await fetch(buildWfsCapabilitiesUrl(_0x5d9d3e), _0x5800b1);
+  if (!_0x2ff6c4["ok"]) throw new OgcRequestError("OGC_CAPABILITIES_REQUEST_FAILED", "WFS GetCapabilities başarısız: " + _0x2ff6c4["status"] + " " + _0x2ff6c4["statusText"]);
+  const _0x56f7f9 = await _0x2ff6c4["text"]();
+  if (isOgcExceptionXml(_0x56f7f9)) throw new OgcRequestError("OGC_CAPABILITIES_EXCEPTION", "WFS GetCapabilities OGC Exception döndü.");
+  const _0x167b8c = repairBareAmpersands(_0x56f7f9), _0x3d4c9e = new DOMParser()["parseFromString"](_0x167b8c, "application/xml");
+  if (_0x3d4c9e["querySelector"]("parsererror")) throw new OgcRequestError("OGC_CAPABILITIES_PARSE_FAILED", "WFS GetCapabilities XML parse edilemedi.");
+  const _0x4048b7 = _0x3d4c9e["documentElement"]["getAttribute"]("version") || "2.0.0", _0x5296d5 = [];
+  for (const _0xa029ad of els(_0x3d4c9e, "FeatureType")) {
+    const _0x37f2a8 = txt(_0xa029ad, "Name") || "";
+    if (!_0x37f2a8) continue;
+    const _0x4e174b = els(_0xa029ad, "OutputFormats")["flatMap"]((_0x9db2f9) => els(_0x9db2f9, "Format")["map"]((_0x520c32) => {
       var _a2;
-      return ((_a2 = _0x7e052c["textContent"]) == null ? void 0 : _a2["trim"]()) || "";
-    })["filter"](Boolean)), _0x52ea41 = txt(_0x325ee2, "Title"), _0x21e656 = txt(_0x325ee2, "DefaultCRS"), _0x10d09b = txt(_0x325ee2, "DefaultSRS");
-    _0x1f6df8["push"]({ "name": _0x2a6d08, ..._0x52ea41 ? { "title": _0x52ea41 } : {}, ..._0x21e656 ? { "defaultCRS": _0x21e656 } : {}, ..._0x10d09b ? { "defaultSRS": _0x10d09b } : {}, ..._0x6fd62["length"] ? { "outputFormats": _0x6fd62 } : {} });
+      return ((_a2 = _0x520c32["textContent"]) == null ? void 0 : _a2["trim"]()) || "";
+    })["filter"](Boolean)), _0x1e0658 = txt(_0xa029ad, "Title"), _0x378c35 = txt(_0xa029ad, "DefaultCRS"), _0x47a585 = txt(_0xa029ad, "DefaultSRS");
+    _0x5296d5["push"]({ "name": _0x37f2a8, ..._0x1e0658 ? { "title": _0x1e0658 } : {}, ..._0x378c35 ? { "defaultCRS": _0x378c35 } : {}, ..._0x47a585 ? { "defaultSRS": _0x47a585 } : {}, ..._0x4e174b["length"] ? { "outputFormats": _0x4e174b } : {} });
   }
-  const _0x14ab2f = el(_0x19028e, "OperationsMetadata");
-  let _0x1d2096 = [];
-  if (_0x14ab2f) {
-    const _0x4b7384 = els(_0x14ab2f, "Operation")["find"]((_0x2b646c) => (_0x2b646c["getAttribute"]("name") || "") === "GetFeature"), _0x4bd405 = els(_0x4b7384 ?? _0x14ab2f, "Parameter")["find"]((_0xf65ee3) => (_0xf65ee3["getAttribute"]("name") || "")["toLowerCase"]() === "outputformat");
-    _0x4bd405 && (_0x1d2096 = els(_0x4bd405, "Value")["map"]((_0x1e9fe4) => {
+  const _0x1f5b84 = el(_0x3d4c9e, "OperationsMetadata");
+  let _0x5729e0 = [];
+  if (_0x1f5b84) {
+    const _0x41ff6a = els(_0x1f5b84, "Operation")["find"]((_0x112fdc) => (_0x112fdc["getAttribute"]("name") || "") === "GetFeature"), _0x41f1ae = els(_0x41ff6a ?? _0x1f5b84, "Parameter")["find"]((_0xce4df5) => (_0xce4df5["getAttribute"]("name") || "")["toLowerCase"]() === "outputformat");
+    _0x41f1ae && (_0x5729e0 = els(_0x41f1ae, "Value")["map"]((_0x182061) => {
       var _a2;
-      return ((_a2 = _0x1e9fe4["textContent"]) == null ? void 0 : _a2["trim"]()) || "";
+      return ((_a2 = _0x182061["textContent"]) == null ? void 0 : _a2["trim"]()) || "";
     })["filter"](Boolean));
   }
-  if (!_0x1d2096["length"]) {
-    const _0x2eb4ca = /* @__PURE__ */ new Set();
-    _0x1d2096 = _0x1f6df8["flatMap"]((_0x3d376c) => _0x3d376c["outputFormats"] || [])["filter"]((_0x54fb02) => !_0x2eb4ca["has"](_0x54fb02) && _0x2eb4ca["add"](_0x54fb02));
+  if (!_0x5729e0["length"]) {
+    const _0x9cf9e1 = /* @__PURE__ */ new Set();
+    _0x5729e0 = _0x5296d5["flatMap"]((_0x3d6808) => _0x3d6808["outputFormats"] || [])["filter"]((_0x41f60d) => !_0x9cf9e1["has"](_0x41f60d) && _0x9cf9e1["add"](_0x41f60d));
   }
-  return { "version": _0x347916, "featureTypes": _0x1f6df8, "outputFormats": _0x1d2096 };
+  return { "version": _0x4048b7, "featureTypes": _0x5296d5, "outputFormats": _0x5729e0 };
 }
-function normName(_0x4b5249) {
-  return _0x4b5249["trim"]()["toLowerCase"]();
+function normName(_0x5e8df7) {
+  return _0x5e8df7["trim"]()["toLowerCase"]();
 }
-function localTypeName(_0x5d433c) {
-  const _0x3baf16 = _0x5d433c["lastIndexOf"](":");
-  return _0x3baf16 >= 0 ? _0x5d433c["slice"](_0x3baf16 + 1) : _0x5d433c;
+function localTypeName(_0x31f009) {
+  const _0x59f906 = _0x31f009["lastIndexOf"](":");
+  return _0x59f906 >= 0 ? _0x31f009["slice"](_0x59f906 + 1) : _0x31f009;
 }
-function resolveWfsFeatureType(_0x211a73, _0x5693e0) {
-  if (!_0x5693e0["length"]) throw new OgcRequestError("OGC_FEATURE_TYPE_NOT_FOUND", "WFS FeatureType bulunamadı.");
-  const _0x24fa0e = _0x211a73 == null ? void 0 : _0x211a73["trim"]();
-  if (_0x24fa0e) {
-    const _0x4ed4c8 = _0x5693e0["find"]((_0xde84f8) => normName(_0xde84f8["name"]) === normName(_0x24fa0e));
-    if (_0x4ed4c8) return _0x4ed4c8;
-    const _0x1f0548 = normName(localTypeName(_0x24fa0e)), _0x2c16bf = _0x5693e0["find"]((_0x21b552) => normName(localTypeName(_0x21b552["name"])) === _0x1f0548);
-    if (_0x2c16bf) return _0x2c16bf;
+function resolveWfsFeatureType(_0x5848e1, _0x751ce4) {
+  if (!_0x751ce4["length"]) throw new OgcRequestError("OGC_FEATURE_TYPE_NOT_FOUND", "WFS FeatureType bulunamadı.");
+  const _0x1f1930 = _0x5848e1 == null ? void 0 : _0x5848e1["trim"]();
+  if (_0x1f1930) {
+    const _0x3dc986 = _0x751ce4["find"]((_0x1b018d) => normName(_0x1b018d["name"]) === normName(_0x1f1930));
+    if (_0x3dc986) return _0x3dc986;
+    const _0x4864ba = normName(localTypeName(_0x1f1930)), _0xb0efa1 = _0x751ce4["find"]((_0x4e7042) => normName(localTypeName(_0x4e7042["name"])) === _0x4864ba);
+    if (_0xb0efa1) return _0xb0efa1;
   }
-  return _0x5693e0[0];
+  return _0x751ce4[0];
 }
-function pickJsonOutput(_0x1c2dd6) {
-  const _0x3005df = ["application/geo+json", "application/json;subtype=geojson", "application/json", "geojson", "json", "esrigeojson", "geojson+gzip", "geojson+zip"], _0x30b01d = _0x1c2dd6["map"]((_0x46b1e0) => _0x46b1e0["toLowerCase"]()["replace"](/\s+/g, ""));
-  for (const _0x1df3c5 of _0x3005df) {
-    const _0x27f974 = _0x30b01d["findIndex"]((_0x36302f) => _0x36302f === _0x1df3c5 || _0x36302f["includes"](_0x1df3c5));
-    if (_0x27f974 >= 0) return _0x1c2dd6[_0x27f974] ?? null;
+function pickJsonOutput(_0x4d5708) {
+  const _0x6881d2 = ["application/geo+json", "application/json;subtype=geojson", "application/json", "geojson", "json", "esrigeojson", "geojson+gzip", "geojson+zip"], _0x183ffc = _0x4d5708["map"]((_0x22d8dc) => _0x22d8dc["toLowerCase"]()["replace"](/\s+/g, ""));
+  for (const _0x2dd2a5 of _0x6881d2) {
+    const _0xf21e7a = _0x183ffc["findIndex"]((_0x45e1d0) => _0x45e1d0 === _0x2dd2a5 || _0x45e1d0["includes"](_0x2dd2a5));
+    if (_0xf21e7a >= 0) return _0x4d5708[_0xf21e7a] ?? null;
   }
   return null;
 }
-function buildWfsGetFeaturePlan(_0x32decf) {
-  const _0x52341f = resolveWfsFeatureType(_0x32decf["typeNameHint"], _0x32decf["caps"]["featureTypes"]), _0x5a0db6 = _0x32decf["version"] || _0x32decf["caps"]["version"] || "2.0.0", _0x484e39 = _0x32decf["srsName"] || _0x52341f["defaultCRS"] || _0x52341f["defaultSRS"] || "EPSG:4326", _0xad0c56 = _0x32decf["outputFormat"] || pickJsonOutput(_0x52341f["outputFormats"] || []) || pickJsonOutput(_0x32decf["caps"]["outputFormats"]), _0x40f67e = _0x32decf["maxFeatures"] ?? 5e3;
-  return { "version": _0x5a0db6, "typeName": _0x52341f["name"], "srsName": _0x484e39, "jsonOutputFormat": _0xad0c56, "maxFeatures": _0x40f67e };
+function buildWfsGetFeaturePlan(_0x75d94d) {
+  const _0x3f03ae = resolveWfsFeatureType(_0x75d94d["typeNameHint"], _0x75d94d["caps"]["featureTypes"]), _0x4f21ee = _0x75d94d["version"] || _0x75d94d["caps"]["version"] || "2.0.0", _0x1fd155 = _0x75d94d["srsName"] || _0x3f03ae["defaultCRS"] || _0x3f03ae["defaultSRS"] || "EPSG:4326", _0x3865a7 = _0x75d94d["outputFormat"] || pickJsonOutput(_0x3f03ae["outputFormats"] || []) || pickJsonOutput(_0x75d94d["caps"]["outputFormats"]), _0x17eccd = _0x75d94d["maxFeatures"] ?? 5e3;
+  return { "version": _0x4f21ee, "typeName": _0x3f03ae["name"], "srsName": _0x1fd155, "jsonOutputFormat": _0x3865a7, "maxFeatures": _0x17eccd };
 }
-function appendWfsGetFeatureParams(_0x1360c3, _0x3ad8aa, _0x49e949) {
-  _0x1360c3["set"]("service", "WFS"), _0x1360c3["set"]("request", "GetFeature"), _0x1360c3["set"]("version", _0x3ad8aa["version"]);
-  const _0x500dfc = _0x3ad8aa["version"]["startsWith"]("2.");
-  _0x1360c3["set"](_0x500dfc ? "typeNames" : "typeName", _0x3ad8aa["typeName"]), _0x1360c3["set"]("srsName", _0x3ad8aa["srsName"]);
-  _0x49e949 && _0x1360c3["set"]("outputFormat", _0x49e949);
-  const _0x10b8d9 = _0x500dfc ? "count" : "maxFeatures";
-  _0x1360c3["set"](_0x10b8d9, String(_0x3ad8aa["maxFeatures"]));
+function appendWfsGetFeatureParams(_0x165980, _0x19baa5, _0x131842) {
+  _0x165980["set"]("service", "WFS"), _0x165980["set"]("request", "GetFeature"), _0x165980["set"]("version", _0x19baa5["version"]);
+  const _0x3acd6f = _0x19baa5["version"]["startsWith"]("2.");
+  _0x165980["set"](_0x3acd6f ? "typeNames" : "typeName", _0x19baa5["typeName"]), _0x165980["set"]("srsName", _0x19baa5["srsName"]);
+  _0x131842 && _0x165980["set"]("outputFormat", _0x131842);
+  const _0x43bbec = _0x3acd6f ? "count" : "maxFeatures";
+  _0x165980["set"](_0x43bbec, String(_0x19baa5["maxFeatures"]));
 }
-async function getCapabilities(_0x96dc65, _0x253d98, _0x275021) {
-  const _0x2f150d = _0x275021 == null ? void 0 : _0x275021["mergeApiKeyHeader"](_0x275021["buildAuthHeaders"](_0x253d98), _0x96dc65), _0x996953 = await fetch(_0x96dc65, _0x2f150d ? { "headers": _0x2f150d } : void 0);
-  if (!_0x996953["ok"]) throw new OgcRequestError("OGC_CAPABILITIES_REQUEST_FAILED", "GetCapabilities isteği başarısız: " + _0x996953["status"] + " " + _0x996953["statusText"]);
-  const _0x13916e = await _0x996953["text"](), _0x55c1d9 = new DOMParser()["parseFromString"](_0x13916e, "application/xml");
-  if (_0x55c1d9["getElementsByTagName"]("parsererror")["length"] > 0) throw new OgcRequestError("OGC_SERVICE_DISCOVERY_PARSE_FAILED", "GetCapabilities yanıtı XML olarak ayrıştırılamadı.");
-  return _0x55c1d9;
+async function getCapabilities(_0x18bdf3, _0x31639f, _0x3cd985) {
+  const _0x4f7de8 = _0x3cd985 == null ? void 0 : _0x3cd985["mergeApiKeyHeader"](_0x3cd985["buildAuthHeaders"](_0x31639f), _0x18bdf3), _0x3d9ee6 = await fetch(_0x18bdf3, _0x4f7de8 ? { "headers": _0x4f7de8 } : void 0);
+  if (!_0x3d9ee6["ok"]) throw new OgcRequestError("OGC_CAPABILITIES_REQUEST_FAILED", "GetCapabilities isteği başarısız: " + _0x3d9ee6["status"] + " " + _0x3d9ee6["statusText"]);
+  const _0x3f99b0 = await _0x3d9ee6["text"](), _0x30455a = new DOMParser()["parseFromString"](_0x3f99b0, "application/xml");
+  if (_0x30455a["getElementsByTagName"]("parsererror")["length"] > 0) throw new OgcRequestError("OGC_SERVICE_DISCOVERY_PARSE_FAILED", "GetCapabilities yanıtı XML olarak ayrıştırılamadı.");
+  return _0x30455a;
 }
-function parseWmsStyles(_0x45c6ee, _0x148a53) {
+function parseWmsStyles(_0x235def, _0x53a3ff) {
   var _a2, _b, _c, _d;
-  const _0x38f542 = elementsByLocalName(_0x45c6ee, "Layer")["find"]((_0x31453c) => {
+  const _0x35ac23 = elementsByLocalName(_0x235def, "Layer")["find"]((_0x26b6ca) => {
     var _a3, _b2;
-    return ((_b2 = (_a3 = childByLocalName(_0x31453c, "Name")) == null ? void 0 : _a3["textContent"]) == null ? void 0 : _b2["trim"]()) === _0x148a53;
+    return ((_b2 = (_a3 = childByLocalName(_0x26b6ca, "Name")) == null ? void 0 : _a3["textContent"]) == null ? void 0 : _b2["trim"]()) === _0x53a3ff;
   });
-  if (!_0x38f542) return [];
-  const _0xa54cfb = [];
-  for (const _0x24612a of Array["from"](_0x38f542["children"])) {
-    if (_0x24612a["localName"] !== "Style") continue;
-    const _0x2cad06 = (_b = (_a2 = childByLocalName(_0x24612a, "Name")) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"]();
-    if (!_0x2cad06) continue;
-    const _0x12da17 = ((_d = (_c = childByLocalName(_0x24612a, "Title")) == null ? void 0 : _c["textContent"]) == null ? void 0 : _d["trim"]()) ?? _0x2cad06;
-    _0xa54cfb["push"]({ "name": _0x2cad06, "title": _0x12da17 });
+  if (!_0x35ac23) return [];
+  const _0x90e048 = [];
+  for (const _0xb5ec68 of Array["from"](_0x35ac23["children"])) {
+    if (_0xb5ec68["localName"] !== "Style") continue;
+    const _0x38f957 = (_b = (_a2 = childByLocalName(_0xb5ec68, "Name")) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"]();
+    if (!_0x38f957) continue;
+    const _0x59c43e = ((_d = (_c = childByLocalName(_0xb5ec68, "Title")) == null ? void 0 : _c["textContent"]) == null ? void 0 : _d["trim"]()) ?? _0x38f957;
+    _0x90e048["push"]({ "name": _0x38f957, "title": _0x59c43e });
   }
-  return _0xa54cfb;
+  return _0x90e048;
 }
-function parseWmtsStyles(_0x18824b, _0x227482) {
+function parseWmtsStyles(_0x385a4c, _0x529b6a) {
   var _a2, _b, _c, _d, _e;
-  const _0x2bc1a1 = elementsByLocalName(_0x18824b, "Layer")["find"]((_0x3ed15c) => {
+  const _0xbbab3c = elementsByLocalName(_0x385a4c, "Layer")["find"]((_0x220023) => {
     var _a3, _b2;
-    return ((_b2 = (_a3 = childByLocalName(_0x3ed15c, "Identifier")) == null ? void 0 : _a3["textContent"]) == null ? void 0 : _b2["trim"]()) === _0x227482;
+    return ((_b2 = (_a3 = childByLocalName(_0x220023, "Identifier")) == null ? void 0 : _a3["textContent"]) == null ? void 0 : _b2["trim"]()) === _0x529b6a;
   });
-  if (!_0x2bc1a1) return [];
-  const _0x2f2bc4 = [];
-  for (const _0x36520e of Array["from"](_0x2bc1a1["children"])) {
-    if (_0x36520e["localName"] !== "Style") continue;
-    const _0x2d3f4f = (_b = (_a2 = childByLocalName(_0x36520e, "Identifier")) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"]();
-    if (!_0x2d3f4f) continue;
-    const _0x71a3da = ((_d = (_c = childByLocalName(_0x36520e, "Title")) == null ? void 0 : _c["textContent"]) == null ? void 0 : _d["trim"]()) ?? _0x2d3f4f, _0x3e9623 = ((_e = childByLocalName(_0x36520e, "LegendURL")) == null ? void 0 : _e["getAttribute"]("xlink:href")) ?? "", _0x351409 = _0x36520e["getAttribute"]("isDefault") === "true";
-    _0x2f2bc4["push"]({ "name": _0x2d3f4f, "title": _0x71a3da, "legendUrl": _0x3e9623, "isDefault": _0x351409 });
+  if (!_0xbbab3c) return [];
+  const _0x19d8d8 = [];
+  for (const _0x5db4ab of Array["from"](_0xbbab3c["children"])) {
+    if (_0x5db4ab["localName"] !== "Style") continue;
+    const _0x2461ec = (_b = (_a2 = childByLocalName(_0x5db4ab, "Identifier")) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"]();
+    if (!_0x2461ec) continue;
+    const _0x2656b7 = ((_d = (_c = childByLocalName(_0x5db4ab, "Title")) == null ? void 0 : _c["textContent"]) == null ? void 0 : _d["trim"]()) ?? _0x2461ec, _0x57f2e0 = ((_e = childByLocalName(_0x5db4ab, "LegendURL")) == null ? void 0 : _e["getAttribute"]("xlink:href")) ?? "", _0x3ebaef = _0x5db4ab["getAttribute"]("isDefault") === "true";
+    _0x19d8d8["push"]({ "name": _0x2461ec, "title": _0x2656b7, "legendUrl": _0x57f2e0, "isDefault": _0x3ebaef });
   }
-  return _0x2f2bc4["sort"]((_0x4a21d7, _0x512ff6) => Number(_0x512ff6["isDefault"]) - Number(_0x4a21d7["isDefault"])), _0x2f2bc4["map"]((_0x4b3b36) => ({ "name": _0x4b3b36["name"], "title": _0x4b3b36["title"], "legendUrl": _0x4b3b36["legendUrl"] }));
+  return _0x19d8d8["sort"]((_0x3eb91e, _0x115cc3) => Number(_0x115cc3["isDefault"]) - Number(_0x3eb91e["isDefault"])), _0x19d8d8["map"]((_0x4c55af) => ({ "name": _0x4c55af["name"], "title": _0x4c55af["title"], "legendUrl": _0x4c55af["legendUrl"] }));
 }
-function buildCapabilitiesUrl(_0x3b52b9, _0x226405, _0x3748b5) {
-  const _0x1aebcd = new URL(_0x3b52b9);
-  return _0x1aebcd["searchParams"]["set"]("SERVICE", _0x226405), _0x1aebcd["searchParams"]["set"]("REQUEST", "GetCapabilities"), _0x1aebcd["searchParams"]["set"]("VERSION", _0x3748b5), _0x1aebcd["toString"]();
+function buildCapabilitiesUrl(_0x3679be, _0x434a94, _0xd52488) {
+  const _0x58a604 = new URL(_0x3679be);
+  return _0x58a604["searchParams"]["set"]("SERVICE", _0x434a94), _0x58a604["searchParams"]["set"]("REQUEST", "GetCapabilities"), _0x58a604["searchParams"]["set"]("VERSION", _0xd52488), _0x58a604["toString"]();
 }
-function elementsByLocalName(_0x1706c0, _0x4cb688) {
-  return Array["from"](_0x1706c0["getElementsByTagNameNS"]("*", _0x4cb688));
+function elementsByLocalName(_0x372652, _0x3b5fa7) {
+  return Array["from"](_0x372652["getElementsByTagNameNS"]("*", _0x3b5fa7));
 }
-function childByLocalName(_0x423bb4, _0x16f7eb) {
-  return Array["from"](_0x423bb4["children"])["find"]((_0x302641) => _0x302641["localName"] === _0x16f7eb);
+function childByLocalName(_0x1852c6, _0x2ad1ad) {
+  return Array["from"](_0x1852c6["children"])["find"]((_0x37628e) => _0x37628e["localName"] === _0x2ad1ad);
 }
-function parseWmsGeographicBoundingBox(_0x10b018) {
+function parseWmsGeographicBoundingBox(_0x4ed7a1) {
   var _a2, _b, _c, _d;
-  const _0x563d5f = childByLocalName(_0x10b018, "EX_GeographicBoundingBox");
-  if (_0x563d5f) {
-    const _0x4da4e2 = (_a2 = childByLocalName(_0x563d5f, "westBoundLongitude")) == null ? void 0 : _a2["textContent"], _0x2f144f = (_b = childByLocalName(_0x563d5f, "eastBoundLongitude")) == null ? void 0 : _b["textContent"], _0x2e53f0 = (_c = childByLocalName(_0x563d5f, "southBoundLatitude")) == null ? void 0 : _c["textContent"], _0x3063e2 = (_d = childByLocalName(_0x563d5f, "northBoundLatitude")) == null ? void 0 : _d["textContent"];
-    if (_0x4da4e2 && _0x2f144f && _0x2e53f0 && _0x3063e2) {
-      const _0x58c212 = { "west": Number(_0x4da4e2), "south": Number(_0x2e53f0), "east": Number(_0x2f144f), "north": Number(_0x3063e2) };
-      if (Object["values"](_0x58c212)["every"](Number["isFinite"])) return _0x58c212;
+  const _0x242e6b = childByLocalName(_0x4ed7a1, "EX_GeographicBoundingBox");
+  if (_0x242e6b) {
+    const _0x42fa65 = (_a2 = childByLocalName(_0x242e6b, "westBoundLongitude")) == null ? void 0 : _a2["textContent"], _0x35fa9a = (_b = childByLocalName(_0x242e6b, "eastBoundLongitude")) == null ? void 0 : _b["textContent"], _0x4d7524 = (_c = childByLocalName(_0x242e6b, "southBoundLatitude")) == null ? void 0 : _c["textContent"], _0x3bb97c = (_d = childByLocalName(_0x242e6b, "northBoundLatitude")) == null ? void 0 : _d["textContent"];
+    if (_0x42fa65 && _0x35fa9a && _0x4d7524 && _0x3bb97c) {
+      const _0x23de78 = { "west": Number(_0x42fa65), "south": Number(_0x4d7524), "east": Number(_0x35fa9a), "north": Number(_0x3bb97c) };
+      if (Object["values"](_0x23de78)["every"](Number["isFinite"])) return _0x23de78;
     }
   }
-  const _0x1e6187 = childByLocalName(_0x10b018, "LatLonBoundingBox");
-  if (_0x1e6187) {
-    const _0x2bca35 = { "west": Number(_0x1e6187["getAttribute"]("minx")), "south": Number(_0x1e6187["getAttribute"]("miny")), "east": Number(_0x1e6187["getAttribute"]("maxx")), "north": Number(_0x1e6187["getAttribute"]("maxy")) };
-    if (Object["values"](_0x2bca35)["every"](Number["isFinite"])) return _0x2bca35;
+  const _0x433c66 = childByLocalName(_0x4ed7a1, "LatLonBoundingBox");
+  if (_0x433c66) {
+    const _0x2b1c78 = { "west": Number(_0x433c66["getAttribute"]("minx")), "south": Number(_0x433c66["getAttribute"]("miny")), "east": Number(_0x433c66["getAttribute"]("maxx")), "north": Number(_0x433c66["getAttribute"]("maxy")) };
+    if (Object["values"](_0x2b1c78)["every"](Number["isFinite"])) return _0x2b1c78;
   }
   return void 0;
 }
-function parseWmsCapabilities(_0x5c6969) {
+function parseWmsCapabilities(_0x2dc05e) {
   var _a2;
-  const _0x438a0c = [];
-  for (const _0x4a3997 of elementsByLocalName(_0x5c6969, "Layer")) {
-    const _0x492321 = childByLocalName(_0x4a3997, "Name");
-    if (!(_0x492321 == null ? void 0 : _0x492321["textContent"])) continue;
-    const _0x5d4bbf = childByLocalName(_0x4a3997, "Title"), _0x229249 = parseWmsGeographicBoundingBox(_0x4a3997);
-    _0x438a0c["push"]({ "identifier": _0x492321["textContent"]["trim"](), "title": ((_a2 = _0x5d4bbf == null ? void 0 : _0x5d4bbf["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x492321["textContent"]["trim"](), ..._0x229249 && { "geographicBoundingBox": _0x229249 } });
+  const _0xc1e653 = [];
+  for (const _0x3fed9b of elementsByLocalName(_0x2dc05e, "Layer")) {
+    const _0x2378e0 = childByLocalName(_0x3fed9b, "Name");
+    if (!(_0x2378e0 == null ? void 0 : _0x2378e0["textContent"])) continue;
+    const _0x3facf4 = childByLocalName(_0x3fed9b, "Title"), _0x41c002 = parseWmsGeographicBoundingBox(_0x3fed9b);
+    _0xc1e653["push"]({ "identifier": _0x2378e0["textContent"]["trim"](), "title": ((_a2 = _0x3facf4 == null ? void 0 : _0x3facf4["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x2378e0["textContent"]["trim"](), ..._0x41c002 && { "geographicBoundingBox": _0x41c002 } });
   }
-  return _0x438a0c;
+  return _0xc1e653;
 }
-function parseWmsTiffFormat(_0x135436) {
-  const _0x15fe9a = elementsByLocalName(_0x135436, "GetMap")[0];
-  if (!_0x15fe9a) return void 0;
-  const _0x165509 = new Set(elementsByLocalName(_0x15fe9a, "Format")["map"]((_0x43fd58) => {
+function parseWmsTiffFormat(_0x463bd4) {
+  const _0x3db08e = elementsByLocalName(_0x463bd4, "GetMap")[0];
+  if (!_0x3db08e) return void 0;
+  const _0x39de17 = new Set(elementsByLocalName(_0x3db08e, "Format")["map"]((_0x15c45d) => {
     var _a2;
-    return (_a2 = _0x43fd58["textContent"]) == null ? void 0 : _a2["trim"]()["toLowerCase"]();
-  })["filter"]((_0x44720) => !!_0x44720));
-  if (_0x165509["has"]("image/geotiff")) return "image/geotiff";
-  if (_0x165509["has"]("image/tiff")) return "image/tiff";
+    return (_a2 = _0x15c45d["textContent"]) == null ? void 0 : _a2["trim"]()["toLowerCase"]();
+  })["filter"]((_0x15d974) => !!_0x15d974));
+  if (_0x39de17["has"]("image/geotiff")) return "image/geotiff";
+  if (_0x39de17["has"]("image/tiff")) return "image/tiff";
   return void 0;
 }
-function parseWcsTiffFormat(_0x226128) {
-  const _0x58b5ec = new Set(elementsByLocalName(_0x226128, "formatSupported")["map"]((_0x5512ec) => {
+function parseWcsTiffFormat(_0xf7a12a) {
+  const _0x4fbe1e = new Set(elementsByLocalName(_0xf7a12a, "formatSupported")["map"]((_0x4c9e7c) => {
     var _a2;
-    return (_a2 = _0x5512ec["textContent"]) == null ? void 0 : _a2["trim"]()["toLowerCase"]();
-  })["filter"]((_0x4de2ea) => !!_0x4de2ea));
-  if (_0x58b5ec["has"]("image/geotiff")) return "image/geotiff";
-  if (_0x58b5ec["has"]("image/tiff")) return "image/tiff";
+    return (_a2 = _0x4c9e7c["textContent"]) == null ? void 0 : _a2["trim"]()["toLowerCase"]();
+  })["filter"]((_0x5a3e99) => !!_0x5a3e99));
+  if (_0x4fbe1e["has"]("image/geotiff")) return "image/geotiff";
+  if (_0x4fbe1e["has"]("image/tiff")) return "image/tiff";
   return void 0;
 }
-function parseWmtsCapabilities(_0x48f826) {
+function parseWmtsCapabilities(_0x5d0952) {
   var _a2;
-  const _0x203653 = [];
-  for (const _0x195039 of elementsByLocalName(_0x48f826, "Layer")) {
-    const _0x42f656 = childByLocalName(_0x195039, "Identifier");
-    if (!(_0x42f656 == null ? void 0 : _0x42f656["textContent"])) continue;
-    const _0x4a3af6 = childByLocalName(_0x195039, "Title"), _0x5c4b98 = childByLocalName(_0x195039, "TileMatrixSetLink"), _0x5e2544 = _0x5c4b98 ? childByLocalName(_0x5c4b98, "TileMatrixSet") : void 0;
-    _0x203653["push"]({ "identifier": _0x42f656["textContent"]["trim"](), "title": ((_a2 = _0x4a3af6 == null ? void 0 : _0x4a3af6["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x42f656["textContent"]["trim"](), ...(_0x5e2544 == null ? void 0 : _0x5e2544["textContent"]) && { "tileMatrixSetID": _0x5e2544["textContent"]["trim"]() } });
+  const _0x4614e6 = [];
+  for (const _0x1795f1 of elementsByLocalName(_0x5d0952, "Layer")) {
+    const _0x436eba = childByLocalName(_0x1795f1, "Identifier");
+    if (!(_0x436eba == null ? void 0 : _0x436eba["textContent"])) continue;
+    const _0x17c636 = childByLocalName(_0x1795f1, "Title"), _0x4fdb64 = childByLocalName(_0x1795f1, "TileMatrixSetLink"), _0x52706f = _0x4fdb64 ? childByLocalName(_0x4fdb64, "TileMatrixSet") : void 0;
+    _0x4614e6["push"]({ "identifier": _0x436eba["textContent"]["trim"](), "title": ((_a2 = _0x17c636 == null ? void 0 : _0x17c636["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x436eba["textContent"]["trim"](), ...(_0x52706f == null ? void 0 : _0x52706f["textContent"]) && { "tileMatrixSetID": _0x52706f["textContent"]["trim"]() } });
   }
-  return _0x203653;
+  return _0x4614e6;
 }
-function parseWfsCapabilities(_0x3577d7) {
+function parseWfsCapabilities(_0x5b8dc8) {
   var _a2;
-  const _0x432815 = [];
-  for (const _0x19d635 of elementsByLocalName(_0x3577d7, "FeatureType")) {
-    const _0x3a12f6 = childByLocalName(_0x19d635, "Name");
-    if (!(_0x3a12f6 == null ? void 0 : _0x3a12f6["textContent"])) continue;
-    const _0x106122 = childByLocalName(_0x19d635, "Title");
-    _0x432815["push"]({ "identifier": _0x3a12f6["textContent"]["trim"](), "title": ((_a2 = _0x106122 == null ? void 0 : _0x106122["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x3a12f6["textContent"]["trim"]() });
+  const _0x6595ae = [];
+  for (const _0xef8b64 of elementsByLocalName(_0x5b8dc8, "FeatureType")) {
+    const _0x5160f7 = childByLocalName(_0xef8b64, "Name");
+    if (!(_0x5160f7 == null ? void 0 : _0x5160f7["textContent"])) continue;
+    const _0x37d64a = childByLocalName(_0xef8b64, "Title");
+    _0x6595ae["push"]({ "identifier": _0x5160f7["textContent"]["trim"](), "title": ((_a2 = _0x37d64a == null ? void 0 : _0x37d64a["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x5160f7["textContent"]["trim"]() });
   }
-  return _0x432815;
+  return _0x6595ae;
 }
-function parseWcsCapabilities(_0x137c9d) {
+function parseWcsCapabilities(_0x2d4209) {
   var _a2, _b;
-  const _0x36eb49 = [];
-  for (const _0x1eabd6 of elementsByLocalName(_0x137c9d, "CoverageSummary")) {
-    const _0x55b886 = childByLocalName(_0x1eabd6, "CoverageId") ?? childByLocalName(_0x1eabd6, "Identifier");
-    if (!(_0x55b886 == null ? void 0 : _0x55b886["textContent"])) continue;
-    const _0x47cdb7 = childByLocalName(_0x1eabd6, "Title");
-    _0x36eb49["push"]({ "identifier": _0x55b886["textContent"]["trim"](), "title": ((_a2 = _0x47cdb7 == null ? void 0 : _0x47cdb7["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x55b886["textContent"]["trim"]() });
+  const _0x5836ce = [];
+  for (const _0x5f5390 of elementsByLocalName(_0x2d4209, "CoverageSummary")) {
+    const _0x359f08 = childByLocalName(_0x5f5390, "CoverageId") ?? childByLocalName(_0x5f5390, "Identifier");
+    if (!(_0x359f08 == null ? void 0 : _0x359f08["textContent"])) continue;
+    const _0xd49685 = childByLocalName(_0x5f5390, "Title");
+    _0x5836ce["push"]({ "identifier": _0x359f08["textContent"]["trim"](), "title": ((_a2 = _0xd49685 == null ? void 0 : _0xd49685["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x359f08["textContent"]["trim"]() });
   }
-  if (_0x36eb49["length"] > 0) return _0x36eb49;
-  for (const _0x26aefa of elementsByLocalName(_0x137c9d, "CoverageOfferingBrief")) {
-    const _0x20d350 = childByLocalName(_0x26aefa, "name");
-    if (!(_0x20d350 == null ? void 0 : _0x20d350["textContent"])) continue;
-    const _0x25b15a = childByLocalName(_0x26aefa, "label");
-    _0x36eb49["push"]({ "identifier": _0x20d350["textContent"]["trim"](), "title": ((_b = _0x25b15a == null ? void 0 : _0x25b15a["textContent"]) == null ? void 0 : _b["trim"]()) || _0x20d350["textContent"]["trim"]() });
+  if (_0x5836ce["length"] > 0) return _0x5836ce;
+  for (const _0x25a109 of elementsByLocalName(_0x2d4209, "CoverageOfferingBrief")) {
+    const _0x195755 = childByLocalName(_0x25a109, "name");
+    if (!(_0x195755 == null ? void 0 : _0x195755["textContent"])) continue;
+    const _0x6dad07 = childByLocalName(_0x25a109, "label");
+    _0x5836ce["push"]({ "identifier": _0x195755["textContent"]["trim"](), "title": ((_b = _0x6dad07 == null ? void 0 : _0x6dad07["textContent"]) == null ? void 0 : _b["trim"]()) || _0x195755["textContent"]["trim"]() });
   }
-  return _0x36eb49;
+  return _0x5836ce;
 }
-async function parseWcsCoverageEnvelope(_0x3a2409) {
+async function parseWcsCoverageEnvelope(_0x434705) {
   var _a2, _b, _c, _d;
-  const _0x4f2095 = childByLocalName(_0x3a2409, "boundedBy"), _0x11d302 = _0x4f2095 ? childByLocalName(_0x4f2095, "Envelope") : void 0;
-  if (!_0x11d302) return void 0;
-  const _0x564ee9 = (_b = (_a2 = childByLocalName(_0x11d302, "lowerCorner")) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"](), _0x3c4920 = (_d = (_c = childByLocalName(_0x11d302, "upperCorner")) == null ? void 0 : _c["textContent"]) == null ? void 0 : _d["trim"]();
-  if (!_0x564ee9 || !_0x3c4920) return void 0;
-  const _0x148efb = _0x564ee9["split"](/\s+/)["map"](Number), _0x284ace = _0x3c4920["split"](/\s+/)["map"](Number);
-  if (_0x148efb["length"] < 2 || _0x284ace["length"] < 2) return void 0;
-  if (![..._0x148efb, ..._0x284ace]["every"](Number["isFinite"])) return void 0;
-  const _0x4de59b = (_0x11d302["getAttribute"]("axisLabels") ?? "")["trim"]()["toLowerCase"](), _0x158c84 = (_0x11d302["getAttribute"]("uomLabels") ?? "")["toLowerCase"]();
-  if (_0x158c84["includes"]("deg")) {
-    const _0x5f12d8 = _0x4de59b["startsWith"]("lat");
-    return _0x5f12d8 ? { "south": _0x148efb[0], "west": _0x148efb[1], "north": _0x284ace[0], "east": _0x284ace[1] } : { "west": _0x148efb[0], "south": _0x148efb[1], "east": _0x284ace[0], "north": _0x284ace[1] };
+  const _0x58c7e1 = childByLocalName(_0x434705, "boundedBy"), _0xc74d92 = _0x58c7e1 ? childByLocalName(_0x58c7e1, "Envelope") : void 0;
+  if (!_0xc74d92) return void 0;
+  const _0x2ec96f = (_b = (_a2 = childByLocalName(_0xc74d92, "lowerCorner")) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"](), _0x3183e4 = (_d = (_c = childByLocalName(_0xc74d92, "upperCorner")) == null ? void 0 : _c["textContent"]) == null ? void 0 : _d["trim"]();
+  if (!_0x2ec96f || !_0x3183e4) return void 0;
+  const _0x38f1b0 = _0x2ec96f["split"](/\s+/)["map"](Number), _0x5cf0c4 = _0x3183e4["split"](/\s+/)["map"](Number);
+  if (_0x38f1b0["length"] < 2 || _0x5cf0c4["length"] < 2) return void 0;
+  if (![..._0x38f1b0, ..._0x5cf0c4]["every"](Number["isFinite"])) return void 0;
+  const _0x3098b0 = (_0xc74d92["getAttribute"]("axisLabels") ?? "")["trim"]()["toLowerCase"](), _0x1bd7a0 = (_0xc74d92["getAttribute"]("uomLabels") ?? "")["toLowerCase"]();
+  if (_0x1bd7a0["includes"]("deg")) {
+    const _0x373dd6 = _0x3098b0["startsWith"]("lat");
+    return _0x373dd6 ? { "south": _0x38f1b0[0], "west": _0x38f1b0[1], "north": _0x5cf0c4[0], "east": _0x5cf0c4[1] } : { "west": _0x38f1b0[0], "south": _0x38f1b0[1], "east": _0x5cf0c4[0], "north": _0x5cf0c4[1] };
   }
-  const _0x5d2531 = _0x11d302["getAttribute"]("srsName") ?? "";
-  return resolveProjectedEnvelope(_0x5d2531, _0x4de59b, _0x148efb, _0x284ace);
+  const _0xa42aa7 = _0xc74d92["getAttribute"]("srsName") ?? "";
+  return resolveProjectedEnvelope(_0xa42aa7, _0x3098b0, _0x38f1b0, _0x5cf0c4);
 }
-async function resolveProjectedEnvelope(_0x147e10, _0x8e217d, _0x3f6cdf, _0x206ad6) {
-  const _0x4102fd = extractEpsgCode(_0x147e10);
-  if (!_0x4102fd) return void 0;
-  const _0x35b09a = await ensureProj4Def(_0x4102fd);
-  if (!_0x35b09a) return void 0;
+async function resolveProjectedEnvelope(_0x4ef421, _0x1086ee, _0x4910b2, _0x3cd9f) {
+  const _0x39101e = extractEpsgCode(_0x4ef421);
+  if (!_0x39101e) return void 0;
+  const _0x437aeb = await ensureProj4Def(_0x39101e);
+  if (!_0x437aeb) return void 0;
   try {
-    const _0x2b7df7 = _0x8e217d["startsWith"]("y") || _0x8e217d["startsWith"]("n"), _0x4e5fc3 = (_0x46cb9e) => _0x2b7df7 ? [_0x46cb9e[1], _0x46cb9e[0]] : [_0x46cb9e[0], _0x46cb9e[1]], [_0x448d03, _0x393bda] = _0x4e5fc3(_0x3f6cdf), [_0x1b15b0, _0x15a3b7] = _0x4e5fc3(_0x206ad6), _0x51103f = [[_0x448d03, _0x393bda], [_0x1b15b0, _0x15a3b7], [_0x448d03, _0x15a3b7], [_0x1b15b0, _0x393bda]], _0x30bbdc = "EPSG:" + _0x4102fd, _0x872693 = _0x51103f["map"]((_0x253317) => _0x35b09a(_0x30bbdc, "EPSG:4326", _0x253317)), _0x12e1d4 = _0x872693["map"]((_0x3da436) => _0x3da436[0]), _0x1f34a5 = _0x872693["map"]((_0x27b21c) => _0x27b21c[1]), _0x5060ad = { "west": Math["min"](..._0x12e1d4), "east": Math["max"](..._0x12e1d4), "south": Math["min"](..._0x1f34a5), "north": Math["max"](..._0x1f34a5) };
-    if (!Object["values"](_0x5060ad)["every"](Number["isFinite"])) return void 0;
-    return _0x5060ad;
+    const _0x50228b = _0x1086ee["startsWith"]("y") || _0x1086ee["startsWith"]("n"), _0x19c1cc = (_0x2c4c24) => _0x50228b ? [_0x2c4c24[1], _0x2c4c24[0]] : [_0x2c4c24[0], _0x2c4c24[1]], [_0x5bdae6, _0x34711b] = _0x19c1cc(_0x4910b2), [_0x17c681, _0x149f8e] = _0x19c1cc(_0x3cd9f), _0x1de042 = [[_0x5bdae6, _0x34711b], [_0x17c681, _0x149f8e], [_0x5bdae6, _0x149f8e], [_0x17c681, _0x34711b]], _0x1dc79d = "EPSG:" + _0x39101e, _0xa5b69b = _0x1de042["map"]((_0x1ffc85) => _0x437aeb(_0x1dc79d, "EPSG:4326", _0x1ffc85)), _0x1c881e = _0xa5b69b["map"]((_0x23c23a) => _0x23c23a[0]), _0x48ad57 = _0xa5b69b["map"]((_0x1040d3) => _0x1040d3[1]), _0x798909 = { "west": Math["min"](..._0x1c881e), "east": Math["max"](..._0x1c881e), "south": Math["min"](..._0x48ad57), "north": Math["max"](..._0x48ad57) };
+    if (!Object["values"](_0x798909)["every"](Number["isFinite"])) return void 0;
+    return _0x798909;
   } catch {
     return void 0;
   }
 }
-async function fetchWcsCoverageExtents(_0x45fe53, _0x178b27, _0x4bbbbe, _0x230431) {
+async function fetchWcsCoverageExtents(_0x3f45b4, _0x3d9fae, _0x5bdf8c, _0x28320a) {
   var _a2;
-  const _0x635f7e = /* @__PURE__ */ new Map();
-  if (_0x178b27["length"] === 0) return _0x635f7e;
+  const _0x358d71 = /* @__PURE__ */ new Map();
+  if (_0x3d9fae["length"] === 0) return _0x358d71;
   try {
-    const _0x462152 = new URL(_0x45fe53);
-    _0x462152["searchParams"]["set"]("SERVICE", "WCS"), _0x462152["searchParams"]["set"]("VERSION", "2.0.1"), _0x462152["searchParams"]["set"]("REQUEST", "DescribeCoverage"), _0x462152["searchParams"]["set"]("COVERAGEID", _0x178b27["join"](","));
-    const _0x3fa895 = await getCapabilities(_0x462152["toString"](), _0x4bbbbe, _0x230431);
-    for (const _0x4e49b9 of elementsByLocalName(_0x3fa895, "CoverageDescription")) {
-      const _0x1d1fa4 = childByLocalName(_0x4e49b9, "CoverageId"), _0x59253b = (_a2 = _0x1d1fa4 == null ? void 0 : _0x1d1fa4["textContent"]) == null ? void 0 : _a2["trim"]();
-      if (!_0x59253b) continue;
-      const _0x7e9dac = await parseWcsCoverageEnvelope(_0x4e49b9);
-      if (_0x7e9dac) _0x635f7e["set"](_0x59253b, _0x7e9dac);
+    const _0x268c70 = new URL(_0x3f45b4);
+    _0x268c70["searchParams"]["set"]("SERVICE", "WCS"), _0x268c70["searchParams"]["set"]("VERSION", "2.0.1"), _0x268c70["searchParams"]["set"]("REQUEST", "DescribeCoverage"), _0x268c70["searchParams"]["set"]("COVERAGEID", _0x3d9fae["join"](","));
+    const _0x1dabf6 = await getCapabilities(_0x268c70["toString"](), _0x5bdf8c, _0x28320a);
+    for (const _0x418a76 of elementsByLocalName(_0x1dabf6, "CoverageDescription")) {
+      const _0x2863ee = childByLocalName(_0x418a76, "CoverageId"), _0x59150d = (_a2 = _0x2863ee == null ? void 0 : _0x2863ee["textContent"]) == null ? void 0 : _a2["trim"]();
+      if (!_0x59150d) continue;
+      const _0x4795f0 = await parseWcsCoverageEnvelope(_0x418a76);
+      if (_0x4795f0) _0x358d71["set"](_0x59150d, _0x4795f0);
     }
   } catch {
   }
-  return _0x635f7e;
+  return _0x358d71;
 }
-function wcsRectangleFor(_0x406266) {
-  const _0x1a5feb = _0x406266["geographicBoundingBox"];
-  if (!_0x1a5feb) return void 0;
-  return Rectangle["fromDegrees"](_0x1a5feb["west"], _0x1a5feb["south"], _0x1a5feb["east"], _0x1a5feb["north"]);
+function wcsRectangleFor(_0x2f6683) {
+  const _0x4514f7 = _0x2f6683["geographicBoundingBox"];
+  if (!_0x4514f7) return void 0;
+  return Rectangle["fromDegrees"](_0x4514f7["west"], _0x4514f7["south"], _0x4514f7["east"], _0x4514f7["north"]);
 }
-function parseCapabilities(_0x4d814b, _0x5841da) {
-  switch (_0x4d814b) {
+function parseCapabilities(_0x32043d, _0x561094) {
+  switch (_0x32043d) {
     case "WMS":
-      return parseWmsCapabilities(_0x5841da);
+      return parseWmsCapabilities(_0x561094);
     case "WMTS":
-      return parseWmtsCapabilities(_0x5841da);
+      return parseWmtsCapabilities(_0x561094);
     case "WFS":
-      return parseWfsCapabilities(_0x5841da);
+      return parseWfsCapabilities(_0x561094);
     case "WCS":
-      return parseWcsCapabilities(_0x5841da);
+      return parseWcsCapabilities(_0x561094);
     default:
       return [];
   }
 }
-function detectServiceType(_0x2d2097) {
-  const _0x146551 = _0x2d2097["documentElement"], _0x115ea9 = _0x146551["localName"], _0x4bc33a = _0x146551["namespaceURI"] ?? "";
-  if (_0x115ea9 === "WMS_Capabilities" || _0x115ea9 === "WMT_MS_Capabilities" || _0x4bc33a["includes"]("/wms")) return "WMS";
-  if (_0x115ea9 === "WFS_Capabilities" || _0x4bc33a["includes"]("/wfs")) return "WFS";
-  if (_0x4bc33a["includes"]("/wmts")) return "WMTS";
-  if (_0x4bc33a["includes"]("/wcs") || _0x115ea9 === "WCS_Capabilities") return "WCS";
+function detectServiceType(_0x2644d2) {
+  const _0x177f94 = _0x2644d2["documentElement"], _0x9fdf31 = _0x177f94["localName"], _0x909835 = _0x177f94["namespaceURI"] ?? "";
+  if (_0x9fdf31 === "WMS_Capabilities" || _0x9fdf31 === "WMT_MS_Capabilities" || _0x909835["includes"]("/wms")) return "WMS";
+  if (_0x9fdf31 === "WFS_Capabilities" || _0x909835["includes"]("/wfs")) return "WFS";
+  if (_0x909835["includes"]("/wmts")) return "WMTS";
+  if (_0x909835["includes"]("/wcs") || _0x9fdf31 === "WCS_Capabilities") return "WCS";
   return void 0;
 }
 const _OgcLayerFactory = class _OgcLayerFactory {
-  constructor(_0x486a13, _0x5767d1) {
-    this["viewer"] = _0x486a13, this["deps"] = _0x5767d1, this["serviceLayerOptions"] = /* @__PURE__ */ new Map();
+  constructor(_0x21b385, _0x6b262c) {
+    this["viewer"] = _0x21b385, this["deps"] = _0x6b262c, this["serviceLayerOptions"] = /* @__PURE__ */ new Map();
   }
-  ["getServiceOptions"](_0x2a0d72) {
-    return this["serviceLayerOptions"]["get"](_0x2a0d72);
+  ["getServiceOptions"](_0x1ce934) {
+    return this["serviceLayerOptions"]["get"](_0x1ce934);
   }
-  ["deleteServiceOptions"](_0x248a22) {
-    this["serviceLayerOptions"]["delete"](_0x248a22);
+  ["deleteServiceOptions"](_0x5eabf6) {
+    this["serviceLayerOptions"]["delete"](_0x5eabf6);
   }
-  ["buildWmsProvider"](_0x359e09) {
+  ["buildWmsProvider"](_0x2107f8) {
     var _a2, _b;
-    const _0x57755d = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wms", _0x359e09["url"]), _0x5a0cb7 = (_a2 = _0x359e09["layers"]) == null ? void 0 : _a2["trim"]();
-    if (!_0x5a0cb7) throw new LayerOperationError("LAYER_WMS_LAYERS_EMPTY", "WMS katmani eklenemedi: layers (ogcLayerName) bos — id=" + _0x359e09["id"]);
-    const _0x1e64e6 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](this["deps"]["apiKeyPolicy"]["buildAuthHeaders"](_0x359e09["authToken"]), _0x57755d), _0x4b02ed = _0x359e09["version"] ?? "1.3.0", _0x14fa8f = new WebMapServiceImageryProvider({ "url": _0x1e64e6 ? new Resource({ "url": _0x57755d, "headers": _0x1e64e6 }) : _0x57755d, "layers": _0x5a0cb7, "parameters": { "service": "WMS", "version": _0x4b02ed, "request": "GetMap", "transparent": "true", "format": "image/png", ..._0x359e09["parameters"] }, "getFeatureInfoParameters": { "version": _0x4b02ed, "styles": ((_b = _0x359e09["parameters"]) == null ? void 0 : _b["styles"]) ?? "" }, "getFeatureInfoFormats": [new GetFeatureInfoFormat("json"), new GetFeatureInfoFormat("xml", "application/vnd.ogc.gml"), new GetFeatureInfoFormat("xml", "text/xml"), new GetFeatureInfoFormat("html")], ..._0x359e09["rectangle"] !== void 0 && { "rectangle": _0x359e09["rectangle"] }, ..._0x359e09["minimumLevel"] !== void 0 && { "minimumLevel": _0x359e09["minimumLevel"] }, ..._0x359e09["maximumLevel"] !== void 0 && { "maximumLevel": _0x359e09["maximumLevel"] }, ..._0x359e09["tileWidth"] !== void 0 && { "tileWidth": _0x359e09["tileWidth"] }, ..._0x359e09["tileHeight"] !== void 0 && { "tileHeight": _0x359e09["tileHeight"] } });
-    return _0x14fa8f;
+    const _0x596b1f = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wms", _0x2107f8["url"]), _0x393b28 = (_a2 = _0x2107f8["layers"]) == null ? void 0 : _a2["trim"]();
+    if (!_0x393b28) throw new LayerOperationError("LAYER_WMS_LAYERS_EMPTY", "WMS katmani eklenemedi: layers (ogcLayerName) bos — id=" + _0x2107f8["id"]);
+    const _0x4cd2e8 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](this["deps"]["apiKeyPolicy"]["buildAuthHeaders"](_0x2107f8["authToken"]), _0x596b1f), _0x113b1b = _0x2107f8["version"] ?? "1.3.0", _0x20e014 = new WebMapServiceImageryProvider({ "url": _0x4cd2e8 ? new Resource({ "url": _0x596b1f, "headers": _0x4cd2e8 }) : _0x596b1f, "layers": _0x393b28, "parameters": { "service": "WMS", "version": _0x113b1b, "request": "GetMap", "transparent": "true", "format": "image/png", ..._0x2107f8["parameters"] }, "getFeatureInfoParameters": { "version": _0x113b1b, "styles": ((_b = _0x2107f8["parameters"]) == null ? void 0 : _b["styles"]) ?? "" }, "getFeatureInfoFormats": [new GetFeatureInfoFormat("json"), new GetFeatureInfoFormat("xml", "application/vnd.ogc.gml"), new GetFeatureInfoFormat("xml", "text/xml"), new GetFeatureInfoFormat("html")], ..._0x2107f8["rectangle"] !== void 0 && { "rectangle": _0x2107f8["rectangle"] }, ..._0x2107f8["minimumLevel"] !== void 0 && { "minimumLevel": _0x2107f8["minimumLevel"] }, ..._0x2107f8["maximumLevel"] !== void 0 && { "maximumLevel": _0x2107f8["maximumLevel"] }, ..._0x2107f8["tileWidth"] !== void 0 && { "tileWidth": _0x2107f8["tileWidth"] }, ..._0x2107f8["tileHeight"] !== void 0 && { "tileHeight": _0x2107f8["tileHeight"] } });
+    return _0x20e014;
   }
-  ["addWMS"](_0x370c8d) {
-    const _0x339568 = this["buildWmsProvider"](_0x370c8d), _0x2dc00e = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x339568), _0x36efb6 = this["deps"]["register"](_0x370c8d["id"], _0x370c8d["title"], "WMS", _0x2dc00e, ![]);
-    return this["serviceLayerOptions"]["set"](_0x370c8d["id"], _0x370c8d), Promise["resolve"](_0x36efb6);
+  ["addWMS"](_0x4f7f2d) {
+    const _0x4d1931 = this["buildWmsProvider"](_0x4f7f2d), _0xdbf677 = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x4d1931), _0x25c1dd = this["deps"]["register"](_0x4f7f2d["id"], _0x4f7f2d["title"], "WMS", _0xdbf677, ![]);
+    return this["serviceLayerOptions"]["set"](_0x4f7f2d["id"], _0x4f7f2d), Promise["resolve"](_0x25c1dd);
   }
-  ["buildWmtsProvider"](_0x4413c4) {
-    const _0xb06476 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wmts", _0x4413c4["url"]), _0x591355 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](this["deps"]["apiKeyPolicy"]["buildAuthHeaders"](_0x4413c4["authToken"]), _0xb06476);
-    return new WebMapTileServiceImageryProvider({ "url": _0x591355 ? new Resource({ "url": _0xb06476, "headers": _0x591355 }) : _0xb06476, "layer": _0x4413c4["layer"], "style": _0x4413c4["style"] ?? "default", "tileMatrixSetID": _0x4413c4["tileMatrixSetID"], "format": _0x4413c4["format"] ?? "image/png", "tilingScheme": new WebMercatorTilingScheme(), ..._0x4413c4["tileWidth"] !== void 0 && { "tileWidth": _0x4413c4["tileWidth"] }, ..._0x4413c4["tileHeight"] !== void 0 && { "tileHeight": _0x4413c4["tileHeight"] }, ..._0x4413c4["minimumLevel"] !== void 0 && { "minimumLevel": _0x4413c4["minimumLevel"] }, ..._0x4413c4["maximumLevel"] !== void 0 && { "maximumLevel": _0x4413c4["maximumLevel"] }, ..._0x4413c4["rectangle"] !== void 0 && { "rectangle": _0x4413c4["rectangle"] } });
+  ["buildWmtsProvider"](_0x544eda) {
+    const _0x265227 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wmts", _0x544eda["url"]), _0x69cae7 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](this["deps"]["apiKeyPolicy"]["buildAuthHeaders"](_0x544eda["authToken"]), _0x265227);
+    return new WebMapTileServiceImageryProvider({ "url": _0x69cae7 ? new Resource({ "url": _0x265227, "headers": _0x69cae7 }) : _0x265227, "layer": _0x544eda["layer"], "style": _0x544eda["style"] ?? "default", "tileMatrixSetID": _0x544eda["tileMatrixSetID"], "format": _0x544eda["format"] ?? "image/png", "tilingScheme": new WebMercatorTilingScheme(), ..._0x544eda["tileWidth"] !== void 0 && { "tileWidth": _0x544eda["tileWidth"] }, ..._0x544eda["tileHeight"] !== void 0 && { "tileHeight": _0x544eda["tileHeight"] }, ..._0x544eda["minimumLevel"] !== void 0 && { "minimumLevel": _0x544eda["minimumLevel"] }, ..._0x544eda["maximumLevel"] !== void 0 && { "maximumLevel": _0x544eda["maximumLevel"] }, ..._0x544eda["rectangle"] !== void 0 && { "rectangle": _0x544eda["rectangle"] } });
   }
-  ["addWMTS"](_0x3b60ad) {
-    const _0x2a1bee = this["buildWmtsProvider"](_0x3b60ad), _0xeeb2ca = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x2a1bee), _0x1867a8 = this["deps"]["register"](_0x3b60ad["id"], _0x3b60ad["title"], "WMTS", _0xeeb2ca, ![]);
-    return this["serviceLayerOptions"]["set"](_0x3b60ad["id"], _0x3b60ad), Promise["resolve"](_0x1867a8);
+  ["addWMTS"](_0x2393b7) {
+    const _0x3a708b = this["buildWmtsProvider"](_0x2393b7), _0x3a7edc = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x3a708b), _0x240a8d = this["deps"]["register"](_0x2393b7["id"], _0x2393b7["title"], "WMTS", _0x3a7edc, ![]);
+    return this["serviceLayerOptions"]["set"](_0x2393b7["id"], _0x2393b7), Promise["resolve"](_0x240a8d);
   }
-  async ["getWmsAvailableStyles"](_0x2cbd70) {
-    const _0x2fc372 = this["requireServiceOptions"](_0x2cbd70, "WMS"), _0x5da742 = _0x2fc372["version"] ?? "1.3.0", _0x202fa = await this["getCapabilitiesDocument"](_0x2fc372["url"], "WMS", _0x5da742, _0x2fc372["authToken"]);
-    return parseWmsStyles(_0x202fa, _0x2fc372["layers"])["map"]((_0x3b6bd5) => ({ ..._0x3b6bd5, "legendUrl": this["getWmsLegendGraphicUrl"](_0x2cbd70, _0x3b6bd5["name"]) }));
+  async ["getWmsAvailableStyles"](_0x23d398) {
+    const _0x9854e6 = this["requireServiceOptions"](_0x23d398, "WMS"), _0xe698e = _0x9854e6["version"] ?? "1.3.0", _0x13846b = await this["getCapabilitiesDocument"](_0x9854e6["url"], "WMS", _0xe698e, _0x9854e6["authToken"]);
+    return parseWmsStyles(_0x13846b, _0x9854e6["layers"])["map"]((_0x186a4f) => ({ ..._0x186a4f, "legendUrl": this["getWmsLegendGraphicUrl"](_0x23d398, _0x186a4f["name"]) }));
   }
-  async ["setWmsStyle"](_0x2b967d, _0x4f66f1) {
-    const _0x2ae82b = this["requireServiceOptions"](_0x2b967d, "WMS"), _0x363714 = { ..._0x2ae82b, "parameters": { ..._0x2ae82b["parameters"], "STYLES": _0x4f66f1 } };
-    await this["rebuildImageryLayer"](_0x2b967d, () => this["buildWmsProvider"](_0x363714)), this["serviceLayerOptions"]["set"](_0x2b967d, _0x363714);
+  async ["setWmsStyle"](_0x34d085, _0x100aa5) {
+    const _0x454d69 = this["requireServiceOptions"](_0x34d085, "WMS"), _0x472399 = { ..._0x454d69, "parameters": { ..._0x454d69["parameters"], "STYLES": _0x100aa5 } };
+    await this["rebuildImageryLayer"](_0x34d085, () => this["buildWmsProvider"](_0x472399)), this["serviceLayerOptions"]["set"](_0x34d085, _0x472399);
   }
-  ["getWmsLegendGraphicUrl"](_0x3f391e, _0x1cba4e) {
-    const _0x8f9914 = this["requireServiceOptions"](_0x3f391e, "WMS"), _0x6776c5 = new URLSearchParams({ "service": "WMS", "version": _0x8f9914["version"] ?? "1.3.0", "request": "GetLegendGraphic", "format": "image/png", "layer": _0x8f9914["layers"], "sld_version": "1.1.0", ..._0x1cba4e !== void 0 && _0x1cba4e !== "" ? { "style": _0x1cba4e } : {} }), _0xe1f257 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wms", _0x8f9914["url"]);
-    return this["deps"]["apiKeyPolicy"]["attachApiKeyToUrl"]("" + _0xe1f257 + (_0xe1f257["includes"]("?") ? "&" : "?") + _0x6776c5["toString"]());
+  ["getWmsLegendGraphicUrl"](_0x503760, _0x3e9c85) {
+    const _0x1388b0 = this["requireServiceOptions"](_0x503760, "WMS"), _0x5ea5e0 = new URLSearchParams({ "service": "WMS", "version": _0x1388b0["version"] ?? "1.3.0", "request": "GetLegendGraphic", "format": "image/png", "layer": _0x1388b0["layers"], "sld_version": "1.1.0", ..._0x3e9c85 !== void 0 && _0x3e9c85 !== "" ? { "style": _0x3e9c85 } : {} }), _0x1460b6 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wms", _0x1388b0["url"]);
+    return this["deps"]["apiKeyPolicy"]["attachApiKeyToUrl"]("" + _0x1460b6 + (_0x1460b6["includes"]("?") ? "&" : "?") + _0x5ea5e0["toString"]());
   }
-  async ["getWmtsAvailableStyles"](_0x29e9f3) {
-    const _0x590e7e = this["requireServiceOptions"](_0x29e9f3, "WMTS"), _0x2a3a49 = await this["getCapabilitiesDocument"](_0x590e7e["url"], "WMTS", "1.0.0", _0x590e7e["authToken"]), _0x8906cb = parseWmtsStyles(_0x2a3a49, _0x590e7e["layer"]);
-    return _0x8906cb["map"]((_0x439538) => ({ ..._0x439538, "legendUrl": this["deps"]["apiKeyPolicy"]["attachApiKeyToUrl"](_0x439538["legendUrl"]) }));
+  async ["getWmtsAvailableStyles"](_0x382bc1) {
+    const _0x32e7b0 = this["requireServiceOptions"](_0x382bc1, "WMTS"), _0x5165e9 = await this["getCapabilitiesDocument"](_0x32e7b0["url"], "WMTS", "1.0.0", _0x32e7b0["authToken"]), _0x41d5ad = parseWmtsStyles(_0x5165e9, _0x32e7b0["layer"]);
+    return _0x41d5ad["map"]((_0x53a2e5) => ({ ..._0x53a2e5, "legendUrl": this["deps"]["apiKeyPolicy"]["attachApiKeyToUrl"](_0x53a2e5["legendUrl"]) }));
   }
-  async ["setWmtsStyle"](_0x365b02, _0x2cb66d) {
-    const _0xeb57fb = this["requireServiceOptions"](_0x365b02, "WMTS"), _0x14601f = { ..._0xeb57fb, "style": _0x2cb66d };
-    await this["rebuildImageryLayer"](_0x365b02, () => this["buildWmtsProvider"](_0x14601f)), this["serviceLayerOptions"]["set"](_0x365b02, _0x14601f);
+  async ["setWmtsStyle"](_0xd051cc, _0x3070df) {
+    const _0x14453b = this["requireServiceOptions"](_0xd051cc, "WMTS"), _0x481c9b = { ..._0x14453b, "style": _0x3070df };
+    await this["rebuildImageryLayer"](_0xd051cc, () => this["buildWmtsProvider"](_0x481c9b)), this["serviceLayerOptions"]["set"](_0xd051cc, _0x481c9b);
   }
-  async ["addWFS"](_0x1a3115) {
-    const _0x2d6596 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wfs", _0x1a3115["url"]), _0x4a6f11 = {};
-    _0x1a3115["authToken"] !== void 0 && (_0x4a6f11["headers"] = { "Authorization": "Bearer " + _0x1a3115["authToken"] });
-    const _0x1ff4b5 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](_0x4a6f11["headers"], _0x2d6596);
-    if (_0x1ff4b5 !== void 0) _0x4a6f11["headers"] = _0x1ff4b5;
-    const _0x356bb7 = { ..._0x1a3115, "url": _0x2d6596 }, _0x211650 = await fetchWfsCapabilities(_0x2d6596, _0x4a6f11), _0x21a4f9 = { "typeNameHint": _0x1a3115["typeName"], "caps": _0x211650 };
-    if (_0x1a3115["version"] !== void 0) _0x21a4f9["version"] = _0x1a3115["version"];
-    if (_0x1a3115["srsName"] !== void 0) _0x21a4f9["srsName"] = _0x1a3115["srsName"];
-    _0x1a3115["outputFormat"] !== void 0 && (_0x21a4f9["outputFormat"] = _0x1a3115["outputFormat"]);
-    _0x1a3115["maxFeatures"] !== void 0 ? _0x21a4f9["maxFeatures"] = _0x1a3115["maxFeatures"] : _0x21a4f9["maxFeatures"] = _OgcLayerFactory["TEMP_WFS_UNLIMITED_MAX_FEATURES"];
-    const _0x593b1f = buildWfsGetFeaturePlan(_0x21a4f9);
-    let _0x8dd9fe;
+  async ["addWFS"](_0x7fc2de) {
+    const _0x4d719f = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wfs", _0x7fc2de["url"]), _0x5070a1 = {};
+    _0x7fc2de["authToken"] !== void 0 && (_0x5070a1["headers"] = { "Authorization": "Bearer " + _0x7fc2de["authToken"] });
+    const _0x326515 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](_0x5070a1["headers"], _0x4d719f);
+    if (_0x326515 !== void 0) _0x5070a1["headers"] = _0x326515;
+    const _0x4a0d3e = { ..._0x7fc2de, "url": _0x4d719f }, _0x1bbcdb = await fetchWfsCapabilities(_0x4d719f, _0x5070a1), _0x581ea4 = { "typeNameHint": _0x7fc2de["typeName"], "caps": _0x1bbcdb };
+    if (_0x7fc2de["version"] !== void 0) _0x581ea4["version"] = _0x7fc2de["version"];
+    if (_0x7fc2de["srsName"] !== void 0) _0x581ea4["srsName"] = _0x7fc2de["srsName"];
+    _0x7fc2de["outputFormat"] !== void 0 && (_0x581ea4["outputFormat"] = _0x7fc2de["outputFormat"]);
+    _0x7fc2de["maxFeatures"] !== void 0 ? _0x581ea4["maxFeatures"] = _0x7fc2de["maxFeatures"] : _0x581ea4["maxFeatures"] = _OgcLayerFactory["TEMP_WFS_UNLIMITED_MAX_FEATURES"];
+    const _0x3cd83e = buildWfsGetFeaturePlan(_0x581ea4);
+    let _0xcd1fb4;
     try {
-      _0x8dd9fe = await this["fetchWfsGeoJson"](_0x356bb7, _0x4a6f11, _0x593b1f);
-    } catch (_0x28ec6a) {
+      _0xcd1fb4 = await this["fetchWfsGeoJson"](_0x4a0d3e, _0x5070a1, _0x3cd83e);
+    } catch (_0x54e6e8) {
       try {
-        _0x8dd9fe = await this["fetchWfsGml"](_0x356bb7, _0x4a6f11, _0x593b1f);
-      } catch (_0x2c46be) {
-        _0x2c46be instanceof Error && (_0x2c46be["cause"] = _0x28ec6a);
-        throw _0x2c46be;
+        _0xcd1fb4 = await this["fetchWfsGml"](_0x4a0d3e, _0x5070a1, _0x3cd83e);
+      } catch (_0x26edd8) {
+        _0x26edd8 instanceof Error && (_0x26edd8["cause"] = _0x54e6e8);
+        throw _0x26edd8;
       }
     }
-    const _0x1a2fcd = _0x8dd9fe !== null && typeof _0x8dd9fe === "object" ? _0x8dd9fe["features"] : void 0;
-    return Array["isArray"](_0x1a2fcd) ? _0x1a2fcd["length"] : _0x593b1f["maxFeatures"], loadVectorGeoJsonLayer(this["viewer"], this["deps"], _0x8dd9fe, { "id": _0x1a3115["id"], "title": _0x1a3115["title"], "layerType": "WFS", "clampToGround": _0x1a3115["clampToGround"] ?? ![] }, (_0xd1653c) => {
+    const _0x24c320 = _0xcd1fb4 !== null && typeof _0xcd1fb4 === "object" ? _0xcd1fb4["features"] : void 0;
+    return Array["isArray"](_0x24c320) ? _0x24c320["length"] : _0x3cd83e["maxFeatures"], loadVectorGeoJsonLayer(this["viewer"], this["deps"], _0xcd1fb4, { "id": _0x7fc2de["id"], "title": _0x7fc2de["title"], "layerType": "WFS", "clampToGround": _0x7fc2de["clampToGround"] ?? ![] }, (_0x3d2fea) => {
     });
   }
-  async ["fetchWfsHitsCount"](_0x42b554, _0x3c463e, _0x1239fb) {
-    if (!_0x1239fb["version"]["startsWith"]("2.") && !_0x1239fb["version"]["startsWith"]("1.1")) return void 0;
-    const _0x11ca5e = new URLSearchParams();
-    appendWfsGetFeatureParams(_0x11ca5e, _0x1239fb), _0x11ca5e["delete"]("count"), _0x11ca5e["delete"]("maxFeatures"), _0x11ca5e["set"]("resultType", "hits");
-    let _0x48f1e7;
+  async ["fetchWfsHitsCount"](_0x372d6a, _0x5d9e1c, _0x45ac1e) {
+    if (!_0x45ac1e["version"]["startsWith"]("2.") && !_0x45ac1e["version"]["startsWith"]("1.1")) return void 0;
+    const _0xf00b88 = new URLSearchParams();
+    appendWfsGetFeatureParams(_0xf00b88, _0x45ac1e), _0xf00b88["delete"]("count"), _0xf00b88["delete"]("maxFeatures"), _0xf00b88["set"]("resultType", "hits");
+    let _0x4a359a;
     try {
-      _0x48f1e7 = await fetch("" + _0x42b554["url"] + (_0x42b554["url"]["includes"]("?") ? "&" : "?") + _0x11ca5e["toString"](), _0x3c463e);
+      _0x4a359a = await fetch("" + _0x372d6a["url"] + (_0x372d6a["url"]["includes"]("?") ? "&" : "?") + _0xf00b88["toString"](), _0x5d9e1c);
     } catch {
       return void 0;
     }
-    if (!_0x48f1e7["ok"]) return void 0;
-    const _0x45f855 = decodeTextBuffer(await _0x48f1e7["arrayBuffer"]());
-    if (isOgcExceptionXml(_0x45f855)) return void 0;
-    const _0x5d49dc = _0x45f855["trimStart"]();
-    if (_0x5d49dc["startsWith"]("{")) try {
-      const _0x2ab513 = JSON["parse"](_0x5d49dc), _0x2b8150 = _0x2ab513["numberMatched"] ?? _0x2ab513["totalFeatures"];
-      return typeof _0x2b8150 === "number" ? _0x2b8150 : void 0;
+    if (!_0x4a359a["ok"]) return void 0;
+    const _0x1fa70c = decodeTextBuffer(await _0x4a359a["arrayBuffer"]());
+    if (isOgcExceptionXml(_0x1fa70c)) return void 0;
+    const _0x2f3b40 = _0x1fa70c["trimStart"]();
+    if (_0x2f3b40["startsWith"]("{")) try {
+      const _0x4253ce = JSON["parse"](_0x2f3b40), _0x1ac2ae = _0x4253ce["numberMatched"] ?? _0x4253ce["totalFeatures"];
+      return typeof _0x1ac2ae === "number" ? _0x1ac2ae : void 0;
     } catch {
       return void 0;
     }
     try {
-      const _0x2af578 = new DOMParser()["parseFromString"](_0x45f855, "application/xml")["documentElement"], _0x5436a5 = _0x2af578["getAttribute"]("numberMatched") ?? _0x2af578["getAttribute"]("numberOfFeatures") ?? _0x2af578["getAttribute"]("numberReturned");
-      if (!_0x5436a5) return void 0;
-      const _0x969562 = Number(_0x5436a5);
-      return Number["isFinite"](_0x969562) ? _0x969562 : void 0;
+      const _0x4b7029 = new DOMParser()["parseFromString"](_0x1fa70c, "application/xml")["documentElement"], _0x407f4d = _0x4b7029["getAttribute"]("numberMatched") ?? _0x4b7029["getAttribute"]("numberOfFeatures") ?? _0x4b7029["getAttribute"]("numberReturned");
+      if (!_0x407f4d) return void 0;
+      const _0x25cb1f = Number(_0x407f4d);
+      return Number["isFinite"](_0x25cb1f) ? _0x25cb1f : void 0;
     } catch {
       return void 0;
     }
   }
-  async ["fetchWfsGeoJson"](_0xf1c92, _0x27b940, _0x58b01b) {
-    const _0x4fef53 = _0x58b01b["jsonOutputFormat"];
-    if (!_0x4fef53) throw new OgcRequestError("OGC_WFS_JSON_FORMAT_UNSUPPORTED", "WFS sunucusu JSON çıktı formatı ilan etmiyor.");
-    const _0x50b3d6 = new URLSearchParams();
-    appendWfsGetFeatureParams(_0x50b3d6, _0x58b01b, _0x4fef53);
-    const _0x35a45e = await fetch("" + _0xf1c92["url"] + (_0xf1c92["url"]["includes"]("?") ? "&" : "?") + _0x50b3d6["toString"](), _0x27b940), _0x5c93f9 = decodeTextBuffer(await _0x35a45e["arrayBuffer"]());
-    if (!_0x35a45e["ok"] || isOgcExceptionXml(_0x5c93f9) || !_0x5c93f9["trimStart"]()["startsWith"]("{")) throw new OgcRequestError("OGC_WFS_GEOJSON_REQUEST_FAILED", "WFS GeoJSON isteği başarısız: " + _0x35a45e["status"] + " " + _0x35a45e["statusText"]);
-    return JSON["parse"](_0x5c93f9);
+  async ["fetchWfsGeoJson"](_0x25a18c, _0x59df54, _0x2336ae) {
+    const _0x247295 = _0x2336ae["jsonOutputFormat"];
+    if (!_0x247295) throw new OgcRequestError("OGC_WFS_JSON_FORMAT_UNSUPPORTED", "WFS sunucusu JSON çıktı formatı ilan etmiyor.");
+    const _0x1a1d69 = new URLSearchParams();
+    appendWfsGetFeatureParams(_0x1a1d69, _0x2336ae, _0x247295);
+    const _0x1f1bf4 = await fetch("" + _0x25a18c["url"] + (_0x25a18c["url"]["includes"]("?") ? "&" : "?") + _0x1a1d69["toString"](), _0x59df54), _0x3f55c4 = decodeTextBuffer(await _0x1f1bf4["arrayBuffer"]());
+    if (!_0x1f1bf4["ok"] || isOgcExceptionXml(_0x3f55c4) || !_0x3f55c4["trimStart"]()["startsWith"]("{")) throw new OgcRequestError("OGC_WFS_GEOJSON_REQUEST_FAILED", "WFS GeoJSON isteği başarısız: " + _0x1f1bf4["status"] + " " + _0x1f1bf4["statusText"]);
+    return JSON["parse"](_0x3f55c4);
   }
-  async ["fetchWfsGml"](_0x281fe3, _0x436f5b, _0x24073f) {
-    const _0x18b3d3 = new URLSearchParams();
-    appendWfsGetFeatureParams(_0x18b3d3, _0x24073f);
-    const _0x3afc77 = await fetch("" + _0x281fe3["url"] + (_0x281fe3["url"]["includes"]("?") ? "&" : "?") + _0x18b3d3["toString"](), _0x436f5b);
-    if (!_0x3afc77["ok"]) throw new OgcRequestError("OGC_WFS_REQUEST_FAILED", "WFS isteği başarısız: " + _0x3afc77["status"] + " " + _0x3afc77["statusText"]);
-    const _0x507f5b = decodeTextBuffer(await _0x3afc77["arrayBuffer"]());
-    if (isOgcExceptionXml(_0x507f5b)) throw new OgcRequestError("OGC_WFS_EXCEPTION", "WFS GetFeature OGC Exception döndü.");
-    let _0x2bdd29, _0xbe9148;
+  async ["fetchWfsGml"](_0x204f73, _0x2d6169, _0x5edcdf) {
+    const _0x74c73a = new URLSearchParams();
+    appendWfsGetFeatureParams(_0x74c73a, _0x5edcdf);
+    const _0x1fd215 = await fetch("" + _0x204f73["url"] + (_0x204f73["url"]["includes"]("?") ? "&" : "?") + _0x74c73a["toString"](), _0x2d6169);
+    if (!_0x1fd215["ok"]) throw new OgcRequestError("OGC_WFS_REQUEST_FAILED", "WFS isteği başarısız: " + _0x1fd215["status"] + " " + _0x1fd215["statusText"]);
+    const _0x17c9bc = decodeTextBuffer(await _0x1fd215["arrayBuffer"]());
+    if (isOgcExceptionXml(_0x17c9bc)) throw new OgcRequestError("OGC_WFS_EXCEPTION", "WFS GetFeature OGC Exception döndü.");
+    let _0x865b47, _0x38b834;
     try {
-      ({ default: _0x2bdd29 } = await import("ol/format/WFS.js")), { default: _0xbe9148 } = await import("ol/format/GeoJSON.js");
+      ({ default: _0x865b47 } = await import("ol/format/WFS.js")), { default: _0x38b834 } = await import("ol/format/GeoJSON.js");
     } catch {
       throw new OgcRequestError("OGC_WFS_OL_PACKAGE_MISSING", 'WFS sunucusu GeoJSON çıktısı desteklemiyor; GML yanıtını okumak için "ol" paketi gereklidir: pnpm add ol');
     }
-    const _0x4da8b2 = new _0x2bdd29({ "version": _0x24073f["version"] })["readFeatures"](_0x507f5b);
-    return new _0xbe9148()["writeFeaturesObject"](_0x4da8b2, { "featureProjection": "EPSG:4326" });
+    const _0x32446a = new _0x865b47({ "version": _0x5edcdf["version"] })["readFeatures"](_0x17c9bc);
+    return new _0x38b834()["writeFeaturesObject"](_0x32446a, { "featureProjection": "EPSG:4326" });
   }
-  async ["addWCS"](_0x185488) {
-    const _0x31bd97 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wcs", _0x185488["url"]), _0x6f1705 = { "service": "WCS", "version": _0x185488["version"] ?? "2.0.1", "request": "GetCoverage", "coverageId": _0x185488["coverageId"], "format": _0x185488["format"] ?? "image/png" }, _0x4904da = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](this["deps"]["apiKeyPolicy"]["buildAuthHeaders"](_0x185488["authToken"]), _0x31bd97), _0x500536 = _0x185488["rectangle"] ?? Rectangle["fromDegrees"](-180, -90, 180, 90), _0x3d0bcd = async (_0x8cf2b4) => {
-      const _0x10004c = { ..._0x6f1705 };
-      if (_0x8cf2b4 !== void 0) _0x10004c["SCALESIZE"] = _0x8cf2b4;
-      const _0x4c2a82 = _0x31bd97 + "?" + new URLSearchParams(_0x10004c)["toString"](), _0x2ae394 = await this["resolveWcsImageUrl"](_0x4c2a82, _0x4904da);
+  async ["addWCS"](_0x15bc92) {
+    const _0x4f7fba = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wcs", _0x15bc92["url"]), _0x14959d = { "service": "WCS", "version": _0x15bc92["version"] ?? "2.0.1", "request": "GetCoverage", "coverageId": _0x15bc92["coverageId"], "format": _0x15bc92["format"] ?? "image/png" }, _0x4a2c04 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](this["deps"]["apiKeyPolicy"]["buildAuthHeaders"](_0x15bc92["authToken"]), _0x4f7fba), _0x152223 = _0x15bc92["rectangle"] ?? Rectangle["fromDegrees"](-180, -90, 180, 90), _0x2f4039 = async (_0x16e039) => {
+      const _0x30a058 = { ..._0x14959d };
+      if (_0x16e039 !== void 0) _0x30a058["SCALESIZE"] = _0x16e039;
+      const _0x4d2fcc = _0x4f7fba + "?" + new URLSearchParams(_0x30a058)["toString"](), _0xdd2508 = await this["resolveWcsImageUrl"](_0x4d2fcc, _0x4a2c04);
       try {
-        return await SingleTileImageryProvider["fromUrl"](_0x2ae394, { "rectangle": _0x500536 });
+        return await SingleTileImageryProvider["fromUrl"](_0xdd2508, { "rectangle": _0x152223 });
       } finally {
-        if (_0x2ae394["startsWith"]("blob:")) URL["revokeObjectURL"](_0x2ae394);
+        if (_0xdd2508["startsWith"]("blob:")) URL["revokeObjectURL"](_0xdd2508);
       }
-    }, _0x3fa8bb = _0x185488["maxSize"] ?? 2048, _0x295d30 = _0x6f1705["version"]["startsWith"]("2.") && Number["isFinite"](_0x3fa8bb);
-    let _0x15fd4a;
-    if (!_0x295d30) _0x15fd4a = await _0x3d0bcd();
+    }, _0xe09d2e = _0x15bc92["maxSize"] ?? 2048, _0x4f26c4 = _0x14959d["version"]["startsWith"]("2.") && Number["isFinite"](_0xe09d2e);
+    let _0x4b223a;
+    if (!_0x4f26c4) _0x4b223a = await _0x2f4039();
     else {
-      const _0xa39107 = "http://www.opengis.net/def/axis/OGC/1/i(" + _0x3fa8bb + "),http://www.opengis.net/def/axis/OGC/1/j(" + _0x3fa8bb + ")";
+      const _0x56a922 = "http://www.opengis.net/def/axis/OGC/1/i(" + _0xe09d2e + "),http://www.opengis.net/def/axis/OGC/1/j(" + _0xe09d2e + ")";
       try {
-        _0x15fd4a = await _0x3d0bcd(_0xa39107);
+        _0x4b223a = await _0x2f4039(_0x56a922);
       } catch {
-        _0x15fd4a = await _0x3d0bcd("x(" + _0x3fa8bb + "),y(" + _0x3fa8bb + ")");
+        _0x4b223a = await _0x2f4039("x(" + _0xe09d2e + "),y(" + _0xe09d2e + ")");
       }
     }
-    const _0x3dfbbd = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x15fd4a);
-    return this["serviceLayerOptions"]["set"](_0x185488["id"], _0x185488), this["deps"]["register"](_0x185488["id"], _0x185488["title"], "WCS", _0x3dfbbd, ![]);
+    const _0x5793e3 = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x4b223a);
+    return this["serviceLayerOptions"]["set"](_0x15bc92["id"], _0x15bc92), this["deps"]["register"](_0x15bc92["id"], _0x15bc92["title"], "WCS", _0x5793e3, ![]);
   }
-  async ["resolveWcsImageUrl"](_0x256f59, _0x4edc7d) {
-    const _0x148192 = await fetch(_0x256f59, _0x4edc7d ? { "headers": _0x4edc7d } : void 0);
-    if (!_0x148192["ok"]) throw new OgcRequestError("OGC_WCS_REQUEST_FAILED", "WCS isteği başarısız: " + _0x148192["status"] + " " + _0x148192["statusText"]);
-    const _0x3dd716 = _0x148192["headers"]["get"]("content-type") ?? "", _0x4e10e9 = await _0x148192["arrayBuffer"](), _0x545c85 = /boundary="?([^";]+)"?/i["exec"](_0x3dd716);
-    if (!_0x3dd716["includes"]("multipart/") || !_0x545c85) return URL["createObjectURL"](new Blob([_0x4e10e9], { "type": _0x3dd716 || "image/png" }));
-    const _0x4c31b0 = extractMultipartImage(new Uint8Array(_0x4e10e9), _0x545c85[1]), _0x399159 = _0x4c31b0["bytes"]["buffer"]["slice"](_0x4c31b0["bytes"]["byteOffset"], _0x4c31b0["bytes"]["byteOffset"] + _0x4c31b0["bytes"]["byteLength"]);
-    return URL["createObjectURL"](new Blob([_0x399159], { "type": _0x4c31b0["mimeType"] }));
+  async ["resolveWcsImageUrl"](_0xf54f8c, _0x14ae12) {
+    const _0x3fb500 = await fetch(_0xf54f8c, _0x14ae12 ? { "headers": _0x14ae12 } : void 0);
+    if (!_0x3fb500["ok"]) throw new OgcRequestError("OGC_WCS_REQUEST_FAILED", "WCS isteği başarısız: " + _0x3fb500["status"] + " " + _0x3fb500["statusText"]);
+    const _0x26d146 = _0x3fb500["headers"]["get"]("content-type") ?? "", _0x4572a9 = await _0x3fb500["arrayBuffer"](), _0x2c0d63 = /boundary="?([^";]+)"?/i["exec"](_0x26d146);
+    if (!_0x26d146["includes"]("multipart/") || !_0x2c0d63) return URL["createObjectURL"](new Blob([_0x4572a9], { "type": _0x26d146 || "image/png" }));
+    const _0x1529df = extractMultipartImage(new Uint8Array(_0x4572a9), _0x2c0d63[1]), _0x4e1f06 = _0x1529df["bytes"]["buffer"]["slice"](_0x1529df["bytes"]["byteOffset"], _0x1529df["bytes"]["byteOffset"] + _0x1529df["bytes"]["byteLength"]);
+    return URL["createObjectURL"](new Blob([_0x4e1f06], { "type": _0x1529df["mimeType"] }));
   }
-  ["addGeoTiff"](_0x172b07) {
+  ["addGeoTiff"](_0x4467e3) {
     throw new LayerOperationError("LAYER_GEOTIFF_UNSUPPORTED", "GeoTIFF katmanı bu Cesium sürümünde (≥1.143) henüz desteklenmiyor. GeoTiffImageryProvider mevcut değil. geotiff.js ile özel provider gereklidir.");
   }
-  ["requireServiceOptions"](_0x56df73, _0x3b9884) {
-    const _0x22f9d0 = this["deps"]["requireLayer"](_0x56df73);
-    if (_0x22f9d0["layerType"] !== _0x3b9884) throw new LayerOperationError("LAYER_TYPE_MISMATCH", "Katman " + _0x3b9884 + ' değil: "' + _0x56df73 + '" (' + _0x22f9d0["layerType"] + ")");
-    const _0x39785b = this["serviceLayerOptions"]["get"](_0x56df73);
-    if (_0x39785b === void 0) throw new LayerOperationError("LAYER_SERVICE_OPTIONS_NOT_FOUND", 'Katman için orijinal servis seçenekleri bulunamadı: "' + _0x56df73 + '"');
-    return _0x39785b;
+  ["requireServiceOptions"](_0x35d994, _0x4ffef6) {
+    const _0x4c1482 = this["deps"]["requireLayer"](_0x35d994);
+    if (_0x4c1482["layerType"] !== _0x4ffef6) throw new LayerOperationError("LAYER_TYPE_MISMATCH", "Katman " + _0x4ffef6 + ' değil: "' + _0x35d994 + '" (' + _0x4c1482["layerType"] + ")");
+    const _0x4d13c2 = this["serviceLayerOptions"]["get"](_0x35d994);
+    if (_0x4d13c2 === void 0) throw new LayerOperationError("LAYER_SERVICE_OPTIONS_NOT_FOUND", 'Katman için orijinal servis seçenekleri bulunamadı: "' + _0x35d994 + '"');
+    return _0x4d13c2;
   }
-  async ["rebuildImageryLayer"](_0x488465, _0x29dca4) {
-    const _0x43fed1 = this["deps"]["requireLayer"](_0x488465);
-    if (!(_0x43fed1["cesiumObject"] instanceof ImageryLayer)) throw new LayerOperationError("LAYER_NOT_RASTER", 'Katman raster (ImageryLayer) değil: "' + _0x488465 + '"');
-    const _0x4741a1 = _0x43fed1["cesiumObject"], _0x4ee51d = this["viewer"]["imageryLayers"]["indexOf"](_0x4741a1), { show: _0x5ea5f4, alpha: _0xb9623a } = _0x4741a1, _0xd3308f = _0x29dca4(), _0x4b20b7 = new ImageryLayer(_0xd3308f, { "show": _0x5ea5f4, "alpha": _0xb9623a });
-    this["viewer"]["imageryLayers"]["remove"](_0x4741a1, !![]), this["viewer"]["imageryLayers"]["add"](_0x4b20b7, _0x4ee51d), this["deps"]["setItem"](_0x488465, Object["freeze"]({ ..._0x43fed1, "cesiumObject": _0x4b20b7 }));
+  async ["rebuildImageryLayer"](_0x50cf43, _0xaa076e) {
+    const _0x2dc99f = this["deps"]["requireLayer"](_0x50cf43);
+    if (!(_0x2dc99f["cesiumObject"] instanceof ImageryLayer)) throw new LayerOperationError("LAYER_NOT_RASTER", 'Katman raster (ImageryLayer) değil: "' + _0x50cf43 + '"');
+    const _0x513db6 = _0x2dc99f["cesiumObject"], _0xfd00fd = this["viewer"]["imageryLayers"]["indexOf"](_0x513db6), { show: _0x588c45, alpha: _0x38e93a } = _0x513db6, _0xcb4d74 = _0xaa076e(), _0x48d75b = new ImageryLayer(_0xcb4d74, { "show": _0x588c45, "alpha": _0x38e93a });
+    this["viewer"]["imageryLayers"]["remove"](_0x513db6, !![]), this["viewer"]["imageryLayers"]["add"](_0x48d75b, _0xfd00fd), this["deps"]["setItem"](_0x50cf43, Object["freeze"]({ ..._0x2dc99f, "cesiumObject": _0x48d75b }));
   }
-  async ["getCapabilitiesDocument"](_0x22e0e1, _0x536f0e, _0x5a7b34, _0x2f2548) {
-    const _0xf9a88b = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"](_0x536f0e["toLowerCase"](), _0x22e0e1), _0x1004ba = buildCapabilitiesUrl(_0xf9a88b, _0x536f0e, _0x5a7b34);
-    return getCapabilities(_0x1004ba, _0x2f2548, this["deps"]["apiKeyPolicy"]);
+  async ["getCapabilitiesDocument"](_0x55fd95, _0xc4488d, _0x17f6e8, _0x314a80) {
+    const _0x546813 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"](_0xc4488d["toLowerCase"](), _0x55fd95), _0x10cea2 = buildCapabilitiesUrl(_0x546813, _0xc4488d, _0x17f6e8);
+    return getCapabilities(_0x10cea2, _0x314a80, this["deps"]["apiKeyPolicy"]);
   }
-  async ["getWcsCoverageExtents"](_0x180429, _0x318fa8, _0x3ca477) {
-    const _0xc93f75 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wcs", _0x180429);
-    return fetchWcsCoverageExtents(_0xc93f75, _0x318fa8, _0x3ca477, this["deps"]["apiKeyPolicy"]);
+  async ["getWcsCoverageExtents"](_0x35e6ca, _0x1574f2, _0x314a02) {
+    const _0x113dc2 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wcs", _0x35e6ca);
+    return fetchWcsCoverageExtents(_0x113dc2, _0x1574f2, _0x314a02, this["deps"]["apiKeyPolicy"]);
   }
 };
 _OgcLayerFactory["TEMP_WFS_UNLIMITED_MAX_FEATURES"] = 1e6;
 let OgcLayerFactory = _OgcLayerFactory;
 class ShapeLayerBridge {
-  constructor(_0x809535, _0x226cc3) {
-    this["viewer"] = _0x809535, this["deps"] = _0x226cc3, this["drawnShapeCounters"] = /* @__PURE__ */ new Map();
+  constructor(_0x5bd5dc, _0x4a9e93) {
+    this["viewer"] = _0x5bd5dc, this["deps"] = _0x4a9e93, this["drawnShapeCounters"] = /* @__PURE__ */ new Map();
   }
-  ["deleteCounter"](_0x3e55fa) {
-    this["drawnShapeCounters"]["delete"](_0x3e55fa);
+  ["deleteCounter"](_0x10cf72) {
+    this["drawnShapeCounters"]["delete"](_0x10cf72);
   }
-  async ["addDrawnShape"](_0x21c3ab, _0x2d6526, _0x14dfa1) {
-    const _0xeaccbf = _0x14dfa1["entity"];
-    this["viewer"]["entities"]["remove"](_0xeaccbf);
-    const _0x12813a = (this["drawnShapeCounters"]["get"](_0x21c3ab) ?? 0) + 1;
-    this["drawnShapeCounters"]["set"](_0x21c3ab, _0x12813a), _0xeaccbf["properties"] = buildDrawnShapeProperties(_0x14dfa1, _0x12813a);
-    const _0xcf5001 = this["deps"]["getItem"](_0x21c3ab), _0x37ddeb = _0xcf5001 && "entities" in _0xcf5001["cesiumObject"] ? _0xcf5001["cesiumObject"] : new CustomDataSource(_0x2d6526), _0x3c963c = _0xcf5001 ? this["deps"]["getStyle"](_0x21c3ab) : void 0, _0x48e77c = (_0x3c963c == null ? void 0 : _0x3c963c["fill"]["mode"]) === "solid" ? Color["fromCssColorString"](_0x3c963c["fill"]["color"])["withAlpha"](_0x3c963c["fill"]["opacity"]) : Color["CYAN"]["withAlpha"](0.4), _0x5a5202 = (_0x3c963c == null ? void 0 : _0x3c963c["outline"]) ?? { "enabled": !![], "color": this["deps"]["defaultOutlineColorHex"], "width": 1 };
-    this["deps"]["applyEntityStyle"](_0xeaccbf, _0x48e77c, _0x5a5202, !![]), _0x37ddeb["entities"]["add"](_0xeaccbf);
-    _0xeaccbf["polygon"] !== void 0 && this["deps"]["addPolygonOutlineCompanion"](_0x37ddeb, _0xeaccbf, Color["fromCssColorString"](_0x5a5202["color"]), _0x5a5202["width"], ![]);
-    if (_0xcf5001) return this["deps"]["tagEntities"](_0x37ddeb, _0x21c3ab), _0xcf5001;
-    await this["viewer"]["dataSources"]["add"](_0x37ddeb);
-    const _0x20847e = Color["CYAN"]["toCssHexString"](), _0x4b9232 = this["deps"]["register"](_0x21c3ab, _0x2d6526, "DRAWING", _0x37ddeb, ![], _0x20847e);
-    return this["deps"]["recordInitialStyle"](_0x4b9232["id"], _0x20847e, 0.4, _0x5a5202), _0x4b9232;
+  async ["addDrawnShape"](_0x311592, _0x550236, _0x536b29) {
+    const _0xb001f6 = _0x536b29["entity"];
+    this["viewer"]["entities"]["remove"](_0xb001f6);
+    const _0x2bc959 = (this["drawnShapeCounters"]["get"](_0x311592) ?? 0) + 1;
+    this["drawnShapeCounters"]["set"](_0x311592, _0x2bc959), _0xb001f6["properties"] = buildDrawnShapeProperties(_0x536b29, _0x2bc959);
+    const _0x433882 = this["deps"]["getItem"](_0x311592), _0x7de85a = _0x433882 && "entities" in _0x433882["cesiumObject"] ? _0x433882["cesiumObject"] : new CustomDataSource(_0x550236), _0x48d0d8 = _0x433882 ? this["deps"]["getStyle"](_0x311592) : void 0, _0x3fc6ea = (_0x48d0d8 == null ? void 0 : _0x48d0d8["fill"]["mode"]) === "solid" ? Color["fromCssColorString"](_0x48d0d8["fill"]["color"])["withAlpha"](_0x48d0d8["fill"]["opacity"]) : Color["CYAN"]["withAlpha"](0.4), _0x323fab = (_0x48d0d8 == null ? void 0 : _0x48d0d8["outline"]) ?? { "enabled": !![], "color": this["deps"]["defaultOutlineColorHex"], "width": 1 };
+    this["deps"]["applyEntityStyle"](_0xb001f6, _0x3fc6ea, _0x323fab, !![]), _0x7de85a["entities"]["add"](_0xb001f6);
+    _0xb001f6["polygon"] !== void 0 && this["deps"]["addPolygonOutlineCompanion"](_0x7de85a, _0xb001f6, Color["fromCssColorString"](_0x323fab["color"]), _0x323fab["width"], ![]);
+    if (_0x433882) return this["deps"]["tagEntities"](_0x7de85a, _0x311592), _0x433882;
+    await this["viewer"]["dataSources"]["add"](_0x7de85a);
+    const _0x296f0a = Color["CYAN"]["toCssHexString"](), _0x98fb28 = this["deps"]["register"](_0x311592, _0x550236, "DRAWING", _0x7de85a, ![], _0x296f0a);
+    return this["deps"]["recordInitialStyle"](_0x98fb28["id"], _0x296f0a, 0.4, _0x323fab), _0x98fb28;
   }
-  async ["addMeasuredShape"](_0x179969, _0x2155b0, _0xa732d0) {
-    const _0x5bd8b8 = _0xa732d0["entity"];
-    this["viewer"]["entities"]["remove"](_0x5bd8b8);
-    const _0x4ad50b = (this["drawnShapeCounters"]["get"](_0x179969) ?? 0) + 1;
-    this["drawnShapeCounters"]["set"](_0x179969, _0x4ad50b), _0x5bd8b8["properties"] = buildMeasuredShapeProperties(_0xa732d0, _0x4ad50b);
-    const _0x30a4f4 = this["deps"]["getItem"](_0x179969), _0x1e18a1 = _0x30a4f4 && "entities" in _0x30a4f4["cesiumObject"] ? _0x30a4f4["cesiumObject"] : new CustomDataSource(_0x2155b0), _0x36ec33 = _0x30a4f4 ? this["deps"]["getStyle"](_0x179969) : void 0, _0x190ded = (_0x36ec33 == null ? void 0 : _0x36ec33["fill"]["mode"]) === "solid" ? Color["fromCssColorString"](_0x36ec33["fill"]["color"])["withAlpha"](_0x36ec33["fill"]["opacity"]) : Color["CYAN"]["withAlpha"](0.4), _0xc0237d = (_0x36ec33 == null ? void 0 : _0x36ec33["outline"]) ?? { "enabled": !![], "color": this["deps"]["defaultOutlineColorHex"], "width": 1 };
-    this["deps"]["applyEntityStyle"](_0x5bd8b8, _0x190ded, _0xc0237d, !![]), _0x1e18a1["entities"]["add"](_0x5bd8b8);
-    _0x5bd8b8["polygon"] !== void 0 && this["deps"]["addPolygonOutlineCompanion"](_0x1e18a1, _0x5bd8b8, Color["fromCssColorString"](_0xc0237d["color"]), _0xc0237d["width"], ![]);
-    if (_0x30a4f4) return this["deps"]["tagEntities"](_0x1e18a1, _0x179969), _0x30a4f4;
-    await this["viewer"]["dataSources"]["add"](_0x1e18a1);
-    const _0x642784 = Color["CYAN"]["toCssHexString"](), _0xb93479 = this["deps"]["register"](_0x179969, _0x2155b0, "MEASURE", _0x1e18a1, ![], _0x642784);
-    return this["deps"]["recordInitialStyle"](_0xb93479["id"], _0x642784, 0.4, _0xc0237d), _0xb93479;
+  async ["addMeasuredShape"](_0x47bdb1, _0x32821e, _0x2839e9) {
+    const _0x4c475a = _0x2839e9["entity"];
+    this["viewer"]["entities"]["remove"](_0x4c475a);
+    const _0x378d69 = (this["drawnShapeCounters"]["get"](_0x47bdb1) ?? 0) + 1;
+    this["drawnShapeCounters"]["set"](_0x47bdb1, _0x378d69), _0x4c475a["properties"] = buildMeasuredShapeProperties(_0x2839e9, _0x378d69);
+    const _0x4569db = this["deps"]["getItem"](_0x47bdb1), _0x5d73e2 = _0x4569db && "entities" in _0x4569db["cesiumObject"] ? _0x4569db["cesiumObject"] : new CustomDataSource(_0x32821e), _0x1492f6 = _0x4569db ? this["deps"]["getStyle"](_0x47bdb1) : void 0, _0x39827f = (_0x1492f6 == null ? void 0 : _0x1492f6["fill"]["mode"]) === "solid" ? Color["fromCssColorString"](_0x1492f6["fill"]["color"])["withAlpha"](_0x1492f6["fill"]["opacity"]) : Color["CYAN"]["withAlpha"](0.4), _0x38c4a3 = (_0x1492f6 == null ? void 0 : _0x1492f6["outline"]) ?? { "enabled": !![], "color": this["deps"]["defaultOutlineColorHex"], "width": 1 };
+    this["deps"]["applyEntityStyle"](_0x4c475a, _0x39827f, _0x38c4a3, !![]), _0x5d73e2["entities"]["add"](_0x4c475a);
+    _0x4c475a["polygon"] !== void 0 && this["deps"]["addPolygonOutlineCompanion"](_0x5d73e2, _0x4c475a, Color["fromCssColorString"](_0x38c4a3["color"]), _0x38c4a3["width"], ![]);
+    if (_0x4569db) return this["deps"]["tagEntities"](_0x5d73e2, _0x47bdb1), _0x4569db;
+    await this["viewer"]["dataSources"]["add"](_0x5d73e2);
+    const _0x52f87c = Color["CYAN"]["toCssHexString"](), _0x52ed41 = this["deps"]["register"](_0x47bdb1, _0x32821e, "MEASURE", _0x5d73e2, ![], _0x52f87c);
+    return this["deps"]["recordInitialStyle"](_0x52ed41["id"], _0x52f87c, 0.4, _0x38c4a3), _0x52ed41;
   }
-  ["removeDrawnShape"](_0x45c844, _0xe0ee39) {
-    const _0xee7cd3 = this["deps"]["getItem"](_0x45c844);
-    if (!_0xee7cd3 || !("entities" in _0xee7cd3["cesiumObject"])) return;
-    _0xee7cd3["cesiumObject"]["entities"]["removeById"](_0xe0ee39["id"] + "::outline"), _0xee7cd3["cesiumObject"]["entities"]["remove"](_0xe0ee39), _0xee7cd3["cesiumObject"]["entities"]["values"]["length"] === 0 && this["deps"]["removeLayer"](_0x45c844);
+  ["removeDrawnShape"](_0x59f437, _0x34ef10) {
+    const _0x55d3ad = this["deps"]["getItem"](_0x59f437);
+    if (!_0x55d3ad || !("entities" in _0x55d3ad["cesiumObject"])) return;
+    _0x55d3ad["cesiumObject"]["entities"]["removeById"](_0x34ef10["id"] + "::outline"), _0x55d3ad["cesiumObject"]["entities"]["remove"](_0x34ef10), _0x55d3ad["cesiumObject"]["entities"]["values"]["length"] === 0 && this["deps"]["removeLayer"](_0x59f437);
   }
 }
 const DRAWN_SHAPE_LABELS = { "point": "Nokta", "polyline": "Çizgi", "polygon": "Alan", "rectangle": "Dikdörtgen", "circle": "Daire", "freehand": "Serbest Çizim" };
-function roundMeters(_0x18ba67) {
-  return Math["round"](_0x18ba67 * 100) / 100;
+function roundMeters(_0x41ce72) {
+  return Math["round"](_0x41ce72 * 100) / 100;
 }
-function roundCoordinate(_0x281185) {
-  return Math["round"](_0x281185 * 1e6) / 1e6;
+function roundCoordinate(_0x350c5c) {
+  return Math["round"](_0x350c5c * 1e6) / 1e6;
 }
-function wktCoordinatePair(_0x196861) {
-  return roundCoordinate(_0x196861[0]) + " " + roundCoordinate(_0x196861[1]);
+function wktCoordinatePair(_0x138f9a) {
+  return roundCoordinate(_0x138f9a[0]) + " " + roundCoordinate(_0x138f9a[1]);
 }
-function geometryToWkt(_0x1e279f) {
-  switch (_0x1e279f["type"]) {
+function geometryToWkt(_0xb49cbf) {
+  switch (_0xb49cbf["type"]) {
     case "Point": {
-      const _0x57173a = _0x1e279f["coordinates"];
-      return "POINT (" + wktCoordinatePair(_0x57173a) + ")";
+      const _0x2925e1 = _0xb49cbf["coordinates"];
+      return "POINT (" + wktCoordinatePair(_0x2925e1) + ")";
     }
     case "LineString": {
-      const _0x1b71be = _0x1e279f["coordinates"];
-      return "LINESTRING (" + _0x1b71be["map"]((_0x4ad421) => wktCoordinatePair(_0x4ad421))["join"](", ") + ")";
+      const _0x50dbdb = _0xb49cbf["coordinates"];
+      return "LINESTRING (" + _0x50dbdb["map"]((_0x55e3b5) => wktCoordinatePair(_0x55e3b5))["join"](", ") + ")";
     }
     case "Polygon": {
-      const _0x254426 = _0x1e279f["coordinates"], _0xe50111 = _0x254426["map"]((_0x2988ef) => "(" + _0x2988ef["map"]((_0x4fb607) => wktCoordinatePair(_0x4fb607))["join"](", ") + ")")["join"](", ");
-      return "POLYGON (" + _0xe50111 + ")";
+      const _0x11cc4f = _0xb49cbf["coordinates"], _0x3fdfcb = _0x11cc4f["map"]((_0x36b60d) => "(" + _0x36b60d["map"]((_0x1c6094) => wktCoordinatePair(_0x1c6094))["join"](", ") + ")")["join"](", ");
+      return "POLYGON (" + _0x3fdfcb + ")";
     }
     default:
       return "";
   }
 }
-function buildDrawnShapeProperties(_0x110fce, _0x494f85) {
-  const _0x490cba = { "id": _0x494f85, "sekil": DRAWN_SHAPE_LABELS[_0x110fce["tool"]] };
-  if (_0x110fce["length"] !== void 0) _0x490cba["uzunluk_m"] = roundMeters(_0x110fce["length"]);
-  if (_0x110fce["area"] !== void 0) _0x490cba["alan_m2"] = roundMeters(_0x110fce["area"]);
-  if (_0x110fce["perimeter"] !== void 0) _0x490cba["cevre_m"] = roundMeters(_0x110fce["perimeter"]);
-  if (_0x110fce["radius"] !== void 0) _0x490cba["yaricap_m"] = roundMeters(_0x110fce["radius"]);
-  return _0x490cba["olusturma_tarihi"] = new Date(_0x110fce["createdAt"])["toLocaleString"]("tr-TR"), _0x490cba["geomwkt"] = geometryToWkt(_0x110fce["geometry"]), new PropertyBag(_0x490cba);
+function buildDrawnShapeProperties(_0x250b91, _0x44f72f) {
+  const _0x406566 = { "id": _0x44f72f, "sekil": DRAWN_SHAPE_LABELS[_0x250b91["tool"]] };
+  if (_0x250b91["length"] !== void 0) _0x406566["uzunluk_m"] = roundMeters(_0x250b91["length"]);
+  if (_0x250b91["area"] !== void 0) _0x406566["alan_m2"] = roundMeters(_0x250b91["area"]);
+  if (_0x250b91["perimeter"] !== void 0) _0x406566["cevre_m"] = roundMeters(_0x250b91["perimeter"]);
+  if (_0x250b91["radius"] !== void 0) _0x406566["yaricap_m"] = roundMeters(_0x250b91["radius"]);
+  return _0x406566["olusturma_tarihi"] = new Date(_0x250b91["createdAt"])["toLocaleString"]("tr-TR"), _0x406566["geomwkt"] = geometryToWkt(_0x250b91["geometry"]), new PropertyBag(_0x406566);
 }
 const MEASURED_SHAPE_LABELS = { "point": "Nokta", "polyline": "Mesafe", "polygon": "Alan", "rectangle": "Dikdörtgen", "circle": "Daire", "freehand": "Serbest Çizim" };
-function buildMeasuredShapeProperties(_0x50518b, _0x741fe6) {
-  const _0x59d18f = { "id": _0x741fe6, "olcum_turu": MEASURED_SHAPE_LABELS[_0x50518b["tool"]] };
-  if (_0x50518b["length"] !== void 0) _0x59d18f["uzunluk_m"] = roundMeters(_0x50518b["length"]);
-  if (_0x50518b["area"] !== void 0) _0x59d18f["alan_m2"] = roundMeters(_0x50518b["area"]);
-  if (_0x50518b["perimeter"] !== void 0) _0x59d18f["cevre_m"] = roundMeters(_0x50518b["perimeter"]);
-  return _0x59d18f["olusturma_tarihi"] = new Date(_0x50518b["createdAt"])["toLocaleString"]("tr-TR"), _0x59d18f["geomwkt"] = geometryToWkt(_0x50518b["geometry"]), new PropertyBag(_0x59d18f);
+function buildMeasuredShapeProperties(_0x2d663f, _0x3689ef) {
+  const _0x2a563a = { "id": _0x3689ef, "olcum_turu": MEASURED_SHAPE_LABELS[_0x2d663f["tool"]] };
+  if (_0x2d663f["length"] !== void 0) _0x2a563a["uzunluk_m"] = roundMeters(_0x2d663f["length"]);
+  if (_0x2d663f["area"] !== void 0) _0x2a563a["alan_m2"] = roundMeters(_0x2d663f["area"]);
+  if (_0x2d663f["perimeter"] !== void 0) _0x2a563a["cevre_m"] = roundMeters(_0x2d663f["perimeter"]);
+  return _0x2a563a["olusturma_tarihi"] = new Date(_0x2d663f["createdAt"])["toLocaleString"]("tr-TR"), _0x2a563a["geomwkt"] = geometryToWkt(_0x2d663f["geometry"]), new PropertyBag(_0x2a563a);
 }
 const _LayerManager = class _LayerManager extends EventEmitter {
-  constructor(_0x22783e) {
-    super(), this["items"] = /* @__PURE__ */ new Map(), this["analysisResultIds"] = /* @__PURE__ */ new Set(), this["viewer"] = _0x22783e, this["apiKeyPolicy"] = new ApiKeyPolicy({ "apiBase": () => getUcbpApiBase() }), this["outlineGeometry"] = new OutlineGeometry({ "getCurrentTime": () => this["viewer"]["clock"]["currentTime"] }), this["opacityController"] = new OpacityController({ "requestRender": () => this["viewer"]["scene"]["requestRender"]() }), this["styleEngine"] = new LayerStyleEngine({ "outlineGeometry": this["outlineGeometry"], "opacityController": this["opacityController"], "getCurrentTime": () => this["viewer"]["clock"]["currentTime"], "requestRender": () => this["viewer"]["scene"]["requestRender"](), "emitStyle": (_0x200c31, _0x51db4d) => this["emit"]("layer:style", { "id": _0x200c31, "style": _0x51db4d }), "waitForRenderSettle": () => this["waitForRenderSettle"]() }), this["localSourceLoader"] = new LocalSourceLoader(_0x22783e, { "styleEngine": this["styleEngine"], "outlineGeometry": this["outlineGeometry"], "addPolygonOutlines": (_0x425768, _0x59aa97, _0x467076) => this["addPolygonOutlines"](_0x425768, _0x59aa97, _0x467076), "register": (_0x1d8acb, _0x1d9f7b, _0x2a7f5a, _0x1b56bb, _0x12047e, _0x10c3be) => this["register"](_0x1d8acb, _0x1d9f7b, _0x2a7f5a, _0x1b56bb, _0x12047e, _0x10c3be), "emitCrsCheckResult": (_0x1c8df1, _0x2d483c) => this["emitCrsCheckResult"](_0x1c8df1, _0x2d483c), "waitForRenderSettle": () => this["waitForRenderSettle"](), "defaultOutlineColor": _LayerManager["DEFAULT_OUTLINE_COLOR"], "defaultOutlineColorHex": _LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] }), this["shapeLayerBridge"] = new ShapeLayerBridge(_0x22783e, { "getItem": (_0x10b99f) => this["items"]["get"](_0x10b99f), "getStyle": (_0x1e34e1) => this["styleEngine"]["getStyle"](_0x1e34e1), "applyEntityStyle": (_0x11f5bf, _0x4512b5, _0x216426, _0x5e2662) => this["applyEntityStyle"](_0x11f5bf, _0x4512b5, _0x216426, _0x5e2662), "addPolygonOutlineCompanion": (_0x3f41dc, _0x398bbd, _0x1f1f99, _0x42e689, _0x2441ba) => this["addPolygonOutlineCompanion"](_0x3f41dc, _0x398bbd, _0x1f1f99, _0x42e689, _0x2441ba), "tagEntities": (_0x1e67c7, _0x3c2d7d) => this["tagEntities"](_0x1e67c7, _0x3c2d7d), "register": (_0x4d6c14, _0x30da92, _0x11dcc9, _0x460830, _0x2e9501, _0x3ff030) => this["register"](_0x4d6c14, _0x30da92, _0x11dcc9, _0x460830, _0x2e9501, _0x3ff030), "recordInitialStyle": (_0x2ad010, _0x4a41df, _0x56c1a7, _0x496214) => this["styleEngine"]["recordInitialStyle"](_0x2ad010, _0x4a41df, _0x56c1a7, _0x496214), "removeLayer": (_0x7c2ec5) => this["removeLayer"](_0x7c2ec5), "defaultOutlineColorHex": _LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] }), this["ogcLayerFactory"] = new OgcLayerFactory(_0x22783e, { "apiKeyPolicy": this["apiKeyPolicy"], "styleEngine": this["styleEngine"], "outlineGeometry": this["outlineGeometry"], "requireLayer": (_0x306476) => this["requireLayer"](_0x306476), "setItem": (_0x9042fa, _0x28a3fc) => this["items"]["set"](_0x9042fa, _0x28a3fc), "register": (_0x2807c4, _0x2eca2f, _0x3faf97, _0x10399f, _0x36bc8c, _0x3d8ca1) => this["register"](_0x2807c4, _0x2eca2f, _0x3faf97, _0x10399f, _0x36bc8c, _0x3d8ca1), "addPolygonOutlines": (_0xf6ca15, _0x486062, _0x5bb1f9) => this["addPolygonOutlines"](_0xf6ca15, _0x486062, _0x5bb1f9), "emitCrsCheckResult": (_0x3614f3, _0x3a1be4) => this["emitCrsCheckResult"](_0x3614f3, _0x3a1be4), "emitFeaturesTruncated": (_0x5670a6, _0x5a2eee, _0x7fe588) => this["emit"]("layer:features-truncated", { "id": _0x5670a6, "totalCount": _0x5a2eee, "loadedCount": _0x7fe588 }), "waitForRenderSettle": () => this["waitForRenderSettle"](), "defaultOutlineColor": _LayerManager["DEFAULT_OUTLINE_COLOR"], "defaultOutlineColorHex": _LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] }), this["cameraHighlight"] = new CameraHighlight(_0x22783e, { "requireLayer": (_0x31c104) => this["requireLayer"](_0x31c104), "getLayerStyle": (_0x553d3a) => this["getLayerStyle"](_0x553d3a) });
+  constructor(_0x1ed722) {
+    super(), this["items"] = /* @__PURE__ */ new Map(), this["analysisResultIds"] = /* @__PURE__ */ new Set(), this["viewer"] = _0x1ed722, this["apiKeyPolicy"] = new ApiKeyPolicy({ "apiBase": () => getUcbpApiBase() }), this["outlineGeometry"] = new OutlineGeometry({ "getCurrentTime": () => this["viewer"]["clock"]["currentTime"] }), this["opacityController"] = new OpacityController({ "requestRender": () => this["viewer"]["scene"]["requestRender"]() }), this["styleEngine"] = new LayerStyleEngine({ "outlineGeometry": this["outlineGeometry"], "opacityController": this["opacityController"], "getCurrentTime": () => this["viewer"]["clock"]["currentTime"], "requestRender": () => this["viewer"]["scene"]["requestRender"](), "emitStyle": (_0x2aea58, _0x3c2563) => this["emit"]("layer:style", { "id": _0x2aea58, "style": _0x3c2563 }), "waitForRenderSettle": () => this["waitForRenderSettle"]() }), this["localSourceLoader"] = new LocalSourceLoader(_0x1ed722, { "styleEngine": this["styleEngine"], "outlineGeometry": this["outlineGeometry"], "addPolygonOutlines": (_0x5db740, _0x5ae596, _0x35c51d) => this["addPolygonOutlines"](_0x5db740, _0x5ae596, _0x35c51d), "register": (_0x1fde1b, _0x20efb0, _0x5cffe0, _0x4fe51a, _0x5f596c, _0x29b494) => this["register"](_0x1fde1b, _0x20efb0, _0x5cffe0, _0x4fe51a, _0x5f596c, _0x29b494), "emitCrsCheckResult": (_0x55ca57, _0x291b62) => this["emitCrsCheckResult"](_0x55ca57, _0x291b62), "waitForRenderSettle": () => this["waitForRenderSettle"](), "defaultOutlineColor": _LayerManager["DEFAULT_OUTLINE_COLOR"], "defaultOutlineColorHex": _LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] }), this["shapeLayerBridge"] = new ShapeLayerBridge(_0x1ed722, { "getItem": (_0x4fe472) => this["items"]["get"](_0x4fe472), "getStyle": (_0x21364b) => this["styleEngine"]["getStyle"](_0x21364b), "applyEntityStyle": (_0x4e577b, _0x2cf965, _0x2788a1, _0x5746ca) => this["applyEntityStyle"](_0x4e577b, _0x2cf965, _0x2788a1, _0x5746ca), "addPolygonOutlineCompanion": (_0x23a293, _0x49c046, _0x5f3098, _0x5b1c76, _0x33d1f0) => this["addPolygonOutlineCompanion"](_0x23a293, _0x49c046, _0x5f3098, _0x5b1c76, _0x33d1f0), "tagEntities": (_0x5d7ee9, _0x5e7e51) => this["tagEntities"](_0x5d7ee9, _0x5e7e51), "register": (_0x1defe8, _0x4a1a99, _0x10a5cc, _0x404e4d, _0x3d8361, _0x4efb70) => this["register"](_0x1defe8, _0x4a1a99, _0x10a5cc, _0x404e4d, _0x3d8361, _0x4efb70), "recordInitialStyle": (_0x5c5dc3, _0x546a60, _0x3d2d79, _0x403339) => this["styleEngine"]["recordInitialStyle"](_0x5c5dc3, _0x546a60, _0x3d2d79, _0x403339), "removeLayer": (_0x3eba50) => this["removeLayer"](_0x3eba50), "defaultOutlineColorHex": _LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] }), this["ogcLayerFactory"] = new OgcLayerFactory(_0x1ed722, { "apiKeyPolicy": this["apiKeyPolicy"], "styleEngine": this["styleEngine"], "outlineGeometry": this["outlineGeometry"], "requireLayer": (_0x3a0618) => this["requireLayer"](_0x3a0618), "setItem": (_0x25913f, _0x35fcda) => this["items"]["set"](_0x25913f, _0x35fcda), "register": (_0x5dc67f, _0x589a84, _0x598133, _0x246c92, _0x248950, _0x34b544) => this["register"](_0x5dc67f, _0x589a84, _0x598133, _0x246c92, _0x248950, _0x34b544), "addPolygonOutlines": (_0x198404, _0x528b77, _0x4e248f) => this["addPolygonOutlines"](_0x198404, _0x528b77, _0x4e248f), "emitCrsCheckResult": (_0x441af5, _0x5b93fd) => this["emitCrsCheckResult"](_0x441af5, _0x5b93fd), "emitFeaturesTruncated": (_0xa3ce68, _0x1253fb, _0xe05387) => this["emit"]("layer:features-truncated", { "id": _0xa3ce68, "totalCount": _0x1253fb, "loadedCount": _0xe05387 }), "waitForRenderSettle": () => this["waitForRenderSettle"](), "defaultOutlineColor": _LayerManager["DEFAULT_OUTLINE_COLOR"], "defaultOutlineColorHex": _LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] }), this["cameraHighlight"] = new CameraHighlight(_0x1ed722, { "requireLayer": (_0x1cf3bd) => this["requireLayer"](_0x1cf3bd), "getLayerStyle": (_0x1b547d) => this["getLayerStyle"](_0x1b547d) });
   }
-  ["configure"](_0x57a94b) {
-    this["apiKeyPolicy"]["configure"](_0x57a94b), _0x57a94b["apiKey"] !== void 0 && this["emit"]("apiKey:change", { "hasApiKey": !![] });
+  ["configure"](_0x1a627a) {
+    this["apiKeyPolicy"]["configure"](_0x1a627a), _0x1a627a["apiKey"] !== void 0 && this["emit"]("apiKey:change", { "hasApiKey": !![] });
   }
   get ["hasApiKey"]() {
     return this["apiKeyPolicy"]["hasApiKey"];
@@ -2081,144 +2081,144 @@ const _LayerManager = class _LayerManager extends EventEmitter {
   async ["getLayerList"]() {
     return this["apiKeyPolicy"]["getLayerList"]();
   }
-  ["canAddAuthorizedLayer"](_0x2462d3) {
-    return this["apiKeyPolicy"]["canAddAuthorizedLayer"](_0x2462d3);
+  ["canAddAuthorizedLayer"](_0x10a912) {
+    return this["apiKeyPolicy"]["canAddAuthorizedLayer"](_0x10a912);
   }
-  async ["addAuthorizedLayer"](_0x12f083) {
-    const _0xe0a0c9 = this["apiKeyPolicy"]["resolveAddOptions"](_0x12f083);
-    if (_0xe0a0c9["layerType"] === "WMS") return this["add"]("WMS", _0xe0a0c9["options"]);
-    if (_0xe0a0c9["layerType"] === "WFS") return this["add"]("WFS", _0xe0a0c9["options"]);
-    return this["add"]("WMTS", _0xe0a0c9["options"]);
+  async ["addAuthorizedLayer"](_0x28334a) {
+    const _0x112a5f = this["apiKeyPolicy"]["resolveAddOptions"](_0x28334a);
+    if (_0x112a5f["layerType"] === "WMS") return this["add"]("WMS", _0x112a5f["options"]);
+    if (_0x112a5f["layerType"] === "WFS") return this["add"]("WFS", _0x112a5f["options"]);
+    return this["add"]("WMTS", _0x112a5f["options"]);
   }
-  ["layerRequiresApiKey"](_0x1f16e5) {
-    return this["apiKeyPolicy"]["layerRequiresApiKey"](_0x1f16e5);
+  ["layerRequiresApiKey"](_0x2e1a11) {
+    return this["apiKeyPolicy"]["layerRequiresApiKey"](_0x2e1a11);
   }
   ["getLayers"]() {
     return Array["from"](this["items"]["values"]());
   }
-  ["getLayerById"](_0xc52be7) {
-    return this["items"]["get"](_0xc52be7);
+  ["getLayerById"](_0xf21b22) {
+    return this["items"]["get"](_0xf21b22);
   }
-  ["getEntityPropertyNames"](_0x21276b) {
-    const _0x4e1102 = this["requireLayer"](_0x21276b);
-    if (!("entities" in _0x4e1102["cesiumObject"])) return [];
-    const _0x33cd0a = /* @__PURE__ */ new Set();
-    for (const _0x32eb49 of _0x4e1102["cesiumObject"]["entities"]["values"]) {
-      const _0xc21725 = _0x32eb49["properties"];
-      if (_0xc21725 === void 0) continue;
-      for (const _0x4bade1 of _0xc21725["propertyNames"]) {
-        if (_0x4bade1 === "layerId" || _0x4bade1 === "featureId") continue;
-        _0x33cd0a["add"](_0x4bade1);
+  ["getEntityPropertyNames"](_0x23111e) {
+    const _0x35b647 = this["requireLayer"](_0x23111e);
+    if (!("entities" in _0x35b647["cesiumObject"])) return [];
+    const _0x2dbd84 = /* @__PURE__ */ new Set();
+    for (const _0x53c262 of _0x35b647["cesiumObject"]["entities"]["values"]) {
+      const _0x4b6b5a = _0x53c262["properties"];
+      if (_0x4b6b5a === void 0) continue;
+      for (const _0xf8a567 of _0x4b6b5a["propertyNames"]) {
+        if (_0xf8a567 === "layerId" || _0xf8a567 === "featureId") continue;
+        _0x2dbd84["add"](_0xf8a567);
       }
     }
-    return Array["from"](_0x33cd0a);
+    return Array["from"](_0x2dbd84);
   }
-  ["getUniqueColumnValues"](_0x1739a9, _0x41aad6) {
-    const _0x511066 = this["requireLayer"](_0x1739a9);
-    if (!("entities" in _0x511066["cesiumObject"])) return [];
-    const _0x5508a7 = this["viewer"]["clock"]["currentTime"], _0x5934aa = /* @__PURE__ */ new Set();
-    for (const _0x36d747 of _0x511066["cesiumObject"]["entities"]["values"]) {
-      const _0x1bcf4f = this["readProperty"](_0x36d747, _0x41aad6, _0x5508a7);
-      if (_0x1bcf4f !== null) _0x5934aa["add"](_0x1bcf4f);
+  ["getUniqueColumnValues"](_0x5f5901, _0xbc3716) {
+    const _0x3f03af = this["requireLayer"](_0x5f5901);
+    if (!("entities" in _0x3f03af["cesiumObject"])) return [];
+    const _0xd0f3a8 = this["viewer"]["clock"]["currentTime"], _0x4e49e2 = /* @__PURE__ */ new Set();
+    for (const _0x4c1b94 of _0x3f03af["cesiumObject"]["entities"]["values"]) {
+      const _0x31e55e = this["readProperty"](_0x4c1b94, _0xbc3716, _0xd0f3a8);
+      if (_0x31e55e !== null) _0x4e49e2["add"](_0x31e55e);
     }
-    return Array["from"](_0x5934aa);
+    return Array["from"](_0x4e49e2);
   }
-  ["getFeatureCount"](_0x42acee) {
-    const _0x4deaa3 = this["requireLayer"](_0x42acee);
-    if (!("entities" in _0x4deaa3["cesiumObject"])) return void 0;
-    let _0x387ea7 = 0;
-    for (const _0x3831dd of _0x4deaa3["cesiumObject"]["entities"]["values"]) {
-      if (!this["isOutlineCompanion"](_0x3831dd)) _0x387ea7++;
+  ["getFeatureCount"](_0x667aaf) {
+    const _0xa23b05 = this["requireLayer"](_0x667aaf);
+    if (!("entities" in _0xa23b05["cesiumObject"])) return void 0;
+    let _0x190e2b = 0;
+    for (const _0x1990db of _0xa23b05["cesiumObject"]["entities"]["values"]) {
+      if (!this["isOutlineCompanion"](_0x1990db)) _0x190e2b++;
     }
-    return _0x387ea7;
+    return _0x190e2b;
   }
-  ["getLayerGeoJSON"](_0x229ffd) {
-    return getLayerGeoJSON(this["requireLayer"](_0x229ffd), this["viewer"]["clock"]["currentTime"], (_0x5cb90c) => this["isOutlineCompanion"](_0x5cb90c));
+  ["getLayerGeoJSON"](_0x257d82) {
+    return getLayerGeoJSON(this["requireLayer"](_0x257d82), this["viewer"]["clock"]["currentTime"], (_0x107b22) => this["isOutlineCompanion"](_0x107b22));
   }
-  ["exportLayerGeoJSON"](_0x5a7241, _0x1275c2 = "katman") {
-    exportLayerGeoJSON(this["getLayerGeoJSON"](_0x5a7241), _0x1275c2);
+  ["exportLayerGeoJSON"](_0x477b0b, _0x103833 = "katman") {
+    exportLayerGeoJSON(this["getLayerGeoJSON"](_0x477b0b), _0x103833);
   }
-  ["exportLayerKml"](_0x22d8a3, _0x8baca4 = "katman") {
-    exportLayerKml(this["getLayerGeoJSON"](_0x22d8a3), _0x8baca4);
+  ["exportLayerKml"](_0x4fb0ba, _0x2f9108 = "katman") {
+    exportLayerKml(this["getLayerGeoJSON"](_0x4fb0ba), _0x2f9108);
   }
-  ["exportLayerShapefile"](_0x1c40b5, _0x2ac590 = "katman") {
-    exportLayerShapefile(this["getLayerGeoJSON"](_0x1c40b5), _0x2ac590);
+  ["exportLayerShapefile"](_0x463912, _0x3a7458 = "katman") {
+    exportLayerShapefile(this["getLayerGeoJSON"](_0x463912), _0x3a7458);
   }
-  ["markAnalysisResult"](_0x11179a) {
-    this["analysisResultIds"]["add"](_0x11179a);
+  ["markAnalysisResult"](_0x18b8fd) {
+    this["analysisResultIds"]["add"](_0x18b8fd);
   }
-  ["isAnalysisResult"](_0x144fa5) {
-    return this["analysisResultIds"]["has"](_0x144fa5);
+  ["isAnalysisResult"](_0x2b205d) {
+    return this["analysisResultIds"]["has"](_0x2b205d);
   }
-  ["isGeoTiffExportAvailable"](_0x348986) {
-    return isGeoTiffExportAvailable(this["items"]["get"](_0x348986), this["ogcLayerFactory"]["getServiceOptions"](_0x348986));
+  ["isGeoTiffExportAvailable"](_0x349a7d) {
+    return isGeoTiffExportAvailable(this["items"]["get"](_0x349a7d), this["ogcLayerFactory"]["getServiceOptions"](_0x349a7d));
   }
-  async ["exportLayerAsGeoTiff"](_0x2ace60, _0x401193 = "katman") {
-    const _0x1458a3 = this["requireLayer"](_0x2ace60);
-    await exportLayerAsGeoTiff(_0x1458a3, this["ogcLayerFactory"]["getServiceOptions"](_0x2ace60), _0x401193, (_0x1e8c46, _0x2263ac) => this["apiKeyPolicy"]["resolveOgcProxyUrl"](_0x1e8c46, _0x2263ac), { "mergeApiKeyHeader": (_0x5beaf4, _0x184642) => this["apiKeyPolicy"]["mergeApiKeyHeader"](_0x5beaf4, _0x184642), "buildAuthHeaders": (_0x58fbe4) => this["apiKeyPolicy"]["buildAuthHeaders"](_0x58fbe4) });
+  async ["exportLayerAsGeoTiff"](_0x5e1fee, _0x5c6c41 = "katman") {
+    const _0x3f9d5e = this["requireLayer"](_0x5e1fee);
+    await exportLayerAsGeoTiff(_0x3f9d5e, this["ogcLayerFactory"]["getServiceOptions"](_0x5e1fee), _0x5c6c41, (_0x85dbbf, _0x892476) => this["apiKeyPolicy"]["resolveOgcProxyUrl"](_0x85dbbf, _0x892476), { "mergeApiKeyHeader": (_0x34cc87, _0x3b2733) => this["apiKeyPolicy"]["mergeApiKeyHeader"](_0x34cc87, _0x3b2733), "buildAuthHeaders": (_0x3a501f) => this["apiKeyPolicy"]["buildAuthHeaders"](_0x3a501f) });
   }
-  ["getColumnRange"](_0x25a071, _0x3fe6fb) {
-    const _0x1b6fe1 = this["requireLayer"](_0x25a071);
-    if (!("entities" in _0x1b6fe1["cesiumObject"])) return null;
-    return this["styleEngine"]["getColumnRange"](_0x1b6fe1["cesiumObject"], this["viewer"]["clock"]["currentTime"], _0x3fe6fb);
+  ["getColumnRange"](_0x43330a, _0x1ce88d) {
+    const _0x5baba0 = this["requireLayer"](_0x43330a);
+    if (!("entities" in _0x5baba0["cesiumObject"])) return null;
+    return this["styleEngine"]["getColumnRange"](_0x5baba0["cesiumObject"], this["viewer"]["clock"]["currentTime"], _0x1ce88d);
   }
-  async ["applyLayerStyle"](_0x4b1f11, _0xcf8d67) {
-    const _0x89e13e = this["requireLayer"](_0x4b1f11);
-    if (!("entities" in _0x89e13e["cesiumObject"])) throw new LayerOperationError("LAYER_STYLE_NOT_VECTOR", 'applyLayerStyle sadece vektör (Entity tabanlı) katmanlarda kullanılabilir: "' + _0x4b1f11 + '"');
-    await this["styleEngine"]["applyLayerStyle"](_0x4b1f11, _0x89e13e["cesiumObject"], _0x89e13e["layerType"] === "DRAWING" || _0x89e13e["layerType"] === "MEASURE", _0xcf8d67);
+  async ["applyLayerStyle"](_0xad3bfc, _0xccb493) {
+    const _0x29752a = this["requireLayer"](_0xad3bfc);
+    if (!("entities" in _0x29752a["cesiumObject"])) throw new LayerOperationError("LAYER_STYLE_NOT_VECTOR", 'applyLayerStyle sadece vektör (Entity tabanlı) katmanlarda kullanılabilir: "' + _0xad3bfc + '"');
+    await this["styleEngine"]["applyLayerStyle"](_0xad3bfc, _0x29752a["cesiumObject"], _0x29752a["layerType"] === "DRAWING" || _0x29752a["layerType"] === "MEASURE", _0xccb493);
   }
-  ["getLayerStyle"](_0x11d47e) {
-    return this["styleEngine"]["getStyle"](_0x11d47e);
+  ["getLayerStyle"](_0x4a0cd0) {
+    return this["styleEngine"]["getStyle"](_0x4a0cd0);
   }
-  ["getInitialFillColor"](_0x2107ea) {
+  ["getInitialFillColor"](_0x56abae) {
     var _a2;
-    return (_a2 = this["items"]["get"](_0x2107ea)) == null ? void 0 : _a2["initialFillColor"];
+    return (_a2 = this["items"]["get"](_0x56abae)) == null ? void 0 : _a2["initialFillColor"];
   }
   ["getImageryLayers"]() {
-    return Array["from"](this["items"]["values"]())["filter"]((_0x33dcef) => !_0x33dcef["isBasemap"] && _0x33dcef["cesiumObject"] instanceof ImageryLayer)["map"]((_0x5ee49d) => _0x5ee49d["cesiumObject"]);
+    return Array["from"](this["items"]["values"]())["filter"]((_0x556c68) => !_0x556c68["isBasemap"] && _0x556c68["cesiumObject"] instanceof ImageryLayer)["map"]((_0x156f64) => _0x156f64["cesiumObject"]);
   }
   ["getBasemapLayers"]() {
-    return Array["from"](this["items"]["values"]())["filter"]((_0x39261b) => _0x39261b["isBasemap"] && _0x39261b["cesiumObject"] instanceof ImageryLayer)["map"]((_0x39654e) => _0x39654e["cesiumObject"]);
+    return Array["from"](this["items"]["values"]())["filter"]((_0x9d059b) => _0x9d059b["isBasemap"] && _0x9d059b["cesiumObject"] instanceof ImageryLayer)["map"]((_0xaa179e) => _0xaa179e["cesiumObject"]);
   }
   ["getDataSourceLayers"]() {
     return this["viewer"]["dataSources"];
   }
-  ["getLayerByType"](_0x5265d8) {
-    return Array["from"](this["items"]["values"]())["filter"]((_0x3519d8) => _0x3519d8["layerType"] === _0x5265d8);
+  ["getLayerByType"](_0x4dfb9b) {
+    return Array["from"](this["items"]["values"]())["filter"]((_0x2c80e6) => _0x2c80e6["layerType"] === _0x4dfb9b);
   }
-  async ["zoomToLayer"](_0xdbb358) {
-    return this["cameraHighlight"]["zoomToLayer"](_0xdbb358);
+  async ["zoomToLayer"](_0x1175f1) {
+    return this["cameraHighlight"]["zoomToLayer"](_0x1175f1);
   }
-  async ["zoomToEntity"](_0xcd8ec1, _0x4667d3) {
-    return this["cameraHighlight"]["zoomToEntity"](_0xcd8ec1, _0x4667d3);
+  async ["zoomToEntity"](_0x30205f, _0x273bbb) {
+    return this["cameraHighlight"]["zoomToEntity"](_0x30205f, _0x273bbb);
   }
-  ["highlightEntity"](_0x4517c0) {
-    this["cameraHighlight"]["highlightEntity"](_0x4517c0);
+  ["highlightEntity"](_0x1f6e61) {
+    this["cameraHighlight"]["highlightEntity"](_0x1f6e61);
   }
   ["clearHighlight"]() {
     this["cameraHighlight"]["clearHighlight"]();
   }
-  async ["add"](_0x58b24e, _0x1b89e4) {
-    this["assertUniqueId"](_0x1b89e4["id"]);
-    switch (_0x58b24e) {
+  async ["add"](_0x351180, _0x43d46f) {
+    this["assertUniqueId"](_0x43d46f["id"]);
+    switch (_0x351180) {
       case "WMS":
-        return this["addWMS"](_0x1b89e4);
+        return this["addWMS"](_0x43d46f);
       case "WMTS":
-        return this["addWMTS"](_0x1b89e4);
+        return this["addWMTS"](_0x43d46f);
       case "WFS":
-        return this["addWFS"](_0x1b89e4);
+        return this["addWFS"](_0x43d46f);
       case "WCS":
-        return this["addWCS"](_0x1b89e4);
+        return this["addWCS"](_0x43d46f);
       case "GEOTIFF":
-        return this["addGeoTiff"](_0x1b89e4);
+        return this["addGeoTiff"](_0x43d46f);
       case "GEOJSON":
       case "KML":
       case "KMZ":
-        return this["addLocalKmlGeoJson"](_0x58b24e, _0x1b89e4);
+        return this["addLocalKmlGeoJson"](_0x351180, _0x43d46f);
       case "SHP":
-        return this["addShp"](_0x1b89e4);
+        return this["addShp"](_0x43d46f);
       case "CSV":
-        return this["addCsv"](_0x1b89e4);
+        return this["addCsv"](_0x43d46f);
       case "XYZ":
         throw new LayerOperationError("LAYER_TYPE_UNSUPPORTED_XYZ", "XYZ katmanı add() ile desteklenmiyor. Map.setBasemap() kullanın.");
       case "DRAWING":
@@ -2227,200 +2227,200 @@ const _LayerManager = class _LayerManager extends EventEmitter {
         throw new LayerOperationError("LAYER_TYPE_UNSUPPORTED_MEASURE", '"MEASURE" katmanı add() ile desteklenmiyor -- DrawingManager draw:complete olayı üzerinden Map tarafından otomatik eklenir.');
     }
   }
-  ["setVisible"](_0x1939db, _0xe03d79) {
-    const _0x2d8f1b = this["requireLayer"](_0x1939db);
-    _0x2d8f1b["cesiumObject"]["show"] = _0xe03d79, this["emit"]("layer:visibility", { "id": _0x1939db, "visible": _0xe03d79 });
+  ["setVisible"](_0x1101a5, _0x23b03a) {
+    const _0x1dc68f = this["requireLayer"](_0x1101a5);
+    _0x1dc68f["cesiumObject"]["show"] = _0x23b03a, this["emit"]("layer:visibility", { "id": _0x1101a5, "visible": _0x23b03a });
   }
-  ["setOpacity"](_0x422cf7, _0xe3a3e4) {
-    const _0x2477ea = Math["max"](0, Math["min"](1, _0xe3a3e4)), _0x5e7888 = this["requireLayer"](_0x422cf7);
-    _0x5e7888["cesiumObject"] instanceof ImageryLayer ? _0x5e7888["cesiumObject"]["alpha"] = _0x2477ea : this["setDataSourceOpacity"](_0x5e7888["cesiumObject"], _0x2477ea), this["emit"]("layer:opacity", { "id": _0x422cf7, "opacity": _0x2477ea });
+  ["setOpacity"](_0x41b50d, _0x160d79) {
+    const _0x41caf2 = Math["max"](0, Math["min"](1, _0x160d79)), _0x3c000f = this["requireLayer"](_0x41b50d);
+    _0x3c000f["cesiumObject"] instanceof ImageryLayer ? _0x3c000f["cesiumObject"]["alpha"] = _0x41caf2 : this["setDataSourceOpacity"](_0x3c000f["cesiumObject"], _0x41caf2), this["emit"]("layer:opacity", { "id": _0x41b50d, "opacity": _0x41caf2 });
   }
-  ["_move"](_0x6c2ac3, _0x5b029f) {
-    const _0x54f033 = this["requireLayer"](_0x6c2ac3), _0x25d29b = _0x54f033["cesiumObject"] instanceof ImageryLayer ? this["viewer"]["imageryLayers"] : this["viewer"]["dataSources"], _0x4f5c25 = _0x25d29b["indexOf"](_0x54f033["cesiumObject"]);
-    _0x25d29b[_0x5b029f](_0x54f033["cesiumObject"]);
-    const _0x32de81 = _0x25d29b["indexOf"](_0x54f033["cesiumObject"]);
-    this["reindexLayerOrder"](), this["emit"]("layer:reorder", { "id": _0x6c2ac3, "oldIndex": _0x4f5c25, "newIndex": _0x32de81, "layer": _0x54f033 });
+  ["_move"](_0x378913, _0x577d4c) {
+    const _0x17a6bd = this["requireLayer"](_0x378913), _0x49c6fb = _0x17a6bd["cesiumObject"] instanceof ImageryLayer ? this["viewer"]["imageryLayers"] : this["viewer"]["dataSources"], _0x7915c7 = _0x49c6fb["indexOf"](_0x17a6bd["cesiumObject"]);
+    _0x49c6fb[_0x577d4c](_0x17a6bd["cesiumObject"]);
+    const _0x1a90e7 = _0x49c6fb["indexOf"](_0x17a6bd["cesiumObject"]);
+    this["reindexLayerOrder"](), this["emit"]("layer:reorder", { "id": _0x378913, "oldIndex": _0x7915c7, "newIndex": _0x1a90e7, "layer": _0x17a6bd });
   }
-  ["raise"](_0x3c2415) {
-    this["_move"](_0x3c2415, "raise");
+  ["raise"](_0x3270d7) {
+    this["_move"](_0x3270d7, "raise");
   }
-  ["lower"](_0x304ec9) {
-    this["_move"](_0x304ec9, "lower");
+  ["lower"](_0x2acbd8) {
+    this["_move"](_0x2acbd8, "lower");
   }
-  ["raiseToTop"](_0x23cd34) {
-    this["_move"](_0x23cd34, "raiseToTop");
+  ["raiseToTop"](_0x165628) {
+    this["_move"](_0x165628, "raiseToTop");
   }
-  ["lowerToBottom"](_0x2648a8) {
-    this["_move"](_0x2648a8, "lowerToBottom");
+  ["lowerToBottom"](_0x3978fa) {
+    this["_move"](_0x3978fa, "lowerToBottom");
   }
-  ["reorder"](_0x26d66f) {
-    const _0x3f5ffb = _0x26d66f[0], _0xcd8154 = _0x3f5ffb !== void 0 ? this["items"]["get"](_0x3f5ffb) : void 0, _0x2af6ac = (_0xcd8154 == null ? void 0 : _0xcd8154["cesiumObject"]) instanceof ImageryLayer, _0x1a0372 = _0xcd8154 ? _0x2af6ac ? this["viewer"]["imageryLayers"]["indexOf"](_0xcd8154["cesiumObject"]) : this["viewer"]["dataSources"]["indexOf"](_0xcd8154["cesiumObject"]) : -1, _0x3ea447 = [], _0x3e7861 = [];
-    for (const _0x5a0a98 of _0x26d66f) {
-      const _0x282090 = this["items"]["get"](_0x5a0a98);
-      if (_0x282090 === void 0) continue;
-      _0x282090["cesiumObject"] instanceof ImageryLayer ? _0x3ea447["push"](_0x5a0a98) : _0x3e7861["push"](_0x5a0a98);
+  ["reorder"](_0x40bcc7) {
+    const _0x89e8bb = _0x40bcc7[0], _0x525ab2 = _0x89e8bb !== void 0 ? this["items"]["get"](_0x89e8bb) : void 0, _0x1de237 = (_0x525ab2 == null ? void 0 : _0x525ab2["cesiumObject"]) instanceof ImageryLayer, _0x352910 = _0x525ab2 ? _0x1de237 ? this["viewer"]["imageryLayers"]["indexOf"](_0x525ab2["cesiumObject"]) : this["viewer"]["dataSources"]["indexOf"](_0x525ab2["cesiumObject"]) : -1, _0xeef61 = [], _0x355c09 = [];
+    for (const _0x34ac84 of _0x40bcc7) {
+      const _0x2083f5 = this["items"]["get"](_0x34ac84);
+      if (_0x2083f5 === void 0) continue;
+      _0x2083f5["cesiumObject"] instanceof ImageryLayer ? _0xeef61["push"](_0x34ac84) : _0x355c09["push"](_0x34ac84);
     }
-    for (let _0x29d9ac = _0x3ea447["length"] - 1; _0x29d9ac >= 0; _0x29d9ac--) {
-      const _0x1358ef = this["items"]["get"](_0x3ea447[_0x29d9ac]);
-      (_0x1358ef == null ? void 0 : _0x1358ef["cesiumObject"]) instanceof ImageryLayer && this["viewer"]["imageryLayers"]["raiseToTop"](_0x1358ef["cesiumObject"]);
+    for (let _0x45e12c = _0xeef61["length"] - 1; _0x45e12c >= 0; _0x45e12c--) {
+      const _0x1bcb33 = this["items"]["get"](_0xeef61[_0x45e12c]);
+      (_0x1bcb33 == null ? void 0 : _0x1bcb33["cesiumObject"]) instanceof ImageryLayer && this["viewer"]["imageryLayers"]["raiseToTop"](_0x1bcb33["cesiumObject"]);
     }
-    for (let _0x5c0ac1 = _0x3e7861["length"] - 1; _0x5c0ac1 >= 0; _0x5c0ac1--) {
-      const _0x16dbe1 = this["items"]["get"](_0x3e7861[_0x5c0ac1]);
-      _0x16dbe1 !== void 0 && !(_0x16dbe1["cesiumObject"] instanceof ImageryLayer) && this["viewer"]["dataSources"]["raiseToTop"](_0x16dbe1["cesiumObject"]);
+    for (let _0x54f44f = _0x355c09["length"] - 1; _0x54f44f >= 0; _0x54f44f--) {
+      const _0x1edf3f = this["items"]["get"](_0x355c09[_0x54f44f]);
+      _0x1edf3f !== void 0 && !(_0x1edf3f["cesiumObject"] instanceof ImageryLayer) && this["viewer"]["dataSources"]["raiseToTop"](_0x1edf3f["cesiumObject"]);
     }
     this["reindexLayerOrder"]();
-    if (_0xcd8154 !== void 0 && _0x3f5ffb !== void 0) {
-      const _0x236cff = _0x2af6ac ? this["viewer"]["imageryLayers"]["indexOf"](_0xcd8154["cesiumObject"]) : this["viewer"]["dataSources"]["indexOf"](_0xcd8154["cesiumObject"]);
-      this["emit"]("layer:reorder", { "id": _0x3f5ffb, "oldIndex": _0x1a0372, "newIndex": _0x236cff, "layer": _0xcd8154 });
+    if (_0x525ab2 !== void 0 && _0x89e8bb !== void 0) {
+      const _0x52f8bd = _0x1de237 ? this["viewer"]["imageryLayers"]["indexOf"](_0x525ab2["cesiumObject"]) : this["viewer"]["dataSources"]["indexOf"](_0x525ab2["cesiumObject"]);
+      this["emit"]("layer:reorder", { "id": _0x89e8bb, "oldIndex": _0x352910, "newIndex": _0x52f8bd, "layer": _0x525ab2 });
     }
   }
-  ["removeLayer"](_0x2a7936) {
-    const _0x59ae5c = this["requireLayer"](_0x2a7936);
-    _0x59ae5c["cesiumObject"] instanceof ImageryLayer ? this["viewer"]["imageryLayers"]["remove"](_0x59ae5c["cesiumObject"], !![]) : void this["viewer"]["dataSources"]["remove"](_0x59ae5c["cesiumObject"], !![]), this["items"]["delete"](_0x2a7936), this["analysisResultIds"]["delete"](_0x2a7936), this["ogcLayerFactory"]["deleteServiceOptions"](_0x2a7936), this["styleEngine"]["deleteStyle"](_0x2a7936), this["shapeLayerBridge"]["deleteCounter"](_0x2a7936), this["emit"]("layer:remove", { "layer": _0x59ae5c });
+  ["removeLayer"](_0x32cb3f) {
+    const _0x41dd82 = this["requireLayer"](_0x32cb3f);
+    _0x41dd82["cesiumObject"] instanceof ImageryLayer ? this["viewer"]["imageryLayers"]["remove"](_0x41dd82["cesiumObject"], !![]) : void this["viewer"]["dataSources"]["remove"](_0x41dd82["cesiumObject"], !![]), this["items"]["delete"](_0x32cb3f), this["analysisResultIds"]["delete"](_0x32cb3f), this["ogcLayerFactory"]["deleteServiceOptions"](_0x32cb3f), this["styleEngine"]["deleteStyle"](_0x32cb3f), this["shapeLayerBridge"]["deleteCounter"](_0x32cb3f), this["emit"]("layer:remove", { "layer": _0x41dd82 });
   }
-  ["addWMS"](_0x1d4dfe) {
-    return this["ogcLayerFactory"]["addWMS"](_0x1d4dfe);
+  ["addWMS"](_0x5ceb4c) {
+    return this["ogcLayerFactory"]["addWMS"](_0x5ceb4c);
   }
-  ["addWMTS"](_0x5ac482) {
-    return this["ogcLayerFactory"]["addWMTS"](_0x5ac482);
+  ["addWMTS"](_0x132878) {
+    return this["ogcLayerFactory"]["addWMTS"](_0x132878);
   }
-  async ["getWmsAvailableStyles"](_0x34fc78) {
-    return this["ogcLayerFactory"]["getWmsAvailableStyles"](_0x34fc78);
+  async ["getWmsAvailableStyles"](_0x96c678) {
+    return this["ogcLayerFactory"]["getWmsAvailableStyles"](_0x96c678);
   }
-  async ["setWmsStyle"](_0x5c102d, _0x14f6b3) {
-    return this["ogcLayerFactory"]["setWmsStyle"](_0x5c102d, _0x14f6b3);
+  async ["setWmsStyle"](_0x39dc92, _0xb6a536) {
+    return this["ogcLayerFactory"]["setWmsStyle"](_0x39dc92, _0xb6a536);
   }
-  ["getWmsLegendGraphicUrl"](_0x4cf971, _0x27abbe) {
-    return this["ogcLayerFactory"]["getWmsLegendGraphicUrl"](_0x4cf971, _0x27abbe);
+  ["getWmsLegendGraphicUrl"](_0x1969f9, _0x2b7c15) {
+    return this["ogcLayerFactory"]["getWmsLegendGraphicUrl"](_0x1969f9, _0x2b7c15);
   }
-  async ["getWmtsAvailableStyles"](_0x11d85f) {
-    return this["ogcLayerFactory"]["getWmtsAvailableStyles"](_0x11d85f);
+  async ["getWmtsAvailableStyles"](_0x2602b3) {
+    return this["ogcLayerFactory"]["getWmtsAvailableStyles"](_0x2602b3);
   }
-  async ["setWmtsStyle"](_0x82435b, _0x2ccb75) {
-    return this["ogcLayerFactory"]["setWmtsStyle"](_0x82435b, _0x2ccb75);
+  async ["setWmtsStyle"](_0x3ffc93, _0x199758) {
+    return this["ogcLayerFactory"]["setWmtsStyle"](_0x3ffc93, _0x199758);
   }
-  ["addWFS"](_0x2d6335) {
-    return this["ogcLayerFactory"]["addWFS"]({ ..._0x2d6335, "clampToGround": _0x2d6335["clampToGround"] ?? !![] });
+  ["addWFS"](_0x1ae7a3) {
+    return this["ogcLayerFactory"]["addWFS"]({ ..._0x1ae7a3, "clampToGround": _0x1ae7a3["clampToGround"] ?? !![] });
   }
-  ["addWCS"](_0x2e9137) {
-    return this["ogcLayerFactory"]["addWCS"](_0x2e9137);
+  ["addWCS"](_0x1c6019) {
+    return this["ogcLayerFactory"]["addWCS"](_0x1c6019);
   }
-  ["addGeoTiff"](_0x5978c5) {
-    return this["ogcLayerFactory"]["addGeoTiff"](_0x5978c5);
+  ["addGeoTiff"](_0x56d145) {
+    return this["ogcLayerFactory"]["addGeoTiff"](_0x56d145);
   }
-  ["addLocalKmlGeoJson"](_0x56a756, _0x16416c) {
-    return this["localSourceLoader"]["addLocalKmlGeoJson"](_0x56a756, _0x16416c);
+  ["addLocalKmlGeoJson"](_0x1bba96, _0x158cd0) {
+    return this["localSourceLoader"]["addLocalKmlGeoJson"](_0x1bba96, _0x158cd0);
   }
-  ["addShp"](_0x1a49bd) {
-    return this["localSourceLoader"]["addShp"](_0x1a49bd);
+  ["addShp"](_0x3dd524) {
+    return this["localSourceLoader"]["addShp"](_0x3dd524);
   }
-  ["addCsv"](_0xb5b754) {
-    return this["localSourceLoader"]["addCsv"](_0xb5b754);
+  ["addCsv"](_0x3ff91e) {
+    return this["localSourceLoader"]["addCsv"](_0x3ff91e);
   }
-  ["_addBasemapImageryLayer"](_0x4589a2, _0x299c2f, _0x5e1f37) {
-    return this["register"](_0x4589a2, _0x299c2f, "XYZ", _0x5e1f37, !![]);
+  ["_addBasemapImageryLayer"](_0x52fe7f, _0xca559d, _0x383565) {
+    return this["register"](_0x52fe7f, _0xca559d, "XYZ", _0x383565, !![]);
   }
   ["_removeBasemapLayers"]() {
-    for (const _0x27a594 of this["items"]["values"]()) {
-      _0x27a594["isBasemap"] && _0x27a594["cesiumObject"] instanceof ImageryLayer && (this["viewer"]["imageryLayers"]["remove"](_0x27a594["cesiumObject"], !![]), this["items"]["delete"](_0x27a594["id"]));
+    for (const _0x3a339c of this["items"]["values"]()) {
+      _0x3a339c["isBasemap"] && _0x3a339c["cesiumObject"] instanceof ImageryLayer && (this["viewer"]["imageryLayers"]["remove"](_0x3a339c["cesiumObject"], !![]), this["items"]["delete"](_0x3a339c["id"]));
     }
   }
-  ["_addDrawnShape"](_0x4c7af7, _0x5d2822, _0x392903) {
-    return this["shapeLayerBridge"]["addDrawnShape"](_0x4c7af7, _0x5d2822, _0x392903);
+  ["_addDrawnShape"](_0x27feeb, _0x3c304a, _0x51ad11) {
+    return this["shapeLayerBridge"]["addDrawnShape"](_0x27feeb, _0x3c304a, _0x51ad11);
   }
-  ["_addMeasuredShape"](_0x882b93, _0x411d66, _0x3bae93) {
-    return this["shapeLayerBridge"]["addMeasuredShape"](_0x882b93, _0x411d66, _0x3bae93);
+  ["_addMeasuredShape"](_0x1812cf, _0x316064, _0x5adac2) {
+    return this["shapeLayerBridge"]["addMeasuredShape"](_0x1812cf, _0x316064, _0x5adac2);
   }
-  ["_removeDrawnShape"](_0x5bc58c, _0x1c5399) {
-    this["shapeLayerBridge"]["removeDrawnShape"](_0x5bc58c, _0x1c5399);
+  ["_removeDrawnShape"](_0x24b63b, _0xcab927) {
+    this["shapeLayerBridge"]["removeDrawnShape"](_0x24b63b, _0xcab927);
   }
-  ["register"](_0x511416, _0x55c93f, _0x1eb263, _0x2a4c7a, _0x2a55b8, _0x23b98b) {
-    "entities" in _0x2a4c7a && this["tagEntities"](_0x2a4c7a, _0x511416);
-    const _0x2d9126 = Object["freeze"]({ "id": _0x511416, "title": _0x55c93f, "layerType": _0x1eb263, "cesiumObject": _0x2a4c7a, "isBasemap": _0x2a55b8, ..._0x23b98b !== void 0 ? { "initialFillColor": _0x23b98b } : {} });
-    return this["items"]["set"](_0x511416, _0x2d9126), this["emit"]("layer:add", { "layer": _0x2d9126 }), _0x2d9126;
+  ["register"](_0x3dbdf8, _0x5ce46f, _0x21b0e6, _0x3db5c3, _0x2273e0, _0x558948) {
+    "entities" in _0x3db5c3 && this["tagEntities"](_0x3db5c3, _0x3dbdf8);
+    const _0x84aac1 = Object["freeze"]({ "id": _0x3dbdf8, "title": _0x5ce46f, "layerType": _0x21b0e6, "cesiumObject": _0x3db5c3, "isBasemap": _0x2273e0, ..._0x558948 !== void 0 ? { "initialFillColor": _0x558948 } : {} });
+    return this["items"]["set"](_0x3dbdf8, _0x84aac1), this["emit"]("layer:add", { "layer": _0x84aac1 }), _0x84aac1;
   }
-  ["emitCrsCheckResult"](_0x3fdeeb, _0x391c76) {
-    if (!_0x391c76) return;
-    switch (_0x391c76["kind"]) {
+  ["emitCrsCheckResult"](_0x50c543, _0x364ba6) {
+    if (!_0x364ba6) return;
+    switch (_0x364ba6["kind"]) {
       case "reprojected":
-        this["emit"]("layer:crs-reprojected", { "id": _0x3fdeeb, "fromEpsg": _0x391c76["fromEpsg"], "toEpsg": "EPSG:4326" });
+        this["emit"]("layer:crs-reprojected", { "id": _0x50c543, "fromEpsg": _0x364ba6["fromEpsg"], "toEpsg": "EPSG:4326" });
         break;
       case "suspicious-unresolved-crs":
-        this["emit"]("layer:crs-unresolved", { "id": _0x3fdeeb, "crsName": _0x391c76["crsName"] });
+        this["emit"]("layer:crs-unresolved", { "id": _0x50c543, "crsName": _0x364ba6["crsName"] });
         break;
     }
   }
-  ["tagEntities"](_0x26f601, _0x35a634) {
-    _0x26f601["entities"]["suspendEvents"]();
-    for (const _0x38081c of _0x26f601["entities"]["values"]) {
-      _0x38081c["properties"] === void 0 && (_0x38081c["properties"] = new PropertyBag()), !_0x38081c["properties"]["hasProperty"]("layerId") && _0x38081c["properties"]["addProperty"]("layerId", _0x35a634), !_0x38081c["properties"]["hasProperty"]("featureId") && _0x38081c["properties"]["addProperty"]("featureId", _0x38081c["id"]);
+  ["tagEntities"](_0x12155e, _0x18fa92) {
+    _0x12155e["entities"]["suspendEvents"]();
+    for (const _0x5bb165 of _0x12155e["entities"]["values"]) {
+      _0x5bb165["properties"] === void 0 && (_0x5bb165["properties"] = new PropertyBag()), !_0x5bb165["properties"]["hasProperty"]("layerId") && _0x5bb165["properties"]["addProperty"]("layerId", _0x18fa92), !_0x5bb165["properties"]["hasProperty"]("featureId") && _0x5bb165["properties"]["addProperty"]("featureId", _0x5bb165["id"]);
     }
-    _0x26f601["entities"]["resumeEvents"]();
+    _0x12155e["entities"]["resumeEvents"]();
   }
   ["reindexLayerOrder"]() {
-    const _0x5c4feb = /* @__PURE__ */ new Map();
-    for (let _0x35d52b = 0; _0x35d52b < this["viewer"]["imageryLayers"]["length"]; _0x35d52b++) {
-      _0x5c4feb["set"](this["viewer"]["imageryLayers"]["get"](_0x35d52b), _0x35d52b);
+    const _0x1b0f28 = /* @__PURE__ */ new Map();
+    for (let _0x1b918a = 0; _0x1b918a < this["viewer"]["imageryLayers"]["length"]; _0x1b918a++) {
+      _0x1b0f28["set"](this["viewer"]["imageryLayers"]["get"](_0x1b918a), _0x1b918a);
     }
-    const _0xc7fd62 = /* @__PURE__ */ new Map();
-    for (let _0x5c43cd = 0; _0x5c43cd < this["viewer"]["dataSources"]["length"]; _0x5c43cd++) {
-      _0xc7fd62["set"](this["viewer"]["dataSources"]["get"](_0x5c43cd), _0x5c43cd);
+    const _0xfb97b0 = /* @__PURE__ */ new Map();
+    for (let _0x7756b5 = 0; _0x7756b5 < this["viewer"]["dataSources"]["length"]; _0x7756b5++) {
+      _0xfb97b0["set"](this["viewer"]["dataSources"]["get"](_0x7756b5), _0x7756b5);
     }
-    const _0x28d592 = (_0x48f62d) => (_0x48f62d["cesiumObject"] instanceof ImageryLayer ? _0x5c4feb["get"](_0x48f62d["cesiumObject"]) : _0xc7fd62["get"](_0x48f62d["cesiumObject"])) ?? Number["POSITIVE_INFINITY"], _0x237419 = Array["from"](this["items"]["entries"]()), _0x16e7a7 = _0x237419["filter"](([, _0x1a9279]) => _0x1a9279["cesiumObject"] instanceof ImageryLayer)["sort"](([, _0x154f99], [, _0x5969f3]) => _0x28d592(_0x154f99) - _0x28d592(_0x5969f3)), _0x33d111 = _0x237419["filter"](([, _0x23f917]) => !(_0x23f917["cesiumObject"] instanceof ImageryLayer))["sort"](([, _0x1b1945], [, _0x485bbc]) => _0x28d592(_0x1b1945) - _0x28d592(_0x485bbc));
-    let _0x1db54f = 0, _0x399041 = 0;
-    const _0x8d01ef = _0x237419["map"](([, _0x5dc457]) => _0x5dc457["cesiumObject"] instanceof ImageryLayer ? _0x16e7a7[_0x1db54f++] : _0x33d111[_0x399041++]);
+    const _0x53ae10 = (_0x26bf15) => (_0x26bf15["cesiumObject"] instanceof ImageryLayer ? _0x1b0f28["get"](_0x26bf15["cesiumObject"]) : _0xfb97b0["get"](_0x26bf15["cesiumObject"])) ?? Number["POSITIVE_INFINITY"], _0x3b54ac = Array["from"](this["items"]["entries"]()), _0x1cb1ff = _0x3b54ac["filter"](([, _0x2087d9]) => _0x2087d9["cesiumObject"] instanceof ImageryLayer)["sort"](([, _0x36af24], [, _0x21b19c]) => _0x53ae10(_0x36af24) - _0x53ae10(_0x21b19c)), _0xbf5020 = _0x3b54ac["filter"](([, _0xea5831]) => !(_0xea5831["cesiumObject"] instanceof ImageryLayer))["sort"](([, _0x53ed8c], [, _0x1278d8]) => _0x53ae10(_0x53ed8c) - _0x53ae10(_0x1278d8));
+    let _0x5efab5 = 0, _0x239a11 = 0;
+    const _0x12aa4e = _0x3b54ac["map"](([, _0x3919e8]) => _0x3919e8["cesiumObject"] instanceof ImageryLayer ? _0x1cb1ff[_0x5efab5++] : _0xbf5020[_0x239a11++]);
     this["items"]["clear"]();
-    for (const [_0x1a04c0, _0x469cb8] of _0x8d01ef) this["items"]["set"](_0x1a04c0, _0x469cb8);
+    for (const [_0x175337, _0x361271] of _0x12aa4e) this["items"]["set"](_0x175337, _0x361271);
   }
-  ["requireLayer"](_0x6d25e4) {
-    const _0x1eeb8b = this["items"]["get"](_0x6d25e4);
-    if (_0x1eeb8b === void 0) throw new LayerOperationError("LAYER_NOT_FOUND", 'Katman bulunamadı: "' + _0x6d25e4 + '"');
-    return _0x1eeb8b;
+  ["requireLayer"](_0x1a2d98) {
+    const _0x2ad98c = this["items"]["get"](_0x1a2d98);
+    if (_0x2ad98c === void 0) throw new LayerOperationError("LAYER_NOT_FOUND", 'Katman bulunamadı: "' + _0x1a2d98 + '"');
+    return _0x2ad98c;
   }
-  ["assertUniqueId"](_0x1008ea) {
-    if (this["items"]["has"](_0x1008ea)) throw new LayerOperationError("LAYER_ID_ALREADY_EXISTS", '"' + _0x1008ea + `" id'li katman zaten eklenmiş.`);
+  ["assertUniqueId"](_0x561b94) {
+    if (this["items"]["has"](_0x561b94)) throw new LayerOperationError("LAYER_ID_ALREADY_EXISTS", '"' + _0x561b94 + `" id'li katman zaten eklenmiş.`);
   }
-  async ["getCapabilitiesDocument"](_0x257786, _0x364d3f, _0x1ae379, _0x177518) {
-    return this["ogcLayerFactory"]["getCapabilitiesDocument"](_0x257786, _0x364d3f, _0x1ae379, _0x177518);
+  async ["getCapabilitiesDocument"](_0x5ec75f, _0x3b9ee2, _0x842984, _0x329456) {
+    return this["ogcLayerFactory"]["getCapabilitiesDocument"](_0x5ec75f, _0x3b9ee2, _0x842984, _0x329456);
   }
-  async ["getWcsCoverageExtents"](_0x392117, _0x297cc2, _0x468135) {
-    return this["ogcLayerFactory"]["getWcsCoverageExtents"](_0x392117, _0x297cc2, _0x468135);
+  async ["getWcsCoverageExtents"](_0x52b32e, _0x51b5c4, _0x54c29c) {
+    return this["ogcLayerFactory"]["getWcsCoverageExtents"](_0x52b32e, _0x51b5c4, _0x54c29c);
   }
-  ["waitForRenderSettle"](_0x435600 = 60) {
-    return new Promise((_0x1f3bea) => {
-      let _0x12e126 = _0x435600;
-      const _0x813154 = () => {
-        _0x12e126 -= 1, _0x12e126 <= 0 && (this["viewer"]["scene"]["postRender"]["removeEventListener"](_0x813154), _0x1f3bea());
+  ["waitForRenderSettle"](_0x29a243 = 60) {
+    return new Promise((_0x599178) => {
+      let _0x44c530 = _0x29a243;
+      const _0x2678ac = () => {
+        _0x44c530 -= 1, _0x44c530 <= 0 && (this["viewer"]["scene"]["postRender"]["removeEventListener"](_0x2678ac), _0x599178());
       };
-      this["viewer"]["scene"]["postRender"]["addEventListener"](_0x813154);
+      this["viewer"]["scene"]["postRender"]["addEventListener"](_0x2678ac);
     });
   }
-  ["isOutlineCompanion"](_0x25cf8d) {
-    return this["outlineGeometry"]["isOutlineCompanion"](_0x25cf8d);
+  ["isOutlineCompanion"](_0x27175a) {
+    return this["outlineGeometry"]["isOutlineCompanion"](_0x27175a);
   }
-  ["hasOutlineCompanion"](_0x3b745f) {
-    return this["outlineGeometry"]["hasOutlineCompanion"](_0x3b745f);
+  ["hasOutlineCompanion"](_0xcb6229) {
+    return this["outlineGeometry"]["hasOutlineCompanion"](_0xcb6229);
   }
-  ["hasRiskyOutline"](_0x18e5d8) {
-    return this["outlineGeometry"]["hasRiskyOutline"](_0x18e5d8);
+  ["hasRiskyOutline"](_0x417ee4) {
+    return this["outlineGeometry"]["hasRiskyOutline"](_0x417ee4);
   }
-  ["addPolygonOutlines"](_0x31bedd, _0x2feb38, _0x49e520) {
-    this["outlineGeometry"]["addPolygonOutlines"](_0x31bedd, _0x2feb38, _0x49e520);
-    for (const _0x4451b9 of _0x31bedd["entities"]["values"]) {
-      this["outlineGeometry"]["hasOutlineCompanion"](_0x4451b9) && this["opacityController"]["ensureDynamicFillColor"](_0x31bedd, _0x4451b9);
+  ["addPolygonOutlines"](_0x4fb3eb, _0x94fbe0, _0x25f103) {
+    this["outlineGeometry"]["addPolygonOutlines"](_0x4fb3eb, _0x94fbe0, _0x25f103);
+    for (const _0xd61431 of _0x4fb3eb["entities"]["values"]) {
+      this["outlineGeometry"]["hasOutlineCompanion"](_0xd61431) && this["opacityController"]["ensureDynamicFillColor"](_0x4fb3eb, _0xd61431);
     }
   }
-  ["addPolygonOutlineCompanion"](_0x392ad7, _0x2c2806, _0x3df997, _0x2d749d, _0x3e97a5) {
-    this["outlineGeometry"]["addPolygonOutlineCompanion"](_0x392ad7, _0x2c2806, _0x3df997, _0x2d749d, _0x3e97a5), this["outlineGeometry"]["hasOutlineCompanion"](_0x2c2806) && this["opacityController"]["ensureDynamicFillColor"](_0x392ad7, _0x2c2806);
+  ["addPolygonOutlineCompanion"](_0x491411, _0x315eec, _0x47bde2, _0x55be3c, _0x65a4b0) {
+    this["outlineGeometry"]["addPolygonOutlineCompanion"](_0x491411, _0x315eec, _0x47bde2, _0x55be3c, _0x65a4b0), this["outlineGeometry"]["hasOutlineCompanion"](_0x315eec) && this["opacityController"]["ensureDynamicFillColor"](_0x491411, _0x315eec);
   }
-  ["readProperty"](_0x252b46, _0xc8129a, _0x41b926) {
-    return this["styleEngine"]["readProperty"](_0x252b46, _0xc8129a, _0x41b926);
+  ["readProperty"](_0x40858f, _0x1143ee, _0x3db85f) {
+    return this["styleEngine"]["readProperty"](_0x40858f, _0x1143ee, _0x3db85f);
   }
-  ["applyEntityStyle"](_0x5b6d06, _0x2ec2eb, _0x21eb7b, _0x28289b) {
-    this["styleEngine"]["applyEntityStyle"](_0x5b6d06, _0x2ec2eb, _0x21eb7b, _0x28289b);
+  ["applyEntityStyle"](_0x56c8e5, _0x5124a2, _0x8d639e, _0x1569ab) {
+    this["styleEngine"]["applyEntityStyle"](_0x56c8e5, _0x5124a2, _0x8d639e, _0x1569ab);
   }
-  ["setDataSourceOpacity"](_0x108670, _0x2f2a85) {
-    this["opacityController"]["setDataSourceOpacity"](_0x108670, _0x2f2a85);
+  ["setDataSourceOpacity"](_0x4c0044, _0x2c94de) {
+    this["opacityController"]["setDataSourceOpacity"](_0x4c0044, _0x2c94de);
   }
   ["destroy"]() {
     this["removeAllListeners"](), this["items"]["clear"]();
@@ -2430,53 +2430,53 @@ _LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] = "#1a73e8";
 _LayerManager["DEFAULT_OUTLINE_COLOR"] = Color["fromCssColorString"](_LayerManager["DEFAULT_OUTLINE_COLOR_HEX"]);
 let LayerManager = _LayerManager;
 const FLAG = "__tucbsSelectionHighlight";
-function isSelectionHighlightEntity(_0x39961d) {
-  return _0x39961d[FLAG] === !![];
+function isSelectionHighlightEntity(_0x2d00d2) {
+  return _0x2d00d2[FLAG] === !![];
 }
 class SelectionHighlight {
-  constructor(_0x532f81) {
-    this["viewer"] = _0x532f81, this["source"] = null, this["generation"] = 0;
+  constructor(_0x31131c) {
+    this["viewer"] = _0x31131c, this["source"] = null, this["generation"] = 0;
   }
-  ["show"](_0x5853d5) {
-    const _0x2348ca = ++this["generation"];
-    if (_0x5853d5["length"] === 0) {
+  ["show"](_0x798da3) {
+    const _0x25456c = ++this["generation"];
+    if (_0x798da3["length"] === 0) {
       this["removeSource"]();
       return;
     }
-    void this["load"](_0x5853d5, _0x2348ca);
+    void this["load"](_0x798da3, _0x25456c);
   }
   ["clear"]() {
     this["generation"]++, this["removeSource"]();
   }
-  async ["load"](_0x59abd2, _0x117c23) {
-    const _0xe95973 = Color["fromCssColorString"]("#dc2626")["withAlpha"](0.25), _0x3e6540 = Color["fromCssColorString"]("#dc2626"), _0x5e37be = { "type": "FeatureCollection", "features": [..._0x59abd2] }, _0x5ddb0e = await GeoJsonDataSource["load"](_0x5e37be, { "clampToGround": !![], "fill": _0xe95973, "stroke": _0x3e6540, "strokeWidth": 3, "markerColor": _0x3e6540, "markerSize": 16 });
-    if (_0x117c23 !== this["generation"]) return;
-    this["removeSource"](), this["paint"](_0x5ddb0e, _0xe95973, _0x3e6540), this["viewer"]["dataSources"]["add"](_0x5ddb0e), this["source"] = _0x5ddb0e;
+  async ["load"](_0x17f608, _0x50ef95) {
+    const _0x5880c9 = Color["fromCssColorString"]("#dc2626")["withAlpha"](0.25), _0x47637a = Color["fromCssColorString"]("#dc2626"), _0x504733 = { "type": "FeatureCollection", "features": [..._0x17f608] }, _0x37d890 = await GeoJsonDataSource["load"](_0x504733, { "clampToGround": !![], "fill": _0x5880c9, "stroke": _0x47637a, "strokeWidth": 3, "markerColor": _0x47637a, "markerSize": 16 });
+    if (_0x50ef95 !== this["generation"]) return;
+    this["removeSource"](), this["paint"](_0x37d890, _0x5880c9, _0x47637a), this["viewer"]["dataSources"]["add"](_0x37d890), this["source"] = _0x37d890;
   }
-  ["paint"](_0x123592, _0x26e1df, _0x41cef9) {
+  ["paint"](_0x3c9bbc, _0x2cebca, _0x170f4a) {
     var _a2;
-    for (const _0x4a6417 of [..._0x123592["entities"]["values"]]) {
-      this["tag"](_0x4a6417);
-      _0x4a6417["billboard"] && (_0x4a6417["billboard"] = void 0, _0x4a6417["point"] = new PointGraphics({ "pixelSize": 16, "color": _0x41cef9, "outlineColor": Color["WHITE"], "outlineWidth": 2, "heightReference": HeightReference["CLAMP_TO_GROUND"], "disableDepthTestDistance": Number["POSITIVE_INFINITY"] }));
-      const _0x4bc2ac = _0x4a6417["polygon"];
-      if (!_0x4bc2ac) continue;
-      _0x4bc2ac["material"] = new ColorMaterialProperty(_0x26e1df), _0x4bc2ac["outline"] = new ConstantProperty(![]);
-      const _0x55f3a7 = (_a2 = _0x4bc2ac["hierarchy"]) == null ? void 0 : _a2["getValue"](JulianDate["now"]());
-      this["addRings"](_0x123592, _0x55f3a7, _0x41cef9);
+    for (const _0xa7135d of [..._0x3c9bbc["entities"]["values"]]) {
+      this["tag"](_0xa7135d);
+      _0xa7135d["billboard"] && (_0xa7135d["billboard"] = void 0, _0xa7135d["point"] = new PointGraphics({ "pixelSize": 16, "color": _0x170f4a, "outlineColor": Color["WHITE"], "outlineWidth": 2, "heightReference": HeightReference["CLAMP_TO_GROUND"], "disableDepthTestDistance": Number["POSITIVE_INFINITY"] }));
+      const _0x5f3f46 = _0xa7135d["polygon"];
+      if (!_0x5f3f46) continue;
+      _0x5f3f46["material"] = new ColorMaterialProperty(_0x2cebca), _0x5f3f46["outline"] = new ConstantProperty(![]);
+      const _0x54c17e = (_a2 = _0x5f3f46["hierarchy"]) == null ? void 0 : _a2["getValue"](JulianDate["now"]());
+      this["addRings"](_0x3c9bbc, _0x54c17e, _0x170f4a);
     }
   }
-  ["addRings"](_0x36fe7c, _0x4d6d48, _0x52949a) {
+  ["addRings"](_0x33328f, _0x500452, _0x99aba8) {
     var _a2;
-    if (!((_a2 = _0x4d6d48 == null ? void 0 : _0x4d6d48["positions"]) == null ? void 0 : _a2["length"])) return;
-    this["addRing"](_0x36fe7c, _0x4d6d48["positions"], _0x52949a);
-    for (const _0x1ac2dc of _0x4d6d48["holes"] ?? []) this["addRings"](_0x36fe7c, _0x1ac2dc, _0x52949a);
+    if (!((_a2 = _0x500452 == null ? void 0 : _0x500452["positions"]) == null ? void 0 : _a2["length"])) return;
+    this["addRing"](_0x33328f, _0x500452["positions"], _0x99aba8);
+    for (const _0x42e3fe of _0x500452["holes"] ?? []) this["addRings"](_0x33328f, _0x42e3fe, _0x99aba8);
   }
-  ["addRing"](_0x10babe, _0x1ec846, _0x5a1661) {
-    const _0xf945be = _0x10babe["entities"]["add"]({ "polyline": { "positions": _0x1ec846, "width": 3, "material": new ColorMaterialProperty(_0x5a1661), "clampToGround": !![] } });
-    this["tag"](_0xf945be);
+  ["addRing"](_0x5eac41, _0x251438, _0x5a3aa7) {
+    const _0x37e070 = _0x5eac41["entities"]["add"]({ "polyline": { "positions": _0x251438, "width": 3, "material": new ColorMaterialProperty(_0x5a3aa7), "clampToGround": !![] } });
+    this["tag"](_0x37e070);
   }
-  ["tag"](_0x2c08b1) {
-    _0x2c08b1[FLAG] = !![];
+  ["tag"](_0x22aa94) {
+    _0x22aa94[FLAG] = !![];
   }
   ["removeSource"]() {
     if (!this["source"]) return;
@@ -2484,72 +2484,72 @@ class SelectionHighlight {
   }
 }
 const DRILL_PICK_LIMIT = 32;
-function boundingBoxFromPoints(_0xa9e592) {
-  if (_0xa9e592["length"] === 0) return void 0;
-  let _0x2b95d6 = Infinity, _0x3f6a40 = Infinity, _0x5f4e3c = -Infinity, _0x4adfc5 = -Infinity;
-  for (const [_0x59b541, _0x33efd7] of _0xa9e592) {
-    if (_0x59b541 < _0x2b95d6) _0x2b95d6 = _0x59b541;
-    if (_0x59b541 > _0x5f4e3c) _0x5f4e3c = _0x59b541;
-    if (_0x33efd7 < _0x3f6a40) _0x3f6a40 = _0x33efd7;
-    if (_0x33efd7 > _0x4adfc5) _0x4adfc5 = _0x33efd7;
+function boundingBoxFromPoints(_0x553b5a) {
+  if (_0x553b5a["length"] === 0) return void 0;
+  let _0x1d9614 = Infinity, _0x5418a9 = Infinity, _0x3ff2ad = -Infinity, _0x1f70f2 = -Infinity;
+  for (const [_0x1a6b8d, _0x1786f9] of _0x553b5a) {
+    if (_0x1a6b8d < _0x1d9614) _0x1d9614 = _0x1a6b8d;
+    if (_0x1a6b8d > _0x3ff2ad) _0x3ff2ad = _0x1a6b8d;
+    if (_0x1786f9 < _0x5418a9) _0x5418a9 = _0x1786f9;
+    if (_0x1786f9 > _0x1f70f2) _0x1f70f2 = _0x1786f9;
   }
-  if (_0x2b95d6 === _0x5f4e3c && _0x3f6a40 === _0x4adfc5) return { "kind": "point", "longitude": _0x2b95d6, "latitude": _0x3f6a40 };
-  return { "kind": "extent", "west": _0x2b95d6, "south": _0x3f6a40, "east": _0x5f4e3c, "north": _0x4adfc5 };
+  if (_0x1d9614 === _0x3ff2ad && _0x5418a9 === _0x1f70f2) return { "kind": "point", "longitude": _0x1d9614, "latitude": _0x5418a9 };
+  return { "kind": "extent", "west": _0x1d9614, "south": _0x5418a9, "east": _0x3ff2ad, "north": _0x1f70f2 };
 }
-function flattenGeoJsonCoordinates(_0x5e09e2, _0x5d6e76) {
-  if (!Array["isArray"](_0x5e09e2) || _0x5e09e2["length"] === 0) return;
-  if (typeof _0x5e09e2[0] === "number") {
-    const [_0x2cbc96, _0xa54e60] = _0x5e09e2;
-    if (typeof _0x2cbc96 === "number" && typeof _0xa54e60 === "number") _0x5d6e76["push"]([_0x2cbc96, _0xa54e60]);
+function flattenGeoJsonCoordinates(_0x2350b8, _0x347268) {
+  if (!Array["isArray"](_0x2350b8) || _0x2350b8["length"] === 0) return;
+  if (typeof _0x2350b8[0] === "number") {
+    const [_0x590b2b, _0x29f0fc] = _0x2350b8;
+    if (typeof _0x590b2b === "number" && typeof _0x29f0fc === "number") _0x347268["push"]([_0x590b2b, _0x29f0fc]);
     return;
   }
-  for (const _0x17fc9d of _0x5e09e2) flattenGeoJsonCoordinates(_0x17fc9d, _0x5d6e76);
+  for (const _0x76154a of _0x2350b8) flattenGeoJsonCoordinates(_0x76154a, _0x347268);
 }
-function extractGeoJsonExtent(_0x482cdc) {
-  if (_0x482cdc === null || typeof _0x482cdc !== "object") return void 0;
-  const _0x1e2cf4 = _0x482cdc, _0x447604 = _0x1e2cf4["type"] === "FeatureCollection" && Array["isArray"](_0x1e2cf4["features"]) ? _0x1e2cf4["features"]["map"]((_0x19203c) => _0x19203c == null ? void 0 : _0x19203c["geometry"])["filter"]((_0x1d6da7) => _0x1d6da7 !== void 0 && _0x1d6da7 !== null) : _0x1e2cf4["geometry"] ? [_0x1e2cf4["geometry"]] : [];
-  if (_0x447604["length"] === 0) return void 0;
-  const _0x11bd1c = [];
-  for (const _0x4aef49 of _0x447604) {
-    const _0x332a3b = _0x4aef49;
-    if (_0x332a3b["type"] === "GeometryCollection" && Array["isArray"](_0x332a3b["geometries"])) for (const _0x322081 of _0x332a3b["geometries"]) {
-      flattenGeoJsonCoordinates(_0x322081 == null ? void 0 : _0x322081["coordinates"], _0x11bd1c);
+function extractGeoJsonExtent(_0x293c6f) {
+  if (_0x293c6f === null || typeof _0x293c6f !== "object") return void 0;
+  const _0x22dcbd = _0x293c6f, _0x328b52 = _0x22dcbd["type"] === "FeatureCollection" && Array["isArray"](_0x22dcbd["features"]) ? _0x22dcbd["features"]["map"]((_0x1f9246) => _0x1f9246 == null ? void 0 : _0x1f9246["geometry"])["filter"]((_0x173882) => _0x173882 !== void 0 && _0x173882 !== null) : _0x22dcbd["geometry"] ? [_0x22dcbd["geometry"]] : [];
+  if (_0x328b52["length"] === 0) return void 0;
+  const _0x164dee = [];
+  for (const _0x7d05d9 of _0x328b52) {
+    const _0x1f94d3 = _0x7d05d9;
+    if (_0x1f94d3["type"] === "GeometryCollection" && Array["isArray"](_0x1f94d3["geometries"])) for (const _0x354954 of _0x1f94d3["geometries"]) {
+      flattenGeoJsonCoordinates(_0x354954 == null ? void 0 : _0x354954["coordinates"], _0x164dee);
     }
-    else flattenGeoJsonCoordinates(_0x332a3b["coordinates"], _0x11bd1c);
+    else flattenGeoJsonCoordinates(_0x1f94d3["coordinates"], _0x164dee);
   }
-  return boundingBoxFromPoints(_0x11bd1c);
+  return boundingBoxFromPoints(_0x164dee);
 }
-function collectGmlCoordinates(_0x125221, _0x1c621c) {
+function collectGmlCoordinates(_0x19fff3, _0x4d8c66) {
   var _a2, _b;
-  for (const _0xe52173 of Array["from"](_0x125221["getElementsByTagNameNS"]("*", "coordinates"))) {
-    const _0x13efd6 = (_a2 = _0xe52173["textContent"]) == null ? void 0 : _a2["trim"]();
-    if (!_0x13efd6) continue;
-    for (const _0x23792e of _0x13efd6["split"](/\s+/)) {
-      const [_0x30c28e, _0xc50ee2] = _0x23792e["split"](","), _0x5e3818 = Number(_0x30c28e), _0x12abc = Number(_0xc50ee2);
-      if (Number["isFinite"](_0x5e3818) && Number["isFinite"](_0x12abc)) _0x1c621c["push"]([_0x5e3818, _0x12abc]);
+  for (const _0x1f4721 of Array["from"](_0x19fff3["getElementsByTagNameNS"]("*", "coordinates"))) {
+    const _0x416a50 = (_a2 = _0x1f4721["textContent"]) == null ? void 0 : _a2["trim"]();
+    if (!_0x416a50) continue;
+    for (const _0x8e6b82 of _0x416a50["split"](/\s+/)) {
+      const [_0x1094b7, _0x26fed2] = _0x8e6b82["split"](","), _0x5a53c6 = Number(_0x1094b7), _0x1145f6 = Number(_0x26fed2);
+      if (Number["isFinite"](_0x5a53c6) && Number["isFinite"](_0x1145f6)) _0x4d8c66["push"]([_0x5a53c6, _0x1145f6]);
     }
   }
-  for (const _0x22c9b4 of ["pos", "posList"]) {
-    for (const _0x17414a of Array["from"](_0x125221["getElementsByTagNameNS"]("*", _0x22c9b4))) {
-      const _0x35c782 = (((_b = _0x17414a["textContent"]) == null ? void 0 : _b["trim"]()) ?? "")["split"](/\s+/)["map"](Number);
-      for (let _0x5450b2 = 0; _0x5450b2 + 1 < _0x35c782["length"]; _0x5450b2 += 2) {
-        const _0x57b622 = _0x35c782[_0x5450b2], _0x50c0ae = _0x35c782[_0x5450b2 + 1];
-        if (Number["isFinite"](_0x57b622) && Number["isFinite"](_0x50c0ae)) _0x1c621c["push"]([_0x57b622, _0x50c0ae]);
+  for (const _0x8e8618 of ["pos", "posList"]) {
+    for (const _0x4d4a54 of Array["from"](_0x19fff3["getElementsByTagNameNS"]("*", _0x8e8618))) {
+      const _0x44b506 = (((_b = _0x4d4a54["textContent"]) == null ? void 0 : _b["trim"]()) ?? "")["split"](/\s+/)["map"](Number);
+      for (let _0x12c873 = 0; _0x12c873 + 1 < _0x44b506["length"]; _0x12c873 += 2) {
+        const _0x55cf74 = _0x44b506[_0x12c873], _0xe70eee = _0x44b506[_0x12c873 + 1];
+        if (Number["isFinite"](_0x55cf74) && Number["isFinite"](_0xe70eee)) _0x4d8c66["push"]([_0x55cf74, _0xe70eee]);
       }
     }
   }
 }
-function extractGmlExtent(_0x40fb54) {
-  if (!(_0x40fb54 instanceof Element)) return void 0;
-  const _0xc0f26d = [];
-  return collectGmlCoordinates(_0x40fb54, _0xc0f26d), boundingBoxFromPoints(_0xc0f26d);
+function extractGmlExtent(_0x3b7cb3) {
+  if (!(_0x3b7cb3 instanceof Element)) return void 0;
+  const _0x283ede = [];
+  return collectGmlCoordinates(_0x3b7cb3, _0x283ede), boundingBoxFromPoints(_0x283ede);
 }
-function extractImageryGeometry(_0x564f17) {
-  return extractGeoJsonExtent(_0x564f17) ?? extractGmlExtent(_0x564f17);
+function extractImageryGeometry(_0x32cf1d) {
+  return extractGeoJsonExtent(_0x32cf1d) ?? extractGmlExtent(_0x32cf1d);
 }
 class InteractionManager extends EventEmitter {
-  constructor(_0x5a3646) {
-    super(), this["unsubscribers"] = [], this["suspended"] = ![], this["identifySuspended"] = ![], this["hoverEnabled"] = ![], this["pickGeneration"] = 0, this["viewer"] = _0x5a3646, this["handler"] = new ScreenSpaceEventHandler(_0x5a3646["scene"]["canvas"]), this["bindMouseEvents"](), this["bindCameraEvents"](), this["bindSceneEvents"]();
+  constructor(_0x4d3635) {
+    super(), this["unsubscribers"] = [], this["suspended"] = ![], this["identifySuspended"] = ![], this["hoverEnabled"] = ![], this["pickGeneration"] = 0, this["viewer"] = _0x4d3635, this["handler"] = new ScreenSpaceEventHandler(_0x4d3635["scene"]["canvas"]), this["bindMouseEvents"](), this["bindCameraEvents"](), this["bindSceneEvents"]();
   }
   get ["scene"]() {
     return this["viewer"]["scene"];
@@ -2576,146 +2576,146 @@ class InteractionManager extends EventEmitter {
   ["isIdentifySuspended"]() {
     return this["identifySuspended"];
   }
-  ["enableHover"](_0x167792) {
-    this["hoverEnabled"] = _0x167792, !_0x167792 && (this["hoveredEntity"] = void 0);
+  ["enableHover"](_0xa759a8) {
+    this["hoverEnabled"] = _0xa759a8, !_0xa759a8 && (this["hoveredEntity"] = void 0);
   }
   ["isHoverEnabled"]() {
     return this["hoverEnabled"];
   }
-  ["flyToPosition"](_0x3462bf, _0x36a29a, _0x16d932) {
-    const _0x17b020 = (_0x16d932 == null ? void 0 : _0x16d932["height"]) ?? 1e3;
-    this["viewer"]["camera"]["flyTo"]({ "destination": Cartesian3["fromDegrees"](_0x3462bf, _0x36a29a, _0x17b020), "orientation": { "pitch": _0x318bcf["toRadians"](-90) }, ...(_0x16d932 == null ? void 0 : _0x16d932["duration"]) !== void 0 ? { "duration": _0x16d932["duration"] } : {} });
+  ["flyToPosition"](_0xa0cc7f, _0x157ae4, _0x48b509) {
+    const _0x57623b = (_0x48b509 == null ? void 0 : _0x48b509["height"]) ?? 1e3;
+    this["viewer"]["camera"]["flyTo"]({ "destination": Cartesian3["fromDegrees"](_0xa0cc7f, _0x157ae4, _0x57623b), "orientation": { "pitch": _0x584e42["toRadians"](-90) }, ...(_0x48b509 == null ? void 0 : _0x48b509["duration"]) !== void 0 ? { "duration": _0x48b509["duration"] } : {} });
   }
-  ["flyToExtent"](_0x47946f, _0x3de2a4, _0x391584, _0x3fe291, _0x446622) {
-    this["viewer"]["camera"]["flyTo"]({ "destination": Rectangle["fromDegrees"](_0x47946f, _0x3de2a4, _0x391584, _0x3fe291), "orientation": { "pitch": _0x318bcf["toRadians"](-90) }, ...(_0x446622 == null ? void 0 : _0x446622["duration"]) !== void 0 ? { "duration": _0x446622["duration"] } : {} });
+  ["flyToExtent"](_0x21412e, _0x17f797, _0x4b1624, _0x486bf4, _0x5bf84b) {
+    this["viewer"]["camera"]["flyTo"]({ "destination": Rectangle["fromDegrees"](_0x21412e, _0x17f797, _0x4b1624, _0x486bf4), "orientation": { "pitch": _0x584e42["toRadians"](-90) }, ...(_0x5bf84b == null ? void 0 : _0x5bf84b["duration"]) !== void 0 ? { "duration": _0x5bf84b["duration"] } : {} });
   }
   ["destroy"]() {
     !this["handler"]["isDestroyed"]() && this["handler"]["destroy"]();
-    for (const _0x42f7a2 of this["unsubscribers"]) {
-      _0x42f7a2();
+    for (const _0x492e13 of this["unsubscribers"]) {
+      _0x492e13();
     }
     this["unsubscribers"]["length"] = 0, this["removeAllListeners"]();
   }
   ["bindMouseEvents"]() {
-    this["handler"]["setInputAction"]((_0x4f5db4) => this["dispatchPick"](_0x4f5db4["position"], "entity:click", "map:click", "imagery:click"), ScreenSpaceEventType["LEFT_CLICK"]), this["handler"]["setInputAction"]((_0x269c3d) => this["dispatchPick"](_0x269c3d["position"], "entity:dblclick", "map:dblclick", "imagery:dblclick"), ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]), this["handler"]["setInputAction"]((_0xebf014) => this["dispatchPick"](_0xebf014["position"], "entity:rightclick", "map:rightclick", "imagery:rightclick"), ScreenSpaceEventType["RIGHT_CLICK"]), this["handler"]["setInputAction"]((_0x4b89b2) => this["dispatchEntityOnly"](_0x4b89b2["position"], "entity:mousedown"), ScreenSpaceEventType["LEFT_DOWN"]), this["handler"]["setInputAction"]((_0x1647b5) => this["dispatchEntityOnly"](_0x1647b5["position"], "entity:mouseup"), ScreenSpaceEventType["LEFT_UP"]), this["handler"]["setInputAction"]((_0x457ad2) => this["handleMouseMove"](_0x457ad2["endPosition"]), ScreenSpaceEventType["MOUSE_MOVE"]), this["handler"]["setInputAction"]((_0x1126be) => this["emit"]("map:wheel", { "delta": _0x1126be }), ScreenSpaceEventType["WHEEL"]), this["handler"]["setInputAction"]((_0x540c8a) => this["emit"]("map:pinchstart", this["buildMapDetail"](_0x540c8a["position1"])), ScreenSpaceEventType["PINCH_START"]), this["handler"]["setInputAction"](() => this["emit"]("map:pinchend", {}), ScreenSpaceEventType["PINCH_END"]), this["handler"]["setInputAction"]((_0x8e30ef) => {
-      const _0x228f95 = Math["atan2"](_0x8e30ef["position2"]["y"] - _0x8e30ef["position1"]["y"], _0x8e30ef["position2"]["x"] - _0x8e30ef["position1"]["x"]);
-      this["emit"]("map:pinchmove", { ...this["buildMapDetail"](_0x8e30ef["position1"]), "angle": _0x228f95 });
+    this["handler"]["setInputAction"]((_0xac70aa) => this["dispatchPick"](_0xac70aa["position"], "entity:click", "map:click", "imagery:click"), ScreenSpaceEventType["LEFT_CLICK"]), this["handler"]["setInputAction"]((_0x256a43) => this["dispatchPick"](_0x256a43["position"], "entity:dblclick", "map:dblclick", "imagery:dblclick"), ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]), this["handler"]["setInputAction"]((_0x2c62e3) => this["dispatchPick"](_0x2c62e3["position"], "entity:rightclick", "map:rightclick", "imagery:rightclick"), ScreenSpaceEventType["RIGHT_CLICK"]), this["handler"]["setInputAction"]((_0x3c1957) => this["dispatchEntityOnly"](_0x3c1957["position"], "entity:mousedown"), ScreenSpaceEventType["LEFT_DOWN"]), this["handler"]["setInputAction"]((_0x54e7e5) => this["dispatchEntityOnly"](_0x54e7e5["position"], "entity:mouseup"), ScreenSpaceEventType["LEFT_UP"]), this["handler"]["setInputAction"]((_0x135c53) => this["handleMouseMove"](_0x135c53["endPosition"]), ScreenSpaceEventType["MOUSE_MOVE"]), this["handler"]["setInputAction"]((_0xfa6808) => this["emit"]("map:wheel", { "delta": _0xfa6808 }), ScreenSpaceEventType["WHEEL"]), this["handler"]["setInputAction"]((_0xab4601) => this["emit"]("map:pinchstart", this["buildMapDetail"](_0xab4601["position1"])), ScreenSpaceEventType["PINCH_START"]), this["handler"]["setInputAction"](() => this["emit"]("map:pinchend", {}), ScreenSpaceEventType["PINCH_END"]), this["handler"]["setInputAction"]((_0x2b8f1b) => {
+      const _0x1084c5 = Math["atan2"](_0x2b8f1b["position2"]["y"] - _0x2b8f1b["position1"]["y"], _0x2b8f1b["position2"]["x"] - _0x2b8f1b["position1"]["x"]);
+      this["emit"]("map:pinchmove", { ...this["buildMapDetail"](_0x2b8f1b["position1"]), "angle": _0x1084c5 });
     }, ScreenSpaceEventType["PINCH_MOVE"]);
   }
-  ["handleMouseMove"](_0x2ad7d1) {
-    this["emit"]("map:mousemove", this["buildMapDetail"](_0x2ad7d1));
+  ["handleMouseMove"](_0x5bf784) {
+    this["emit"]("map:mousemove", this["buildMapDetail"](_0x5bf784));
     if (!this["hoverEnabled"] || this["suspended"]) return;
-    const _0x1e640b = this["pickSelectableEntity"](_0x2ad7d1);
-    if (_0x1e640b === this["hoveredEntity"]) return;
-    this["hoveredEntity"] !== void 0 && this["emit"]("entity:mouseleave", this["buildEntityDetail"](this["hoveredEntity"], _0x2ad7d1)), this["hoveredEntity"] = _0x1e640b, _0x1e640b !== void 0 && this["emit"]("entity:mouseenter", this["buildEntityDetail"](_0x1e640b, _0x2ad7d1));
+    const _0x1275e8 = this["pickSelectableEntity"](_0x5bf784);
+    if (_0x1275e8 === this["hoveredEntity"]) return;
+    this["hoveredEntity"] !== void 0 && this["emit"]("entity:mouseleave", this["buildEntityDetail"](this["hoveredEntity"], _0x5bf784)), this["hoveredEntity"] = _0x1275e8, _0x1275e8 !== void 0 && this["emit"]("entity:mouseenter", this["buildEntityDetail"](_0x1275e8, _0x5bf784));
   }
-  ["dispatchPick"](_0x40f62c, _0x15a40f, _0xaab720, _0x2a9647) {
+  ["dispatchPick"](_0x385c95, _0x259131, _0x4b684f, _0x200356) {
     if (this["suspended"]) return;
     this["pickGeneration"]++;
-    const _0x2eee54 = this["pickSelectableEntity"](_0x40f62c);
-    _0x2eee54 ? this["emit"](_0x15a40f, this["buildEntityDetail"](_0x2eee54, _0x40f62c)) : this["emit"](_0xaab720, this["buildMapDetail"](_0x40f62c)), this["pickImageryFeatures"](_0x40f62c, _0x2a9647);
+    const _0x4c2c1b = this["pickSelectableEntity"](_0x385c95);
+    _0x4c2c1b ? this["emit"](_0x259131, this["buildEntityDetail"](_0x4c2c1b, _0x385c95)) : this["emit"](_0x4b684f, this["buildMapDetail"](_0x385c95)), this["pickImageryFeatures"](_0x385c95, _0x200356);
   }
-  ["pickSelectableEntity"](_0x4f5182) {
-    const _0x346b8a = this["scene"]["drillPick"](_0x4f5182, DRILL_PICK_LIMIT);
-    for (const _0x10c047 of _0x346b8a) {
-      const _0x50713c = _0x10c047 == null ? void 0 : _0x10c047["id"];
-      if (!(_0x50713c instanceof Entity)) continue;
-      if (isSelectionHighlightEntity(_0x50713c)) continue;
-      return _0x50713c;
+  ["pickSelectableEntity"](_0x189b78) {
+    const _0x4b5b08 = this["scene"]["drillPick"](_0x189b78, DRILL_PICK_LIMIT);
+    for (const _0x3e008f of _0x4b5b08) {
+      const _0x18550b = _0x3e008f == null ? void 0 : _0x3e008f["id"];
+      if (!(_0x18550b instanceof Entity)) continue;
+      if (isSelectionHighlightEntity(_0x18550b)) continue;
+      return _0x18550b;
     }
     return void 0;
   }
-  ["pickImageryFeatures"](_0x50d98e, _0x146a1b) {
-    const _0x1f8175 = this["pickGeneration"], _0x2ecd49 = this["camera"]["getPickRay"](_0x50d98e);
-    if (!_0x2ecd49) return;
-    const _0x3b0792 = this["viewer"]["imageryLayers"]["pickImageryLayerFeatures"](_0x2ecd49, this["scene"]);
-    if (!_0x3b0792) return;
-    this["emit"]("imagery:querying", this["buildMapDetail"](_0x50d98e));
-    const _0x1c3034 = (_0x2f1c35) => {
-      if (this["suspended"] || _0x1f8175 !== this["pickGeneration"]) return;
-      this["emit"](_0x146a1b, this["buildImageryDetail"](_0x2f1c35, _0x50d98e));
+  ["pickImageryFeatures"](_0x3ec959, _0x216ddb) {
+    const _0x4557f7 = this["pickGeneration"], _0x309b11 = this["camera"]["getPickRay"](_0x3ec959);
+    if (!_0x309b11) return;
+    const _0x2edd25 = this["viewer"]["imageryLayers"]["pickImageryLayerFeatures"](_0x309b11, this["scene"]);
+    if (!_0x2edd25) return;
+    this["emit"]("imagery:querying", this["buildMapDetail"](_0x3ec959));
+    const _0x3b85c7 = (_0xddcbb1) => {
+      if (this["suspended"] || _0x4557f7 !== this["pickGeneration"]) return;
+      this["emit"](_0x216ddb, this["buildImageryDetail"](_0xddcbb1, _0x3ec959));
     };
-    _0x3b0792["then"](_0x1c3034)["catch"](() => {
-      _0x1c3034([]);
+    _0x2edd25["then"](_0x3b85c7)["catch"](() => {
+      _0x3b85c7([]);
     });
   }
-  ["buildImageryDetail"](_0x4a41c4, _0x328314) {
-    const _0x12ea09 = _0x4a41c4["map"]((_0x3ade00) => ({ "imageryLayer": _0x3ade00["imageryLayer"], "name": _0x3ade00["name"] ?? null, "properties": _0x3ade00["properties"] ?? {}, "description": _0x3ade00["description"] ?? null, "geometryHint": extractImageryGeometry(_0x3ade00["data"]) }));
-    return { "position": this["toLonLat"](_0x328314), "screenPos": { "x": _0x328314["x"], "y": _0x328314["y"] }, "features": _0x12ea09 };
+  ["buildImageryDetail"](_0x5d78fe, _0x309341) {
+    const _0x4bcf85 = _0x5d78fe["map"]((_0x48cd6f) => ({ "imageryLayer": _0x48cd6f["imageryLayer"], "name": _0x48cd6f["name"] ?? null, "properties": _0x48cd6f["properties"] ?? {}, "description": _0x48cd6f["description"] ?? null, "geometryHint": extractImageryGeometry(_0x48cd6f["data"]) }));
+    return { "position": this["toLonLat"](_0x309341), "screenPos": { "x": _0x309341["x"], "y": _0x309341["y"] }, "features": _0x4bcf85 };
   }
-  ["dispatchEntityOnly"](_0x5a2829, _0x4eefc4) {
+  ["dispatchEntityOnly"](_0x47569e, _0x1adfaa) {
     if (this["suspended"]) return;
-    const _0x3b4f8f = this["scene"]["pick"](_0x5a2829);
-    (_0x3b4f8f == null ? void 0 : _0x3b4f8f["id"]) instanceof Entity && this["emit"](_0x4eefc4, this["buildEntityDetail"](_0x3b4f8f["id"], _0x5a2829));
+    const _0x2499f3 = this["scene"]["pick"](_0x47569e);
+    (_0x2499f3 == null ? void 0 : _0x2499f3["id"]) instanceof Entity && this["emit"](_0x1adfaa, this["buildEntityDetail"](_0x2499f3["id"], _0x47569e));
   }
   ["bindCameraEvents"]() {
-    this["unsubscribers"]["push"](this["camera"]["moveStart"]["addEventListener"](() => this["emit"]("camera:moveStart", {})), this["camera"]["moveEnd"]["addEventListener"](() => this["emit"]("camera:moveEnd", {})), this["camera"]["changed"]["addEventListener"]((_0x4d19df) => this["emit"]("camera:changed", { "percentage": _0x4d19df })));
+    this["unsubscribers"]["push"](this["camera"]["moveStart"]["addEventListener"](() => this["emit"]("camera:moveStart", {})), this["camera"]["moveEnd"]["addEventListener"](() => this["emit"]("camera:moveEnd", {})), this["camera"]["changed"]["addEventListener"]((_0x3ca910) => this["emit"]("camera:changed", { "percentage": _0x3ca910 })));
   }
   ["bindSceneEvents"]() {
-    this["unsubscribers"]["push"](this["scene"]["preRender"]["addEventListener"]((_0x7a730c, _0x353940) => this["emit"]("scene:preRender", { "time": _0x353940 })), this["scene"]["postRender"]["addEventListener"]((_0x79ed45, _0x438b2b) => this["emit"]("scene:postRender", { "time": _0x438b2b })), this["scene"]["morphStart"]["addEventListener"](() => this["emit"]("scene:morphStart", {})), this["scene"]["morphComplete"]["addEventListener"](() => this["emit"]("scene:morphComplete", {})));
+    this["unsubscribers"]["push"](this["scene"]["preRender"]["addEventListener"]((_0x413281, _0x2eb9dd) => this["emit"]("scene:preRender", { "time": _0x2eb9dd })), this["scene"]["postRender"]["addEventListener"]((_0x254d22, _0x44c8d4) => this["emit"]("scene:postRender", { "time": _0x44c8d4 })), this["scene"]["morphStart"]["addEventListener"](() => this["emit"]("scene:morphStart", {})), this["scene"]["morphComplete"]["addEventListener"](() => this["emit"]("scene:morphComplete", {})));
   }
-  ["buildMapDetail"](_0x33a9f1) {
-    return { "position": this["toLonLat"](_0x33a9f1), "screenPos": { "x": _0x33a9f1["x"], "y": _0x33a9f1["y"] } };
+  ["buildMapDetail"](_0xa20792) {
+    return { "position": this["toLonLat"](_0xa20792), "screenPos": { "x": _0xa20792["x"], "y": _0xa20792["y"] } };
   }
-  ["buildEntityDetail"](_0x242bd9, _0x34011e) {
-    return { ...this["resolveFeature"](_0x242bd9), "position": this["toLonLat"](_0x34011e), "screenPos": { "x": _0x34011e["x"], "y": _0x34011e["y"] }, "features": this["pickAllFeatures"](_0x34011e, _0x242bd9) };
+  ["buildEntityDetail"](_0x54d966, _0x321e79) {
+    return { ...this["resolveFeature"](_0x54d966), "position": this["toLonLat"](_0x321e79), "screenPos": { "x": _0x321e79["x"], "y": _0x321e79["y"] }, "features": this["pickAllFeatures"](_0x321e79, _0x54d966) };
   }
-  ["resolveFeature"](_0x4251a8) {
+  ["resolveFeature"](_0xcf3c7f) {
     var _a2, _b;
-    const _0x2b9ecf = JulianDate["now"](), _0x5f4282 = ((_a2 = _0x4251a8["properties"]) == null ? void 0 : _a2["getValue"](_0x2b9ecf)) ?? {}, _0xd82098 = _0x5f4282["__tucbsOutlineOf"];
-    if (typeof _0xd82098 === "string") {
-      const _0x22ef5e = (_b = _0x4251a8["entityCollection"]) == null ? void 0 : _b["getById"](_0xd82098);
-      if (_0x22ef5e && _0x22ef5e !== _0x4251a8) return this["resolveFeature"](_0x22ef5e);
+    const _0x564f5a = JulianDate["now"](), _0x290bdb = ((_a2 = _0xcf3c7f["properties"]) == null ? void 0 : _a2["getValue"](_0x564f5a)) ?? {}, _0x3f9e91 = _0x290bdb["__tucbsOutlineOf"];
+    if (typeof _0x3f9e91 === "string") {
+      const _0x3048ac = (_b = _0xcf3c7f["entityCollection"]) == null ? void 0 : _b["getById"](_0x3f9e91);
+      if (_0x3048ac && _0x3048ac !== _0xcf3c7f) return this["resolveFeature"](_0x3048ac);
     }
-    const _0x2725ec = typeof _0x5f4282["layerId"] === "string" ? _0x5f4282["layerId"] : null, _0x361db4 = typeof _0x5f4282["featureId"] === "string" ? _0x5f4282["featureId"] : null;
-    if ("__tucbsOutlineOf" in _0x5f4282) {
-      const { __tucbsOutlineOf: _0x590246, ..._0x412d97 } = _0x5f4282;
-      return { "entity": _0x4251a8, "layerId": _0x2725ec, "featureId": _0x361db4, "properties": _0x412d97 };
+    const _0x241f5a = typeof _0x290bdb["layerId"] === "string" ? _0x290bdb["layerId"] : null, _0x3dad5c = typeof _0x290bdb["featureId"] === "string" ? _0x290bdb["featureId"] : null;
+    if ("__tucbsOutlineOf" in _0x290bdb) {
+      const { __tucbsOutlineOf: _0x2e5000, ..._0x2e0eff } = _0x290bdb;
+      return { "entity": _0xcf3c7f, "layerId": _0x241f5a, "featureId": _0x3dad5c, "properties": _0x2e0eff };
     }
-    return { "entity": _0x4251a8, "layerId": _0x2725ec, "featureId": _0x361db4, "properties": _0x5f4282 };
+    return { "entity": _0xcf3c7f, "layerId": _0x241f5a, "featureId": _0x3dad5c, "properties": _0x290bdb };
   }
-  ["pickAllFeatures"](_0x1397ea, _0xd56b08) {
-    const _0x29302e = this["resolveFeature"](_0xd56b08), _0x2bc875 = [_0x29302e], _0x501336 = /* @__PURE__ */ new Set([_0x29302e["entity"]]), _0x33c15e = this["scene"]["drillPick"](_0x1397ea, DRILL_PICK_LIMIT);
-    for (const _0x292057 of _0x33c15e) {
-      const _0x17f72e = _0x292057 == null ? void 0 : _0x292057["id"];
-      if (!(_0x17f72e instanceof Entity)) continue;
-      const _0x143a93 = this["resolveFeature"](_0x17f72e);
-      if (_0x501336["has"](_0x143a93["entity"])) continue;
-      _0x501336["add"](_0x143a93["entity"]), _0x2bc875["push"](_0x143a93);
+  ["pickAllFeatures"](_0x490241, _0x1331c0) {
+    const _0x46c69e = this["resolveFeature"](_0x1331c0), _0x5d83ca = [_0x46c69e], _0x479974 = /* @__PURE__ */ new Set([_0x46c69e["entity"]]), _0x381872 = this["scene"]["drillPick"](_0x490241, DRILL_PICK_LIMIT);
+    for (const _0x305978 of _0x381872) {
+      const _0x237875 = _0x305978 == null ? void 0 : _0x305978["id"];
+      if (!(_0x237875 instanceof Entity)) continue;
+      const _0x571862 = this["resolveFeature"](_0x237875);
+      if (_0x479974["has"](_0x571862["entity"])) continue;
+      _0x479974["add"](_0x571862["entity"]), _0x5d83ca["push"](_0x571862);
     }
-    return _0x2bc875;
+    return _0x5d83ca;
   }
-  ["toLonLat"](_0x512e85) {
-    const _0x576e97 = this["camera"]["pickEllipsoid"](_0x512e85, this["scene"]["globe"]["ellipsoid"]);
-    if (_0x576e97 === void 0) return [0, 0];
-    const _0x44098f = Cartographic["fromCartesian"](_0x576e97);
-    return [_0x318bcf["toDegrees"](_0x44098f["longitude"]), _0x318bcf["toDegrees"](_0x44098f["latitude"])];
+  ["toLonLat"](_0x12aba8) {
+    const _0x2b054e = this["camera"]["pickEllipsoid"](_0x12aba8, this["scene"]["globe"]["ellipsoid"]);
+    if (_0x2b054e === void 0) return [0, 0];
+    const _0x31e93c = Cartographic["fromCartesian"](_0x2b054e);
+    return [_0x584e42["toDegrees"](_0x31e93c["longitude"]), _0x584e42["toDegrees"](_0x31e93c["latitude"])];
   }
 }
 const EARTH_RADIUS_METERS = 6378137, CIRCLE_SEGMENTS = 48;
-function dedupePositions(_0x14861c) {
-  return _0x14861c["filter"]((_0x5e98ea, _0x41523c) => _0x41523c === 0 || !Cartesian3["equalsEpsilon"](_0x5e98ea, _0x14861c[_0x41523c - 1], _0x318bcf["EPSILON7"]));
+function dedupePositions(_0x483e72) {
+  return _0x483e72["filter"]((_0x474bb5, _0x4a7029) => _0x4a7029 === 0 || !Cartesian3["equalsEpsilon"](_0x474bb5, _0x483e72[_0x4a7029 - 1], _0x584e42["EPSILON7"]));
 }
 class DrawingManager extends EventEmitter {
-  constructor(_0x89afde, _0x4a4884) {
-    super(), this["shapes"] = /* @__PURE__ */ new Map(), this["positions"] = [], this["tempVertexEntities"] = [], this["freehandDragging"] = ![], this["onEscapeKey"] = (_0x4af128) => {
-      if (_0x4af128["key"] !== "Escape") return;
+  constructor(_0x40a446, _0x3e96a2) {
+    super(), this["shapes"] = /* @__PURE__ */ new Map(), this["positions"] = [], this["tempVertexEntities"] = [], this["freehandDragging"] = ![], this["onEscapeKey"] = (_0xc080b2) => {
+      if (_0xc080b2["key"] !== "Escape") return;
       this["abortCurrentShape"]();
-    }, this["viewer"] = _0x89afde, this["interactionManager"] = _0x4a4884, this["handler"] = new ScreenSpaceEventHandler(_0x89afde["scene"]["canvas"]);
+    }, this["viewer"] = _0x40a446, this["interactionManager"] = _0x3e96a2, this["handler"] = new ScreenSpaceEventHandler(_0x40a446["scene"]["canvas"]);
   }
   get ["scene"]() {
     return this["viewer"]["scene"];
   }
-  ["activate"](_0x40ee1f, _0x85c67c) {
+  ["activate"](_0x325986, _0xa3d86) {
     if (this["activeTool"]) this["deactivate"]();
-    this["activeTool"] = _0x40ee1f, this["activeSource"] = _0x85c67c, this["positions"] = [], this["previewPosition"] = void 0, this["interactionManager"]["suspend"](), this["resetTrackedEntity"](), this["suspendBuiltInDoubleClick"]();
-    if (_0x40ee1f === "freehand") this["lockCamera"]();
-    this["setCursor"]("crosshair"), this["bindToolHandlers"](_0x40ee1f), this["emit"]("draw:start", _0x85c67c === void 0 ? { "tool": _0x40ee1f } : { "tool": _0x40ee1f, "source": _0x85c67c });
+    this["activeTool"] = _0x325986, this["activeSource"] = _0xa3d86, this["positions"] = [], this["previewPosition"] = void 0, this["interactionManager"]["suspend"](), this["resetTrackedEntity"](), this["suspendBuiltInDoubleClick"]();
+    if (_0x325986 === "freehand") this["lockCamera"]();
+    this["setCursor"]("crosshair"), this["bindToolHandlers"](_0x325986), this["emit"]("draw:start", _0xa3d86 === void 0 ? { "tool": _0x325986 } : { "tool": _0x325986, "source": _0xa3d86 });
   }
   ["deactivate"]() {
     if (!this["activeTool"]) return;
-    const _0x544ee6 = this["activeTool"], _0x18ad9d = this["activeSource"];
-    this["finishSession"](), this["emit"]("draw:cancel", _0x18ad9d === void 0 ? { "tool": _0x544ee6 } : { "tool": _0x544ee6, "source": _0x18ad9d });
+    const _0x44a6f3 = this["activeTool"], _0xe48110 = this["activeSource"];
+    this["finishSession"](), this["emit"]("draw:cancel", _0xe48110 === void 0 ? { "tool": _0x44a6f3 } : { "tool": _0x44a6f3, "source": _0xe48110 });
   }
   ["getActiveTool"]() {
     return this["activeTool"];
@@ -2726,95 +2726,95 @@ class DrawingManager extends EventEmitter {
   ["getShapes"]() {
     return [...this["shapes"]["values"]()];
   }
-  ["getShapeById"](_0x2ac2f9) {
-    return this["shapes"]["get"](_0x2ac2f9);
+  ["getShapeById"](_0x279f92) {
+    return this["shapes"]["get"](_0x279f92);
   }
-  ["removeShape"](_0x3be7a8) {
-    const _0x2b255e = this["shapes"]["get"](_0x3be7a8);
-    if (!_0x2b255e) return;
-    this["viewer"]["entities"]["remove"](_0x2b255e["entity"]), this["shapes"]["delete"](_0x3be7a8), this["emit"]("draw:remove", { "id": _0x3be7a8, "shape": _0x2b255e });
+  ["removeShape"](_0x525174) {
+    const _0x164d4c = this["shapes"]["get"](_0x525174);
+    if (!_0x164d4c) return;
+    this["viewer"]["entities"]["remove"](_0x164d4c["entity"]), this["shapes"]["delete"](_0x525174), this["emit"]("draw:remove", { "id": _0x525174, "shape": _0x164d4c });
   }
   ["clearAll"]() {
-    for (const _0x1c5f5e of [...this["shapes"]["keys"]()]) this["removeShape"](_0x1c5f5e);
+    for (const _0x577a35 of [...this["shapes"]["keys"]()]) this["removeShape"](_0x577a35);
   }
   ["undo"]() {
     if (this["positions"]["length"] === 0) return;
     this["positions"]["pop"]();
-    const _0x2b31e2 = this["tempVertexEntities"]["pop"]();
-    if (_0x2b31e2) this["viewer"]["entities"]["remove"](_0x2b31e2);
+    const _0x56c13f = this["tempVertexEntities"]["pop"]();
+    if (_0x56c13f) this["viewer"]["entities"]["remove"](_0x56c13f);
   }
   ["toGeoJSON"]() {
-    return { "type": "FeatureCollection", "features": this["getShapes"]()["map"]((_0xb41e0f) => ({ "type": "Feature", "properties": { "id": _0xb41e0f["id"], "tool": _0xb41e0f["tool"] }, "geometry": _0xb41e0f["geometry"] })) };
+    return { "type": "FeatureCollection", "features": this["getShapes"]()["map"]((_0x5847d5) => ({ "type": "Feature", "properties": { "id": _0x5847d5["id"], "tool": _0x5847d5["tool"] }, "geometry": _0x5847d5["geometry"] })) };
   }
   ["destroy"]() {
     this["deactivate"](), this["handler"]["destroy"](), this["removeAllListeners"]();
   }
-  ["bindToolHandlers"](_0x51be54) {
+  ["bindToolHandlers"](_0x2a093d) {
     this["handler"]["setInputAction"](() => this["deactivate"](), ScreenSpaceEventType["RIGHT_CLICK"]), document["addEventListener"]("keydown", this["onEscapeKey"]);
-    if (_0x51be54 === "freehand") {
-      this["handler"]["setInputAction"]((_0x37a45c) => this["onFreehandDown"](_0x37a45c["position"]), ScreenSpaceEventType["LEFT_DOWN"]), this["handler"]["setInputAction"](() => this["onFreehandUp"](), ScreenSpaceEventType["LEFT_UP"]), this["handler"]["setInputAction"]((_0x51a556) => this["onFreehandMove"](_0x51a556["endPosition"]), ScreenSpaceEventType["MOUSE_MOVE"]);
+    if (_0x2a093d === "freehand") {
+      this["handler"]["setInputAction"]((_0x58bb1c) => this["onFreehandDown"](_0x58bb1c["position"]), ScreenSpaceEventType["LEFT_DOWN"]), this["handler"]["setInputAction"](() => this["onFreehandUp"](), ScreenSpaceEventType["LEFT_UP"]), this["handler"]["setInputAction"]((_0x202ca6) => this["onFreehandMove"](_0x202ca6["endPosition"]), ScreenSpaceEventType["MOUSE_MOVE"]);
       return;
     }
-    this["handler"]["setInputAction"]((_0x53d49e) => this["onVertexClick"](_0x53d49e["position"]), ScreenSpaceEventType["LEFT_CLICK"]), this["handler"]["setInputAction"]((_0xe4bf97) => this["onPreviewMove"](_0xe4bf97["endPosition"]), ScreenSpaceEventType["MOUSE_MOVE"]), (_0x51be54 === "polyline" || _0x51be54 === "polygon") && this["handler"]["setInputAction"](() => this["finishMultiVertexViaDoubleClick"](), ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]);
+    this["handler"]["setInputAction"]((_0x1aa44e) => this["onVertexClick"](_0x1aa44e["position"]), ScreenSpaceEventType["LEFT_CLICK"]), this["handler"]["setInputAction"]((_0x5c71ba) => this["onPreviewMove"](_0x5c71ba["endPosition"]), ScreenSpaceEventType["MOUSE_MOVE"]), (_0x2a093d === "polyline" || _0x2a093d === "polygon") && this["handler"]["setInputAction"](() => this["finishMultiVertexViaDoubleClick"](), ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]);
   }
   ["unbindToolHandlers"]() {
     this["handler"]["removeInputAction"](ScreenSpaceEventType["LEFT_CLICK"]), this["handler"]["removeInputAction"](ScreenSpaceEventType["LEFT_DOWN"]), this["handler"]["removeInputAction"](ScreenSpaceEventType["LEFT_UP"]), this["handler"]["removeInputAction"](ScreenSpaceEventType["MOUSE_MOVE"]), this["handler"]["removeInputAction"](ScreenSpaceEventType["RIGHT_CLICK"]), this["handler"]["removeInputAction"](ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]), document["removeEventListener"]("keydown", this["onEscapeKey"]);
   }
   ["abortCurrentShape"]() {
     if (this["activeTool"] === void 0 || this["positions"]["length"] === 0) return;
-    const _0x18d410 = this["activeTool"], _0xcb999f = this["activeSource"];
-    this["clearTempEntity"](), this["resetSessionForContinuousDrawing"](), this["resetTrackedEntity"](), this["emit"]("draw:abort", _0xcb999f === void 0 ? { "tool": _0x18d410 } : { "tool": _0x18d410, "source": _0xcb999f });
+    const _0x419624 = this["activeTool"], _0x62e169 = this["activeSource"];
+    this["clearTempEntity"](), this["resetSessionForContinuousDrawing"](), this["resetTrackedEntity"](), this["emit"]("draw:abort", _0x62e169 === void 0 ? { "tool": _0x419624 } : { "tool": _0x419624, "source": _0x62e169 });
   }
-  ["onVertexClick"](_0x3c78cd) {
-    const _0x23d84d = this["toCartesian"](_0x3c78cd);
-    if (_0x23d84d === void 0 || this["activeTool"] === void 0) return;
-    this["positions"]["push"](_0x23d84d), this["emitVertex"](_0x3c78cd), this["ensureTempEntity"]();
-    (this["activeTool"] === "polygon" || this["activeTool"] === "polyline") && this["addVertexMarker"](_0x23d84d);
+  ["onVertexClick"](_0x422e6d) {
+    const _0x240748 = this["toCartesian"](_0x422e6d);
+    if (_0x240748 === void 0 || this["activeTool"] === void 0) return;
+    this["positions"]["push"](_0x240748), this["emitVertex"](_0x422e6d), this["ensureTempEntity"]();
+    (this["activeTool"] === "polygon" || this["activeTool"] === "polyline") && this["addVertexMarker"](_0x240748);
     if (this["activeTool"] === "point") {
       this["completeShape"]();
       return;
     }
     (this["activeTool"] === "rectangle" || this["activeTool"] === "circle") && this["positions"]["length"] >= 2 && this["completeShape"]();
   }
-  ["onPreviewMove"](_0x3f3dfb) {
+  ["onPreviewMove"](_0x893035) {
     if (this["positions"]["length"] === 0 || this["activeTool"] === void 0) return;
-    const _0xf9753 = this["toCartesian"](_0x3f3dfb);
-    if (_0xf9753 === void 0) return;
-    this["previewPosition"] = _0xf9753, this["emit"]("draw:move", { "tool": this["activeTool"], "coordinates": this["toLonLat"](_0xf9753), "screenPos": { "x": _0x3f3dfb["x"], "y": _0x3f3dfb["y"] } });
+    const _0x3d86aa = this["toCartesian"](_0x893035);
+    if (_0x3d86aa === void 0) return;
+    this["previewPosition"] = _0x3d86aa, this["emit"]("draw:move", { "tool": this["activeTool"], "coordinates": this["toLonLat"](_0x3d86aa), "screenPos": { "x": _0x893035["x"], "y": _0x893035["y"] } });
   }
   ["finishMultiVertex"]() {
-    const _0x323e4c = this["activeTool"] === "polygon" ? 3 : 2;
-    if (this["positions"]["length"] < _0x323e4c) return;
+    const _0x20ae7e = this["activeTool"] === "polygon" ? 3 : 2;
+    if (this["positions"]["length"] < _0x20ae7e) return;
     this["completeShape"]();
   }
   ["finishMultiVertexViaDoubleClick"]() {
     this["positions"]["length"] >= 2 && this["positions"]["pop"](), this["finishMultiVertex"](), this["resetTrackedEntity"]();
   }
-  ["onFreehandDown"](_0x515432) {
+  ["onFreehandDown"](_0x167aa7) {
     this["freehandDragging"] = !![], this["positions"] = [];
-    const _0x15eec6 = this["toCartesian"](_0x515432);
-    if (_0x15eec6 === void 0) return;
-    this["positions"]["push"](_0x15eec6), this["emitVertex"](_0x515432), this["ensureTempEntity"]();
+    const _0xd4f1f7 = this["toCartesian"](_0x167aa7);
+    if (_0xd4f1f7 === void 0) return;
+    this["positions"]["push"](_0xd4f1f7), this["emitVertex"](_0x167aa7), this["ensureTempEntity"]();
   }
-  ["onFreehandMove"](_0x23ee70) {
+  ["onFreehandMove"](_0x17b829) {
     if (!this["freehandDragging"] || this["activeTool"] === void 0) return;
-    const _0x1c753d = this["toCartesian"](_0x23ee70);
-    if (_0x1c753d === void 0) return;
-    this["positions"]["push"](_0x1c753d), this["previewPosition"] = _0x1c753d, this["emit"]("draw:move", { "tool": this["activeTool"], "coordinates": this["toLonLat"](_0x1c753d), "screenPos": { "x": _0x23ee70["x"], "y": _0x23ee70["y"] } });
+    const _0x110e27 = this["toCartesian"](_0x17b829);
+    if (_0x110e27 === void 0) return;
+    this["positions"]["push"](_0x110e27), this["previewPosition"] = _0x110e27, this["emit"]("draw:move", { "tool": this["activeTool"], "coordinates": this["toLonLat"](_0x110e27), "screenPos": { "x": _0x17b829["x"], "y": _0x17b829["y"] } });
   }
   ["onFreehandUp"]() {
     this["freehandDragging"] = ![];
     if (this["positions"]["length"] >= 2) this["completeShape"]();
   }
-  ["emitVertex"](_0x16592d) {
+  ["emitVertex"](_0x16b7ed) {
     if (this["activeTool"] === void 0) return;
-    const _0x46b076 = this["requireIndex"](this["positions"], this["positions"]["length"] - 1);
-    this["emit"]("draw:vertex", { "tool": this["activeTool"], "index": this["positions"]["length"] - 1, "coordinates": this["toLonLat"](_0x46b076), "screenPos": { "x": _0x16592d["x"], "y": _0x16592d["y"] } });
+    const _0x619ae2 = this["requireIndex"](this["positions"], this["positions"]["length"] - 1);
+    this["emit"]("draw:vertex", { "tool": this["activeTool"], "index": this["positions"]["length"] - 1, "coordinates": this["toLonLat"](_0x619ae2), "screenPos": { "x": _0x16b7ed["x"], "y": _0x16b7ed["y"] } });
   }
   ["completeShape"]() {
     if (this["activeTool"] === void 0 || this["positions"]["length"] === 0) return;
-    const _0x42d16e = this["buildShape"](this["activeTool"], this["positions"]), _0xe0c548 = this["activeSource"] === void 0 ? _0x42d16e : { ..._0x42d16e, "source": this["activeSource"] };
-    this["shapes"]["set"](_0xe0c548["id"], _0xe0c548), this["clearTempEntity"](), this["resetSessionForContinuousDrawing"](), this["emit"]("draw:complete", { "shape": _0xe0c548 });
+    const _0x38b7a2 = this["buildShape"](this["activeTool"], this["positions"]), _0x11a575 = this["activeSource"] === void 0 ? _0x38b7a2 : { ..._0x38b7a2, "source": this["activeSource"] };
+    this["shapes"]["set"](_0x11a575["id"], _0x11a575), this["clearTempEntity"](), this["resetSessionForContinuousDrawing"](), this["emit"]("draw:complete", { "shape": _0x11a575 });
   }
   ["resetSessionForContinuousDrawing"]() {
     this["positions"] = [], this["previewPosition"] = void 0, this["freehandDragging"] = ![];
@@ -2830,39 +2830,39 @@ class DrawingManager extends EventEmitter {
     }
     if (this["tempFillEntity"] === void 0) {
       if (this["activeTool"] === "polygon") this["tempFillEntity"] = this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": new CallbackProperty(() => {
-        const _0x38279b = [...this["positions"], ...this["previewPosition"] ? [this["previewPosition"]] : []], _0x49b575 = dedupePositions(_0x38279b);
-        return _0x49b575["length"] >= 3 ? new PolygonHierarchy(_0x49b575) : void 0;
+        const _0x17d158 = [...this["positions"], ...this["previewPosition"] ? [this["previewPosition"]] : []], _0x32dade = dedupePositions(_0x17d158);
+        return _0x32dade["length"] >= 3 ? new PolygonHierarchy(_0x32dade) : void 0;
       }, ![]), "material": Color["CYAN"]["withAlpha"](0.35) } });
       else {
         if (this["activeTool"] === "rectangle") this["tempFillEntity"] = this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": new CallbackProperty(() => {
-          const _0xfe88f = this["positions"][0], _0x591ac2 = this["previewPosition"];
-          if (_0xfe88f === void 0 || _0x591ac2 === void 0) return void 0;
-          const _0x4fe963 = this["computeRectangleCoordinates"](_0xfe88f, _0x591ac2);
-          return new PolygonHierarchy(_0x4fe963["map"]((_0x1f1466) => this["toCartesianFromLonLat"](_0x1f1466)));
+          const _0xa2f704 = this["positions"][0], _0x53a875 = this["previewPosition"];
+          if (_0xa2f704 === void 0 || _0x53a875 === void 0) return void 0;
+          const _0x1253fa = this["computeRectangleCoordinates"](_0xa2f704, _0x53a875);
+          return new PolygonHierarchy(_0x1253fa["map"]((_0x547c90) => this["toCartesianFromLonLat"](_0x547c90)));
         }, ![]), "material": Color["CYAN"]["withAlpha"](0.35) } });
         else this["activeTool"] === "circle" && (this["tempFillEntity"] = this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": new CallbackProperty(() => {
-          const _0x2aa52c = this["positions"][0], _0x3d1671 = this["previewPosition"];
-          if (_0x2aa52c === void 0 || _0x3d1671 === void 0) return void 0;
-          const _0x58eb1f = this["computeCircleRing"](_0x2aa52c, _0x3d1671);
-          return new PolygonHierarchy(_0x58eb1f["map"]((_0x2f7973) => this["toCartesianFromLonLat"](_0x2f7973)));
+          const _0x5b88f3 = this["positions"][0], _0x47609a = this["previewPosition"];
+          if (_0x5b88f3 === void 0 || _0x47609a === void 0) return void 0;
+          const _0x5e8cb5 = this["computeCircleRing"](_0x5b88f3, _0x47609a);
+          return new PolygonHierarchy(_0x5e8cb5["map"]((_0x33325a) => this["toCartesianFromLonLat"](_0x33325a)));
         }, ![]), "material": Color["CYAN"]["withAlpha"](0.35) } }));
       }
     }
   }
-  ["addVertexMarker"](_0x1397af) {
-    this["tempVertexEntities"]["push"](this["viewer"]["entities"]["add"]({ "position": _0x1397af, "point": { "pixelSize": 6, "color": Color["YELLOW"], "outlineColor": Color["BLACK"], "outlineWidth": 1 } }));
+  ["addVertexMarker"](_0x5426dc) {
+    this["tempVertexEntities"]["push"](this["viewer"]["entities"]["add"]({ "position": _0x5426dc, "point": { "pixelSize": 6, "color": Color["YELLOW"], "outlineColor": Color["BLACK"], "outlineWidth": 1 } }));
   }
-  ["buildPositionsCallback"](_0x3afc6a) {
+  ["buildPositionsCallback"](_0x5c5399) {
     return new CallbackProperty(() => {
-      const _0x318d48 = [...this["positions"], ...this["previewPosition"] ? [this["previewPosition"]] : []], _0x46d619 = dedupePositions(_0x318d48);
-      return _0x46d619["length"] >= _0x3afc6a ? _0x46d619 : void 0;
+      const _0x22e81d = [...this["positions"], ...this["previewPosition"] ? [this["previewPosition"]] : []], _0x30248c = dedupePositions(_0x22e81d);
+      return _0x30248c["length"] >= _0x5c5399 ? _0x30248c : void 0;
     }, ![]);
   }
   ["clearTempEntity"]() {
     this["tempEntity"] !== void 0 && (this["viewer"]["entities"]["remove"](this["tempEntity"]), this["tempEntity"] = void 0);
     this["tempFillEntity"] !== void 0 && (this["viewer"]["entities"]["remove"](this["tempFillEntity"]), this["tempFillEntity"] = void 0);
-    for (const _0x4d072a of this["tempVertexEntities"]) {
-      this["viewer"]["entities"]["remove"](_0x4d072a);
+    for (const _0xcf35da of this["tempVertexEntities"]) {
+      this["viewer"]["entities"]["remove"](_0xcf35da);
     }
     this["tempVertexEntities"] = [];
   }
@@ -2871,16 +2871,16 @@ class DrawingManager extends EventEmitter {
   }
   ["suspendBuiltInDoubleClick"]() {
     if (this["builtInDoubleClickAction"] !== void 0) return;
-    const _0x261b55 = this["viewer"]["screenSpaceEventHandler"], _0x519ac6 = _0x261b55["getInputAction"](ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]);
-    if (_0x519ac6 === void 0) return;
-    this["builtInDoubleClickAction"] = _0x519ac6, _0x261b55["removeInputAction"](ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]);
+    const _0x4c78de = this["viewer"]["screenSpaceEventHandler"], _0x27b998 = _0x4c78de["getInputAction"](ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]);
+    if (_0x27b998 === void 0) return;
+    this["builtInDoubleClickAction"] = _0x27b998, _0x4c78de["removeInputAction"](ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]);
   }
   ["restoreBuiltInDoubleClick"]() {
     if (this["builtInDoubleClickAction"] === void 0) return;
     this["viewer"]["screenSpaceEventHandler"]["setInputAction"](this["builtInDoubleClickAction"], ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]), this["builtInDoubleClickAction"] = void 0;
   }
-  ["setCursor"](_0x4a1584) {
-    this["viewer"]["scene"]["canvas"]["style"]["cursor"] = _0x4a1584;
+  ["setCursor"](_0x72cd83) {
+    this["viewer"]["scene"]["canvas"]["style"]["cursor"] = _0x72cd83;
   }
   ["lockCamera"]() {
     this["viewer"]["scene"]["screenSpaceCameraController"]["enableRotate"] = ![], this["viewer"]["scene"]["screenSpaceCameraController"]["enableTilt"] = ![];
@@ -2888,213 +2888,213 @@ class DrawingManager extends EventEmitter {
   ["unlockCamera"]() {
     this["viewer"]["scene"]["screenSpaceCameraController"]["enableRotate"] = !![], this["viewer"]["scene"]["screenSpaceCameraController"]["enableTilt"] = !![];
   }
-  ["buildShape"](_0x4aaa1c, _0x3103c9) {
-    const _0x947586 = crypto["randomUUID"](), _0x3ca054 = Date["now"]();
-    if (_0x4aaa1c === "point") {
-      const _0x4d5f81 = this["requireIndex"](_0x3103c9, 0), _0x3cf8b5 = this["toLonLat"](_0x4d5f81);
-      return { "id": _0x947586, "tool": _0x4aaa1c, "entity": this["viewer"]["entities"]["add"]({ "position": _0x4d5f81, "point": { "pixelSize": 8, "color": Color["CYAN"] } }), "positions": _0x3103c9, "coordinates": [_0x3cf8b5], "geometry": { "type": "Point", "coordinates": _0x3cf8b5 }, "createdAt": _0x3ca054 };
+  ["buildShape"](_0x4fcb74, _0x30945e) {
+    const _0x42d42c = crypto["randomUUID"](), _0x6cc4d = Date["now"]();
+    if (_0x4fcb74 === "point") {
+      const _0x170390 = this["requireIndex"](_0x30945e, 0), _0x585d66 = this["toLonLat"](_0x170390);
+      return { "id": _0x42d42c, "tool": _0x4fcb74, "entity": this["viewer"]["entities"]["add"]({ "position": _0x170390, "point": { "pixelSize": 8, "color": Color["CYAN"] } }), "positions": _0x30945e, "coordinates": [_0x585d66], "geometry": { "type": "Point", "coordinates": _0x585d66 }, "createdAt": _0x6cc4d };
     }
-    if (_0x4aaa1c === "circle") return this["buildCircleShape"](_0x947586, _0x3103c9, _0x3ca054);
-    if (_0x4aaa1c === "rectangle") return this["buildRectangleShape"](_0x947586, _0x3103c9, _0x3ca054);
-    if (_0x4aaa1c === "polygon") return this["buildPolygonShape"](_0x947586, _0x3103c9, _0x3ca054);
-    return this["buildLineShape"](_0x947586, _0x4aaa1c, _0x3103c9, _0x3ca054);
+    if (_0x4fcb74 === "circle") return this["buildCircleShape"](_0x42d42c, _0x30945e, _0x6cc4d);
+    if (_0x4fcb74 === "rectangle") return this["buildRectangleShape"](_0x42d42c, _0x30945e, _0x6cc4d);
+    if (_0x4fcb74 === "polygon") return this["buildPolygonShape"](_0x42d42c, _0x30945e, _0x6cc4d);
+    return this["buildLineShape"](_0x42d42c, _0x4fcb74, _0x30945e, _0x6cc4d);
   }
-  ["buildLineShape"](_0x40d81a, _0x10a4cc, _0x497425, _0x5a70fa) {
-    const _0x39b1cb = _0x497425["map"]((_0x14abf3) => this["toLonLat"](_0x14abf3));
-    return { "id": _0x40d81a, "tool": _0x10a4cc, "entity": this["viewer"]["entities"]["add"]({ "polyline": { "positions": _0x497425, "width": 3, "material": Color["CYAN"] } }), "positions": _0x497425, "coordinates": _0x39b1cb, "geometry": { "type": "LineString", "coordinates": _0x39b1cb }, "length": this["computeLength"](_0x497425), "createdAt": _0x5a70fa };
+  ["buildLineShape"](_0x198040, _0x2197d8, _0x5b2098, _0x103575) {
+    const _0x55cd08 = _0x5b2098["map"]((_0x15285b) => this["toLonLat"](_0x15285b));
+    return { "id": _0x198040, "tool": _0x2197d8, "entity": this["viewer"]["entities"]["add"]({ "polyline": { "positions": _0x5b2098, "width": 3, "material": Color["CYAN"] } }), "positions": _0x5b2098, "coordinates": _0x55cd08, "geometry": { "type": "LineString", "coordinates": _0x55cd08 }, "length": this["computeLength"](_0x5b2098), "createdAt": _0x103575 };
   }
-  ["buildPolygonShape"](_0x5277b7, _0x482664, _0x1bfe02) {
-    const _0x489216 = _0x482664["map"]((_0x3d9575) => this["toLonLat"](_0x3d9575)), _0x449758 = this["requireIndex"](_0x489216, 0), _0xccf9c3 = this["requireIndex"](_0x482664, 0), _0x5daefe = [..._0x489216, _0x449758];
-    return { "id": _0x5277b7, "tool": "polygon", "entity": this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": _0x482664, "material": Color["CYAN"]["withAlpha"](0.4) } }), "positions": _0x482664, "coordinates": _0x489216, "geometry": { "type": "Polygon", "coordinates": [_0x5daefe] }, "area": this["computeArea"](_0x489216), "perimeter": this["computeLength"]([..._0x482664, _0xccf9c3]), "createdAt": _0x1bfe02 };
+  ["buildPolygonShape"](_0x2f0e75, _0x54156f, _0x2b75d4) {
+    const _0x148df8 = _0x54156f["map"]((_0x24f972) => this["toLonLat"](_0x24f972)), _0x5d6471 = this["requireIndex"](_0x148df8, 0), _0x5e5483 = this["requireIndex"](_0x54156f, 0), _0x5ad59c = [..._0x148df8, _0x5d6471];
+    return { "id": _0x2f0e75, "tool": "polygon", "entity": this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": _0x54156f, "material": Color["CYAN"]["withAlpha"](0.4) } }), "positions": _0x54156f, "coordinates": _0x148df8, "geometry": { "type": "Polygon", "coordinates": [_0x5ad59c] }, "area": this["computeArea"](_0x148df8), "perimeter": this["computeLength"]([..._0x54156f, _0x5e5483]), "createdAt": _0x2b75d4 };
   }
-  ["buildRectangleShape"](_0x501f2c, _0xf28ebb, _0x33edf3) {
-    const _0x3640bb = this["requireIndex"](_0xf28ebb, 0), _0x2d117d = this["requireIndex"](_0xf28ebb, 1), _0x5c2e7e = this["computeRectangleCoordinates"](_0x3640bb, _0x2d117d), _0x2dc942 = _0x5c2e7e["map"]((_0x382774) => this["toCartesianFromLonLat"](_0x382774)), _0x5a9108 = this["requireIndex"](_0x2dc942, 0);
-    return { "id": _0x501f2c, "tool": "rectangle", "entity": this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": _0x2dc942, "material": Color["CYAN"]["withAlpha"](0.4) } }), "positions": _0x2dc942, "coordinates": _0x5c2e7e, "geometry": { "type": "Polygon", "coordinates": [[..._0x5c2e7e, this["requireIndex"](_0x5c2e7e, 0)]] }, "area": this["computeArea"](_0x5c2e7e), "perimeter": this["computeLength"]([..._0x2dc942, _0x5a9108]), "createdAt": _0x33edf3 };
+  ["buildRectangleShape"](_0x433435, _0x22cc5f, _0x2847bf) {
+    const _0x55dfa5 = this["requireIndex"](_0x22cc5f, 0), _0x331368 = this["requireIndex"](_0x22cc5f, 1), _0x2350e9 = this["computeRectangleCoordinates"](_0x55dfa5, _0x331368), _0x3cef7d = _0x2350e9["map"]((_0x4d8848) => this["toCartesianFromLonLat"](_0x4d8848)), _0xccaa2 = this["requireIndex"](_0x3cef7d, 0);
+    return { "id": _0x433435, "tool": "rectangle", "entity": this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": _0x3cef7d, "material": Color["CYAN"]["withAlpha"](0.4) } }), "positions": _0x3cef7d, "coordinates": _0x2350e9, "geometry": { "type": "Polygon", "coordinates": [[..._0x2350e9, this["requireIndex"](_0x2350e9, 0)]] }, "area": this["computeArea"](_0x2350e9), "perimeter": this["computeLength"]([..._0x3cef7d, _0xccaa2]), "createdAt": _0x2847bf };
   }
-  ["buildCircleShape"](_0x483035, _0x2360a3, _0x19da0f) {
-    const _0x589b46 = this["requireIndex"](_0x2360a3, 0), _0xac8fc1 = this["requireIndex"](_0x2360a3, 1), _0x19914c = Cartesian3["distance"](_0x589b46, _0xac8fc1), _0x58f7a4 = this["computeCircleRing"](_0x589b46, _0xac8fc1), _0x16274c = _0x58f7a4["map"]((_0x36a0ce) => this["toCartesianFromLonLat"](_0x36a0ce)), _0x3ed4c6 = this["requireIndex"](_0x58f7a4, 0);
-    return { "id": _0x483035, "tool": "circle", "entity": this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": _0x16274c, "material": Color["CYAN"]["withAlpha"](0.4) } }), "positions": [_0x589b46, _0xac8fc1], "coordinates": [this["toLonLat"](_0x589b46)], "geometry": { "type": "Polygon", "coordinates": [[..._0x58f7a4, _0x3ed4c6]] }, "area": Math["PI"] * _0x19914c * _0x19914c, "perimeter": 2 * Math["PI"] * _0x19914c, "radius": _0x19914c, "createdAt": _0x19da0f };
+  ["buildCircleShape"](_0x80f1a1, _0xc6f709, _0x2be829) {
+    const _0x2faaa0 = this["requireIndex"](_0xc6f709, 0), _0x52385c = this["requireIndex"](_0xc6f709, 1), _0xd06824 = Cartesian3["distance"](_0x2faaa0, _0x52385c), _0x580cee = this["computeCircleRing"](_0x2faaa0, _0x52385c), _0x895321 = _0x580cee["map"]((_0x5d8acb) => this["toCartesianFromLonLat"](_0x5d8acb)), _0x3e2f6c = this["requireIndex"](_0x580cee, 0);
+    return { "id": _0x80f1a1, "tool": "circle", "entity": this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": _0x895321, "material": Color["CYAN"]["withAlpha"](0.4) } }), "positions": [_0x2faaa0, _0x52385c], "coordinates": [this["toLonLat"](_0x2faaa0)], "geometry": { "type": "Polygon", "coordinates": [[..._0x580cee, _0x3e2f6c]] }, "area": Math["PI"] * _0xd06824 * _0xd06824, "perimeter": 2 * Math["PI"] * _0xd06824, "radius": _0xd06824, "createdAt": _0x2be829 };
   }
-  ["sampleCircleRing"](_0x1040a3, _0x4bdbe5) {
-    const _0x2fd403 = [];
-    for (let _0x1c032d = 0; _0x1c032d < CIRCLE_SEGMENTS; _0x1c032d++) {
-      const _0x4fa7a7 = 2 * Math["PI"] * _0x1c032d / CIRCLE_SEGMENTS, _0x1de7f5 = _0x4bdbe5 * Math["cos"](_0x4fa7a7), _0x157661 = _0x4bdbe5 * Math["sin"](_0x4fa7a7);
-      _0x2fd403["push"](this["offsetMetersToLonLat"](_0x1040a3, _0x1de7f5, _0x157661));
+  ["sampleCircleRing"](_0x433178, _0x5b87a5) {
+    const _0x57267d = [];
+    for (let _0x49d842 = 0; _0x49d842 < CIRCLE_SEGMENTS; _0x49d842++) {
+      const _0x30d61e = 2 * Math["PI"] * _0x49d842 / CIRCLE_SEGMENTS, _0x1c8aaf = _0x5b87a5 * Math["cos"](_0x30d61e), _0x3b1acf = _0x5b87a5 * Math["sin"](_0x30d61e);
+      _0x57267d["push"](this["offsetMetersToLonLat"](_0x433178, _0x1c8aaf, _0x3b1acf));
     }
-    return _0x2fd403;
+    return _0x57267d;
   }
-  ["computeRectangleCoordinates"](_0x4afcbb, _0x329772) {
-    const _0x5e6114 = this["toLonLat"](_0x4afcbb), _0x425a2d = this["toLonLat"](_0x329772), _0x10da6e = Math["min"](_0x5e6114[0], _0x425a2d[0]), _0x3f652c = Math["max"](_0x5e6114[0], _0x425a2d[0]), _0x35c425 = Math["min"](_0x5e6114[1], _0x425a2d[1]), _0x4938a9 = Math["max"](_0x5e6114[1], _0x425a2d[1]);
-    return [[_0x10da6e, _0x35c425], [_0x3f652c, _0x35c425], [_0x3f652c, _0x4938a9], [_0x10da6e, _0x4938a9]];
+  ["computeRectangleCoordinates"](_0x542e50, _0x60b3a5) {
+    const _0x4c74d1 = this["toLonLat"](_0x542e50), _0x380363 = this["toLonLat"](_0x60b3a5), _0x3c9635 = Math["min"](_0x4c74d1[0], _0x380363[0]), _0x35ccbc = Math["max"](_0x4c74d1[0], _0x380363[0]), _0x283521 = Math["min"](_0x4c74d1[1], _0x380363[1]), _0x474f7e = Math["max"](_0x4c74d1[1], _0x380363[1]);
+    return [[_0x3c9635, _0x283521], [_0x35ccbc, _0x283521], [_0x35ccbc, _0x474f7e], [_0x3c9635, _0x474f7e]];
   }
-  ["computeCircleRing"](_0x273d4f, _0x33c476) {
-    const _0x2f981b = Cartesian3["distance"](_0x273d4f, _0x33c476), _0x38a486 = this["toLonLat"](_0x273d4f);
-    return this["sampleCircleRing"](_0x38a486, _0x2f981b);
+  ["computeCircleRing"](_0x3db1d4, _0x407628) {
+    const _0x121fab = Cartesian3["distance"](_0x3db1d4, _0x407628), _0x273975 = this["toLonLat"](_0x3db1d4);
+    return this["sampleCircleRing"](_0x273975, _0x121fab);
   }
-  ["computeArea"](_0x5def08) {
-    const _0x3118e6 = this["requireIndex"](_0x5def08, 0)[1], _0x1cddec = _0x5def08["map"]((_0x6fdebf) => this["projectMeters"](_0x6fdebf, _0x3118e6));
-    let _0x371737 = 0;
-    for (let _0x131a54 = 0; _0x131a54 < _0x1cddec["length"]; _0x131a54++) {
-      const [_0x3fa231, _0x46fd68] = this["requireIndex"](_0x1cddec, _0x131a54), [_0x2b37fa, _0x4ed616] = this["requireIndex"](_0x1cddec, (_0x131a54 + 1) % _0x1cddec["length"]);
-      _0x371737 += _0x3fa231 * _0x4ed616 - _0x2b37fa * _0x46fd68;
+  ["computeArea"](_0x334a06) {
+    const _0x5bad62 = this["requireIndex"](_0x334a06, 0)[1], _0x3dc122 = _0x334a06["map"]((_0x2528fa) => this["projectMeters"](_0x2528fa, _0x5bad62));
+    let _0x3fd38f = 0;
+    for (let _0x2b1738 = 0; _0x2b1738 < _0x3dc122["length"]; _0x2b1738++) {
+      const [_0x14071d, _0x5d845b] = this["requireIndex"](_0x3dc122, _0x2b1738), [_0x128ab5, _0x1c3808] = this["requireIndex"](_0x3dc122, (_0x2b1738 + 1) % _0x3dc122["length"]);
+      _0x3fd38f += _0x14071d * _0x1c3808 - _0x128ab5 * _0x5d845b;
     }
-    return Math["abs"](_0x371737) / 2;
+    return Math["abs"](_0x3fd38f) / 2;
   }
-  ["computeLength"](_0x5eead8) {
-    let _0x3e92e8 = 0;
-    for (let _0x4592a6 = 0; _0x4592a6 < _0x5eead8["length"] - 1; _0x4592a6++) {
-      _0x3e92e8 += Cartesian3["distance"](this["requireIndex"](_0x5eead8, _0x4592a6), this["requireIndex"](_0x5eead8, _0x4592a6 + 1));
+  ["computeLength"](_0x5d3732) {
+    let _0xcbf03 = 0;
+    for (let _0x52c48d = 0; _0x52c48d < _0x5d3732["length"] - 1; _0x52c48d++) {
+      _0xcbf03 += Cartesian3["distance"](this["requireIndex"](_0x5d3732, _0x52c48d), this["requireIndex"](_0x5d3732, _0x52c48d + 1));
     }
-    return _0x3e92e8;
+    return _0xcbf03;
   }
-  ["projectMeters"](_0x180f51, _0x46bbaf) {
-    const _0x5e377b = _0x318bcf["toRadians"](_0x180f51[0]) * Math["cos"](_0x318bcf["toRadians"](_0x46bbaf)) * EARTH_RADIUS_METERS, _0x105cb4 = _0x318bcf["toRadians"](_0x180f51[1]) * EARTH_RADIUS_METERS;
-    return [_0x5e377b, _0x105cb4];
+  ["projectMeters"](_0x2bca8b, _0x44605f) {
+    const _0xa5b422 = _0x584e42["toRadians"](_0x2bca8b[0]) * Math["cos"](_0x584e42["toRadians"](_0x44605f)) * EARTH_RADIUS_METERS, _0x29c74d = _0x584e42["toRadians"](_0x2bca8b[1]) * EARTH_RADIUS_METERS;
+    return [_0xa5b422, _0x29c74d];
   }
-  ["offsetMetersToLonLat"](_0x5e7f41, _0x2516bd, _0x3d4908) {
-    const _0x570c9c = _0x5e7f41[1] + _0x318bcf["toDegrees"](_0x3d4908 / EARTH_RADIUS_METERS), _0x3decdb = _0x5e7f41[0] + _0x318bcf["toDegrees"](_0x2516bd / (EARTH_RADIUS_METERS * Math["cos"](_0x318bcf["toRadians"](_0x5e7f41[1]))));
-    return [_0x3decdb, _0x570c9c];
+  ["offsetMetersToLonLat"](_0x1b0737, _0x363bd, _0x38c868) {
+    const _0x116c47 = _0x1b0737[1] + _0x584e42["toDegrees"](_0x38c868 / EARTH_RADIUS_METERS), _0x4d3c38 = _0x1b0737[0] + _0x584e42["toDegrees"](_0x363bd / (EARTH_RADIUS_METERS * Math["cos"](_0x584e42["toRadians"](_0x1b0737[1]))));
+    return [_0x4d3c38, _0x116c47];
   }
-  ["toCartesianFromLonLat"](_0x4f1267) {
-    return Cartesian3["fromDegrees"](_0x4f1267[0], _0x4f1267[1]);
+  ["toCartesianFromLonLat"](_0x3a56a8) {
+    return Cartesian3["fromDegrees"](_0x3a56a8[0], _0x3a56a8[1]);
   }
-  ["toCartesian"](_0x4d82f7) {
-    return this["viewer"]["camera"]["pickEllipsoid"](_0x4d82f7, this["scene"]["globe"]["ellipsoid"]);
+  ["toCartesian"](_0xc1fc7) {
+    return this["viewer"]["camera"]["pickEllipsoid"](_0xc1fc7, this["scene"]["globe"]["ellipsoid"]);
   }
-  ["toLonLat"](_0x378194) {
-    const _0x5ac0c0 = Cartographic["fromCartesian"](_0x378194);
-    return [_0x318bcf["toDegrees"](_0x5ac0c0["longitude"]), _0x318bcf["toDegrees"](_0x5ac0c0["latitude"])];
+  ["toLonLat"](_0x3fb498) {
+    const _0x28c761 = Cartographic["fromCartesian"](_0x3fb498);
+    return [_0x584e42["toDegrees"](_0x28c761["longitude"]), _0x584e42["toDegrees"](_0x28c761["latitude"])];
   }
-  ["requireIndex"](_0x10e181, _0x1fb114) {
-    const _0x2aec27 = _0x10e181[_0x1fb114];
-    if (_0x2aec27 === void 0) throw new TucbsError("INTERNAL_INDEX_OUT_OF_RANGE", "DrawingManager: beklenen index (" + _0x1fb114 + ") dizide bulunamadi");
-    return _0x2aec27;
+  ["requireIndex"](_0x7f87df, _0x2769c3) {
+    const _0x4bd48b = _0x7f87df[_0x2769c3];
+    if (_0x4bd48b === void 0) throw new TucbsError("INTERNAL_INDEX_OUT_OF_RANGE", "DrawingManager: beklenen index (" + _0x2769c3 + ") dizide bulunamadi");
+    return _0x4bd48b;
   }
 }
-function trimSlash$1(_0x4b615f) {
-  return _0x4b615f["replace"](/\/+$/, "");
+function trimSlash$1(_0x2712f8) {
+  return _0x2712f8["replace"](/\/+$/, "");
 }
 function newClientId() {
   if (typeof crypto !== "undefined" && typeof crypto["randomUUID"] === "function") return crypto["randomUUID"]();
   return "00000000-0000-0000-0000-000000000001";
 }
 class AnalysisManager {
-  constructor(_0x1dd64a) {
+  constructor(_0x233297) {
     __privateAdd(this, _AnalysisManager_instances);
     __privateAdd(this, _apiKey2);
-    __privateSet(this, _apiKey2, _0x1dd64a["apiKey"] ?? ""), this["clientId"] = _0x1dd64a["clientId"] ?? newClientId();
+    __privateSet(this, _apiKey2, _0x233297["apiKey"] ?? ""), this["clientId"] = _0x233297["clientId"] ?? newClientId();
   }
-  ["configure"](_0x518ec8) {
-    if (_0x518ec8["apiKey"] !== void 0) __privateSet(this, _apiKey2, _0x518ec8["apiKey"]);
-    if (_0x518ec8["clientId"] !== void 0) this["clientId"] = _0x518ec8["clientId"];
+  ["configure"](_0x1e0018) {
+    if (_0x1e0018["apiKey"] !== void 0) __privateSet(this, _apiKey2, _0x1e0018["apiKey"]);
+    if (_0x1e0018["clientId"] !== void 0) this["clientId"] = _0x1e0018["clientId"];
   }
   get ["configured"]() {
     return Boolean(getUcbpApiBase() && __privateGet(this, _apiKey2));
   }
-  async ["buffer"](_0x503c93) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/buffer", _0x503c93);
+  async ["buffer"](_0x4e01d2) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/buffer", _0x4e01d2);
   }
-  async ["intersection"](_0x59dde4) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/intersection", _0x59dde4);
+  async ["intersection"](_0x4baaab) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/intersection", _0x4baaab);
   }
-  async ["boundary"](_0x324ec8) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/boundary", _0x324ec8);
+  async ["boundary"](_0x24b2af) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/boundary", _0x24b2af);
   }
-  async ["clip"](_0x20ec38) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/clip", _0x20ec38);
+  async ["clip"](_0x781cca) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/clip", _0x781cca);
   }
-  async ["difference"](_0x3b3883) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/difference", _0x3b3883);
+  async ["difference"](_0x4fbb44) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/difference", _0x4fbb44);
   }
-  async ["subtract"](_0x340efd) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/subtract", _0x340efd);
+  async ["subtract"](_0x2c7b82) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/subtract", _0x2c7b82);
   }
-  async ["union"](_0x2c9d6e) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/union", _0x2c9d6e);
+  async ["union"](_0x223a94) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/union", _0x223a94);
   }
-  async ["wedgeBuffer"](_0x5c04b9) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/wedge-buffer", _0x5c04b9);
+  async ["wedgeBuffer"](_0x25d974) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/wedge-buffer", _0x25d974);
   }
 }
 _apiKey2 = new WeakMap();
 _AnalysisManager_instances = new WeakSet();
-post_fn = async function(_0x5bc676, _0x846bd4) {
+post_fn = async function(_0x2dbfe7, _0x402f9f) {
   if (!__privateGet(this, _apiKey2)) throw new AnalysisRequestError("ANALYSIS_API_KEY_MISSING", "apiKey tanımlı değil (tucbs-map apiKey).");
-  const _0x267e46 = { "clientId": this["clientId"], "object": _0x846bd4 }, _0x10c683 = "" + trimSlash$1(getUcbpApiBase()) + _0x5bc676;
-  let _0x2d20e3;
+  const _0xdd5289 = { "clientId": this["clientId"], "object": _0x402f9f }, _0x947c7d = "" + trimSlash$1(getUcbpApiBase()) + _0x2dbfe7;
+  let _0x5a3b00;
   try {
-    _0x2d20e3 = await fetch(_0x10c683, { "method": "POST", "headers": { "Content-Type": "application/json", "X-API-Key": __privateGet(this, _apiKey2) }, "body": JSON["stringify"](_0x267e46) });
-  } catch (_0x3b9da7) {
-    const _0x4d3509 = _0x3b9da7 instanceof Error ? _0x3b9da7["message"] : String(_0x3b9da7);
-    throw new AnalysisRequestError("ANALYSIS_NETWORK_ERROR", "Ağ hatası: " + _0x4d3509);
+    _0x5a3b00 = await fetch(_0x947c7d, { "method": "POST", "headers": { "Content-Type": "application/json", "X-API-Key": __privateGet(this, _apiKey2) }, "body": JSON["stringify"](_0xdd5289) });
+  } catch (_0x8b8726) {
+    const _0x928808 = _0x8b8726 instanceof Error ? _0x8b8726["message"] : String(_0x8b8726);
+    throw new AnalysisRequestError("ANALYSIS_NETWORK_ERROR", "Ağ hatası: " + _0x928808);
   }
-  const _0x3741dd = await _0x2d20e3["json"]()["catch"](() => null);
-  if (!_0x2d20e3["ok"]) {
-    const _0xa311f2 = (_0x3741dd == null ? void 0 : _0x3741dd["mesaj"]) || (_0x3741dd == null ? void 0 : _0x3741dd["message"]) || "İstek başarısız (HTTP " + _0x2d20e3["status"] + ")";
-    throw new AnalysisRequestError("ANALYSIS_REQUEST_FAILED", _0xa311f2);
+  const _0x672b5f = await _0x5a3b00["json"]()["catch"](() => null);
+  if (!_0x5a3b00["ok"]) {
+    const _0x6cb793 = (_0x672b5f == null ? void 0 : _0x672b5f["mesaj"]) || (_0x672b5f == null ? void 0 : _0x672b5f["message"]) || "İstek başarısız (HTTP " + _0x5a3b00["status"] + ")";
+    throw new AnalysisRequestError("ANALYSIS_REQUEST_FAILED", _0x6cb793);
   }
-  if ((_0x3741dd == null ? void 0 : _0x3741dd["isSuccess"]) === ![] || (_0x3741dd == null ? void 0 : _0x3741dd["success"]) === ![]) throw new AnalysisRequestError("ANALYSIS_UNSUCCESSFUL", _0x3741dd["mesaj"] || _0x3741dd["message"] || "Analiz başarısız.");
-  const _0x566906 = _0x3741dd == null ? void 0 : _0x3741dd["object"];
-  if (!(_0x566906 == null ? void 0 : _0x566906["geojson"])) throw new AnalysisRequestError("ANALYSIS_RESPONSE_MISSING_GEOJSON", "Yanıtta geojson yok.");
-  return _0x566906;
+  if ((_0x672b5f == null ? void 0 : _0x672b5f["isSuccess"]) === ![] || (_0x672b5f == null ? void 0 : _0x672b5f["success"]) === ![]) throw new AnalysisRequestError("ANALYSIS_UNSUCCESSFUL", _0x672b5f["mesaj"] || _0x672b5f["message"] || "Analiz başarısız.");
+  const _0x5e1bb0 = _0x672b5f == null ? void 0 : _0x672b5f["object"];
+  if (!(_0x5e1bb0 == null ? void 0 : _0x5e1bb0["geojson"])) throw new AnalysisRequestError("ANALYSIS_RESPONSE_MISSING_GEOJSON", "Yanıtta geojson yok.");
+  return _0x5e1bb0;
 };
 const FALLBACK_IMAGE_FILENAME = "blue-marble-fallback.jpg", FALLBACK_WORLD_IMAGE = new URL(FALLBACK_IMAGE_FILENAME, import.meta.url)["href"], FALLBACK_DELAY_MS = 3e3, BASEMAP_ERROR_RETRY_LIMIT = 2, BASEMAP_UNAVAILABLE_DELAY_MS = 1e4;
-function watchBasemap(_0x228c5a, _0x2350bf, _0x2426c5, _0x560cb8, _0xfd2abb, _0xded464) {
-  let _0x54b97f = ![], _0x5dbf96 = ![];
-  const _0x238d3e = window["setTimeout"](() => {
-    if (_0x54b97f || !_0x2350bf["isCurrentGeneration"](_0x2426c5)) return;
-    _0x2350bf["ensureFallbackBasemap"]();
-  }, FALLBACK_DELAY_MS), _0x3d8fea = window["setTimeout"](() => {
-    if (_0x54b97f || !_0x2350bf["isCurrentGeneration"](_0x2426c5)) return;
-    _0x54b97f = !![], _0x144cc3(), _0x2350bf["setStatus"]("unavailable"), _0x2350bf["removeBasemapLayer"](), _0x2350bf["ensureFallbackBasemap"](), _0x2350bf["emit"]("basemap:error", { "id": _0x560cb8 });
-  }, BASEMAP_UNAVAILABLE_DELAY_MS), _0x144cc3 = () => {
-    _0x5dbf96 = !![], window["clearTimeout"](_0x238d3e), window["clearTimeout"](_0x3d8fea), _0xded464["errorEvent"]["removeEventListener"](_0x5f4537);
-  }, _0x5f4537 = (_0x2a8233) => {
-    if (_0x54b97f) return;
-    if (!_0x2350bf["isCurrentGeneration"](_0x2426c5)) return;
-    if (!_0x228c5a["imageryLayers"]["contains"](_0xfd2abb)) return;
-    if (_0x2a8233["timesRetried"] < BASEMAP_ERROR_RETRY_LIMIT) {
-      _0x2a8233["retry"] = !![];
+function watchBasemap(_0x5710bc, _0x4a0c70, _0x20c0c7, _0x347f18, _0x5dde52, _0x50ad53) {
+  let _0xcaef6a = ![], _0x4f25e2 = ![];
+  const _0xab9d69 = window["setTimeout"](() => {
+    if (_0xcaef6a || !_0x4a0c70["isCurrentGeneration"](_0x20c0c7)) return;
+    _0x4a0c70["ensureFallbackBasemap"]();
+  }, FALLBACK_DELAY_MS), _0xb39b6f = window["setTimeout"](() => {
+    if (_0xcaef6a || !_0x4a0c70["isCurrentGeneration"](_0x20c0c7)) return;
+    _0xcaef6a = !![], _0x42f1c5(), _0x4a0c70["setStatus"]("unavailable"), _0x4a0c70["removeBasemapLayer"](), _0x4a0c70["ensureFallbackBasemap"](), _0x4a0c70["emit"]("basemap:error", { "id": _0x347f18 });
+  }, BASEMAP_UNAVAILABLE_DELAY_MS), _0x42f1c5 = () => {
+    _0x4f25e2 = !![], window["clearTimeout"](_0xab9d69), window["clearTimeout"](_0xb39b6f), _0x50ad53["errorEvent"]["removeEventListener"](_0x3eb63e);
+  }, _0x3eb63e = (_0x4be3b4) => {
+    if (_0xcaef6a) return;
+    if (!_0x4a0c70["isCurrentGeneration"](_0x20c0c7)) return;
+    if (!_0x5710bc["imageryLayers"]["contains"](_0x5dde52)) return;
+    if (_0x4be3b4["timesRetried"] < BASEMAP_ERROR_RETRY_LIMIT) {
+      _0x4be3b4["retry"] = !![];
       return;
     }
-    _0x54b97f = !![], _0x144cc3(), _0x2350bf["setStatus"]("unavailable"), _0x2350bf["removeBasemapLayer"](), _0x2350bf["ensureFallbackBasemap"](), _0x2350bf["emit"]("basemap:error", { "id": _0x560cb8 });
-  }, _0x4f6821 = _0xded464["requestImage"]["bind"](_0xded464);
-  _0xded464["requestImage"] = (_0x4c6edd, _0x158e51, _0x384d7e, _0x3a3fdb) => {
-    const _0x1cab65 = _0x4f6821(_0x4c6edd, _0x158e51, _0x384d7e, _0x3a3fdb);
-    if (_0x1cab65 && !_0x54b97f && !_0x5dbf96) _0x1cab65["then"](_0x3ba2be, () => void 0);
-    return _0x1cab65;
+    _0xcaef6a = !![], _0x42f1c5(), _0x4a0c70["setStatus"]("unavailable"), _0x4a0c70["removeBasemapLayer"](), _0x4a0c70["ensureFallbackBasemap"](), _0x4a0c70["emit"]("basemap:error", { "id": _0x347f18 });
+  }, _0x558c35 = _0x50ad53["requestImage"]["bind"](_0x50ad53);
+  _0x50ad53["requestImage"] = (_0x375a3b, _0x43125e, _0x428e14, _0x1784b) => {
+    const _0x33b139 = _0x558c35(_0x375a3b, _0x43125e, _0x428e14, _0x1784b);
+    if (_0x33b139 && !_0xcaef6a && !_0x4f25e2) _0x33b139["then"](_0x13fcfd, () => void 0);
+    return _0x33b139;
   };
-  const _0x3ba2be = () => {
-    if (_0x54b97f || _0x5dbf96) return;
-    if (!_0x2350bf["isCurrentGeneration"](_0x2426c5)) {
-      _0x144cc3();
+  const _0x13fcfd = () => {
+    if (_0xcaef6a || _0x4f25e2) return;
+    if (!_0x4a0c70["isCurrentGeneration"](_0x20c0c7)) {
+      _0x42f1c5();
       return;
     }
-    _0x54b97f = !![], _0x144cc3(), _0x2350bf["setStatus"]("ready"), _0x2350bf["clearFallbackBasemap"](), _0x2350bf["emit"]("basemap:recovered", { "id": _0x560cb8 });
+    _0xcaef6a = !![], _0x42f1c5(), _0x4a0c70["setStatus"]("ready"), _0x4a0c70["clearFallbackBasemap"](), _0x4a0c70["emit"]("basemap:recovered", { "id": _0x347f18 });
   };
-  return _0xded464["errorEvent"]["addEventListener"](_0x5f4537), _0x144cc3;
+  return _0x50ad53["errorEvent"]["addEventListener"](_0x3eb63e), _0x42f1c5;
 }
 const BASEMAP_LAYER_ID = "__tucbs_basemap__";
-function trackProviderRequests(_0xccf853) {
-  const _0x4bfe08 = /* @__PURE__ */ new Set(), _0x520d6a = _0xccf853["requestImage"]["bind"](_0xccf853);
-  return _0xccf853["requestImage"] = (_0xbf2b05, _0x4442c2, _0x3091d3, _0x260d63) => {
-    if (_0x260d63) _0x4bfe08["add"](_0x260d63);
-    const _0x28814a = _0x520d6a(_0xbf2b05, _0x4442c2, _0x3091d3, _0x260d63);
-    if (_0x260d63 && _0x28814a) {
-      const _0x379923 = () => {
-        _0x4bfe08["delete"](_0x260d63);
+function trackProviderRequests(_0x221a5c) {
+  const _0x4c99bc = /* @__PURE__ */ new Set(), _0x3525c4 = _0x221a5c["requestImage"]["bind"](_0x221a5c);
+  return _0x221a5c["requestImage"] = (_0x30fae0, _0xedad27, _0x501851, _0x4e2fc2) => {
+    if (_0x4e2fc2) _0x4c99bc["add"](_0x4e2fc2);
+    const _0x1a157d = _0x3525c4(_0x30fae0, _0xedad27, _0x501851, _0x4e2fc2);
+    if (_0x4e2fc2 && _0x1a157d) {
+      const _0x223711 = () => {
+        _0x4c99bc["delete"](_0x4e2fc2);
       };
-      _0x28814a["then"](_0x379923, _0x379923);
+      _0x1a157d["then"](_0x223711, _0x223711);
     }
-    return _0x28814a;
+    return _0x1a157d;
   }, () => {
-    for (const _0x481046 of _0x4bfe08) _0x481046["cancel"]();
-    _0x4bfe08["clear"]();
+    for (const _0x3b776e of _0x4c99bc) _0x3b776e["cancel"]();
+    _0x4c99bc["clear"]();
   };
 }
 class BasemapController {
-  constructor(_0x5b619a, _0x2455a9) {
-    this["_basemapGeneration"] = 0, this["_basemapStatus"] = "ready", this["_fallbackBasemapLayer"] = null, this["viewer"] = _0x5b619a, this["deps"] = _0x2455a9;
+  constructor(_0x19932f, _0x4eb3f2) {
+    this["_basemapGeneration"] = 0, this["_basemapStatus"] = "ready", this["_fallbackBasemapLayer"] = null, this["viewer"] = _0x19932f, this["deps"] = _0x4eb3f2;
   }
   get ["status"]() {
     return this["_basemapStatus"];
@@ -3102,214 +3102,214 @@ class BasemapController {
   get ["currentBasemapId"]() {
     return this["_currentBasemapId"];
   }
-  ["set"](_0x1f3d79) {
+  ["set"](_0x466045) {
     var _a2, _b;
     (_a2 = this["_stopBasemapWatch"]) == null ? void 0 : _a2.call(this), (_b = this["_cancelBasemapRequests"]) == null ? void 0 : _b.call(this), this["_cancelBasemapRequests"] = void 0, this["deps"]["removeBasemapLayers"](), this["clearFallbackBasemap"]();
-    const _0x3b8a0a = ++this["_basemapGeneration"];
-    if (_0x1f3d79 === null || _0x1f3d79 === void 0) {
+    const _0x32ad2e = ++this["_basemapGeneration"];
+    if (_0x466045 === null || _0x466045 === void 0) {
       this["_basemapStatus"] = "ready", this["_currentBasemapId"] = void 0;
       return;
     }
-    const _0x1b6594 = typeof _0x1f3d79 === "string" ? { "id": _0x1f3d79 } : _0x1f3d79;
-    if (!_0x1b6594["id"]) {
+    const _0x382b8a = typeof _0x466045 === "string" ? { "id": _0x466045 } : _0x466045;
+    if (!_0x382b8a["id"]) {
       this["_basemapStatus"] = "ready", this["_currentBasemapId"] = void 0;
       return;
     }
-    this["_basemapStatus"] = "loading", this["_currentBasemapId"] = _0x1b6594["id"];
-    const _0x12b767 = this["resolveBasemapUrl"](_0x1b6594), _0x4e1d12 = new UrlTemplateImageryProvider({ "url": _0x12b767 }), _0xef5fdb = trackProviderRequests(_0x4e1d12);
-    this["_cancelBasemapRequests"] = _0xef5fdb;
-    const _0x569d48 = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x4e1d12, 0);
-    this["deps"]["addBasemapImageryLayer"](BASEMAP_LAYER_ID, _0x1b6594["id"], _0x569d48), this["_stopBasemapWatch"] = watchBasemap(this["viewer"], { "ensureFallbackBasemap": () => this["ensureFallbackBasemap"](), "clearFallbackBasemap": () => this["clearFallbackBasemap"](), "removeBasemapLayer": () => {
-      _0xef5fdb(), this["deps"]["removeLayer"](BASEMAP_LAYER_ID);
-    }, "emit": (_0x4d9f31, _0x38b1bb) => this["deps"]["emit"](_0x4d9f31, _0x38b1bb), "setStatus": (_0x2d5d3a) => {
-      this["_basemapStatus"] = _0x2d5d3a;
-    }, "isCurrentGeneration": (_0x1612c2) => _0x1612c2 === this["_basemapGeneration"] }, _0x3b8a0a, _0x1b6594["id"], _0x569d48, _0x4e1d12);
+    this["_basemapStatus"] = "loading", this["_currentBasemapId"] = _0x382b8a["id"];
+    const _0x52a7d9 = this["resolveBasemapUrl"](_0x382b8a), _0x53a5ae = new UrlTemplateImageryProvider({ "url": _0x52a7d9 }), _0x160c5a = trackProviderRequests(_0x53a5ae);
+    this["_cancelBasemapRequests"] = _0x160c5a;
+    const _0x350c08 = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x53a5ae, 0);
+    this["deps"]["addBasemapImageryLayer"](BASEMAP_LAYER_ID, _0x382b8a["id"], _0x350c08), this["_stopBasemapWatch"] = watchBasemap(this["viewer"], { "ensureFallbackBasemap": () => this["ensureFallbackBasemap"](), "clearFallbackBasemap": () => this["clearFallbackBasemap"](), "removeBasemapLayer": () => {
+      _0x160c5a(), this["deps"]["removeLayer"](BASEMAP_LAYER_ID);
+    }, "emit": (_0x2d214a, _0x4d6e63) => this["deps"]["emit"](_0x2d214a, _0x4d6e63), "setStatus": (_0x558a29) => {
+      this["_basemapStatus"] = _0x558a29;
+    }, "isCurrentGeneration": (_0x448fd4) => _0x448fd4 === this["_basemapGeneration"] }, _0x32ad2e, _0x382b8a["id"], _0x350c08, _0x53a5ae);
   }
   ["stop"]() {
     var _a2, _b;
     (_a2 = this["_stopBasemapWatch"]) == null ? void 0 : _a2.call(this), (_b = this["_cancelBasemapRequests"]) == null ? void 0 : _b.call(this), this["_cancelBasemapRequests"] = void 0;
   }
   ["addFallbackBasemap"]() {
-    const _0x121c3d = new SingleTileImageryProvider({ "url": FALLBACK_WORLD_IMAGE, "tileWidth": 5400, "tileHeight": 2700, "credit": "NASA Earth Observatory (Blue Marble)" }), _0x5c969f = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x121c3d, 0);
-    this["_fallbackBasemapLayer"] = _0x5c969f;
+    const _0x73ae8 = new SingleTileImageryProvider({ "url": FALLBACK_WORLD_IMAGE, "tileWidth": 5400, "tileHeight": 2700, "credit": "NASA Earth Observatory (Blue Marble)" }), _0x46b91a = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x73ae8, 0);
+    this["_fallbackBasemapLayer"] = _0x46b91a;
   }
   ["ensureFallbackBasemap"]() {
     if (this["_fallbackBasemapLayer"] !== null) return;
     try {
       this["addFallbackBasemap"]();
-    } catch (_0xc59ac4) {
-      console["warn"]("[tucbs-core] Basemap yedek goruntusu eklenemedi:", _0xc59ac4);
+    } catch (_0x3ed27a) {
+      console["warn"]("[tucbs-core] Basemap yedek goruntusu eklenemedi:", _0x3ed27a);
     }
   }
   ["clearFallbackBasemap"]() {
     this["_fallbackBasemapLayer"] !== null && (this["viewer"]["imageryLayers"]["remove"](this["_fallbackBasemapLayer"], !![]), this["_fallbackBasemapLayer"] = null);
   }
-  ["resolveBasemapUrl"](_0x3e1965) {
-    const _0x877b64 = (_0x23990d) => {
-      const _0x187f04 = this["deps"]["getProxyBase"](), _0x1ab66d = _0x187f04 + "https://atlas.harita.gov.tr/" + _0x23990d + "/{z}/{x}/{y}.png";
-      return this["appendTucbsApiKeyQuery"](_0x1ab66d);
+  ["resolveBasemapUrl"](_0x20bd7b) {
+    const _0x56cad1 = (_0x1e1a8f) => {
+      const _0x2c17fa = this["deps"]["getProxyBase"](), _0x3a22af = _0x2c17fa + "https://atlas.harita.gov.tr/" + _0x1e1a8f + "/{z}/{x}/{y}.png";
+      return this["appendTucbsApiKeyQuery"](_0x3a22af);
     };
-    switch (_0x3e1965["id"]) {
+    switch (_0x20bd7b["id"]) {
       case "hgm-temel":
-        return _0x877b64("temel");
+        return _0x56cad1("temel");
       case "hgm-ortofoto":
-        return _0x877b64("ortofotoservis");
+        return _0x56cad1("ortofotoservis");
       case "hgm-siyasi":
-        return _0x877b64("siyasi");
+        return _0x56cad1("siyasi");
       case "hgm-yukseklik":
-        return _0x877b64("yukseklik");
+        return _0x56cad1("yukseklik");
       default:
-        return _0x3e1965["id"];
+        return _0x20bd7b["id"];
     }
   }
-  ["appendTucbsApiKeyQuery"](_0x35b90c) {
-    const _0x2307d4 = this["deps"]["getApiKey"]();
-    if (!_0x2307d4) return _0x35b90c;
-    const _0x3f9ea4 = _0x35b90c["includes"]("?") ? "&" : "?";
-    return "" + _0x35b90c + _0x3f9ea4 + "tucbsapikey=" + encodeURIComponent(_0x2307d4);
+  ["appendTucbsApiKeyQuery"](_0x13c40b) {
+    const _0x2d98c5 = this["deps"]["getApiKey"]();
+    if (!_0x2d98c5) return _0x13c40b;
+    const _0x49c674 = _0x13c40b["includes"]("?") ? "&" : "?";
+    return "" + _0x13c40b + _0x49c674 + "tucbsapikey=" + encodeURIComponent(_0x2d98c5);
   }
 }
-function nextFrame(_0x543cef) {
-  return new Promise((_0x3baf3f) => {
-    const _0x12622b = () => {
-      _0x543cef["scene"]["postRender"]["removeEventListener"](_0x12622b), _0x3baf3f();
+function nextFrame(_0x3c99e6) {
+  return new Promise((_0x3f4858) => {
+    const _0x154641 = () => {
+      _0x3c99e6["scene"]["postRender"]["removeEventListener"](_0x154641), _0x3f4858();
     };
-    _0x543cef["scene"]["postRender"]["addEventListener"](_0x12622b), _0x543cef["scene"]["requestRender"]();
+    _0x3c99e6["scene"]["postRender"]["addEventListener"](_0x154641), _0x3c99e6["scene"]["requestRender"]();
   });
 }
-async function captureCanvasBlob(_0x4b0fe6, _0x4caf53, _0x1c6087) {
-  const _0x18522d = _0x4b0fe6["canvas"];
-  if (typeof _0x18522d["toBlob"] === "function") return new Promise((_0x1944c6, _0xe6655) => {
-    _0x18522d["toBlob"]((_0x3b8abc) => _0x3b8abc ? _0x1944c6(_0x3b8abc) : _0xe6655(new Error("canvas.toBlob basarisiz oldu")), _0x4caf53, _0x1c6087);
+async function captureCanvasBlob(_0x203041, _0x514aab, _0x302e0b) {
+  const _0x26b10b = _0x203041["canvas"];
+  if (typeof _0x26b10b["toBlob"] === "function") return new Promise((_0x4bbcaf, _0x1bae40) => {
+    _0x26b10b["toBlob"]((_0x1919a4) => _0x1919a4 ? _0x4bbcaf(_0x1919a4) : _0x1bae40(new Error("canvas.toBlob basarisiz oldu")), _0x514aab, _0x302e0b);
   });
-  const _0x314e71 = _0x18522d["toDataURL"](_0x4caf53, _0x1c6087), _0x3a94b9 = _0x314e71["split"](",")[1] ?? "", _0x87c665 = atob(_0x3a94b9), _0x19d67e = new Uint8Array(_0x87c665["length"]);
-  for (let _0x298922 = 0; _0x298922 < _0x87c665["length"]; _0x298922++) _0x19d67e[_0x298922] = _0x87c665["charCodeAt"](_0x298922);
-  return new Blob([_0x19d67e], { "type": _0x4caf53 });
+  const _0x11feb7 = _0x26b10b["toDataURL"](_0x514aab, _0x302e0b), _0x1bfc1c = _0x11feb7["split"](",")[1] ?? "", _0x19879f = atob(_0x1bfc1c), _0x195b6f = new Uint8Array(_0x19879f["length"]);
+  for (let _0x98cdbd = 0; _0x98cdbd < _0x19879f["length"]; _0x98cdbd++) _0x195b6f[_0x98cdbd] = _0x19879f["charCodeAt"](_0x98cdbd);
+  return new Blob([_0x195b6f], { "type": _0x514aab });
 }
-function measureGroundMetersPerPixel(_0x443439) {
-  const _0x184cf0 = _0x443439["scene"], _0x32ef4c = _0x443439["camera"], _0x1d7f50 = _0x443439["canvas"], _0x480690 = _0x1d7f50["clientWidth"] / 2, _0x5cdaae = _0x1d7f50["clientHeight"] / 2, _0x1f8f0f = _0x32ef4c["getPickRay"](new Cartesian2(_0x480690 - 1, _0x5cdaae)), _0x232e39 = _0x32ef4c["getPickRay"](new Cartesian2(_0x480690 + 1, _0x5cdaae));
-  if (!_0x1f8f0f || !_0x232e39) return null;
-  const _0xa9ec3 = _0x184cf0["globe"]["pick"](_0x1f8f0f, _0x184cf0), _0x347ac9 = _0x184cf0["globe"]["pick"](_0x232e39, _0x184cf0);
-  if (!_0xa9ec3 || !_0x347ac9) return null;
-  return Cartesian3["distance"](_0xa9ec3, _0x347ac9) / 2;
+function measureGroundMetersPerPixel(_0xef6325) {
+  const _0x16b366 = _0xef6325["scene"], _0xe2f981 = _0xef6325["camera"], _0x463401 = _0xef6325["canvas"], _0x1591e7 = _0x463401["clientWidth"] / 2, _0x11ce1c = _0x463401["clientHeight"] / 2, _0x1f9492 = _0xe2f981["getPickRay"](new Cartesian2(_0x1591e7 - 1, _0x11ce1c)), _0x1342fc = _0xe2f981["getPickRay"](new Cartesian2(_0x1591e7 + 1, _0x11ce1c));
+  if (!_0x1f9492 || !_0x1342fc) return null;
+  const _0x29502f = _0x16b366["globe"]["pick"](_0x1f9492, _0x16b366), _0x37e559 = _0x16b366["globe"]["pick"](_0x1342fc, _0x16b366);
+  if (!_0x29502f || !_0x37e559) return null;
+  return Cartesian3["distance"](_0x29502f, _0x37e559) / 2;
 }
-function toOrientedDestination(_0x248053) {
-  return { "destination": Cartesian3["fromDegrees"](_0x248053["longitude"], _0x248053["latitude"], _0x248053["height"]), "orientation": { "heading": _0x318bcf["toRadians"](_0x248053["heading"] ?? 0), "pitch": _0x318bcf["toRadians"](_0x248053["pitch"] ?? -90), "roll": _0x318bcf["toRadians"](_0x248053["roll"] ?? 0) } };
+function toOrientedDestination(_0xa09cde) {
+  return { "destination": Cartesian3["fromDegrees"](_0xa09cde["longitude"], _0xa09cde["latitude"], _0xa09cde["height"]), "orientation": { "heading": _0x584e42["toRadians"](_0xa09cde["heading"] ?? 0), "pitch": _0x584e42["toRadians"](_0xa09cde["pitch"] ?? -90), "roll": _0x584e42["toRadians"](_0xa09cde["roll"] ?? 0) } };
 }
-function setView(_0x1ebc83, _0x5e6295) {
-  _0x1ebc83["camera"]["setView"](toOrientedDestination(_0x5e6295));
+function setView(_0x15740c, _0x48e4da) {
+  _0x15740c["camera"]["setView"](toOrientedDestination(_0x48e4da));
 }
-function setExtent(_0x9b1cd9, _0x46533c) {
-  _0x9b1cd9["camera"]["setView"]({ "destination": Rectangle["fromDegrees"](_0x46533c["west"], _0x46533c["south"], _0x46533c["east"], _0x46533c["north"]) });
+function setExtent(_0x4c32b7, _0x12660e) {
+  _0x4c32b7["camera"]["setView"]({ "destination": Rectangle["fromDegrees"](_0x12660e["west"], _0x12660e["south"], _0x12660e["east"], _0x12660e["north"]) });
 }
-function flyTo(_0x5a9830, _0x1d8553) {
-  _0x5a9830["camera"]["flyTo"](toOrientedDestination(_0x1d8553));
+function flyTo(_0x2491a0, _0x24d49e) {
+  _0x2491a0["camera"]["flyTo"](toOrientedDestination(_0x24d49e));
 }
-function zoomTo(_0x3aa45c, _0x559bc3, _0x489d17, _0x5930b0) {
-  _0x3aa45c["camera"]["setView"]({ "destination": Cartesian3["fromDegrees"](_0x559bc3, _0x489d17, _0x5930b0) });
+function zoomTo(_0x47a5ab, _0x34ce99, _0x233ee5, _0x1523bc) {
+  _0x47a5ab["camera"]["setView"]({ "destination": Cartesian3["fromDegrees"](_0x34ce99, _0x233ee5, _0x1523bc) });
 }
-async function zoomToLayer(_0x1c8cc4, _0x2834ef) {
-  return _0x1c8cc4["zoomTo"](_0x2834ef["cesiumObject"], new HeadingPitchRange(0, -_0x318bcf["PI_OVER_TWO"], 0));
+async function zoomToLayer(_0x1165dd, _0x5ae1c2) {
+  return _0x1165dd["zoomTo"](_0x5ae1c2["cesiumObject"], new HeadingPitchRange(0, -_0x584e42["PI_OVER_TWO"], 0));
 }
-function trimSlash(_0x14ac22) {
-  return _0x14ac22["replace"](/\/+$/, "");
+function trimSlash(_0x18b464) {
+  return _0x18b464["replace"](/\/+$/, "");
 }
-async function validateApiKey(_0x2f1448, _0x9480e0 = getUcbpApiBase()) {
-  if (!_0x2f1448) return;
-  const _0x585a56 = trimSlash(_0x9480e0) + "/auth/validate";
-  let _0x2c8647;
+async function validateApiKey(_0x1582f4, _0x15ca32 = getUcbpApiBase()) {
+  if (!_0x1582f4) return;
+  const _0xae96a6 = trimSlash(_0x15ca32) + "/auth/validate";
+  let _0x301338;
   try {
-    _0x2c8647 = await fetch(_0x585a56, { "method": "GET", "headers": { "X-API-Key": _0x2f1448 } });
-  } catch (_0x3f4c2f) {
-    const _0x4c7459 = _0x3f4c2f instanceof Error ? _0x3f4c2f["message"] : String(_0x3f4c2f);
-    throw new ApiKeyValidationError(_0x4c7459);
+    _0x301338 = await fetch(_0xae96a6, { "method": "GET", "headers": { "X-API-Key": _0x1582f4 } });
+  } catch (_0x179cab) {
+    const _0x4fbd8c = _0x179cab instanceof Error ? _0x179cab["message"] : String(_0x179cab);
+    throw new ApiKeyValidationError(_0x4fbd8c);
   }
-  if (!_0x2c8647["ok"]) {
-    let _0x54bca5, _0x43c561, _0x46d99a, _0x5f149c;
+  if (!_0x301338["ok"]) {
+    let _0x3cf83e, _0x1cd07d, _0x45b0ac, _0x4fb50e;
     try {
-      const _0x15b0bb = await _0x2c8647["json"]();
-      _0x54bca5 = _0x15b0bb["title"], _0x43c561 = _0x15b0bb["message"] || _0x15b0bb["mesaj"], _0x46d99a = _0x15b0bb["reason"], _0x5f149c = _0x15b0bb["detail"];
+      const _0x3d830c = await _0x301338["json"]();
+      _0x3cf83e = _0x3d830c["title"], _0x1cd07d = _0x3d830c["message"] || _0x3d830c["mesaj"], _0x45b0ac = _0x3d830c["reason"], _0x4fb50e = _0x3d830c["detail"];
     } catch {
     }
-    const _0x5cd8ca = {};
-    if (_0x54bca5 !== void 0) _0x5cd8ca["title"] = _0x54bca5;
-    if (_0x46d99a !== void 0) _0x5cd8ca["reason"] = _0x46d99a;
-    if (_0x5f149c !== void 0) _0x5cd8ca["detail"] = _0x5f149c;
-    throw new ApiKeyValidationError(_0x43c561 || "HTTP " + _0x2c8647["status"], _0x5cd8ca);
+    const _0x4dfbad = {};
+    if (_0x3cf83e !== void 0) _0x4dfbad["title"] = _0x3cf83e;
+    if (_0x45b0ac !== void 0) _0x4dfbad["reason"] = _0x45b0ac;
+    if (_0x4fb50e !== void 0) _0x4dfbad["detail"] = _0x4fb50e;
+    throw new ApiKeyValidationError(_0x1cd07d || "HTTP " + _0x301338["status"], _0x4dfbad);
   }
 }
-async function ensureEffectiveApiKeyValid(_0x517bc5, _0x554e4a) {
-  const _0x4a30ab = _0x517bc5 || getGlobalApiKey();
-  if (!_0x4a30ab) throw new ApiKeyValidationError("Haritayı görüntülemek için geçerli bir apiKey gereklidir.", { "title": "API Anahtarı Eksik", "reason": "missing-key", "code": "API_KEY_MISSING" });
-  await validateApiKey(_0x4a30ab, _0x554e4a);
+async function ensureEffectiveApiKeyValid(_0x247523, _0x1ff6c6) {
+  const _0x5dc9e0 = _0x247523 || getGlobalApiKey();
+  if (!_0x5dc9e0) throw new ApiKeyValidationError("Haritayı görüntülemek için geçerli bir apiKey gereklidir.", { "title": "API Anahtarı Eksik", "reason": "missing-key", "code": "API_KEY_MISSING" });
+  await validateApiKey(_0x5dc9e0, _0x1ff6c6);
 }
 const DRAWING_LAYER_ID = "__tucbs_drawing_layer__", DRAWING_LAYER_TITLE = "Çizim Katmanı", MEASURE_LAYER_ID = "__tucbs_measure_layer__", MEASURE_LAYER_TITLE = "Ölçü Katmanı", MAX_ZOOM_DISTANCE_METERS = 25e6, MAX_ZOOM_OUT_SCALE_DENOMINATOR = 25e6, MAX_ZOOM_SCALE_DENOMINATOR = 100, MIN_ZOOM_DISTANCE_METERS = 10, DEFAULT_INITIAL_EXTENT = { "west": 22.94, "south": 34.05, "east": 47.39, "north": 42.7 };
 let Map$1 = (_a = class {
-  constructor(_0x4ccc21, _0x118eb9 = {}) {
+  constructor(_0xf4d962, _0x341049 = {}) {
     __privateAdd(this, _unregisterApiKeyRefresh);
     __privateAdd(this, _removeLodSeamGuard);
     __privateAdd(this, _removeMinZoomScale);
     __privateAdd(this, _removeScaleWheelZoom);
     __privateAdd(this, _apiKey3);
     ensureCesiumRuntime();
-    const _0x14ed0e = document["createElement"]("div");
-    _0x14ed0e["style"]["display"] = "none", this["viewer"] = new Viewer(_0x4ccc21, this["buildViewerOptions"](_0x118eb9, _0x14ed0e)), this["viewer"]["scene"]["globe"]["baseColor"] = Color["fromCssColorString"]("#a3c6e0"), this["viewer"]["scene"]["screenSpaceCameraController"]["maximumZoomDistance"] = MAX_ZOOM_DISTANCE_METERS, this["viewer"]["scene"]["screenSpaceCameraController"]["minimumZoomDistance"] = MIN_ZOOM_DISTANCE_METERS;
-    const _0x34bb54 = _0x118eb9["apiKey"] ?? getGlobalApiKey();
-    __privateSet(this, _apiKey3, _0x34bb54), this["layerManager"] = new LayerManager(this["viewer"]), this["selectionHighlight"] = new SelectionHighlight(this["viewer"]), this["layerManager"]["configure"]({ ..._0x34bb54 !== void 0 && { "apiKey": _0x34bb54 }, ..._0x118eb9["trustedApiKeyHosts"] !== void 0 && { "trustedApiKeyHosts": _0x118eb9["trustedApiKeyHosts"] }, ..._0x118eb9["apiKeyDiscoveryUrl"] !== void 0 && { "apiKeyDiscoveryUrl": _0x118eb9["apiKeyDiscoveryUrl"] } }), this["interactionManager"] = new InteractionManager(this["viewer"]), this["drawingManager"] = new DrawingManager(this["viewer"], this["interactionManager"]), this["analysisManager"] = new AnalysisManager({ "apiKey": _0x34bb54 ?? "" }), this["basemapController"] = new BasemapController(this["viewer"], { "removeBasemapLayers": () => this["layerManager"]["_removeBasemapLayers"](), "addBasemapImageryLayer": (_0x71e423, _0x396d0a, _0x50aeed) => this["layerManager"]["_addBasemapImageryLayer"](_0x71e423, _0x396d0a, _0x50aeed), "removeLayer": (_0x30eaf0) => this["layerManager"]["removeLayer"](_0x30eaf0), "emit": (_0x1d99d0, _0x11fb76) => this["layerManager"]["emit"](_0x1d99d0, _0x11fb76), "getProxyBase": () => getProxyBase(), "getApiKey": () => __privateGet(this, _apiKey3) }), _0x118eb9["apiKey"] === void 0 && this["registerGlobalApiKeyRotation"](_0x34bb54), this["wireShapeSource"]("draw", DRAWING_LAYER_ID, DRAWING_LAYER_TITLE, (_0xdc447e, _0x4f9491, _0x2b20b3) => this["layerManager"]["_addDrawnShape"](_0xdc447e, _0x4f9491, _0x2b20b3)), this["wireShapeSource"]("measure", MEASURE_LAYER_ID, MEASURE_LAYER_TITLE, (_0xa03b38, _0x4ffb82, _0x3e3d0f) => this["layerManager"]["_addMeasuredShape"](_0xa03b38, _0x4ffb82, _0x3e3d0f)), _0x118eb9["camera"] !== void 0 ? this["setView"](_0x118eb9["camera"]) : this["setExtent"](_0x118eb9["initialExtent"] ?? DEFAULT_INITIAL_EXTENT), __privateSet(this, _removeLodSeamGuard, installLodSeamGuard(this["viewer"])), __privateSet(this, _removeMinZoomScale, installMinZoomScale(this["viewer"], MAX_ZOOM_SCALE_DENOMINATOR, MAX_ZOOM_OUT_SCALE_DENOMINATOR)), __privateSet(this, _removeScaleWheelZoom, installScaleWheelZoom(this["viewer"])), this["setBasemap"](_0x118eb9["basemap"]);
+    const _0x585862 = document["createElement"]("div");
+    _0x585862["style"]["display"] = "none", this["viewer"] = new Viewer(_0xf4d962, this["buildViewerOptions"](_0x341049, _0x585862)), this["viewer"]["scene"]["globe"]["baseColor"] = Color["fromCssColorString"]("#a3c6e0"), this["viewer"]["scene"]["screenSpaceCameraController"]["maximumZoomDistance"] = MAX_ZOOM_DISTANCE_METERS, this["viewer"]["scene"]["screenSpaceCameraController"]["minimumZoomDistance"] = MIN_ZOOM_DISTANCE_METERS;
+    const _0xcb89a6 = _0x341049["apiKey"] ?? getGlobalApiKey();
+    __privateSet(this, _apiKey3, _0xcb89a6), this["layerManager"] = new LayerManager(this["viewer"]), this["selectionHighlight"] = new SelectionHighlight(this["viewer"]), this["layerManager"]["configure"]({ ..._0xcb89a6 !== void 0 && { "apiKey": _0xcb89a6 }, ..._0x341049["trustedApiKeyHosts"] !== void 0 && { "trustedApiKeyHosts": _0x341049["trustedApiKeyHosts"] }, ..._0x341049["apiKeyDiscoveryUrl"] !== void 0 && { "apiKeyDiscoveryUrl": _0x341049["apiKeyDiscoveryUrl"] } }), this["interactionManager"] = new InteractionManager(this["viewer"]), this["drawingManager"] = new DrawingManager(this["viewer"], this["interactionManager"]), this["analysisManager"] = new AnalysisManager({ "apiKey": _0xcb89a6 ?? "" }), this["basemapController"] = new BasemapController(this["viewer"], { "removeBasemapLayers": () => this["layerManager"]["_removeBasemapLayers"](), "addBasemapImageryLayer": (_0x1c60d0, _0x48ba88, _0x481a72) => this["layerManager"]["_addBasemapImageryLayer"](_0x1c60d0, _0x48ba88, _0x481a72), "removeLayer": (_0x119ea4) => this["layerManager"]["removeLayer"](_0x119ea4), "emit": (_0x2f3b66, _0x10bbd1) => this["layerManager"]["emit"](_0x2f3b66, _0x10bbd1), "getProxyBase": () => getProxyBase(), "getApiKey": () => __privateGet(this, _apiKey3) }), _0x341049["apiKey"] === void 0 && this["registerGlobalApiKeyRotation"](_0xcb89a6), this["wireShapeSource"]("draw", DRAWING_LAYER_ID, DRAWING_LAYER_TITLE, (_0x2ba24c, _0x420ad3, _0x3bdc46) => this["layerManager"]["_addDrawnShape"](_0x2ba24c, _0x420ad3, _0x3bdc46)), this["wireShapeSource"]("measure", MEASURE_LAYER_ID, MEASURE_LAYER_TITLE, (_0x449ef5, _0x2e88c6, _0x33c8bb) => this["layerManager"]["_addMeasuredShape"](_0x449ef5, _0x2e88c6, _0x33c8bb)), _0x341049["camera"] !== void 0 ? this["setView"](_0x341049["camera"]) : this["setExtent"](_0x341049["initialExtent"] ?? DEFAULT_INITIAL_EXTENT), __privateSet(this, _removeLodSeamGuard, installLodSeamGuard(this["viewer"])), __privateSet(this, _removeMinZoomScale, installMinZoomScale(this["viewer"], MAX_ZOOM_SCALE_DENOMINATOR, MAX_ZOOM_OUT_SCALE_DENOMINATOR)), __privateSet(this, _removeScaleWheelZoom, installScaleWheelZoom(this["viewer"])), this["setBasemap"](_0x341049["basemap"]);
   }
   async ["ensureApiKeyValid"]() {
     await validateApiKey(__privateGet(this, _apiKey3) ?? "", getUcbpApiBase());
   }
-  async ["runBuffer"](_0x307c0f, _0x49ee6d) {
-    const _0x4a0594 = await this["analysisManager"]["buffer"](_0x307c0f), _0x335035 = (_0x49ee6d == null ? void 0 : _0x49ee6d["id"]) ?? "buffer-" + Date["now"](), _0x20a179 = (_0x49ee6d == null ? void 0 : _0x49ee6d["title"]) ?? "Tampon sonucu (" + _0x307c0f["distanceM"] + "m)";
-    this["layerManager"]["markAnalysisResult"](_0x335035);
-    const _0x1aaebe = await this["layerManager"]["add"]("GEOJSON", { "id": _0x335035, "title": _0x20a179, "data": _0x4a0594["geojson"], "layerType": "GEOJSON", "clampToGround": !![] });
-    return _0x1aaebe;
+  async ["runBuffer"](_0x45569b, _0x32aca8) {
+    const _0x53b72d = await this["analysisManager"]["buffer"](_0x45569b), _0x48a1fb = (_0x32aca8 == null ? void 0 : _0x32aca8["id"]) ?? "buffer-" + Date["now"](), _0x3e1099 = (_0x32aca8 == null ? void 0 : _0x32aca8["title"]) ?? "Tampon sonucu (" + _0x45569b["distanceM"] + "m)";
+    this["layerManager"]["markAnalysisResult"](_0x48a1fb);
+    const _0x449f9e = await this["layerManager"]["add"]("GEOJSON", { "id": _0x48a1fb, "title": _0x3e1099, "data": _0x53b72d["geojson"], "layerType": "GEOJSON", "clampToGround": !![] });
+    return _0x449f9e;
   }
-  async ["runIntersection"](_0x43f3cd, _0x10bdd9) {
-    const _0x3e279f = await this["analysisManager"]["intersection"](_0x43f3cd), _0x4b925b = (_0x10bdd9 == null ? void 0 : _0x10bdd9["id"]) ?? "intersection-" + Date["now"](), _0x27251a = (_0x10bdd9 == null ? void 0 : _0x10bdd9["title"]) ?? "Kesişim sonucu";
-    this["layerManager"]["markAnalysisResult"](_0x4b925b);
-    const _0x25c2c4 = await this["layerManager"]["add"]("GEOJSON", { "id": _0x4b925b, "title": _0x27251a, "data": _0x3e279f["geojson"], "layerType": "GEOJSON", "clampToGround": !![] });
-    return _0x25c2c4;
+  async ["runIntersection"](_0x16c58c, _0x3753e8) {
+    const _0x59af1d = await this["analysisManager"]["intersection"](_0x16c58c), _0x2962d4 = (_0x3753e8 == null ? void 0 : _0x3753e8["id"]) ?? "intersection-" + Date["now"](), _0x5c486d = (_0x3753e8 == null ? void 0 : _0x3753e8["title"]) ?? "Kesişim sonucu";
+    this["layerManager"]["markAnalysisResult"](_0x2962d4);
+    const _0x49cd5a = await this["layerManager"]["add"]("GEOJSON", { "id": _0x2962d4, "title": _0x5c486d, "data": _0x59af1d["geojson"], "layerType": "GEOJSON", "clampToGround": !![] });
+    return _0x49cd5a;
   }
-  async ["runBoundary"](_0x1186db, _0x368212) {
-    const _0x107802 = await this["analysisManager"]["boundary"](_0x1186db);
-    return this["addAnalysisGeoJson"]((_0x368212 == null ? void 0 : _0x368212["id"]) ?? "boundary-" + Date["now"](), (_0x368212 == null ? void 0 : _0x368212["title"]) ?? "Sınır sonucu", _0x107802["geojson"]);
+  async ["runBoundary"](_0x384c4e, _0x390bf7) {
+    const _0x5295ee = await this["analysisManager"]["boundary"](_0x384c4e);
+    return this["addAnalysisGeoJson"]((_0x390bf7 == null ? void 0 : _0x390bf7["id"]) ?? "boundary-" + Date["now"](), (_0x390bf7 == null ? void 0 : _0x390bf7["title"]) ?? "Sınır sonucu", _0x5295ee["geojson"]);
   }
-  async ["runClip"](_0xb21cf6, _0x39ddcc) {
-    const _0x4728db = await this["analysisManager"]["clip"](_0xb21cf6);
-    return this["addAnalysisGeoJson"]((_0x39ddcc == null ? void 0 : _0x39ddcc["id"]) ?? "clip-" + Date["now"](), (_0x39ddcc == null ? void 0 : _0x39ddcc["title"]) ?? "Kırpma sonucu", _0x4728db["geojson"]);
+  async ["runClip"](_0x4bf942, _0x528602) {
+    const _0xdc2a59 = await this["analysisManager"]["clip"](_0x4bf942);
+    return this["addAnalysisGeoJson"]((_0x528602 == null ? void 0 : _0x528602["id"]) ?? "clip-" + Date["now"](), (_0x528602 == null ? void 0 : _0x528602["title"]) ?? "Kırpma sonucu", _0xdc2a59["geojson"]);
   }
-  async ["runDifference"](_0x583e0a, _0x20d6db) {
-    const _0x54fb5f = await this["analysisManager"]["difference"](_0x583e0a);
-    return this["addAnalysisGeoJson"]((_0x20d6db == null ? void 0 : _0x20d6db["id"]) ?? "difference-" + Date["now"](), (_0x20d6db == null ? void 0 : _0x20d6db["title"]) ?? "Fark sonucu", _0x54fb5f["geojson"]);
+  async ["runDifference"](_0x2afb38, _0x572e2a) {
+    const _0x483c75 = await this["analysisManager"]["difference"](_0x2afb38);
+    return this["addAnalysisGeoJson"]((_0x572e2a == null ? void 0 : _0x572e2a["id"]) ?? "difference-" + Date["now"](), (_0x572e2a == null ? void 0 : _0x572e2a["title"]) ?? "Fark sonucu", _0x483c75["geojson"]);
   }
-  async ["runSubtract"](_0x463c5a, _0x3b14b7) {
-    const _0x2b0f96 = await this["analysisManager"]["subtract"](_0x463c5a);
-    return this["addAnalysisGeoJson"]((_0x3b14b7 == null ? void 0 : _0x3b14b7["id"]) ?? "subtract-" + Date["now"](), (_0x3b14b7 == null ? void 0 : _0x3b14b7["title"]) ?? "Çıkarma sonucu", _0x2b0f96["geojson"]);
+  async ["runSubtract"](_0x5538a0, _0x80a538) {
+    const _0x201ef0 = await this["analysisManager"]["subtract"](_0x5538a0);
+    return this["addAnalysisGeoJson"]((_0x80a538 == null ? void 0 : _0x80a538["id"]) ?? "subtract-" + Date["now"](), (_0x80a538 == null ? void 0 : _0x80a538["title"]) ?? "Çıkarma sonucu", _0x201ef0["geojson"]);
   }
-  async ["runUnion"](_0x4b5851, _0x451e7c) {
-    const _0x1189b6 = await this["analysisManager"]["union"](_0x4b5851);
-    return this["addAnalysisGeoJson"]((_0x451e7c == null ? void 0 : _0x451e7c["id"]) ?? "union-" + Date["now"](), (_0x451e7c == null ? void 0 : _0x451e7c["title"]) ?? "Birleştir sonucu", _0x1189b6["geojson"]);
+  async ["runUnion"](_0x5d4576, _0x3f3129) {
+    const _0x2e97b2 = await this["analysisManager"]["union"](_0x5d4576);
+    return this["addAnalysisGeoJson"]((_0x3f3129 == null ? void 0 : _0x3f3129["id"]) ?? "union-" + Date["now"](), (_0x3f3129 == null ? void 0 : _0x3f3129["title"]) ?? "Birleştir sonucu", _0x2e97b2["geojson"]);
   }
-  async ["runWedgeBuffer"](_0x5002b0, _0x2ab4f5) {
-    const _0x57860f = await this["analysisManager"]["wedgeBuffer"](_0x5002b0);
-    return this["addAnalysisGeoJson"]((_0x2ab4f5 == null ? void 0 : _0x2ab4f5["id"]) ?? "wedge-" + Date["now"](), (_0x2ab4f5 == null ? void 0 : _0x2ab4f5["title"]) ?? "Kama tampon sonucu", _0x57860f["geojson"]);
+  async ["runWedgeBuffer"](_0x2480d7, _0x43638b) {
+    const _0x3ce371 = await this["analysisManager"]["wedgeBuffer"](_0x2480d7);
+    return this["addAnalysisGeoJson"]((_0x43638b == null ? void 0 : _0x43638b["id"]) ?? "wedge-" + Date["now"](), (_0x43638b == null ? void 0 : _0x43638b["title"]) ?? "Kama tampon sonucu", _0x3ce371["geojson"]);
   }
-  async ["addAnalysisGeoJson"](_0x1c5500, _0x22a29b, _0x3e4472) {
-    return this["layerManager"]["markAnalysisResult"](_0x1c5500), this["layerManager"]["add"]("GEOJSON", { "id": _0x1c5500, "title": _0x22a29b, "data": _0x3e4472, "layerType": "GEOJSON", "clampToGround": !![] });
+  async ["addAnalysisGeoJson"](_0x114313, _0x19d846, _0x29b1a4) {
+    return this["layerManager"]["markAnalysisResult"](_0x114313), this["layerManager"]["add"]("GEOJSON", { "id": _0x114313, "title": _0x19d846, "data": _0x29b1a4, "layerType": "GEOJSON", "clampToGround": !![] });
   }
-  ["setView"](_0x4c6282) {
-    setView(this["viewer"], _0x4c6282);
+  ["setView"](_0x45f11b) {
+    setView(this["viewer"], _0x45f11b);
   }
-  ["setExtent"](_0x19fcb6) {
-    setExtent(this["viewer"], _0x19fcb6);
+  ["setExtent"](_0x5e9ce6) {
+    setExtent(this["viewer"], _0x5e9ce6);
   }
-  ["flyTo"](_0x1f4e83) {
-    flyTo(this["viewer"], _0x1f4e83);
+  ["flyTo"](_0x4079c0) {
+    flyTo(this["viewer"], _0x4079c0);
   }
-  ["zoomTo"](_0x5a34d2, _0x38bd3d, _0x24c902) {
-    zoomTo(this["viewer"], _0x5a34d2, _0x38bd3d, _0x24c902);
+  ["zoomTo"](_0xbeb795, _0x392507, _0x5689a0) {
+    zoomTo(this["viewer"], _0xbeb795, _0x392507, _0x5689a0);
   }
   ["zoomInStep"]() {
     scaleZoomStep(this["viewer"], 1);
@@ -3317,11 +3317,11 @@ let Map$1 = (_a = class {
   ["zoomOutStep"]() {
     scaleZoomStep(this["viewer"], -1);
   }
-  async ["zoomToLayer"](_0x27ca07) {
-    return zoomToLayer(this["viewer"], _0x27ca07);
+  async ["zoomToLayer"](_0x2b43f8) {
+    return zoomToLayer(this["viewer"], _0x2b43f8);
   }
-  ["dropMarker"](_0x58490e, _0x22b607, _0x46e48e, _0x1cbc1f = {}) {
-    this["clearMarker"](), this["_removeMarker"] = createMarkerOverlay(this["viewer"], _0x58490e, _0x22b607, _0x46e48e, _0x1cbc1f);
+  ["dropMarker"](_0x56b617, _0x385943, _0x2c5d41, _0x1215d3 = {}) {
+    this["clearMarker"](), this["_removeMarker"] = createMarkerOverlay(this["viewer"], _0x56b617, _0x385943, _0x2c5d41, _0x1215d3);
   }
   ["clearMarker"]() {
     var _a2;
@@ -3330,51 +3330,51 @@ let Map$1 = (_a = class {
   get ["basemapStatus"]() {
     return this["basemapController"]["status"];
   }
-  ["setBasemap"](_0x4383de) {
-    this["basemapController"]["set"](_0x4383de);
+  ["setBasemap"](_0x44653a) {
+    this["basemapController"]["set"](_0x44653a);
   }
-  ["setMode"](_0x20eaeb) {
-    _0x20eaeb === "2D" ? this["viewer"]["scene"]["morphTo2D"](0) : this["viewer"]["scene"]["morphTo3D"](0);
+  ["setMode"](_0x35e5a9) {
+    _0x35e5a9 === "2D" ? this["viewer"]["scene"]["morphTo2D"](0) : this["viewer"]["scene"]["morphTo3D"](0);
   }
-  ["setQuality"](_0x17c5a6) {
-    const _0x1cb508 = Math["min"](100, Math["max"](0, _0x17c5a6));
-    this["viewer"]["resolutionScale"] = Math["max"](0.1, _0x1cb508 / 100);
+  ["setQuality"](_0x467c55) {
+    const _0x5b2704 = Math["min"](100, Math["max"](0, _0x467c55));
+    this["viewer"]["resolutionScale"] = Math["max"](0.1, _0x5b2704 / 100);
   }
   ["resize"]() {
     this["viewer"]["resize"]();
   }
-  async ["exportJPEG"](_0x4d3c02 = "tucbs-harita", _0x20c075 = 0.92) {
-    const _0x8ce505 = await this["captureScreenshotBlob"](_0x20c075);
-    triggerDownload(_0x8ce505, _0x4d3c02 + "-" + Date["now"]() + ".jpg");
+  async ["exportJPEG"](_0x1a908e = "tucbs-harita", _0x128a66 = 0.92) {
+    const _0x447133 = await this["captureScreenshotBlob"](_0x128a66);
+    triggerDownload(_0x447133, _0x1a908e + "-" + Date["now"]() + ".jpg");
   }
-  async ["captureScreenshotBlob"](_0x5a24f2 = 0.92) {
-    return await nextFrame(this["viewer"]), captureCanvasBlob(this["viewer"], "image/jpeg", _0x5a24f2);
+  async ["captureScreenshotBlob"](_0xaa5a3f = 0.92) {
+    return await nextFrame(this["viewer"]), captureCanvasBlob(this["viewer"], "image/jpeg", _0xaa5a3f);
   }
   ["measureGroundMetersPerPixel"]() {
     return measureGroundMetersPerPixel(this["viewer"]);
   }
-  ["buildViewerOptions"](_0x4f3a98, _0x556fd5) {
-    return { "timeline": _0x4f3a98["timeline"] ?? ![], "animation": _0x4f3a98["animation"] ?? ![], "baseLayerPicker": _0x4f3a98["baseLayerPicker"] ?? ![], "baseLayer": ![], "geocoder": _0x4f3a98["geocoder"] ?? ![], "homeButton": _0x4f3a98["homeButton"] ?? ![], "sceneModePicker": _0x4f3a98["sceneModePicker"] ?? ![], "navigationHelpButton": _0x4f3a98["navigationHelpButton"] ?? ![], "infoBox": _0x4f3a98["infoBox"] ?? ![], "selectionIndicator": _0x4f3a98["selectionIndicator"] ?? ![], "shadows": _0x4f3a98["shadows"] ?? ![], "shouldAnimate": _0x4f3a98["shouldAnimate"] ?? ![], "fullscreenButton": _0x4f3a98["fullscreenButton"] ?? ![], "creditContainer": _0x556fd5, ..._0x4f3a98["cesiumOptions"] };
+  ["buildViewerOptions"](_0x18d592, _0x2af829) {
+    return { "timeline": _0x18d592["timeline"] ?? ![], "animation": _0x18d592["animation"] ?? ![], "baseLayerPicker": _0x18d592["baseLayerPicker"] ?? ![], "baseLayer": ![], "geocoder": _0x18d592["geocoder"] ?? ![], "homeButton": _0x18d592["homeButton"] ?? ![], "sceneModePicker": _0x18d592["sceneModePicker"] ?? ![], "navigationHelpButton": _0x18d592["navigationHelpButton"] ?? ![], "infoBox": _0x18d592["infoBox"] ?? ![], "selectionIndicator": _0x18d592["selectionIndicator"] ?? ![], "shadows": _0x18d592["shadows"] ?? ![], "shouldAnimate": _0x18d592["shouldAnimate"] ?? ![], "fullscreenButton": _0x18d592["fullscreenButton"] ?? ![], "creditContainer": _0x2af829, ..._0x18d592["cesiumOptions"] };
   }
-  ["registerGlobalApiKeyRotation"](_0x169999) {
-    _0x169999 !== void 0 && console["info"]("[@tucbs/core] Bu Map instance'i configureTucbs() global apiKey'ini kullaniyor (kendi apiKey attribute'u/options'u verilmedi). Farkli bir anahtar gerekiyorsa Map/component'e acikca apiKey verin."), __privateSet(this, _unregisterApiKeyRefresh, registerApiKeyRefresh(() => {
-      const _0x1d4e9b = getGlobalApiKey();
-      __privateSet(this, _apiKey3, _0x1d4e9b), this["layerManager"]["configure"]({ ..._0x1d4e9b !== void 0 && { "apiKey": _0x1d4e9b } }), this["analysisManager"]["configure"]({ "apiKey": _0x1d4e9b ?? "" }), void this["ensureApiKeyValid"]()["catch"]((_0x472b96) => {
-        console["error"]("[@tucbs/core] apiKey rotasyon validate basarisiz:", _0x472b96);
+  ["registerGlobalApiKeyRotation"](_0x48df0f) {
+    _0x48df0f !== void 0 && console["info"]("[@tucbs/core] Bu Map instance'i configureTucbs() global apiKey'ini kullaniyor (kendi apiKey attribute'u/options'u verilmedi). Farkli bir anahtar gerekiyorsa Map/component'e acikca apiKey verin."), __privateSet(this, _unregisterApiKeyRefresh, registerApiKeyRefresh(() => {
+      const _0x5ef394 = getGlobalApiKey();
+      __privateSet(this, _apiKey3, _0x5ef394), this["layerManager"]["configure"]({ ..._0x5ef394 !== void 0 && { "apiKey": _0x5ef394 } }), this["analysisManager"]["configure"]({ "apiKey": _0x5ef394 ?? "" }), void this["ensureApiKeyValid"]()["catch"]((_0x44b1f2) => {
+        console["error"]("[@tucbs/core] apiKey rotasyon validate basarisiz:", _0x44b1f2);
       }), this["basemapController"]["currentBasemapId"] !== void 0 && this["setBasemap"](this["basemapController"]["currentBasemapId"]);
     }));
   }
-  ["wireShapeSource"](_0x3747a2, _0x586e1b, _0x246328, _0x1f89af) {
-    this["drawingManager"]["on"]("draw:complete", ({ shape: _0x411746 }) => {
-      if (_0x411746["source"] !== _0x3747a2) return;
-      void _0x1f89af(_0x586e1b, _0x246328, _0x411746);
-    }), this["drawingManager"]["on"]("draw:remove", ({ shape: _0x4176b2 }) => {
-      if (_0x4176b2["source"] !== _0x3747a2) return;
-      this["layerManager"]["_removeDrawnShape"](_0x586e1b, _0x4176b2["entity"]);
+  ["wireShapeSource"](_0x5eaaec, _0x4268b6, _0x1cb56d, _0x5a6195) {
+    this["drawingManager"]["on"]("draw:complete", ({ shape: _0x2607ef }) => {
+      if (_0x2607ef["source"] !== _0x5eaaec) return;
+      void _0x5a6195(_0x4268b6, _0x1cb56d, _0x2607ef);
+    }), this["drawingManager"]["on"]("draw:remove", ({ shape: _0x327159 }) => {
+      if (_0x327159["source"] !== _0x5eaaec) return;
+      this["layerManager"]["_removeDrawnShape"](_0x4268b6, _0x327159["entity"]);
     });
   }
-  ["showSelectionHighlight"](_0x1e05d8) {
-    this["selectionHighlight"]["show"](_0x1e05d8);
+  ["showSelectionHighlight"](_0x4cc4e3) {
+    this["selectionHighlight"]["show"](_0x4cc4e3);
   }
   ["clearSelectionHighlight"]() {
     this["selectionHighlight"]["clear"]();

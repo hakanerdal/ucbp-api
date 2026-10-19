@@ -14,5 +14,10 @@ Thumbs.db
 *.log
 *.tsbuildinfo
 
-# Yayın tarball'ları — commit'e girmez, yalnız GitHub release'e eklenir
+# Yayın paketleri — commit'e girmez, yalnız GitHub release'e eklenir
 *.tgz
+*.zip
+attachments/
+
+# Yerel deneme uygulamaları. Kurulum rehberleri react-js.md, react-ts.md, html.md.
+examples/

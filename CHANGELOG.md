@@ -4,6 +4,13 @@ Bu dosyadaki kayıtlar [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/)
 biçimine uygundur; sürüm numaralandırması [SemVer](https://semver.org/lang/tr/)
 kurallarına göredir.
 
+## [0.2.3] — 2026-10-19
+
+### Eklenenler
+
+- Düz HTML kurulumu. `tucbs-html-0.2.3.zip` indirilir; npm gerekmez. Adımlar `html.md` içindedir.
+- `@tucbs/core` ve `@tucbs/components` davranışı 0.2.2 ile aynıdır.
+
 ## [0.2.2] — 2026-10-16
 
 ### Düzeltilenler

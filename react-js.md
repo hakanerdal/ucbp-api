@@ -25,7 +25,7 @@ Kütüphane GitHub Releases üzerinden dağıtılır; her paket kendi tarball (`
 Harita motorunu tek başına kullanacaksanız yalnız `@tucbs/core` yeter:
 
 ```powershell
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.2/tucbs-core-0.2.2.tgz
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.3/tucbs-core-0.2.3.tgz
 ```
 
 ### @tucbs/components
@@ -33,7 +33,7 @@ npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.2/tucb
 `@tucbs/components`, `@tucbs/core`'a bağımlıdır. Önce core'u, sonra components'i kurun:
 
 ```powershell
-npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.2/tucbs-components-0.2.2.tgz
+npm install https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.3/tucbs-components-0.2.3.tgz
 ```
 
 ### Cesium

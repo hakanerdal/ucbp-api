@@ -5,7 +5,7 @@ UCBP API bir zip dosyasıyla gelir.
 ## 1. Zip'i indir
 
 ```text
-https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.3/tucbs-html-0.2.3.zip
+https://github.com/hakanerdal/ucbp-api/releases/download/v0.2.4/tucbs-html-0.2.4.zip
 ```
 
 Zip'i aç. İçindeki klasörün adı `html`.

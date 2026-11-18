@@ -4,6 +4,27 @@ Bu dosyadaki kayıtlar [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/)
 biçimine uygundur; sürüm numaralandırması [SemVer](https://semver.org/lang/tr/)
 kurallarına göredir.
 
+## [0.2.4] — 2026-11-18
+
+### Eklenenler
+
+- **@tucbs/core** — `AuthorizedLayerInfo.tokenUrl`: QGIS / kopyala için token’lı servis adresi; harita yine `servisUrl` (opaque `/ogc/...`) kullanır.
+- **@tucbs/core** — Altlık düşerse NASA Blue Marble yedeği; `Map.fallbackAttribution`, `basemap:fallback-shown` / `basemap:fallback-hidden`.
+- **@tucbs/components** — Yetkili katman satırında link ikonu; `tokenUrl` varsa “Token URL” diyalogu (göster / panoya kopyala).
+- **@tucbs/components** — `<tucbs-map quality="…">` artık gerçekten uygulanır (0–100).
+- **@tucbs/components** — `tucbs-info-bar` yedek dünya görüntüsü atfını gösterir; altlık tamamen düştüyse yalnız yedek satırı kalır.
+- **@tucbs/core** / **@tucbs/components** — Apache-2.0 `LICENSE`, `NOTICE`, `THIRD_PARTY_NOTICES` paketle birlikte gider.
+
+### Düzeltilenler
+
+- **@tucbs/components** — Coğrafi Analiz, Çizim, Ölçüm ve Koordinata Git açılınca birbirini otomatik kapatır.
+- **@tucbs/components** — Araç çubuğu yalnız import edilince yazdırma aracı da yüklenir (sessiz kırılma yok).
+- **@tucbs/components** — Yazdırma lejant sayfalama, alan ölçümü köşe tutarsızlığı, çizim diyaloğunda Enter ile yanlış onay, Koordinata Git’e yapıştırılan “enlem, boylam”, stil editörü yarışı, eşzamanlı GeoTIFF indirme durumu, 2B’de yere yapışık nokta kayması, en uzak zoom’da dünya kırpılması.
+
+### Değişenler
+
+- **@tucbs/core** — Yetkili katman `servisUrl` opaque ucbp-api `/ogc/{tür}/{id}` yoludur; tile/feature istekleri `X-API-Key` ile gider. Masaüstü istemci için ayrı `tokenUrl` kullanılır.
+
 ## [0.2.3] — 2026-10-19
 
 ### Eklenenler

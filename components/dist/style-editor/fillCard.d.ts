@@ -8,6 +8,7 @@ export interface ColorModeOption {
     /** Dropdown'da görünen ad. */
     label: string;
 }
+/** Renk Modu dropdown'unun seçenekleri. */
 export declare const FILL_COLOR_MODES: readonly ColorModeOption[];
 /** Kategori Sırası dropdown seçeneği. */
 export interface CategorySortOption {
@@ -16,6 +17,7 @@ export interface CategorySortOption {
     /** Dropdown'da görünen ad. */
     label: string;
 }
+/** Kategori Sırası dropdown'unun seçenekleri. */
 export declare const CATEGORY_SORT_OPTIONS: readonly CategorySortOption[];
 /** Dolgu kartı template'lerinin stil editöründen okuyup yazdığı state ve çağırdığı metotlar. */
 export interface FillCardHost {
@@ -51,6 +53,10 @@ export interface FillCardHost {
     readonly dataColumns: readonly string[];
     /** Sayısal veri sütunları (Gradient/Bin için). */
     readonly numericDataColumns: readonly string[];
+    /** Dolgu açık mı (kart başlığındaki anahtar; kapalıysa stile `mode: "off"` yazılır). */
+    readonly fillEnabled: boolean;
+    /** Dolgu anahtarını açar/kapatır; kapatırken mevcut mod, açarken geri yüklenir. */
+    setFillEnabled(enabled: boolean): void;
     /** Renk Modu seçimi gizli mi (Çizim/Ölçü katmanı). */
     readonly isFixedSolidLayer: boolean;
     /** Min alanına negatif değer girilebilir mi. */

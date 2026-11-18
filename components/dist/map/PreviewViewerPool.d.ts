@@ -1,3 +1,4 @@
+/** Sayfada aynı anda etkin olabilecek en fazla önizleme Viewer'ı sayısı. */
 declare const MAX_CONCURRENT_PREVIEW_VIEWERS = 6;
 declare class PreviewViewerPool {
     private readonly entries;
@@ -9,6 +10,7 @@ declare class PreviewViewerPool {
     release(id: string): void;
     private evictOldest;
 }
+/** Sayfadaki tüm `TucbsMapPreview`'ların paylaştığı tekil havuz. */
 export declare const previewViewerPool: PreviewViewerPool;
 export { MAX_CONCURRENT_PREVIEW_VIEWERS };
 //# sourceMappingURL=PreviewViewerPool.d.ts.map

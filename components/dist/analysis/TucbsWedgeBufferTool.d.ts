@@ -5,8 +5,11 @@ import { Map as TucbsMapCore } from '@tucbs/core';
  */
 export declare class TucbsWedgeBufferTool extends LitElement {
     static readonly styles: import('lit').CSSResult[];
+    /** Haritanın bağlı olduğu host elementin `id`'si; `map` verilmemişse bununla `document.getElementById` üzerinden bulunur. */
     mapElementId: string;
+    /** Doğrudan bağlanacak `@tucbs/core` `Map` referansı; verilirse `mapElementId` yerine bu kullanılır. */
     map: TucbsMapCore | null;
+    /** Shadow DOM köküne uygulanacak özel CSS metni. */
     customCss: string;
     private _label;
     private _distance;

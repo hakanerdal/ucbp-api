@@ -3,17 +3,26 @@ import { LayerManager, LayerType } from '@tucbs/core';
 import { toHexColor } from './fillStyleSpec.js';
 export { toHexColor };
 /**
- * Katman stili duzenleme diyalogu.
- * Su an sadece arayuz: girilen degerler yerel state'te tutulur. LayerManager/
- * ManagedLayer'a bir stil uygulama API'si (orn. layer.applyStyle()) eklendiginde
- * buradaki degerler ona baglanacak.
+ * Katman stili düzenleme diyaloğu (`<tucbs-style-editor>`). Katman listesinin
+ * katman menüsündeki "Stil Düzenle" ile açılır; her değişiklik
+ * `LayerManager.applyLayerStyle()` ile haritaya anında uygulanır.
+ *
+ * Kartlar katmandaki geometri türlerine (`LayerManager.getGeometryKinds()`) göre gösterilir:
+ * - **Dolgu**: renk modu (Sabit Renk, Sürekli, Kesikli, Kategorik) ve opaklık; başlıktaki
+ *   anahtar dolguyu kapatır. Yalnız çizgi içeren katmanda gösterilmez.
+ * - **Dış Hat**: renk, opaklık ve kalınlık; başlıktaki anahtar dış hattı kapatır. Yalnız
+ *   çizgi içeren katmanda adı "Hat" olur, anahtarı yoktur ve hat her zaman açıktır.
+ * - **Sembol**: noktada şekil ve boyut, çizgide ve kenarı ayrı çizilen alanda çizgi tipi.
+ *
+ * WMS/WMTS katmanlarında bu kartların yerine sunucunun stillerinden seçim yapılan
+ * "Sunucu Stili" kartı gösterilir.
  * @fires tucbs-style-editor-closed - Diyalog kapatıldığında (`open` false yapılır); `detail` yok.
  */
 export declare class TucbsStyleEditor extends LitElement {
     static readonly styles: import('lit').CSSResult;
     /** Diyaloğun açık olup olmadığı (`open` attribute'una reflect edilir). */
     open: boolean;
-    /** Core JS API `LayerManager` referansı. */
+    /** Core JS API `LayerManager` referansı (stil buradan okunur ve uygulanır). */
     layerManager: LayerManager | undefined;
     /** Düzenlenecek katmanın kimliği. */
     layerId: string;
@@ -43,7 +52,14 @@ export declare class TucbsStyleEditor extends LitElement {
     private _outlineEnabled;
     private _outlineColor;
     private _outlineWidth;
-    private _featureCount;
+    private _fillModeBeforeOff;
+    private _outlineOpacity;
+    private _outlineOpacityRaf;
+    private _pointShape;
+    private _pointSize;
+    private _pointCustomized;
+    private _lineDash;
+    private _geometryKinds;
     private _serviceStyleRequestId;
     private readonly _drag;
     private _categoryListEl?;
@@ -75,7 +91,7 @@ export declare class TucbsStyleEditor extends LitElement {
     openFor(layerId: string, layerTitle: string, layerType: LayerType, initialFillColor?: string, initialFillOpacity?: number): void;
     private get _isServiceLayer();
     private get _isFixedSolidLayer();
-    private get _outlineWidthDisabledByScale();
+    private get _cardLayout();
     /**
      * Diger panel/dialoglarla karsilikli disari kapatma icin genel API (bkz TucbsLayerList).
      *
@@ -88,6 +104,8 @@ export declare class TucbsStyleEditor extends LitElement {
     private _close;
     private _reset;
     private _updateOpacitySlider;
+    private _setFillEnabled;
+    private _setOutlineOpacity;
     private _setFillOpacity;
     private _loadDataColumns;
     private _onDataColumnChange;
@@ -106,6 +124,8 @@ export declare class TucbsStyleEditor extends LitElement {
     /** Bileşenin şablonunu render eder (`open` false ise boş şablon). */
     render(): import('lit').TemplateResult<1>;
     private readonly _fillCardHost;
+    private readonly _symbolCardHost;
+    private _renderOutlineWidthField;
     private _renderOutlineCard;
 }
 //# sourceMappingURL=TucbsStyleEditor.d.ts.map

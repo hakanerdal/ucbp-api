@@ -6,7 +6,9 @@ export interface PrintPreviewInputOptions {
     readonly map: TucbsMapInstance;
     /** Hedef sayfa boyutu (mm). */
     readonly pageDims: {
+        /** Sayfa genişliği (mm). */
         readonly widthMm: number;
+        /** Sayfa yüksekliği (mm). */
         readonly heightMm: number;
     };
     /** Sayfa başlığı (boşsa başlık/tarih bloğu hiç gösterilmez). */

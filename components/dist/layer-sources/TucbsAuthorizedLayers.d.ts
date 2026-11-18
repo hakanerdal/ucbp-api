@@ -1,18 +1,26 @@
 import { LitElement, nothing, PropertyValues } from 'lit';
 import { LayerManager } from '@tucbs/core';
 /**
- * `TucbsLayerList`'in "Yetkili Katmanlar" (apiKey ile `GET /layers` → seç →
- * haritaya ekle) bloğunu barındıran bağımsız, `document.body`'ye portallanan
- * bileşen (bkz. God Component kılavuzu GC-03 4.4 Adım 3).
+ * API anahtarınıza tanımlı yetkili katmanları (WMS/WFS/WMTS) listeleyip
+ * seçtiklerinizi haritaya ekleyen pencere.
  *
- * `<tucbs-layer-list>`'in `layer-list/PortalHost.ts` üzerinden `ensure()`'ladığı
- * bir kopya olarak kullanılır; tüketicinin HTML'inde bir `<tucbs-authorized-layers>`
- * "çıplak marker" etiketi bulunmadıkça hiç oluşturulmaz (bkz TucbsLayerList.ts'teki
- * `_authorizedLayersAvailable` alanı).
+ * Sayfaya bu etiketi eklemeniz yeterlidir; `mapElementId` gerekmez.
+ * `<tucbs-layer-list>` etiketi sayfada bulur ve apiKey tanımlıysa katman
+ * listesinde "APIKey ile Yetkili Katmanlarımı Getir" butonunu gösterir.
+ * Butona basılınca `GET /layers` ile liste getirilir ve "Yetkili Katmanlar"
+ * penceresi açılır; işaretlenen katmanlar haritaya eklenir. Haritaya
+ * kendiliğinden hiçbir katman eklenmez. Katman istekleri ucbp-api'nin
+ * `/ogc/...` proxy'si üzerinden `X-API-Key` ile gider; asıl servis adresi
+ * tarayıcıya açılmaz. Satırdaki "URL Göster" düğmesi katmanın token URL'sini
+ * (QGIS gibi araçlar için) gösterir; harita bu URL'yi kullanmaz.
+ *
+ * `<tucbs-app>` bu etiketi kendi içinde barındırır, ayrıca eklenmez.
  *
  * @example
  * ```html
- * <tucbs-authorized-layers></tucbs-authorized-layers>
+ * <tucbs-map id="map" api-key="YOUR_API_KEY"></tucbs-map>
+ * <tucbs-layer-list id="layer-list" mapElementId="map"></tucbs-layer-list>
+ * <tucbs-authorized-layers id="authorized-layers"></tucbs-authorized-layers>
  * ```
  */
 export declare class TucbsAuthorizedLayers extends LitElement {
@@ -48,6 +56,7 @@ export declare class TucbsAuthorizedLayers extends LitElement {
      * Getir" butonu tarafından çağrılır.
      */
     fetchAndOpen(): Promise<void>;
+    /** Yetkili katmanlar penceresini (ve açıksa token URL penceresini) kapatır; seçim hatasını temizler. */
     closePicker(): void;
     private _openTokenUrlDialog;
     private _closeTokenUrlDialog;

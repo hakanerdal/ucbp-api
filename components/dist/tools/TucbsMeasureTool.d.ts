@@ -10,8 +10,7 @@ import { Map as TucbsMapInstance } from '@tucbs/core';
  * ONEMLI -- "source" tabanli sahiplik: TucbsDrawTool da AYNI "polyline"/
  * "polygon" degerlerini (duz cizim icin) kullaniyor. Bu component SADECE
  * `source === "measure"` ile baslayan oturumlara etiket ekler -- DrawTool'un
- * normal cizimlerini yanlislikla "olcum" sanip etiketlemez (bkz
- * project_ucbp_api_tucbstoolbar_mimarisi memory onaltinci tur).
+ * normal cizimlerini yanlislikla "olcum" sanip etiketlemez.
  *
  * `mapElementId`, sayfadaki `<tucbs-map>` elementinin `id`'siyle eşleşmelidir;
  * bileşen bu sayede haritaya otomatik bağlanır (Senaryo 2).

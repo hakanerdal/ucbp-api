@@ -1,5 +1,7 @@
 import { PrintLegendEntry } from './PrintLegendData.js';
+/** Bir lejant satırının yaklaşık basılı yüksekliği (mm); sayfalama bununla hesaplanır. */
 export declare const LEGEND_ROW_HEIGHT_MM = 3.4;
+/** Uzun bir lejant listesinin bölündüğü kolon sayısı. */
 export declare const LEGEND_COLUMNS_PER_PAGE = 3;
 /** `paginateLegendEntries()`'in sonucu. */
 export interface LegendPaginationResult {

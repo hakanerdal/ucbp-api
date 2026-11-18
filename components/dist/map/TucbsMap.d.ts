@@ -6,6 +6,13 @@ import type * as cesium from "cesium";
  * Cesium tabanlı ana harita web component'i (`<tucbs-map>`) — Core JS API'nin
  * (`Map`/`LayerManager`/`DrawingManager`/`InteractionManager`/`AnalysisManager`)
  * DOM üzerinden kullanılmasını sağlar.
+ *
+ * Harita kendi atıf (kaynak/telif) satırını göstermez; Cesium'un credit kutusu
+ * gizlidir. Altlık haritanın kaynağını (varsayılan HGM) ve gösteriliyorsa yedek
+ * dünya görüntüsünün kaynağını (NASA) `<tucbs-info-bar>` gösterir. Bilgi
+ * çubuğunu kullanmıyorsanız bu atıfları sayfanızda kendiniz gösterin
+ * (`map.fallbackAttribution`, `basemap:fallback-shown`/`basemap:fallback-hidden`).
+ *
  * @fires ready - apiKey doğrulanıp harita (Cesium `Viewer`) başarıyla kurulduğunda; `detail: { map: Map }`.
  * @fires error - apiKey doğrulaması başarısız olduğunda (harita hiç kurulmaz); `detail: { error, message, title, code?, number? }`.
  *
@@ -36,11 +43,8 @@ export declare class TucbsMap extends LitElement {
     private get hostId();
     /** Harita apiKey'i — yalnızca yazılabilir; `get` güvenlik nedeniyle her zaman maskelenmiş döner (bkz yukarıdaki `#apiKeyState` WHY notu). */
     set apiKey(value: string);
+    /** apiKey tanımlıysa `"••••••"`, değilse boş metin döner; gerçek değer dışarıdan okunamaz. */
     get apiKey(): string;
-    /** Analiz backend'i (ucbp-api) için X-API-Key değeri. */
-    authToken: string;
-    /** JWT Bearer token; TUCBS API kimlik doğrulaması için. */
-    proxyBase: string;
     /** Başlangıç altlık harita kimliği; değiştiğinde `map.setBasemap()` otomatik çağrılır. */
     basemap: BasemapId;
     /**
@@ -101,9 +105,13 @@ export declare class TucbsMap extends LitElement {
     }): void;
     /** Shadow DOM yerine Light DOM kullanır (bkz yukarıdaki WHY yorumu). */
     protected createRenderRoot(): HTMLElement;
-    /** Bileşen DOM'a bağlandığında: `id` yoksa otomatik-üretilen id'yi atar. */
+    /** Kaldırılmış nitelik uyarısının bu eleman için zaten basılıp basılmadığı (eleman DOM'da taşınınca tekrar basılmasın). */
+    private _removedAttributesWarned;
+    /** Etikette kaldırılmış bir nitelik varsa her biri için bir kez konsol uyarısı basar. */
+    private _warnRemovedAttributes;
+    /** Bileşen DOM'a bağlandığında: kaldırılmış nitelikler için uyarır, `id` yoksa otomatik-üretilen id'yi atar. */
     connectedCallback(): void;
-    /** İlk render sonrası: apiKey'i doğrulayıp haritayı (Cesium `Viewer`'ı) kurar (bkz {@link _prepareMap}). */
+    /** İlk render sonrası: apiKey'i doğrulayıp haritayı (Cesium `Viewer`'ı) kurar (bkz `_prepareMap`). */
     firstUpdated(): void;
     /** apiKey'i (instance veya global) Map kurulmadan ONCE dogrular; basarisizsa Map hic kurulmaz. */
     private _prepareMap;

@@ -1,3 +1,10 @@
+/*!
+ * @license
+ * UCBP API @tucbs/core
+ * Copyright 2026 T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı
+ * SPDX-License-Identifier: Apache-2.0
+ * Lisans metni ve bildirimler: LICENSE, NOTICE
+ */
 "use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -29,7 +36,7 @@ var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read fr
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
-var _apiKey, _apiKey2, _AnalysisManager_instances, post_fn, _unregisterApiKeyRefresh, _removeLodSeamGuard, _removeMinZoomScale, _removeScaleWheelZoom, _apiKey3, _a;
+var _apiKey, _apiKey2, _AnalysisManager_instances, post_fn, _unregisterApiKeyRefresh, _removeLodSeamGuard, _removeMinZoomScale, _removeScaleWheelZoom, _apiKey3, _drawingLayerPicker, _drawQueue, _a;
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const cesium = require("cesium");
 var _documentCurrentScript = typeof document !== "undefined" ? document.currentScript : null;
@@ -38,7 +45,6 @@ function ensureCesiumRuntime() {
   const host = window;
   if (!host.CESIUM_BASE_URL) {
     host.CESIUM_BASE_URL = `https://cdn.jsdelivr.net/npm/cesium@${"1.143.0"}/Build/Cesium/`;
-    console.info("[gizLog] cesium base url atandi surum=1.143.0");
   }
   const base = host.CESIUM_BASE_URL.replace(/\/?$/, "/");
   const already = Array.from(document.querySelectorAll("link")).some(
@@ -49,7 +55,6 @@ function ensureCesiumRuntime() {
   link.rel = "stylesheet";
   link.href = `${base}Widgets/widgets.css`;
   document.head.appendChild(link);
-  console.info("[gizLog] cesium widgets.css eklendi");
 }
 const MAX_LEVEL = 24;
 const EARTH_RADIUS = 6371e3;
@@ -125,80 +130,6 @@ function installLodSeamGuard(viewer) {
     }
   };
 }
-const SCREEN_DPI$1 = 96;
-const METERS_PER_INCH$1 = 0.0254;
-const REWRITE_TOLERANCE = 5e-3;
-function minZoomDistanceForScale(scaleDenominator, canvasHeightPx, fovy) {
-  const tanHalf = Math.tan(fovy / 2);
-  const distance = scaleDenominator * METERS_PER_INCH$1 / SCREEN_DPI$1 * canvasHeightPx / (2 * tanHalf);
-  return Number.isFinite(distance) && distance > 0 ? distance : null;
-}
-const SNAP_WINDOW_RATIO = 1.06;
-const MIN_SNAP_GAP_METERS = 1e-3;
-const SNAP_DURATION_MS = 150;
-function snapToMinAmount(height, minDistance) {
-  const gap = height - minDistance;
-  if (!(gap > MIN_SNAP_GAP_METERS) || height > minDistance * SNAP_WINDOW_RATIO) return 0;
-  return gap;
-}
-function installMinZoomScale(viewer, scaleDenominator, maxScaleDenominator) {
-  const scene = viewer.scene;
-  const controller = scene.screenSpaceCameraController;
-  const onPreRender = () => {
-    const fovy = scene.camera.frustum.fovy;
-    if (fovy === void 0) return;
-    const height = scene.canvas.clientHeight;
-    const distance = minZoomDistanceForScale(scaleDenominator, height, fovy);
-    if (distance !== null) {
-      const current = controller.minimumZoomDistance;
-      if (Math.abs(current - distance) > current * REWRITE_TOLERANCE) {
-        controller.minimumZoomDistance = distance;
-      }
-    }
-    const maxDistance = minZoomDistanceForScale(maxScaleDenominator, height, fovy);
-    if (maxDistance === null) return;
-    const currentMax = controller.maximumZoomDistance;
-    if (Math.abs(currentMax - maxDistance) > currentMax * REWRITE_TOLERANCE) {
-      controller.maximumZoomDistance = maxDistance;
-    }
-  };
-  const camera = scene.camera;
-  const canvas = scene.canvas;
-  let frame;
-  const cancelSnap = () => {
-    if (frame !== void 0) cancelAnimationFrame(frame);
-    frame = void 0;
-  };
-  const onMoveEnd = () => {
-    if (frame !== void 0) return;
-    const total = snapToMinAmount(
-      camera.positionCartographic.height,
-      controller.minimumZoomDistance
-    );
-    if (total <= 0) return;
-    const start = performance.now();
-    let done = 0;
-    const step = (now) => {
-      const t = Math.min(1, (now - start) / SNAP_DURATION_MS);
-      const target = total * (1 - (1 - t) * (1 - t));
-      if (target > done) camera.zoomIn(target - done);
-      done = target;
-      frame = t < 1 ? requestAnimationFrame(step) : void 0;
-    };
-    frame = requestAnimationFrame(step);
-  };
-  canvas.addEventListener("pointerdown", cancelSnap);
-  canvas.addEventListener("wheel", cancelSnap, { passive: true });
-  const removePreRender = scene.preRender.addEventListener(onPreRender);
-  const removeMoveEnd = camera.moveEnd.addEventListener(onMoveEnd);
-  return () => {
-    cancelSnap();
-    canvas.removeEventListener("pointerdown", cancelSnap);
-    canvas.removeEventListener("wheel", cancelSnap);
-    removePreRender();
-    removeMoveEnd();
-  };
-}
 const ZOOM_SCALE_STEPS = [
   100,
   250,
@@ -216,7 +147,16 @@ const ZOOM_SCALE_STEPS = [
   25e5,
   5e6,
   15e6,
-  25e6
+  25e6,
+  3e7,
+  4e7,
+  5e7,
+  75e6,
+  1e8,
+  15e7,
+  25e7,
+  5e8,
+  1e9
 ];
 const ON_STEP_TOLERANCE = 0.03;
 function nextScaleStep(current, direction) {
@@ -228,8 +168,8 @@ function nextScaleStep(current, direction) {
   const limit = current * (1 + ON_STEP_TOLERANCE);
   return ZOOM_SCALE_STEPS.find((s) => s > limit) ?? Infinity;
 }
-const SCREEN_DPI = 96;
-const METERS_PER_INCH = 0.0254;
+const SCREEN_DPI$1 = 96;
+const METERS_PER_INCH$1 = 0.0254;
 function measureGround(scene) {
   const globe = scene.globe;
   if (!globe) return null;
@@ -246,7 +186,7 @@ function measureGround(scene) {
   if (!leftPos || !rightPos || !middlePos) return null;
   const metersPerPixel = cesium.Cartesian3.distance(leftPos, rightPos) / 2;
   return {
-    scale: metersPerPixel * SCREEN_DPI / METERS_PER_INCH,
+    scale: metersPerPixel * SCREEN_DPI$1 / METERS_PER_INCH$1,
     distance: cesium.Cartesian3.distance(camera.position, middlePos)
   };
 }
@@ -341,6 +281,108 @@ function installScaleWheelZoom(viewer) {
   return () => {
     canvas.removeEventListener("wheel", onWheel);
     controller.zoomEventTypes = previousZoomTypes;
+  };
+}
+const SCREEN_DPI = 96;
+const METERS_PER_INCH = 0.0254;
+const REWRITE_TOLERANCE = 5e-3;
+function minZoomDistanceForScale(scaleDenominator, canvasHeightPx, fovy) {
+  const tanHalf = Math.tan(fovy / 2);
+  const distance = scaleDenominator * METERS_PER_INCH / SCREEN_DPI * canvasHeightPx / (2 * tanHalf);
+  return Number.isFinite(distance) && distance > 0 ? distance : null;
+}
+const EARTH_MAX_RADIUS_METERS = 6378137;
+const GLOBE_FIT_RATIO = 0.9;
+function globeFitDistance(canvasWidthPx, canvasHeightPx, fovy) {
+  if (!(canvasWidthPx > 0) || !(canvasHeightPx > 0)) return null;
+  const tanHalfY = Math.tan(fovy / 2);
+  const tanHalfX = tanHalfY * canvasWidthPx / canvasHeightPx;
+  const tanHalf = Math.min(tanHalfX, tanHalfY);
+  if (!(tanHalf > 0) || !Number.isFinite(tanHalf)) return null;
+  const angle = Math.atan(tanHalf * GLOBE_FIT_RATIO);
+  const distance = EARTH_MAX_RADIUS_METERS / Math.sin(angle) - EARTH_MAX_RADIUS_METERS;
+  return Number.isFinite(distance) && distance > 0 ? distance : null;
+}
+function maxZoomOutDistance(baseScaleDenominator, canvasWidthPx, canvasHeightPx, fovy) {
+  const baseDistance = minZoomDistanceForScale(baseScaleDenominator, canvasHeightPx, fovy);
+  if (baseDistance === null) return null;
+  const fit = globeFitDistance(canvasWidthPx, canvasHeightPx, fovy);
+  if (fit === null || baseDistance >= fit) return baseDistance;
+  for (const step of ZOOM_SCALE_STEPS) {
+    if (step <= baseScaleDenominator) continue;
+    const distance = minZoomDistanceForScale(step, canvasHeightPx, fovy);
+    if (distance !== null && distance >= fit) return distance;
+  }
+  return fit;
+}
+const SNAP_WINDOW_RATIO = 1.06;
+const MIN_SNAP_GAP_METERS = 1e-3;
+const SNAP_DURATION_MS = 150;
+function snapToMinAmount(height, minDistance) {
+  const gap = height - minDistance;
+  if (!(gap > MIN_SNAP_GAP_METERS) || height > minDistance * SNAP_WINDOW_RATIO) return 0;
+  return gap;
+}
+function installMinZoomScale(viewer, scaleDenominator, maxScaleDenominator) {
+  const scene = viewer.scene;
+  const controller = scene.screenSpaceCameraController;
+  const onPreRender = () => {
+    const fovy = scene.camera.frustum.fovy;
+    if (fovy === void 0) return;
+    const height = scene.canvas.clientHeight;
+    const distance = minZoomDistanceForScale(scaleDenominator, height, fovy);
+    if (distance !== null) {
+      const current = controller.minimumZoomDistance;
+      if (Math.abs(current - distance) > current * REWRITE_TOLERANCE) {
+        controller.minimumZoomDistance = distance;
+      }
+    }
+    const maxDistance = maxZoomOutDistance(maxScaleDenominator, scene.canvas.clientWidth, height, fovy);
+    if (maxDistance === null) return;
+    const currentMax = controller.maximumZoomDistance;
+    if (Math.abs(currentMax - maxDistance) > currentMax * REWRITE_TOLERANCE) {
+      controller.maximumZoomDistance = maxDistance;
+      if (scene.mode !== cesium.SceneMode.SCENE3D) return;
+      const camHeight = scene.camera.positionCartographic.height;
+      const wasAtMax = camHeight >= currentMax * (1 - REWRITE_TOLERANCE);
+      if (wasAtMax || camHeight > maxDistance) scene.camera.zoomIn(camHeight - maxDistance);
+    }
+  };
+  const camera = scene.camera;
+  const canvas = scene.canvas;
+  let frame;
+  const cancelSnap = () => {
+    if (frame !== void 0) cancelAnimationFrame(frame);
+    frame = void 0;
+  };
+  const onMoveEnd = () => {
+    if (frame !== void 0) return;
+    const total = snapToMinAmount(
+      camera.positionCartographic.height,
+      controller.minimumZoomDistance
+    );
+    if (total <= 0) return;
+    const start = performance.now();
+    let done = 0;
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / SNAP_DURATION_MS);
+      const target = total * (1 - (1 - t) * (1 - t));
+      if (target > done) camera.zoomIn(target - done);
+      done = target;
+      frame = t < 1 ? requestAnimationFrame(step) : void 0;
+    };
+    frame = requestAnimationFrame(step);
+  };
+  canvas.addEventListener("pointerdown", cancelSnap);
+  canvas.addEventListener("wheel", cancelSnap, { passive: true });
+  const removePreRender = scene.preRender.addEventListener(onPreRender);
+  const removeMoveEnd = camera.moveEnd.addEventListener(onMoveEnd);
+  return () => {
+    cancelSnap();
+    canvas.removeEventListener("pointerdown", cancelSnap);
+    canvas.removeEventListener("wheel", cancelSnap);
+    removePreRender();
+    removeMoveEnd();
   };
 }
 function createMarkerOverlay(viewer, longitude, latitude, iconUrl, options = {}) {
@@ -699,13 +741,13 @@ const ERROR_REGISTRY = {
     code: "LAYER_SHP_PACKAGE_MISSING",
     number: "E110",
     title: "shpjs Paketi Eksik",
-    description: 'SHP katmanı için gereken "shpjs" paketi tüketici uygulamaya eklenmemiş.'
+    description: `SHP katmanı için gereken "shpjs" paketi yüklenemedi (kurulu değil ya da importmap'te tanımlı değil).`
   },
   LAYER_CSV_PACKAGE_MISSING: {
     code: "LAYER_CSV_PACKAGE_MISSING",
     number: "E111",
     title: "papaparse Paketi Eksik",
-    description: 'CSV katmanı için gereken "papaparse" paketi tüketici uygulamaya eklenmemiş.'
+    description: `CSV katmanı için gereken "papaparse" paketi yüklenemedi (kurulu değil ya da importmap'te tanımlı değil).`
   },
   LAYER_CSV_LATLON_NOT_FOUND: {
     code: "LAYER_CSV_LATLON_NOT_FOUND",
@@ -783,7 +825,7 @@ const ERROR_REGISTRY = {
     code: "OGC_WFS_OL_PACKAGE_MISSING",
     number: "E211",
     title: "ol Paketi Eksik",
-    description: 'WFS GML yanıtını okumak için gereken "ol" paketi tüketici uygulamaya eklenmemiş.'
+    description: `WFS GML yanıtını okumak için gereken "ol" paketi yüklenemedi (kurulu değil ya da importmap'te tanımlı değil).`
   },
   OGC_WCS_REQUEST_FAILED: {
     code: "OGC_WCS_REQUEST_FAILED",
@@ -838,6 +880,12 @@ const ERROR_REGISTRY = {
     number: "E123",
     title: "TileMatrixSet Bilgisi Bulunamadı",
     description: "Keşfedilen WMTS katmanı için TileMatrixSet bilgisi bulunamadı."
+  },
+  LAYER_OUTSIDE_SERVICE_EXTENT: {
+    code: "LAYER_OUTSIDE_SERVICE_EXTENT",
+    number: "E124",
+    title: "Katman Türkiye Sınırları Dışında",
+    description: "Servis katmanının kapsama alanı Türkiye extent'i ile kesişmiyor; servis istekleri yalnızca Türkiye extent'iyle sınırlı olduğu için katman eklenemedi."
   }
 };
 function getErrorCodes() {
@@ -893,9 +941,7 @@ const _ApiKeyPolicy = class _ApiKeyPolicy {
     // anahtar sozcugu sadece derleme-zamaninda kontrol eder, derlenen JS'te
     // silinir ve disaridan (ör. sayfada calisan baska bir script, XSS
     // payload'i) runtime'da hala okunabilir kalirdi. # ile gercekten
-    // disaridan erisilemez hale gelir (bkz.
-    // project_ucbp_api_global_import_seviyesi_apikey_arastirma guvenlik
-    // bolumu).
+    // disaridan erisilemez hale gelir.
     __privateAdd(this, _apiKey);
     this.getApiBase = options.apiBase;
   }
@@ -922,7 +968,7 @@ const _ApiKeyPolicy = class _ApiKeyPolicy {
     return __privateGet(this, _apiKey) !== void 0;
   }
   /** {@link LayerManager.getAuthorizedLayers} implementasyonu -- apiKey'e
-   * gore yetkili WMS/WFS/WMTS listesi, {@code GET /layers} + {@code X-API-Key}. */
+   * gore yetkili WMS/WFS/WMTS listesi, `GET /layers` + `X-API-Key`. */
   async getAuthorizedLayers() {
     if (__privateGet(this, _apiKey) === void 0) {
       throw new LayerOperationError(
@@ -1100,7 +1146,7 @@ const _ApiKeyPolicy = class _ApiKeyPolicy {
     return `${base}${pathAndQuery}`;
   }
   /**
-   * apiKey varsa opaque {@code /ogc/{type}/{id}} veya legacy {@code /wms-proxy/{type}?url=} kullanır.
+   * apiKey varsa opaque `/ogc/{type}/{id}` veya legacy `/wms-proxy/{type}?url=` kullanır.
    */
   resolveOgcProxyUrl(serviceType, upstreamUrl) {
     if (__privateGet(this, _apiKey) === void 0) return upstreamUrl;
@@ -1140,6 +1186,7 @@ const _ApiKeyPolicy = class _ApiKeyPolicy {
     const separator = url.includes("?") ? "&" : "?";
     return `${url}${separator}${_ApiKeyPolicy.API_KEY_QUERY_PARAM_NAME}=${encodeURIComponent(__privateGet(this, _apiKey))}`;
   }
+  /** Kullanıcı jetonu verilmişse `Authorization: Bearer …` başlığını üretir; yoksa `undefined` döner. */
   buildAuthHeaders(authToken) {
     if (authToken === void 0) return void 0;
     return { Authorization: `Bearer ${authToken}` };
@@ -1577,6 +1624,130 @@ function concat(parts) {
   }
   return out;
 }
+function extractEpsgCode(srsName) {
+  if (!/EPSG/i.test(srsName)) return void 0;
+  const trimmed = srsName.trim();
+  let end = trimmed.length;
+  while (end > 0 && trimmed.charCodeAt(end - 1) >= 48 && trimmed.charCodeAt(end - 1) <= 57) {
+    end--;
+  }
+  const digits = trimmed.slice(end);
+  return digits.length > 0 ? digits : void 0;
+}
+const proj4DefRequests = /* @__PURE__ */ new Map();
+const tmerc = (lon0, ellps) => `+proj=tmerc +lat_0=0 +lon_0=${lon0} +k=1 +x_0=500000 +y_0=0 +ellps=${ellps} +units=m +no_defs +type=crs`;
+const utm = (zone, datum) => `+proj=utm +zone=${zone} ${datum} +units=m +no_defs +type=crs`;
+const TUREF = "GRS80 +towgs84=0,0,0,0,0,0,0";
+const ED50 = "intl +towgs84=-87,-98,-121,0,0,0,0";
+const TM_CENTRAL_MERIDIANS = [27, 30, 33, 36, 39, 42, 45];
+const UTM_ZONES = [35, 36, 37, 38];
+const BUNDLED_PROJ4_DEFS = Object.freeze({
+  ...Object.fromEntries(TM_CENTRAL_MERIDIANS.map((lon0, i) => [String(5253 + i), tmerc(lon0, TUREF)])),
+  ...Object.fromEntries(TM_CENTRAL_MERIDIANS.map((lon0, i) => [String(2319 + i), tmerc(lon0, ED50)])),
+  ...Object.fromEntries(UTM_ZONES.map((zone) => [String(23e3 + zone), utm(zone, `+ellps=${ED50}`)])),
+  ...Object.fromEntries(UTM_ZONES.map((zone) => [String(32600 + zone), utm(zone, "+datum=WGS84")]))
+});
+async function registerProj4Def(proj4, epsgCode) {
+  const name = `EPSG:${epsgCode}`;
+  if (proj4.defs(name)) return true;
+  const bundled = BUNDLED_PROJ4_DEFS[epsgCode];
+  if (bundled) {
+    proj4.defs(name, bundled);
+    return true;
+  }
+  let pending = proj4DefRequests.get(epsgCode);
+  if (!pending) {
+    pending = (async () => {
+      try {
+        const response = await fetch(`https://epsg.io/${epsgCode}.proj4`);
+        if (!response.ok) return response.status === 404 ? "missing" : "transient-failure";
+        const def = (await response.text()).trim();
+        if (!def) return "missing";
+        proj4.defs(name, def);
+        return "registered";
+      } catch {
+        return "transient-failure";
+      }
+    })();
+    proj4DefRequests.set(epsgCode, pending);
+  }
+  const result = await pending;
+  if (result === "transient-failure" && proj4DefRequests.get(epsgCode) === pending) {
+    proj4DefRequests.delete(epsgCode);
+  }
+  return result === "registered";
+}
+async function ensureProj4Def(epsgCode) {
+  let proj4;
+  try {
+    ({ default: proj4 } = await import("proj4"));
+  } catch {
+    console.warn(
+      `[ogc/proj4Defs] EPSG:${epsgCode} icin koordinat donusumu atlandi -- "proj4" paketi yuklu degil (peer dependency olarak eklenmemis). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir.`
+    );
+    return void 0;
+  }
+  if (!await registerProj4Def(proj4, epsgCode)) {
+    console.warn(
+      `[ogc/proj4Defs] EPSG:${epsgCode} icin proj4 tanimi epsg.io'dan alinamadi (agsizlik veya gecersiz/desteklenmeyen kod olabilir). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir.`
+    );
+    return void 0;
+  }
+  return proj4;
+}
+const SERVICE_REQUEST_EXTENT = Object.freeze({
+  west: 22.94,
+  south: 34.05,
+  east: 47.39,
+  north: 42.7
+});
+function clipToServiceExtent(box) {
+  const extent = SERVICE_REQUEST_EXTENT;
+  if (!box) return { ...extent };
+  const clipped = {
+    west: Math.max(box.west, extent.west),
+    south: Math.max(box.south, extent.south),
+    east: Math.min(box.east, extent.east),
+    north: Math.min(box.north, extent.north)
+  };
+  if (clipped.west >= clipped.east || clipped.south >= clipped.north) return void 0;
+  return clipped;
+}
+function intersectsServiceExtent(box) {
+  return clipToServiceExtent(box) !== void 0;
+}
+function clipRectangleToServiceExtent(rectangle) {
+  const { west, south, east, north } = SERVICE_REQUEST_EXTENT;
+  const extent = cesium.Rectangle.fromDegrees(west, south, east, north);
+  if (!rectangle) return extent;
+  return cesium.Rectangle.intersection(rectangle, extent);
+}
+async function wfsBboxParam(version, nativeSrs, box) {
+  if (!version.startsWith("1.0")) {
+    return `${box.south},${box.west},${box.north},${box.east},urn:ogc:def:crs:EPSG::4326`;
+  }
+  const epsgCode = nativeSrs ? extractEpsgCode(nativeSrs) : void 0;
+  if (!epsgCode || epsgCode === "4326") {
+    return `${box.west},${box.south},${box.east},${box.north}`;
+  }
+  const proj4 = await ensureProj4Def(epsgCode);
+  if (!proj4) return void 0;
+  const STEPS = 32;
+  const points = [];
+  for (let i = 0; i <= STEPS; i++) {
+    const lon = box.west + (box.east - box.west) * i / STEPS;
+    const lat = box.south + (box.north - box.south) * i / STEPS;
+    points.push([lon, box.south], [lon, box.north], [box.west, lat], [box.east, lat]);
+  }
+  const projected = points.map((point) => proj4("EPSG:4326", `EPSG:${epsgCode}`, point));
+  const xs = projected.map(([x]) => x);
+  const ys = projected.map(([, y]) => y);
+  const [minX, minY, maxX, maxY] = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+  const padX = (maxX - minX) * 0.01;
+  const padY = (maxY - minY) * 0.01;
+  const values = [minX - padX, minY - padY, maxX + padX, maxY + padY];
+  return values.every(Number.isFinite) ? values.join(",") : void 0;
+}
 function getLayerGeoJSON(managed, currentTime, isOutlineCompanion) {
   if (!("entities" in managed.cesiumObject)) return void 0;
   const features = managed.cesiumObject.entities.values.filter((entity) => !isOutlineCompanion(entity)).map((entity) => entityToGeoJSON(entity, currentTime)).filter((feature) => feature !== null);
@@ -1628,11 +1799,14 @@ function geoTiffExportDimensions(bbox, maxDimension) {
 }
 function buildWmsGeoTiffExportUrl(options, resolveOgcProxyUrl) {
   const base = resolveOgcProxyUrl("wms", options.url);
-  const { width, height } = geoTiffExportDimensions(
-    options.geographicBoundingBox,
-    GEOTIFF_EXPORT_MAX_WMS_DIMENSION
-  );
-  const bbox = options.geographicBoundingBox;
+  const bbox = clipToServiceExtent(options.geographicBoundingBox);
+  if (!bbox) {
+    throw new LayerOperationError(
+      "LAYER_OUTSIDE_SERVICE_EXTENT",
+      `Katmanın kapsama alanı Türkiye sınırları dışında — id=${options.id}`
+    );
+  }
+  const { width, height } = geoTiffExportDimensions(bbox, GEOTIFF_EXPORT_MAX_WMS_DIMENSION);
   const params = new URLSearchParams({
     SERVICE: "WMS",
     REQUEST: "GetMap",
@@ -1644,7 +1818,7 @@ function buildWmsGeoTiffExportUrl(options, resolveOgcProxyUrl) {
     WIDTH: String(width),
     HEIGHT: String(height),
     CRS: "CRS:84",
-    BBOX: bbox ? `${bbox.west},${bbox.south},${bbox.east},${bbox.north}` : "-180,-90,180,90"
+    BBOX: `${bbox.west},${bbox.south},${bbox.east},${bbox.north}`
   });
   const sep = base.includes("?") ? "&" : "?";
   return `${base}${sep}${params.toString()}`;
@@ -1781,6 +1955,7 @@ const _OutlineGeometry = class _OutlineGeometry {
   hasRiskyOutline(entity) {
     return this.entitiesWithRiskyOutline.has(entity);
   }
+  /** Katmandaki tüm poligonlara görünür dış hat için eşlikçi (companion) polyline entity'si ekler; antimeridyen/kutup riski taşıyan poligonlar atlanır. */
   // clampToGround poligonlarda Cesium'un outline'i framework seviyesinde
   // kapatmasinin (bkz addPolygonOutlineCompanion) workaround'u olarak
   // eklenen companion polyline entity'lerini isaretler -- applyLayerStyle()'in
@@ -1795,6 +1970,7 @@ const _OutlineGeometry = class _OutlineGeometry {
     }
     dataSource.entities.resumeEvents();
   }
+  /** Tek bir poligon entity'sine, köşe koordinatlarından üretilen ayrı bir dış hat polyline entity'si (`<id>::outline`) ekler. */
   // Bir poligon entity'sinin kose koordinatlarindan AYRI bir polyline
   // "outline" entity'si ekler (bkz yukaridaki addPolygonOutlines yorumu) --
   // hem TOPLU ilk yukleme (addPolygonOutlines) HEM DE Cizim Katmani'na TEK
@@ -1830,6 +2006,7 @@ const _OutlineGeometry = class _OutlineGeometry {
       __tucbsOutlineOf: entity.id
     });
   }
+  /** Antimeridyeni geçen ya da kutba çok yakın poligonların native dış hattını kapatır (Cesium'un render'ı durduran tessellation hatasına karşı); dolgu etkilenmez. */
   // Antimeridyeni (-180/180 boylam) gecen ya da kutuba (enlem ~=90) cok
   // yakin poligonlarda (orn. Rusya, Antarktika gibi genis kapsamli WFS/
   // GeoJSON katmanlarinda) Cesium'un KENDI outline tessellation'i
@@ -1932,6 +2109,7 @@ const _OutlineGeometry = class _OutlineGeometry {
     }
     return false;
   }
+  /** Şüpheli koordinat sistemiyle yüklenen katmanda poligon ve çizgilerin `granularity` değerini π yaparak ek alt bölüm noktası üretilmesini engeller. */
   // bkz isSuspiciousCrsResult WHY yorumu -- supheli (cozulemeyen/gecersiz
   // aralikta) koordinatlarla yuklenen bir katmanda kucuk bir gercek
   // parselin (birkaç metre) kenarlari yanlislikla BINLERCE KM'lik "geodesic"
@@ -2066,11 +2244,12 @@ class OpacityController {
   getWrappedBaseColor(colorProperty) {
     return this.dataSourceOpacityProperties.get(colorProperty);
   }
+  /** Katmandaki tüm entity renklerini bir kez, katmanın opaklık durumunu okuyan dinamik property'lere çevirir. */
   // DataSource opacity degistiginde tum entity'leri tekrar dolasmak pahali.
   // Her entity rengi bir kez dinamik property'ye cevrilir; slider suruklenirken
   // yalnizca katmanin opacity state'i guncellenir.
   prepareDataSourceOpacity(dataSource) {
-    var _a2, _b;
+    var _a2, _b, _c;
     const state = this.getDataSourceOpacityState(dataSource);
     const time = cesium.JulianDate.now();
     dataSource.entities.suspendEvents();
@@ -2085,7 +2264,7 @@ class OpacityController {
           (property) => material.color = property
         );
       }
-      if (((_b = entity.polyline) == null ? void 0 : _b.material) instanceof cesium.ColorMaterialProperty) {
+      if (((_b = entity.polyline) == null ? void 0 : _b.material) instanceof cesium.ColorMaterialProperty || ((_c = entity.polyline) == null ? void 0 : _c.material) instanceof cesium.PolylineDashMaterialProperty) {
         const material = entity.polyline.material;
         this.installOpacityColorProperty(
           material.color,
@@ -2116,6 +2295,7 @@ class OpacityController {
     }
     dataSource.entities.resumeEvents();
   }
+  /** Poligonun dolgu rengini paylaşılan opaklık durumuna bağlı dinamik bir `CallbackProperty`'ye çevirir; dolgu `ColorMaterialProperty` değilse no-op. */
   // OutlineGeometry'nin companion-outline teknigi (bkz LayerManager.
   // addPolygonOutlines/addPolygonOutlineCompanion) ile birlikte kullanilan
   // poligonlarda, dolgu rengi HER ZAMAN (setOpacity() hic cagrilmasa, deger
@@ -2143,6 +2323,11 @@ class OpacityController {
       (property) => material.color = property
     );
   }
+  /**
+   * Katmanın opaklığını (0–1) değiştirir ve yeniden çizim ister; değer aynıysa no-op.
+   *
+   * Renkleri dinamik property'ye çevirme (bkz. `prepareDataSourceOpacity`) yalnız opaklık ilk kez 1'den farklı olduğunda, bir kez yapılır.
+   */
   setDataSourceOpacity(dataSource, opacity) {
     const state = this.getDataSourceOpacityState(dataSource);
     if (state.opacity === opacity) return;
@@ -2386,27 +2571,214 @@ const _CameraHighlight = class _CameraHighlight {
 _CameraHighlight.HIGHLIGHT_COLOR = cesium.Color.fromCssColorString("#00FFFF");
 _CameraHighlight.HIGHLIGHT_ELEVATION_METERS = 0.5;
 let CameraHighlight = _CameraHighlight;
+const originals = /* @__PURE__ */ new WeakMap();
+function graphicsOf(entity) {
+  return [entity.billboard, entity.point].filter(
+    (graphics) => graphics !== void 0
+  );
+}
+function syncPointHeightReferences(entities, mode, time) {
+  var _a2;
+  let changed = false;
+  for (const entity of entities) {
+    const graphics = graphicsOf(entity);
+    if (graphics.length === 0) continue;
+    if (mode === cesium.SceneMode.SCENE2D) {
+      for (const item of graphics) {
+        const current = (_a2 = item.heightReference) == null ? void 0 : _a2.getValue(time);
+        if (current === void 0 || current === cesium.HeightReference.NONE) continue;
+        if (!originals.has(entity)) originals.set(entity, current);
+        item.heightReference = cesium.HeightReference.NONE;
+        changed = true;
+      }
+    } else {
+      const original = originals.get(entity);
+      if (original === void 0) continue;
+      for (const item of graphics) item.heightReference = original;
+      originals.delete(entity);
+      changed = true;
+    }
+  }
+  return changed;
+}
+const POINT_SHAPES = [
+  "circle",
+  "square",
+  "triangle",
+  "diamond",
+  "cross",
+  "star"
+];
+const LINE_DASHES = [
+  "solid",
+  "dashed",
+  "dotted",
+  "dash-dot",
+  "long-dash"
+];
+const POINT_SHAPE_LABELS = {
+  circle: "Daire",
+  square: "Kare",
+  triangle: "Üçgen",
+  diamond: "Elmas",
+  cross: "Artı",
+  star: "Yıldız"
+};
+const LINE_DASH_LABELS = {
+  solid: "Düz",
+  dashed: "Kesikli",
+  dotted: "Noktalı",
+  "dash-dot": "Çizgi-nokta",
+  "long-dash": "Uzun kesikli"
+};
+const DEFAULT_POINT_SYMBOL = { shape: "circle", size: 12 };
+const POINT_SIZE_MIN = 8;
+const POINT_SIZE_MAX = 48;
+function clampPointSize(value) {
+  if (!Number.isFinite(value)) return DEFAULT_POINT_SYMBOL.size;
+  return Math.min(POINT_SIZE_MAX, Math.max(POINT_SIZE_MIN, value));
+}
+const POINT_SHAPE_VISUAL_SCALE = {
+  circle: 1,
+  square: 1,
+  triangle: 1.35,
+  diamond: 1.25,
+  cross: 1.22,
+  star: 1.5
+};
+function shapeBoxSize(shape, size) {
+  return size * POINT_SHAPE_VISUAL_SCALE[shape];
+}
+const DASH_DEFS = {
+  // bit 4-11 açık (8), kalanı kapalı.
+  dashed: { pattern: 4080, unitMultiplier: 8 },
+  // bit 2-13 açık (12).
+  "long-dash": { pattern: 16380, unitMultiplier: 12 },
+  // bit 6-9 açık (4): nokta.
+  dotted: { pattern: 960, unitMultiplier: 4 },
+  // bit 5-10 çizgi (6), bit 15 ve 0 nokta (2, döngüde bitişik), aralarda 4'er boşluk.
+  "dash-dot": { pattern: 34785, unitMultiplier: 12 }
+};
+const MIN_DASH_UNIT = 1.5;
+function dashParams(dash, width) {
+  if (dash === void 0 || dash === "solid") return void 0;
+  const def = DASH_DEFS[dash];
+  const unit = Math.max(Number.isFinite(width) ? width : 1, MIN_DASH_UNIT);
+  return { dashLength: def.unitMultiplier * unit, dashPattern: def.pattern };
+}
+function dashLengths(dash, width) {
+  const params = dashParams(dash, width);
+  if (params === void 0) return void 0;
+  const bitLength = params.dashLength / 16;
+  const bits = Array.from({ length: 16 }, (_, i) => (params.dashPattern >> i & 1) === 1);
+  const start = bits.findIndex((on, i) => on && !bits[(i + 15) % 16]);
+  const rotated = start < 0 ? bits : [...bits.slice(start), ...bits.slice(0, start)];
+  const runs = [];
+  let current = rotated[0];
+  let count = 0;
+  for (const on of rotated) {
+    if (on === current) {
+      count++;
+    } else {
+      runs.push(count * bitLength);
+      current = on;
+      count = 1;
+    }
+  }
+  runs.push(count * bitLength);
+  if (runs.length % 2 === 1) runs.push(0);
+  return runs;
+}
+function dashArray(dash, width) {
+  const lengths = dashLengths(dash, width);
+  return lengths == null ? void 0 : lengths.map((value) => Number(value.toFixed(2))).join(" ");
+}
+const VIEW = 64;
+const MAX_STROKE_UNITS = 24;
+function starPoints() {
+  const cx = 32;
+  const cy = 33.5;
+  const outer = 32;
+  const inner = 13;
+  const points = [];
+  for (let i = 0; i < 10; i++) {
+    const radius = i % 2 === 0 ? outer : inner;
+    const angle = -Math.PI / 2 + i * Math.PI / 5;
+    points.push(`${(cx + radius * Math.cos(angle)).toFixed(2)},${(cy + radius * Math.sin(angle)).toFixed(2)}`);
+  }
+  return points.join(" ");
+}
+const STAR_POINTS = starPoints();
+const POLYGON_POINTS = {
+  triangle: "32,4.3 64,59.7 0,59.7",
+  diamond: "32,0 64,32 32,64 0,32",
+  cross: "22,0 42,0 42,22 64,22 64,42 42,42 42,64 22,64 22,42 0,42 0,22 22,22",
+  star: STAR_POINTS
+};
+function pointSymbolSvg(shape, options) {
+  const hasStroke = options.stroke !== void 0 && (options.strokeWidth ?? 0) > 0;
+  const strokeUnits = hasStroke ? Math.min(MAX_STROKE_UNITS, (options.strokeWidth ?? 0) * VIEW / Math.max(options.size, 1)) : 0;
+  const scale = (VIEW - strokeUnits) / VIEW;
+  const strokeOpacity = options.strokeOpacity ?? 1;
+  const strokeOpacityAttr = strokeOpacity < 1 ? ` stroke-opacity="${Number(Math.max(0, strokeOpacity).toFixed(2))}"` : "";
+  const dashLengthsRendered = hasStroke ? dashLengths(options.strokeDash, strokeUnits) : void 0;
+  const dashAttr = dashLengthsRendered !== void 0 ? ` stroke-dasharray="${dashLengthsRendered.map((v) => Number((v / scale).toFixed(2))).join(" ")}"` : "";
+  const strokeAttrs = hasStroke ? ` stroke="${options.stroke}" stroke-width="${Number((strokeUnits / scale).toFixed(2))}" stroke-linejoin="round"${strokeOpacityAttr}${dashAttr}` : "";
+  const transform = strokeUnits > 0 ? ` transform="translate(32 32) scale(${Number(scale.toFixed(4))}) translate(-32 -32)"` : "";
+  const fillOpacity = options.fillOpacity ?? 1;
+  const opacityAttr = fillOpacity < 1 ? ` fill-opacity="${Number(Math.max(0, fillOpacity).toFixed(2))}"` : "";
+  const common = `fill="${options.fill}"${opacityAttr}${strokeAttrs}${transform}`;
+  let body;
+  switch (shape) {
+    case "circle":
+      body = `<circle cx="32" cy="32" r="32" ${common}/>`;
+      break;
+    case "square":
+      body = `<rect x="0" y="0" width="64" height="64" ${common}/>`;
+      break;
+    default:
+      body = `<polygon points="${POLYGON_POINTS[shape]}" ${common}/>`;
+  }
+  const renderSize = options.renderSize ?? VIEW;
+  const pad = Math.max(0, options.padding ?? 0);
+  const origin = Number((-pad).toFixed(3));
+  const extent = Number((VIEW + 2 * pad).toFixed(3));
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${origin} ${origin} ${extent} ${extent}" width="${renderSize}" height="${renderSize}">${body}</svg>`;
+}
+function pointSymbolDataUri(shape, options) {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(pointSymbolSvg(shape, options))}`;
+}
 const SEAM_COVER_WIDTH = 1;
 const OUTLINE_ID_SUFFIX = "::outline";
+const BILLBOARD_COLOR_STEP = 4;
+const TEXTURE_PADDING_PX = 2;
 class LayerStyleEngine {
   constructor(options) {
     this.appliedLayerStyles = /* @__PURE__ */ new Map();
     this.appliedCompanionWidths = /* @__PURE__ */ new Map();
+    this.symbolPoints = /* @__PURE__ */ new WeakMap();
     this.outlineGeometry = options.outlineGeometry;
     this.opacityController = options.opacityController;
     this.getCurrentTime = options.getCurrentTime;
     this.requestRender = options.requestRender;
     this.emitStyle = options.emitStyle;
     this.waitForRenderSettle = options.waitForRenderSettle;
+    this.getPixelRatio = options.getPixelRatio ?? (() => 1);
   }
+  /**
+   * Katmana dolgu (solid/gradient/bin/enum) ve dış hat stilini uygular, stili kaydedip `layer:style` olayını yayar.
+   *
+   * Dönen Promise dış hat genişliği değiştiyse render oturunca, aksi halde hemen çözülür.
+   */
   // Donen Promise, GENISLIK gercekten degistiyse (bkz asagidaki widthChanged)
   // waitForRenderSettle() ile cozulur -- cagiran taraf (TucbsStyleEditor)
   // bu Promise'i "Uygulanıyor…" gostergesini ne kadar sure tutacagini
   // bilmek icin kullanabilir. Renk/opaklik gibi geometriye dokunmayan
   // degisikliklerde HEMEN cozulur (yapay bir bekleme EKLENMEZ).
   async applyLayerStyle(id, dataSource, isShapeLayer, spec) {
-    var _a2;
+    var _a2, _b;
     const previousWidth = this.appliedCompanionWidths.get(id) ?? ((_a2 = this.appliedLayerStyles.get(id)) == null ? void 0 : _a2.outline.width);
+    const previousDash = ((_b = this.appliedLayerStyles.get(id)) == null ? void 0 : _b.outline.dash) ?? "solid";
     const time = this.getCurrentTime();
     const range = this.resolveStyleRange(dataSource, time, spec.fill);
     const outlineCompanions = [];
@@ -2419,7 +2791,7 @@ class LayerStyleEngine {
       }
       const color = this.resolveFillColor(entity, spec.fill, range, time);
       if (entity.polygon !== void 0 && color !== void 0) fillColors.set(entity.id, color);
-      this.applyEntityStyle(entity, color, spec.outline, isShapeLayer);
+      this.applyEntityStyle(entity, color, spec.outline, isShapeLayer, spec.point);
     }
     const companionWidth = this.styleOutlineCompanions(
       outlineCompanions,
@@ -2433,7 +2805,7 @@ class LayerStyleEngine {
     this.requestRender();
     this.emitStyle(id, resolvedSpec);
     this.appliedCompanionWidths.set(id, companionWidth);
-    const widthChanged = previousWidth === void 0 || previousWidth !== companionWidth;
+    const widthChanged = previousWidth === void 0 || previousWidth !== companionWidth || previousDash !== (spec.outline.dash ?? "solid");
     if (widthChanged) await this.waitForRenderSettle();
   }
   // God component refactor Faz 3.6b: applyLayerStyle'in companion (dis hat)
@@ -2442,7 +2814,7 @@ class LayerStyleEngine {
   // kapaliyken SEAM_COVER_WIDTH) -- applyLayerStyle bunu render-bekleme
   // karari icin saklar (bkz widthChanged).
   styleOutlineCompanions(companions, outline, isShapeLayer, fillColors) {
-    const outlineColor = outline.enabled ? cesium.Color.fromCssColorString(outline.color) : void 0;
+    const outlineColor = outline.enabled ? LayerStyleEngine.outlineColor(outline) : void 0;
     const companionWidth = outline.enabled ? outline.width : SEAM_COVER_WIDTH;
     for (const companion of companions) {
       const seamColor = outline.enabled || isShapeLayer ? void 0 : fillColors.get(LayerStyleEngine.outlineOwnerId(companion));
@@ -2450,9 +2822,11 @@ class LayerStyleEngine {
       companion.show = outline.enabled || seamCover;
       const color = outlineColor ?? (seamCover ? seamColor : void 0);
       if (color !== void 0 && companion.polyline !== void 0) {
-        companion.polyline.material = this.updateColorMaterial(
+        companion.polyline.material = this.updateLineMaterial(
           companion.polyline.material,
-          color
+          color,
+          outline.enabled ? outline.dash : void 0,
+          companionWidth
         );
         companion.polyline.width = LayerStyleEngine.updateConstantProperty(
           companion.polyline.width,
@@ -2462,10 +2836,39 @@ class LayerStyleEngine {
     }
     return companionWidth;
   }
+  // Dis hat rengi + opakligi (OutlineStyle.opacity; verilmezse tam opak).
+  static outlineColor(outline) {
+    return cesium.Color.fromCssColorString(outline.color).withAlpha(LayerStyleEngine.outlineOpacity(outline));
+  }
+  static outlineOpacity(outline) {
+    const opacity = outline.opacity ?? 1;
+    return Number.isFinite(opacity) ? Math.min(1, Math.max(0, opacity)) : 1;
+  }
   // OutlineGeometry.addPolygonOutlineCompanion companion id'sini
   // `${poligonId}::outline` olarak verir.
   static outlineOwnerId(companion) {
     return companion.id.endsWith(OUTLINE_ID_SUFFIX) ? companion.id.slice(0, -OUTLINE_ID_SUFFIX.length) : companion.id;
+  }
+  /**
+   * Sembolu hic belirlenmemis bir katmandaki noktalarin GERCEK gorunumunu
+   * (daire + toplam piksel boyutu) cikarir: pixelSize + dis hat payi. Editor
+   * "Boyut" alaninda bunu gosterir; boylece varsayilan daire de, secilen diger
+   * sekiller gibi ayni "dis hat dahil toplam piksel" tanimiyla konusur.
+   */
+  inferPointSymbol(dataSource) {
+    var _a2, _b;
+    const time = this.getCurrentTime();
+    for (const entity of dataSource.entities.values) {
+      if (this.outlineGeometry.isOutlineCompanion(entity)) continue;
+      const point = entity.point;
+      if (point === void 0) continue;
+      const pixelSize = (_a2 = point.pixelSize) == null ? void 0 : _a2.getValue(time);
+      if (typeof pixelSize !== "number") return void 0;
+      const outlineWidth = (_b = point.outlineWidth) == null ? void 0 : _b.getValue(time);
+      const share = typeof outlineWidth === "number" && outlineWidth > 0 ? 2 * outlineWidth : 0;
+      return { shape: "circle", size: Math.round(clampPointSize(pixelSize + share)) };
+    }
+    return void 0;
   }
   /** Bir vektor katmana en son uygulanan stili döndürür (TucbsLegendPanel için). */
   getStyle(id) {
@@ -2476,25 +2879,65 @@ class LayerStyleEngine {
     this.appliedLayerStyles.delete(id);
     this.appliedCompanionWidths.delete(id);
   }
+  /** Katman eklenirken atanan rengi "solid" ilk stil olarak kaydeder ve `layer:style` olayını yayar. */
   // Katman eklenirken atanan random rengi appliedLayerStyles'a "solid" stil
   // olarak kaydeder ve layer:style event'ini emit eder — TucbsStyleEditor ve
   // TucbsLayerList katman eklendigi an getLayerStyle() ile gercek/guncel
   // rengi okuyabilsin diye (bkz. ManagedLayer.initialFillColor: bu kayit
   // SONRAKI applyLayerStyle() cagrilariyla degisir, initialFillColor ise
   // sabit kalir ve "Sifirla" icin referans noktasidir).
-  recordInitialStyle(id, colorHex, fillOpacity, outline) {
+  //
+  // `dataSource` verilirse ve katmanda nokta varsa, noktalar ILK andan itibaren
+  // varsayilan sembolle (daire, DEFAULT_POINT_SYMBOL.size) ve bu dis hatla,
+  // yani tum sekillerle AYNI hattan cizilir. Aksi halde noktalar eski Cesium
+  // noktasi olarak kalir, editor ise tahminden boyut gosterirdi ("10" gosterip
+  // daha buyuk cizilmesi).
+  recordInitialStyle(id, colorHex, fillOpacity, outline, dataSource) {
+    const point = dataSource !== void 0 ? this.applyInitialPointSymbol(dataSource, colorHex, outline) : void 0;
+    if (dataSource !== void 0) this.applyInitialLineStyle(dataSource, colorHex, outline);
     const style = {
       fill: { mode: "solid", color: colorHex, opacity: fillOpacity },
-      outline
+      outline,
+      ...point !== void 0 ? { point } : {}
     };
     this.appliedLayerStyles.set(id, style);
     this.emitStyle(id, style);
   }
-  // Yerel dosyadan (GeoJSON/KML/KMZ/SHP) gelen her katman, Cesium'un varsayilan
-  // sari renginde eklenmesin diye her eklemede rastgele bir renk alir.
+  // Katmandaki cizgilere BASLANGIC stilini (Hat rengi/kalinligi) uygular. Yuklemede cizgiler
+  // rastgele katman rengiyle boyaniyor (bkz applyEntityColor), oysa kaydedilen stil "Hat = varsayilan
+  // mavi" diyor; liste/editor mavi gosterirken harita mor kaliyordu (ilk duzenlemeye kadar).
+  applyInitialLineStyle(dataSource, colorHex, outline) {
+    const fill = cesium.Color.fromCssColorString(colorHex);
+    const outlineColor = outline.enabled ? LayerStyleEngine.outlineColor(outline) : void 0;
+    dataSource.entities.suspendEvents();
+    for (const entity of dataSource.entities.values) {
+      if (this.outlineGeometry.isOutlineCompanion(entity) || entity.polyline === void 0) continue;
+      this.applyPolylineStyle(entity.polyline, fill, outline, outlineColor, false);
+    }
+    dataSource.entities.resumeEvents();
+  }
+  // Katmandaki noktalara varsayilan sembolu uygular; nokta yoksa undefined doner.
+  // Noktanin MEVCUT rengi (opak) korunur -- yalniz cizici ve dis hat degisir.
+  applyInitialPointSymbol(dataSource, colorHex, outline) {
+    var _a2;
+    const time = this.getCurrentTime();
+    const fallback = cesium.Color.fromCssColorString(colorHex);
+    let applied = false;
+    dataSource.entities.suspendEvents();
+    for (const entity of dataSource.entities.values) {
+      if (this.outlineGeometry.isOutlineCompanion(entity) || entity.point === void 0) continue;
+      const current = (_a2 = entity.point.color) == null ? void 0 : _a2.getValue(time);
+      this.applyPointSymbol(entity, current instanceof cesium.Color ? current : fallback, outline, DEFAULT_POINT_SYMBOL);
+      applied = true;
+    }
+    dataSource.entities.resumeEvents();
+    return applied ? DEFAULT_POINT_SYMBOL : void 0;
+  }
+  /** Yerel dosyadan (GeoJSON/KML/KMZ/SHP) gelen katman için rastgele, tam opak bir renk üretir (Cesium'un varsayılan sarısı yerine). */
   randomLayerColor() {
     return cesium.Color.fromRandom({ alpha: 1 });
   }
+  /** Katmandaki her entity'ye bağımsız bir renk materyali atar (yükleme sonrası tek renk uygulaması). */
   // Iki cagiran grubu var: (1) KmlDataSource kendi stilini KML dosyasindan
   // alir, GeoJsonDataSource.load'daki fill/stroke/markerColor secenekleri
   // burada gecerli olmadigindan entity'lere yuklendikten sonra renk uygulanir.
@@ -2528,6 +2971,7 @@ class LayerStyleEngine {
     }
     dataSource.entities.resumeEvents();
   }
+  /** Yükleme sonrası nokta billboard'larını (varsayılan pin) verilen renkte native nokta (daire) grafiğine çevirir; KML katmanlarında kullanılmaz. */
   // GeoJsonDataSource.load, Point/MultiPoint geometrileri icin HER ZAMAN
   // Cesium'in varsayilan PinBuilder billboard'ini (yer isareti/pin gorunumu)
   // uretir -- "markerColor" gibi secenekler SADECE bu pin'in rengini/boyutunu
@@ -2553,11 +2997,13 @@ class LayerStyleEngine {
     }
     dataSource.entities.resumeEvents();
   }
+  /** Tek bir entity'ye dolgu rengini ve dış hat stilini uygular (yeni çizilen/ölçülen şeklin ilk stili için de kullanılır). */
   // _addDrawnShape/_addMeasuredShape (LayerManager.ts) applyLayerStyle'dan
   // BAGIMSIZ olarak dogrudan cagirir (yeni cizilen/olculen sekle ilk stili
   // uygulamak icin) -- bu yuzden public.
-  applyEntityStyle(entity, color, outline, isShapeLayer) {
-    const outlineColor = outline.enabled ? cesium.Color.fromCssColorString(outline.color) : void 0;
+  applyEntityStyle(entity, color, outline, isShapeLayer, pointSymbol) {
+    const outlineColor = outline.enabled ? LayerStyleEngine.outlineColor(outline) : void 0;
+    if (pointSymbol === void 0) this.restoreStashedPoint(entity);
     if (entity.polygon !== void 0) {
       entity.polygon.material = this.updateColorMaterial(
         entity.polygon.material,
@@ -2581,47 +3027,179 @@ class LayerStyleEngine {
       }
     }
     if (entity.polyline !== void 0) {
-      let lineColor;
-      if (isShapeLayer) {
-        lineColor = outlineColor ?? cesium.Color.WHITE.withAlpha(0);
-      } else {
-        lineColor = outline.enabled ? outlineColor : color;
-      }
-      entity.polyline.material = this.updateColorMaterial(
-        entity.polyline.material,
-        lineColor ?? cesium.Color.WHITE.withAlpha(0)
-      );
-      if (outline.enabled) {
-        entity.polyline.width = LayerStyleEngine.updateConstantProperty(
-          entity.polyline.width,
-          outline.width
-        );
-      }
+      this.applyPolylineStyle(entity.polyline, color, outline, outlineColor, isShapeLayer);
     }
     if (entity.point !== void 0) {
-      entity.point.color = color !== void 0 ? this.updateColorProperty(entity.point.color, color) : void 0;
-      if (outline.enabled && outlineColor !== void 0) {
-        entity.point.outlineColor = LayerStyleEngine.updateConstantProperty(
-          entity.point.outlineColor,
-          outlineColor
-        );
-        entity.point.outlineWidth = LayerStyleEngine.updateConstantProperty(
-          entity.point.outlineWidth,
-          outline.width
-        );
-      }
+      this.applyPointColor(entity.point, color, outline, outlineColor);
     }
-    if (entity.billboard !== void 0 && color !== void 0) {
+    if (entity.point !== void 0 || this.symbolPoints.has(entity)) {
+      this.applyPointSymbol(entity, color, outline, pointSymbol);
+    }
+    if (entity.billboard !== void 0 && color !== void 0 && !this.symbolPoints.has(entity)) {
       entity.billboard.color = this.updateColorProperty(
         entity.billboard.color,
         color
       );
     }
   }
+  // Nokta (PointGraphics) rengi ve dis hatti (applyEntityStyle karmasikligi icin ayrildi).
+  applyPointColor(point, color, outline, outlineColor) {
+    point.color = color !== void 0 ? this.updateColorProperty(point.color, color) : void 0;
+    if (outline.enabled && outlineColor !== void 0) {
+      point.outlineColor = LayerStyleEngine.updateConstantProperty(
+        point.outlineColor,
+        outlineColor
+      );
+      point.outlineWidth = LayerStyleEngine.updateConstantProperty(
+        point.outlineWidth,
+        outline.width
+      );
+    } else if (!outline.enabled && point.outlineWidth !== void 0) {
+      point.outlineWidth = LayerStyleEngine.updateConstantProperty(point.outlineWidth, 0);
+    }
+  }
+  // Nokta sembolu: sembol verilince DAIRE DAHIL tum sekiller ayni SVG
+  // billboard hattindan cizilir. Daire ayri (Cesium PointGraphics) cizilince
+  // boyut/dis hat kalinligi/opaklik kurallari digerleriyle hicbir zaman birebir
+  // tutmuyordu (canli: biri kucuk, digerinin dis hati kalin). Sembol verilmediyse
+  // (point undefined) noktalar oldugu gibi birakilir; onceden billboard'a
+  // cevrilmis nokta varsa point'ine GERI doner (bkz applyEntityStyle basi).
+  applyPointSymbol(entity, color, outline, symbol) {
+    if (symbol === void 0) return;
+    const size = shapeBoxSize(symbol.shape, clampPointSize(symbol.size));
+    const inner = this.rasterSize(size);
+    const full = inner + 2 * TEXTURE_PADDING_PX;
+    const boxWithPadding = full / this.safePixelRatio();
+    const fill = color ?? cesium.Color.WHITE;
+    const image = pointSymbolDataUri(symbol.shape, {
+      fill: LayerStyleEngine.quantizedHex(fill),
+      // Dolgu opakligi YALNIZ dolguya yazilir, dis hat opak kalir (dairede de
+      // oyle: PointGraphics.outlineColor opaklikla carpilmaz). Boyle olmazsa
+      // sekiller daireden silik ve dis hatsiz gorunur.
+      fillOpacity: Math.round(fill.alpha * 20) / 20,
+      ...outline.enabled ? {
+        stroke: outline.color,
+        strokeWidth: this.visibleStrokeWidth(outline.width),
+        strokeOpacity: Math.round(LayerStyleEngine.outlineOpacity(outline) * 20) / 20,
+        ...outline.dash !== void 0 ? { strokeDash: outline.dash } : {}
+      } : {},
+      size,
+      renderSize: full,
+      padding: TEXTURE_PADDING_PX * 64 / inner
+    });
+    const tint = cesium.Color.WHITE;
+    let billboard = entity.billboard;
+    if (billboard === void 0 || !this.symbolPoints.has(entity)) {
+      const point = entity.point;
+      if (point === void 0) return;
+      billboard = new cesium.BillboardGraphics({
+        ...point.heightReference !== void 0 ? { heightReference: point.heightReference } : {},
+        ...point.disableDepthTestDistance !== void 0 ? { disableDepthTestDistance: point.disableDepthTestDistance } : {}
+      });
+      this.symbolPoints.set(entity, point);
+      entity.point = void 0;
+      entity.billboard = billboard;
+    }
+    billboard.image = LayerStyleEngine.updateConstantProperty(billboard.image, image);
+    billboard.width = LayerStyleEngine.updateConstantProperty(billboard.width, boxWithPadding);
+    billboard.height = LayerStyleEngine.updateConstantProperty(billboard.height, boxWithPadding);
+    billboard.color = this.updateColorProperty(billboard.color, tint);
+  }
+  // Sembol billboard'ini kaldirip kenara alinmis orijinal point'i geri takar.
+  restoreStashedPoint(entity) {
+    const point = this.symbolPoints.get(entity);
+    if (point === void 0) return;
+    entity.billboard = void 0;
+    entity.point = point;
+    this.symbolPoints.delete(entity);
+  }
+  // Billboard dokusu EKRANDA gorunecegi piksel boyutunda uretilir (Cesium
+  // billboard boyutunu scene.pixelRatio ile carpar). 64 px'lik sabit bir doku
+  // ~7 px'e mipmap'siz kucultulunce ince dis hat ve acik dolgu kayboluyordu
+  // (canli olculdu: ucgen/artı/yildiz silik ve daireden belirgin kucuk).
+  rasterSize(size) {
+    return Math.max(4, Math.round(size * this.safePixelRatio()));
+  }
+  safePixelRatio() {
+    const ratio = this.getPixelRatio();
+    return Number.isFinite(ratio) && ratio > 0 ? ratio : 1;
+  }
+  // Dis hat ekranda en az 1 piksel kalinlikta olsun (pixelRatio < 1'de 1 css px
+  // dis hat 1 ekran pikselinin altina dusup siliniyordu).
+  visibleStrokeWidth(width) {
+    return Math.max(width, 1 / this.safePixelRatio());
+  }
+  static quantizedHex(color) {
+    const channel = (value) => {
+      const stepped = Math.min(255, Math.round(value * 255 / BILLBOARD_COLOR_STEP) * BILLBOARD_COLOR_STEP);
+      return stepped.toString(16).padStart(2, "0");
+    };
+    return `#${channel(color.red)}${channel(color.green)}${channel(color.blue)}`;
+  }
+  /**
+   * Katmandaki geometri turleri (nokta/cizgi/alan). Dis hat companion
+   * polyline'lari "cizgi" SAYILMAZ (poligonun parcasi). Stil editoru hangi
+   * sembol kontrollerini gosterecegini buradan belirler.
+   */
+  getGeometryKinds(dataSource) {
+    let point = false;
+    let line2 = false;
+    let area = false;
+    let dashableArea = false;
+    for (const entity of dataSource.entities.values) {
+      if (this.outlineGeometry.isOutlineCompanion(entity)) continue;
+      if (entity.point !== void 0 || this.symbolPoints.has(entity)) point = true;
+      if (entity.polyline !== void 0) line2 = true;
+      if (entity.polygon !== void 0) {
+        area = true;
+        if (this.outlineGeometry.hasOutlineCompanion(entity)) dashableArea = true;
+      }
+      if (point && line2 && dashableArea) break;
+    }
+    return { point, line: line2, area, dashable: line2 || dashableArea };
+  }
+  /**
+   * Cizim/Olcu katmanina SONRADAN eklenen bir poligonun yeni olusturulmus
+   * companion'ina katmanin mevcut cizgi tipini uygular (toplu applyLayerStyle
+   * bu companion'i gormemisti).
+   */
+  applyCompanionDash(companion, outline) {
+    const polyline = companion.polyline;
+    if (polyline === void 0) return;
+    const color = LayerStyleEngine.outlineColor(outline);
+    polyline.material = this.updateLineMaterial(
+      polyline.material,
+      color,
+      outline.enabled ? outline.dash : void 0,
+      outline.width
+    );
+  }
+  // Cizgi geometrisi: renk/kalinlik/cizgi tipi (applyEntityStyle'dan karmasiklik
+  // sinirini asmamak icin ayrildi; davranis ayni).
+  applyPolylineStyle(polyline, color, outline, outlineColor, isShapeLayer) {
+    let lineColor;
+    if (isShapeLayer) {
+      lineColor = outlineColor ?? cesium.Color.WHITE.withAlpha(0);
+    } else {
+      lineColor = outline.enabled ? outlineColor : color;
+    }
+    polyline.material = this.updateLineMaterial(
+      polyline.material,
+      lineColor ?? cesium.Color.WHITE.withAlpha(0),
+      outline.enabled ? outline.dash : void 0,
+      outline.width
+    );
+    if (outline.enabled) {
+      polyline.width = LayerStyleEngine.updateConstantProperty(
+        polyline.width,
+        outline.width
+      );
+    }
+  }
   resolveFillColor(entity, fill, range, time) {
     switch (fill.mode) {
       case "off":
-        return void 0;
+        return cesium.Color.WHITE.withAlpha(0);
       case "solid":
         return cesium.Color.fromCssColorString(fill.color).withAlpha(fill.opacity);
       case "gradient": {
@@ -2657,6 +3235,7 @@ class LayerStyleEngine {
       }
     }
   }
+  /** Entity'nin verilen kolondaki öznitelik değerini okur; sayı dışındaki değerler metne çevrilir, alan yoksa ya da boşsa `null`. */
   // applyLayerStyle() ve okuma metodlarinin (getUniqueColumnValues/getColumnRange)
   // paylastigi ortak property-okuma yardimcilari. entity.properties bir
   // PropertyBag'dir; getValue(time) TUM alanlari coz(ulmus) duz bir objede
@@ -2782,7 +3361,29 @@ class LayerStyleEngine {
       current.color = this.updateColorProperty(current.color, color);
       return current;
     }
-    return new cesium.ColorMaterialProperty(this.updateColorProperty(void 0, color));
+    const carried = current instanceof cesium.PolylineDashMaterialProperty ? current.color : void 0;
+    return new cesium.ColorMaterialProperty(this.updateColorProperty(carried, color));
+  }
+  // Cizgi materyali: dash verilmemis/"solid" ise duz renk, aksi halde
+  // PolylineDashMaterialProperty. Ayni turdeki materyal YERINDE guncellenir
+  // (flicker onleme, bkz updateColorMaterial); tur degisirken renk property'si
+  // (opaklik sarmali dahil) yeni materyale tasinir.
+  updateLineMaterial(current, color, dash, width) {
+    const params = dashParams(dash, width);
+    if (params === void 0) return this.updateColorMaterial(current, color);
+    if (current instanceof cesium.PolylineDashMaterialProperty) {
+      current.color = this.updateColorProperty(current.color, color);
+      current.dashLength = LayerStyleEngine.updateConstantProperty(current.dashLength, params.dashLength);
+      current.dashPattern = LayerStyleEngine.updateConstantProperty(current.dashPattern, params.dashPattern);
+      return current;
+    }
+    const carried = current instanceof cesium.ColorMaterialProperty ? current.color : void 0;
+    return new cesium.PolylineDashMaterialProperty({
+      color: this.updateColorProperty(carried, color),
+      gapColor: cesium.Color.TRANSPARENT,
+      dashLength: params.dashLength,
+      dashPattern: params.dashPattern
+    });
   }
   // qualitative paletler (Set2/Tableau10 vb.) AYRIK kategorik renk setleridir --
   // karistirilirsa palette'te hic olmayan bulanik ara tonlar cikar. sequential/
@@ -2792,8 +3393,7 @@ class LayerStyleEngine {
     return paletteKind === "qualitative" ? LayerStyleEngine.sampleDiscrete(palette, t) : LayerStyleEngine.sampleGradient(palette, t);
   }
   // Hand-rolled lineer interpolasyon: d3-scale-chromatic gibi ek bagimlilik
-  // EKLENMEDI (bkz. project_ucbp_api_styleeditor_arastirma — "@tucbs/core
-  // Cesium-only peer dep" kurali).
+  // EKLENMEDI ("@tucbs/core Cesium-only peer dep" kurali).
   static sampleGradient(palette, t) {
     if (palette.length === 0) return cesium.Color.GRAY;
     if (palette.length === 1) return cesium.Color.fromCssColorString(palette[0]);
@@ -2818,60 +3418,6 @@ class LayerStyleEngine {
     }
     return boundaries.length - 1;
   }
-}
-function extractEpsgCode(srsName) {
-  if (!/EPSG/i.test(srsName)) return void 0;
-  const trimmed = srsName.trim();
-  let end = trimmed.length;
-  while (end > 0 && trimmed.charCodeAt(end - 1) >= 48 && trimmed.charCodeAt(end - 1) <= 57) {
-    end--;
-  }
-  const digits = trimmed.slice(end);
-  return digits.length > 0 ? digits : void 0;
-}
-const proj4DefRequests = /* @__PURE__ */ new Map();
-async function registerProj4Def(proj4, epsgCode) {
-  const name = `EPSG:${epsgCode}`;
-  if (proj4.defs(name)) return true;
-  let pending = proj4DefRequests.get(epsgCode);
-  if (!pending) {
-    pending = (async () => {
-      try {
-        const response = await fetch(`https://epsg.io/${epsgCode}.proj4`);
-        if (!response.ok) return response.status === 404 ? "missing" : "transient-failure";
-        const def = (await response.text()).trim();
-        if (!def) return "missing";
-        proj4.defs(name, def);
-        return "registered";
-      } catch {
-        return "transient-failure";
-      }
-    })();
-    proj4DefRequests.set(epsgCode, pending);
-  }
-  const result = await pending;
-  if (result === "transient-failure" && proj4DefRequests.get(epsgCode) === pending) {
-    proj4DefRequests.delete(epsgCode);
-  }
-  return result === "registered";
-}
-async function ensureProj4Def(epsgCode) {
-  let proj4;
-  try {
-    ({ default: proj4 } = await import("proj4"));
-  } catch {
-    console.warn(
-      `[ogc/proj4Defs] EPSG:${epsgCode} icin koordinat donusumu atlandi -- "proj4" paketi yuklu degil (peer dependency olarak eklenmemis). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir.`
-    );
-    return void 0;
-  }
-  if (!await registerProj4Def(proj4, epsgCode)) {
-    console.warn(
-      `[ogc/proj4Defs] EPSG:${epsgCode} icin proj4 tanimi epsg.io'dan alinamadi (agsizlik veya gecersiz/desteklenmeyen kod olabilir). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir.`
-    );
-    return void 0;
-  }
-  return proj4;
 }
 const CESIUM_BUILTIN_CRS_NAMES = /* @__PURE__ */ new Set([
   "urn:ogc:def:crs:OGC:1.3:CRS84",
@@ -2984,11 +3530,160 @@ async function ensureGeoJsonCrsSupport(geojson) {
   };
   return { kind: "reprojected", fromEpsg };
 }
+function edgesOf(box) {
+  return [
+    { inside: (p) => p[0] >= box.west, t: (a, b) => (box.west - a[0]) / (b[0] - a[0]) },
+    { inside: (p) => p[0] <= box.east, t: (a, b) => (box.east - a[0]) / (b[0] - a[0]) },
+    { inside: (p) => p[1] >= box.south, t: (a, b) => (box.south - a[1]) / (b[1] - a[1]) },
+    { inside: (p) => p[1] <= box.north, t: (a, b) => (box.north - a[1]) / (b[1] - a[1]) }
+  ];
+}
+function lerp(a, b, t) {
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+}
+function clipRing(ring, box) {
+  let output = [...ring];
+  for (const edge of edgesOf(box)) {
+    const input = output;
+    output = [];
+    for (let i = 0; i < input.length; i++) {
+      const current = input[i];
+      const previous = input[(i + input.length - 1) % input.length];
+      if (edge.inside(current)) {
+        if (!edge.inside(previous)) output.push(lerp(previous, current, edge.t(previous, current)));
+        output.push(current);
+      } else if (edge.inside(previous)) {
+        output.push(lerp(previous, current, edge.t(previous, current)));
+      }
+    }
+    if (output.length === 0) return [];
+  }
+  return output.length >= 3 ? output : [];
+}
+function clipLine(line2, box) {
+  const pieces = [];
+  let current = [];
+  const flush = () => {
+    if (current.length >= 2) pieces.push(current);
+    current = [];
+  };
+  for (let i = 0; i + 1 < line2.length; i++) {
+    const segment = clipSegment(line2[i], line2[i + 1], box);
+    if (!segment) {
+      flush();
+      continue;
+    }
+    const [start, end] = segment;
+    const last = current[current.length - 1];
+    if (!last || last[0] !== start[0] || last[1] !== start[1]) {
+      flush();
+      current.push(start);
+    }
+    current.push(end);
+    if (end !== line2[i + 1]) flush();
+  }
+  flush();
+  return pieces;
+}
+function clipSegment(a, b, box) {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  let t0 = 0;
+  let t1 = 1;
+  const checks = [
+    [-dx, a[0] - box.west],
+    [dx, box.east - a[0]],
+    [-dy, a[1] - box.south],
+    [dy, box.north - a[1]]
+  ];
+  for (const [p, q] of checks) {
+    if (p === 0) {
+      if (q < 0) return void 0;
+      continue;
+    }
+    const r = q / p;
+    if (p < 0) {
+      if (r > t1) return void 0;
+      if (r > t0) t0 = r;
+    } else {
+      if (r < t0) return void 0;
+      if (r < t1) t1 = r;
+    }
+  }
+  return [t0 === 0 ? a : lerp(a, b, t0), t1 === 1 ? b : lerp(a, b, t1)];
+}
+function isInside(p, box) {
+  return p[0] >= box.west && p[0] <= box.east && p[1] >= box.south && p[1] <= box.north;
+}
+function toLonLat(position) {
+  const c = cesium.Cartographic.fromCartesian(position);
+  return [cesium.Math.toDegrees(c.longitude), cesium.Math.toDegrees(c.latitude), c.height];
+}
+function toCartesian(points) {
+  return points.map(([lon, lat, height]) => cesium.Cartesian3.fromDegrees(lon, lat, height));
+}
+function clipHierarchy(hierarchy, box) {
+  const ring = hierarchy.positions.map(toLonLat);
+  if (ring.every((point) => isInside(point, box))) return hierarchy;
+  const outer = clipRing(ring, box);
+  if (outer.length === 0) return void 0;
+  const holes = (hierarchy.holes ?? []).flatMap((hole) => {
+    const clipped = clipHierarchy(hole, box);
+    return clipped ? [clipped] : [];
+  });
+  return new cesium.PolygonHierarchy(toCartesian(outer), holes);
+}
+function clipPolygonEntity(entity, box, time) {
+  var _a2;
+  const hierarchy = (_a2 = entity.polygon.hierarchy) == null ? void 0 : _a2.getValue(time);
+  if (!hierarchy) return false;
+  const clipped = clipHierarchy(hierarchy, box);
+  if (!clipped) return false;
+  if (clipped !== hierarchy) entity.polygon.hierarchy = new cesium.ConstantProperty(clipped);
+  return true;
+}
+function clipPolylineEntity(dataSource, entity, box, time) {
+  var _a2;
+  const positions = (_a2 = entity.polyline.positions) == null ? void 0 : _a2.getValue(time);
+  if (!positions) return false;
+  const points = positions.map(toLonLat);
+  if (points.every((point) => isInside(point, box))) return true;
+  const [first, ...rest] = clipLine(points, box);
+  if (!first) return false;
+  entity.polyline.positions = new cesium.ConstantProperty(toCartesian(first));
+  rest.forEach((piece, index) => {
+    const polyline = entity.polyline.clone();
+    polyline.positions = new cesium.ConstantProperty(toCartesian(piece));
+    dataSource.entities.add({
+      id: `${entity.id}::parca-${index + 1}`,
+      ...entity.name !== void 0 && { name: entity.name },
+      ...entity.properties !== void 0 && { properties: entity.properties },
+      polyline
+    });
+  });
+  return true;
+}
+function clipDataSourceToExtent(dataSource, box) {
+  const time = cesium.JulianDate.now();
+  for (const entity of [...dataSource.entities.values]) {
+    let keep = true;
+    if (entity.polygon) {
+      keep = clipPolygonEntity(entity, box, time);
+    } else if (entity.polyline) {
+      keep = clipPolylineEntity(dataSource, entity, box, time);
+    } else if (entity.position) {
+      const position = entity.position.getValue(time);
+      keep = position !== void 0 && isInside(toLonLat(position), box);
+    }
+    if (!keep) dataSource.entities.remove(entity);
+  }
+}
 class LocalSourceLoader {
   constructor(viewer, deps) {
     this.viewer = viewer;
     this.deps = deps;
   }
+  /** GeoJSON, KML ya da KMZ dosyasını okuyup vektör katman olarak ekler. */
   async addLocalKmlGeoJson(layerType, options) {
     let dataSource;
     let blobUrl;
@@ -3046,11 +3741,12 @@ class LocalSourceLoader {
       enabled: true,
       color: this.deps.defaultOutlineColorHex,
       width: 2
-    });
+    }, dataSource);
     await this.deps.waitForRenderSettle();
     return managed;
   }
   // ── İç: SHP ──────────────────────────────────────────────────────────────
+  /** Shapefile verisini (dosya, adres ya da bayt dizisi) shpjs ile GeoJSON'a çevirip vektör katman olarak ekler; shpjs kurulu değilse hata fırlatır. */
   async addShp(options) {
     let shp;
     try {
@@ -3058,7 +3754,7 @@ class LocalSourceLoader {
     } catch {
       throw new LayerOperationError(
         "LAYER_SHP_PACKAGE_MISSING",
-        'SHP katmanı için "shpjs" paketi gereklidir: shpjs kütüphanesini import etmelisiniz'
+        `SHP katmanı için gereken "shpjs" paketi yüklenemedi: paket kurulu değil ya da importmap'te tanımlı değil`
       );
     }
     const source = options.data instanceof File ? await this.fileToArrayBuffer(options.data) : options.data;
@@ -3075,6 +3771,7 @@ class LocalSourceLoader {
     });
   }
   // ── İç: CSV ──────────────────────────────────────────────────────────────
+  /** Enlem/boylam sütunları olan CSV dosyasını papaparse ile okuyup nokta katmanı olarak ekler; papaparse kurulu değilse ya da enlem/boylam sütunu bulunamazsa hata fırlatır. */
   async addCsv(options) {
     let Papa;
     try {
@@ -3082,7 +3779,7 @@ class LocalSourceLoader {
     } catch {
       throw new LayerOperationError(
         "LAYER_CSV_PACKAGE_MISSING",
-        'CSV katmanı için "papaparse" paketi gereklidir: papaparse kütüphanesini import etmelisiniz'
+        `CSV katmanı için gereken "papaparse" paketi yüklenemedi: paket kurulu değil ya da importmap'te tanımlı değil`
       );
     }
     const text = options.data instanceof File ? await this.fileToText(options.data) : options.data;
@@ -3123,11 +3820,10 @@ class LocalSourceLoader {
       enabled: false,
       color: colorHex,
       width: 0
-    });
+    }, dataSource);
     return managed;
   }
-  // CSV basliklarindaki lat/lon sutunlarini yaygin adlandirma varyasyonlarina
-  // gore (case-insensitive) bulur; bulamazsa null doner.
+  /** CSV satırındaki enlem/boylam sütun adlarını yaygın adlandırma varyasyonlarına göre (büyük/küçük harf duyarsız) bulur; bulamazsa `null`. */
   detectLatLonKeys(row) {
     const keys = Object.keys(row).reduce(
       (acc, key) => {
@@ -3141,12 +3837,15 @@ class LocalSourceLoader {
     );
     return keys.lat && keys.lon ? keys : null;
   }
+  /** Dosyayı metin olarak okur; UTF-8 değilse Windows-1254 ile çözer (bkz. `decodeTextBuffer`). */
   async fileToText(file) {
     return decodeTextBuffer(await file.arrayBuffer());
   }
+  /** Dosya için geçici bir `blob:` adresi oluşturur. */
   fileToBlobUrl(file) {
     return URL.createObjectURL(file);
   }
+  /** Dosyanın ham baytlarını okur. */
   fileToArrayBuffer(file) {
     return file.arrayBuffer();
   }
@@ -3162,6 +3861,7 @@ async function loadVectorGeoJsonLayer(viewer, deps, geojson, layer, afterRegiste
     strokeWidth: 2,
     markerColor: color
   });
+  if (layer.clipExtent) clipDataSourceToExtent(dataSource, layer.clipExtent);
   deps.styleEngine.applyEntityColor(dataSource, color);
   deps.styleEngine.convertMarkersToPoints(dataSource, color);
   deps.outlineGeometry.disableRiskyPolygonOutlines(dataSource);
@@ -3178,7 +3878,7 @@ async function loadVectorGeoJsonLayer(viewer, deps, geojson, layer, afterRegiste
     enabled: true,
     color: deps.defaultOutlineColorHex,
     width: 2
-  });
+  }, dataSource);
   await deps.waitForRenderSettle();
   return managed;
 }
@@ -3247,11 +3947,13 @@ async function fetchWfsCapabilities(url, fetchOptions = {}) {
     const title = txt(node, "Title");
     const defaultCRS = txt(node, "DefaultCRS");
     const defaultSRS = txt(node, "DefaultSRS");
+    const srs = txt(node, "SRS");
     featureTypes.push({
       name,
       ...title ? { title } : {},
       ...defaultCRS ? { defaultCRS } : {},
       ...defaultSRS ? { defaultSRS } : {},
+      ...srs ? { srs } : {},
       ...outputFormats2.length ? { outputFormats: outputFormats2 } : {}
     });
   }
@@ -3324,12 +4026,14 @@ function buildWfsGetFeaturePlan(args) {
   const srsName = args.srsName || ft.defaultCRS || ft.defaultSRS || "EPSG:4326";
   const jsonOutputFormat = args.outputFormat || pickJsonOutput(ft.outputFormats || []) || pickJsonOutput(args.caps.outputFormats);
   const maxFeatures = args.maxFeatures ?? 5e3;
+  const nativeSrs = ft.defaultCRS || ft.defaultSRS || ft.srs;
   return {
     version,
     typeName: ft.name,
     srsName,
     jsonOutputFormat,
-    maxFeatures
+    maxFeatures,
+    ...nativeSrs && { nativeSrs }
   };
 }
 function appendWfsGetFeatureParams(params, plan, outputFormat) {
@@ -3344,6 +4048,9 @@ function appendWfsGetFeatureParams(params, plan, outputFormat) {
   }
   const limitParam = isV2 ? "count" : "maxFeatures";
   params.set(limitParam, String(plan.maxFeatures));
+  if (plan.bbox) {
+    params.set("bbox", plan.bbox);
+  }
 }
 async function getCapabilities(url, authToken, authContext) {
   const headers = authContext == null ? void 0 : authContext.mergeApiKeyHeader(authContext.buildAuthHeaders(authToken), url);
@@ -3413,6 +4120,28 @@ function childByLocalName(element, tagName) {
   return Array.from(element.children).find(
     (child) => child.localName === tagName
   );
+}
+function lonLatBox(lowerText, upperText) {
+  const lower = (lowerText == null ? void 0 : lowerText.trim().split(/\s+/).map(Number)) ?? [];
+  const upper = (upperText == null ? void 0 : upperText.trim().split(/\s+/).map(Number)) ?? [];
+  if (lower.length < 2 || upper.length < 2) return void 0;
+  const box = { west: lower[0], south: lower[1], east: upper[0], north: upper[1] };
+  return Object.values(box).every(Number.isFinite) ? box : void 0;
+}
+function parseWcsSummaryBoundingBox(summary) {
+  var _a2, _b;
+  const bbox = childByLocalName(summary, "WGS84BoundingBox");
+  if (!bbox) return void 0;
+  return lonLatBox(
+    (_a2 = childByLocalName(bbox, "LowerCorner")) == null ? void 0 : _a2.textContent,
+    (_b = childByLocalName(bbox, "UpperCorner")) == null ? void 0 : _b.textContent
+  );
+}
+function parseWcs10LonLatEnvelope(brief) {
+  const envelope = childByLocalName(brief, "lonLatEnvelope");
+  if (!envelope) return void 0;
+  const [lower, upper] = Array.from(envelope.children).filter((child) => child.localName === "pos");
+  return lonLatBox(lower == null ? void 0 : lower.textContent, upper == null ? void 0 : upper.textContent);
 }
 function parseWmsGeographicBoundingBox(layer) {
   var _a2, _b, _c, _d;
@@ -3522,9 +4251,11 @@ function parseWcsCapabilities(doc) {
     const idEl = childByLocalName(summary, "CoverageId") ?? childByLocalName(summary, "Identifier");
     if (!(idEl == null ? void 0 : idEl.textContent)) continue;
     const titleEl = childByLocalName(summary, "Title");
+    const geographicBoundingBox = parseWcsSummaryBoundingBox(summary);
     items.push({
       identifier: idEl.textContent.trim(),
-      title: ((_a2 = titleEl == null ? void 0 : titleEl.textContent) == null ? void 0 : _a2.trim()) || idEl.textContent.trim()
+      title: ((_a2 = titleEl == null ? void 0 : titleEl.textContent) == null ? void 0 : _a2.trim()) || idEl.textContent.trim(),
+      ...geographicBoundingBox && { geographicBoundingBox }
     });
   }
   if (items.length > 0) return items;
@@ -3532,9 +4263,11 @@ function parseWcsCapabilities(doc) {
     const nameEl = childByLocalName(brief, "name");
     if (!(nameEl == null ? void 0 : nameEl.textContent)) continue;
     const labelEl = childByLocalName(brief, "label");
+    const geographicBoundingBox = parseWcs10LonLatEnvelope(brief);
     items.push({
       identifier: nameEl.textContent.trim(),
-      title: ((_b = labelEl == null ? void 0 : labelEl.textContent) == null ? void 0 : _b.trim()) || nameEl.textContent.trim()
+      title: ((_b = labelEl == null ? void 0 : labelEl.textContent) == null ? void 0 : _b.trim()) || nameEl.textContent.trim(),
+      ...geographicBoundingBox && { geographicBoundingBox }
     });
   }
   return items;
@@ -3547,29 +4280,32 @@ async function parseWcsCoverageEnvelope(descriptionEl) {
   const lowerText = (_b = (_a2 = childByLocalName(envelopeEl, "lowerCorner")) == null ? void 0 : _a2.textContent) == null ? void 0 : _b.trim();
   const upperText = (_d = (_c = childByLocalName(envelopeEl, "upperCorner")) == null ? void 0 : _c.textContent) == null ? void 0 : _d.trim();
   if (!lowerText || !upperText) return void 0;
-  const lower = lowerText.split(/\s+/).map(Number);
-  const upper = upperText.split(/\s+/).map(Number);
-  if (lower.length < 2 || upper.length < 2) return void 0;
-  if (![...lower, ...upper].every(Number.isFinite)) return void 0;
-  const axisLabels = (envelopeEl.getAttribute("axisLabels") ?? "").trim().toLowerCase();
+  const lowerTokens = lowerText.split(/\s+/);
+  const upperTokens = upperText.split(/\s+/);
+  const axes = (envelopeEl.getAttribute("axisLabels") ?? "").trim().toLowerCase().split(/\s+/).filter(Boolean);
   const uomLabels = (envelopeEl.getAttribute("uomLabels") ?? "").toLowerCase();
-  if (uomLabels.includes("deg")) {
-    const latFirst = axisLabels.startsWith("lat");
-    return latFirst ? { south: lower[0], west: lower[1], north: upper[0], east: upper[1] } : { west: lower[0], south: lower[1], east: upper[0], north: upper[1] };
+  const isGeographic = uomLabels.includes("deg");
+  const xIndex = axes.findIndex((a) => isGeographic ? a.startsWith("lon") : a === "x" || a.startsWith("e"));
+  const yIndex = axes.findIndex((a) => isGeographic ? a.startsWith("lat") : a === "y" || a.startsWith("n"));
+  const yFirst = axes[0] !== void 0 && /^(lat|y|n)/.test(axes[0]);
+  const [xi, yi] = xIndex >= 0 && yIndex >= 0 ? [xIndex, yIndex] : yFirst ? [1, 0] : [0, 1];
+  const lower = [Number(lowerTokens[xi]), Number(lowerTokens[yi])];
+  const upper = [Number(upperTokens[xi]), Number(upperTokens[yi])];
+  if (![...lower, ...upper].every(Number.isFinite)) return void 0;
+  if (isGeographic) {
+    return { west: lower[0], south: lower[1], east: upper[0], north: upper[1] };
   }
   const srsName = envelopeEl.getAttribute("srsName") ?? "";
-  return resolveProjectedEnvelope(srsName, axisLabels, lower, upper);
+  return resolveProjectedEnvelope(srsName, lower, upper);
 }
-async function resolveProjectedEnvelope(srsName, axisLabels, lower, upper) {
+async function resolveProjectedEnvelope(srsName, lower, upper) {
   const epsgCode = extractEpsgCode(srsName);
   if (!epsgCode) return void 0;
   const proj4 = await ensureProj4Def(epsgCode);
   if (!proj4) return void 0;
   try {
-    const yFirst = axisLabels.startsWith("y") || axisLabels.startsWith("n");
-    const toXY = (pair) => yFirst ? [pair[1], pair[0]] : [pair[0], pair[1]];
-    const [lx, ly] = toXY(lower);
-    const [ux, uy] = toXY(upper);
+    const [lx, ly] = [lower[0], lower[1]];
+    const [ux, uy] = [upper[0], upper[1]];
     const corners = [
       [lx, ly],
       [ux, uy],
@@ -3593,9 +4329,54 @@ async function resolveProjectedEnvelope(srsName, axisLabels, lower, upper) {
   }
 }
 async function fetchWcsCoverageExtents(rawUrl, coverageIds, authToken, authContext) {
+  return (await fetchWcsCoverageDescriptions(rawUrl, coverageIds, coverageIds, authToken, authContext)).extents;
+}
+async function fetchWcsCoverageDescriptions(rawUrl, coverageIds, unlocatedIds, authToken, authContext) {
   var _a2;
-  const result = /* @__PURE__ */ new Map();
-  if (coverageIds.length === 0) return result;
+  const extents = /* @__PURE__ */ new Map();
+  const elevationIds = /* @__PURE__ */ new Set();
+  if (coverageIds.length === 0) return { extents, elevationIds };
+  const batches = await Promise.all(
+    chunkCoverageIds(coverageIds).map((chunk) => describeCoverages(rawUrl, chunk, authToken, authContext))
+  );
+  const requestedByKey = new Map(coverageIds.map((id) => [coverageIdKey(id), id]));
+  for (const descEl of batches.flat()) {
+    const idEl = childByLocalName(descEl, "CoverageId");
+    const returnedId = (_a2 = idEl == null ? void 0 : idEl.textContent) == null ? void 0 : _a2.trim();
+    if (!returnedId) continue;
+    const id = requestedByKey.get(coverageIdKey(returnedId)) ?? returnedId;
+    if (isWcsElevationCoverage(id, descEl)) elevationIds.add(id);
+    const box = await parseWcsCoverageEnvelope(descEl);
+    if (box) extents.set(id, box);
+  }
+  const missing = unlocatedIds.filter((id) => !extents.has(id));
+  if (missing.length > 0) {
+    await fillFromWcs10LonLatEnvelopes(rawUrl, missing, extents, authToken, authContext);
+  }
+  return { extents, elevationIds };
+}
+const DESCRIBE_COVERAGE_IDS_MAX_LENGTH = 1500;
+function chunkCoverageIds(coverageIds) {
+  const chunks = [];
+  let current = [];
+  let length = 0;
+  for (const id of coverageIds) {
+    const added = encodeURIComponent(id).length + 3;
+    if (current.length > 0 && length + added > DESCRIBE_COVERAGE_IDS_MAX_LENGTH) {
+      chunks.push(current);
+      current = [];
+      length = 0;
+    }
+    current.push(id);
+    length += added;
+  }
+  if (current.length > 0) chunks.push(current);
+  return chunks;
+}
+function coverageIdKey(id) {
+  return id.replace(/[^a-z0-9]/gi, "").toLowerCase();
+}
+async function describeCoverages(rawUrl, coverageIds, authToken, authContext) {
   try {
     const url = new URL(rawUrl);
     url.searchParams.set("SERVICE", "WCS");
@@ -3603,16 +4384,38 @@ async function fetchWcsCoverageExtents(rawUrl, coverageIds, authToken, authConte
     url.searchParams.set("REQUEST", "DescribeCoverage");
     url.searchParams.set("COVERAGEID", coverageIds.join(","));
     const doc = await getCapabilities(url.toString(), authToken, authContext);
-    for (const descEl of elementsByLocalName(doc, "CoverageDescription")) {
-      const idEl = childByLocalName(descEl, "CoverageId");
-      const id = (_a2 = idEl == null ? void 0 : idEl.textContent) == null ? void 0 : _a2.trim();
-      if (!id) continue;
-      const box = await parseWcsCoverageEnvelope(descEl);
+    return elementsByLocalName(doc, "CoverageDescription");
+  } catch {
+    return [];
+  }
+}
+const ELEVATION_KEYWORD = /elev|altitud|bathym|terrain|srtm|(^|[^a-z])(g?dem|dtm|dsm)([^a-z]|$)/i;
+const ELEVATION_BAND_KEYWORD = /height/i;
+function isWcsElevationCoverage(coverageId, descEl) {
+  const rangeTypeEl = childByLocalName(descEl, "rangeType");
+  if (!rangeTypeEl) return false;
+  const fields = elementsByLocalName(rangeTypeEl, "field");
+  if (fields.length !== 1) return false;
+  const bandName = fields[0].getAttribute("name") ?? "";
+  return ELEVATION_KEYWORD.test(coverageId) || ELEVATION_KEYWORD.test(bandName) || ELEVATION_BAND_KEYWORD.test(bandName);
+}
+async function fillFromWcs10LonLatEnvelopes(rawUrl, coverageIds, result, authToken, authContext) {
+  var _a2, _b;
+  try {
+    const url = new URL(rawUrl);
+    url.searchParams.set("SERVICE", "WCS");
+    url.searchParams.set("VERSION", "1.0.0");
+    url.searchParams.set("REQUEST", "GetCapabilities");
+    const doc = await getCapabilities(url.toString(), authToken, authContext);
+    const missing = new Set(coverageIds);
+    for (const brief of elementsByLocalName(doc, "CoverageOfferingBrief")) {
+      const id = (_b = (_a2 = childByLocalName(brief, "name")) == null ? void 0 : _a2.textContent) == null ? void 0 : _b.trim();
+      if (!id || !missing.has(id)) continue;
+      const box = parseWcs10LonLatEnvelope(brief);
       if (box) result.set(id, box);
     }
   } catch {
   }
-  return result;
 }
 function wcsRectangleFor(item) {
   const box = item.geographicBoundingBox;
@@ -3654,9 +4457,11 @@ const _OgcLayerFactory = class _OgcLayerFactory {
     this.deps = deps;
     this.serviceLayerOptions = /* @__PURE__ */ new Map();
   }
+  /** Katmanın eklenirken verilen WMS/WMTS/WCS seçeneklerini döndürür; kayıtlı değilse `undefined`. */
   getServiceOptions(id) {
     return this.serviceLayerOptions.get(id);
   }
+  /** Katmanın saklanan servis seçeneklerini siler (katman kaldırılınca çağrılır). */
   deleteServiceOptions(id) {
     this.serviceLayerOptions.delete(id);
   }
@@ -3723,7 +4528,7 @@ const _OgcLayerFactory = class _OgcLayerFactory {
         new cesium.GetFeatureInfoFormat("xml", "text/xml"),
         new cesium.GetFeatureInfoFormat("html")
       ],
-      ...options.rectangle !== void 0 && { rectangle: options.rectangle },
+      rectangle: this.serviceRectangle(options.id, options.rectangle),
       ...options.minimumLevel !== void 0 && {
         minimumLevel: options.minimumLevel
       },
@@ -3737,6 +4542,7 @@ const _OgcLayerFactory = class _OgcLayerFactory {
     });
     return provider;
   }
+  /** WMS katmanını imagery katmanı olarak haritaya ekler ve kaydeder. */
   addWMS(options) {
     const provider = this.buildWmsProvider(options);
     const imageryLayer = this.viewer.imageryLayers.addImageryProvider(provider);
@@ -3768,9 +4574,10 @@ const _OgcLayerFactory = class _OgcLayerFactory {
       ...options.maximumLevel !== void 0 && {
         maximumLevel: options.maximumLevel
       },
-      ...options.rectangle !== void 0 && { rectangle: options.rectangle }
+      rectangle: this.serviceRectangle(options.id, options.rectangle)
     });
   }
+  /** WMTS katmanını imagery katmanı olarak haritaya ekler ve kaydeder. */
   addWMTS(options) {
     const provider = this.buildWmtsProvider(options);
     const imageryLayer = this.viewer.imageryLayers.addImageryProvider(provider);
@@ -3784,9 +4591,8 @@ const _OgcLayerFactory = class _OgcLayerFactory {
   // arasından seçim yapılıp ImageryLayer, seçilen STYLES parametresiyle
   // YENİDEN kuruluyor (Cesium'da provider parametreleri construct-sonrası
   // immutable). Lejant, WMS'te ayrı bir GetLegendGraphic isteğiyle, WMTS'te
-  // ise mümkünse doğrudan capabilities içindeki <LegendURL>'den alınır (bkz.
-  // project_ucbp_api_styleeditor_arastirma memory, B2/client-side SLD KAPSAM
-  // DIŞI kararı).
+  // ise mümkünse doğrudan capabilities içindeki <LegendURL>'den alınır
+  // (istemci tarafı SLD kapsam dışı).
   /** Bir WMS katmanının sunucu-tanımlı (GetCapabilities'ten) stil seçeneklerini, lejant URL'leriyle birlikte döndürür. */
   async getWmsAvailableStyles(id) {
     const options = this.requireServiceOptions(id, "WMS");
@@ -3819,7 +4625,7 @@ const _OgcLayerFactory = class _OgcLayerFactory {
       // MapServer GetLegendGraphic'i SLD_VERSION olmadan
       // "MissingParameterValue" hatasiyla reddediyor (gercek demo.mapserver.org
       // istegiyle dogrulandi); GeoServer bu parametreyi zaten yok sayiyor
-      // (regresyon yok) -- bkz. project_ucbp_api_styleeditor_arastirma memory.
+      // (regresyon yok).
       sld_version: "1.1.0",
       ...styleName !== void 0 && styleName !== "" ? { style: styleName } : {}
     });
@@ -3846,6 +4652,7 @@ const _OgcLayerFactory = class _OgcLayerFactory {
     this.serviceLayerOptions.set(id, updated);
   }
   // ── İç: WFS ──────────────────────────────────────────────────────────────
+  /** WFS katmanının özelliklerini (GeoJSON, gerekirse GML) proxy üzerinden indirip vektör katman olarak ekler ve rastgele ilk rengini atar. */
   async addWFS(options) {
     const proxyUrl = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wfs", options.url);
     const fetchOptions = {};
@@ -3873,7 +4680,9 @@ const _OgcLayerFactory = class _OgcLayerFactory {
     } else {
       planArgs.maxFeatures = _OgcLayerFactory.TEMP_WFS_UNLIMITED_MAX_FEATURES;
     }
-    const plan = buildWfsGetFeaturePlan(planArgs);
+    const basePlan = buildWfsGetFeaturePlan(planArgs);
+    const bbox = await wfsBboxParam(basePlan.version, basePlan.nativeSrs, SERVICE_REQUEST_EXTENT);
+    const plan = bbox ? { ...basePlan, bbox } : basePlan;
     let geojson;
     try {
       geojson = await this.fetchWfsGeoJson(proxied, fetchOptions, plan);
@@ -3893,7 +4702,15 @@ const _OgcLayerFactory = class _OgcLayerFactory {
       this.viewer,
       this.deps,
       geojson,
-      { id: options.id, title: options.title, layerType: "WFS", clampToGround: options.clampToGround ?? false },
+      {
+        id: options.id,
+        title: options.title,
+        layerType: "WFS",
+        clampToGround: options.clampToGround ?? false,
+        // BBOX kutuyla KESISEN feature'lari tam geometrisiyle doner (ör.
+        // Turkiye'ye degen Rusya poligonu) -- Turkiye disi kisimlar kirpilir.
+        clipExtent: SERVICE_REQUEST_EXTENT
+      },
       (managed) => {
       }
     );
@@ -3999,7 +4816,7 @@ const _OgcLayerFactory = class _OgcLayerFactory {
     } catch {
       throw new OgcRequestError(
         "OGC_WFS_OL_PACKAGE_MISSING",
-        'WFS sunucusu GeoJSON çıktısı desteklemiyor; GML yanıtını okumak için "ol" paketi gereklidir: pnpm add ol'
+        `WFS sunucusu GeoJSON çıktısı desteklemiyor; GML yanıtını okumak için gereken "ol" paketi yüklenemedi: paket kurulu değil ya da importmap'te tanımlı değil`
       );
     }
     const features = new WFSFormat({
@@ -4010,6 +4827,7 @@ const _OgcLayerFactory = class _OgcLayerFactory {
     });
   }
   // ── İç: WCS ──────────────────────────────────────────────────────────────
+  /** WCS kapsamını (coverage) proxy üzerinden görsel olarak indirip tek görüntülü imagery katmanı olarak ekler. */
   async addWCS(options) {
     const proxyUrl = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wcs", options.url);
     const baseParams = {
@@ -4027,6 +4845,7 @@ const _OgcLayerFactory = class _OgcLayerFactory {
       proxyUrl
     );
     const rect = options.rectangle ?? cesium.Rectangle.fromDegrees(-180, -90, 180, 90);
+    const visibleRect = this.serviceRectangle(options.id, options.rectangle);
     const loadProvider = async (scaleSize) => {
       const params = { ...baseParams };
       if (scaleSize !== void 0) params["SCALESIZE"] = scaleSize;
@@ -4044,14 +4863,27 @@ const _OgcLayerFactory = class _OgcLayerFactory {
     if (!canScale) {
       provider = await loadProvider();
     } else {
-      const urnAxes = `http://www.opengis.net/def/axis/OGC/1/i(${maxSize}),http://www.opengis.net/def/axis/OGC/1/j(${maxSize})`;
-      try {
-        provider = await loadProvider(urnAxes);
-      } catch {
-        provider = await loadProvider(`x(${maxSize}),y(${maxSize})`);
+      const axisVariants = [
+        `http://www.opengis.net/def/axis/OGC/1/i(${maxSize}),http://www.opengis.net/def/axis/OGC/1/j(${maxSize})`,
+        `x(${maxSize}),y(${maxSize})`,
+        `Lon(${maxSize}),Lat(${maxSize})`,
+        `Long(${maxSize}),Lat(${maxSize})`
+      ];
+      let loaded;
+      let lastError;
+      for (const scaleSize of axisVariants) {
+        try {
+          loaded = await loadProvider(scaleSize);
+          break;
+        } catch (error) {
+          lastError = error;
+        }
       }
+      if (!loaded) throw lastError;
+      provider = loaded;
     }
-    const imageryLayer = this.viewer.imageryLayers.addImageryProvider(provider);
+    const imageryLayer = new cesium.ImageryLayer(provider, { rectangle: visibleRect });
+    this.viewer.imageryLayers.add(imageryLayer);
     this.serviceLayerOptions.set(options.id, options);
     return this.deps.register(options.id, options.title, "WCS", imageryLayer, false);
   }
@@ -4074,6 +4906,12 @@ const _OgcLayerFactory = class _OgcLayerFactory {
     const buffer = await response.arrayBuffer();
     const boundaryMatch = /boundary="?([^";]+)"?/i.exec(contentType);
     if (!contentType.includes("multipart/") || !boundaryMatch) {
+      if (/xml|html|text\/|json/i.test(contentType)) {
+        throw new OgcRequestError(
+          "OGC_WCS_REQUEST_FAILED",
+          `WCS isteği görüntü yerine "${contentType}" döndürdü (sunucu hatası).`
+        );
+      }
       return URL.createObjectURL(
         new Blob([buffer], { type: contentType || "image/png" })
       );
@@ -4091,6 +4929,7 @@ const _OgcLayerFactory = class _OgcLayerFactory {
     );
   }
   // ── İç: GeoTIFF ──────────────────────────────────────────────────────────
+  /** Desteklenmiyor: her zaman `LayerOperationError` (`LAYER_GEOTIFF_UNSUPPORTED`) fırlatır. */
   addGeoTiff(_options) {
     throw new LayerOperationError(
       "LAYER_GEOTIFF_UNSUPPORTED",
@@ -4098,6 +4937,19 @@ const _OgcLayerFactory = class _OgcLayerFactory {
     );
   }
   // ── Yardımcılar ──────────────────────────────────────────────────────────
+  // Servis istekleri yalnizca Turkiye extent'iyle sinirli (TUCBS1-1403):
+  // katmanin kendi kapsama alani verildiyse onunla kesisimi alinir.
+  // Kesisim yoksa katman Turkiye'de hic veri gostermeyecegi icin eklenmez.
+  serviceRectangle(id, rectangle) {
+    const clipped = clipRectangleToServiceExtent(rectangle);
+    if (!clipped) {
+      throw new LayerOperationError(
+        "LAYER_OUTSIDE_SERVICE_EXTENT",
+        `Katmanın kapsama alanı Türkiye sınırları dışında — id=${id}`
+      );
+    }
+    return clipped;
+  }
   requireServiceOptions(id, expected) {
     const managed = this.deps.requireLayer(id);
     if (managed.layerType !== expected) {
@@ -4136,7 +4988,7 @@ const _OgcLayerFactory = class _OgcLayerFactory {
    * çeker. `TucbsServiceUpload` (GC-05) gibi ayrı bir `LayerManager`
    * referansına sahip tüketiciler de servis keşfi için bunu kullanır --
    * eskiden bu tüketiciler proxy/apiKey'den TAMAMEN habersiz çıplak `fetch`
-   * kullanıyordu (bkz project_ucbp_api_ogc_capabilities_uygulama_plani, ML-12).
+   * kullanıyordu (ML-12).
    */
   async getCapabilitiesDocument(baseUrl, serviceType, version, authToken) {
     const proxiedUrl = this.deps.apiKeyPolicy.resolveOgcProxyUrl(
@@ -4151,30 +5003,80 @@ const _OgcLayerFactory = class _OgcLayerFactory {
    * coğrafi kapsama alanlarını `getCapabilitiesDocument` ile AYNI apiKey/proxy
    * politikasından geçirerek çeker -- eskiden bu istek proxy'siz gittiği için
    * CORS-korumalı sunucularda sessizce başarısız olup katmanlar global
-   * (-180,-90,180,90) dikdörtgene düşüyordu (bkz
-   * project_ucbp_api_ogc_capabilities_uygulama_plani Faz 5b).
+   * (-180,-90,180,90) dikdörtgene düşüyordu.
    */
   async getWcsCoverageExtents(rawUrl, coverageIds, authToken) {
     const proxiedUrl = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wcs", rawUrl);
     return fetchWcsCoverageExtents(proxiedUrl, coverageIds, authToken, this.deps.apiKeyPolicy);
   }
+  /**
+   * TUCBS1-1441: `getWcsCoverageExtents` ile AYNI apiKey/proxy politikasıyla
+   * coverage'ların zarfını VE yükseklik (Elevation) sınıflamasını tek
+   * DescribeCoverage isteğiyle çeker (bkz `fetchWcsCoverageDescriptions`).
+   */
+  async getWcsCoverageDescriptions(rawUrl, coverageIds, unlocatedIds, authToken) {
+    const proxiedUrl = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wcs", rawUrl);
+    return fetchWcsCoverageDescriptions(
+      proxiedUrl,
+      coverageIds,
+      unlocatedIds,
+      authToken,
+      this.deps.apiKeyPolicy
+    );
+  }
 };
 _OgcLayerFactory.TEMP_WFS_UNLIMITED_MAX_FEATURES = 1e6;
 let OgcLayerFactory = _OgcLayerFactory;
+function drawnFillColor(style) {
+  if ((style == null ? void 0 : style.fill.mode) === "solid") {
+    return cesium.Color.fromCssColorString(style.fill.color).withAlpha(style.fill.opacity);
+  }
+  if ((style == null ? void 0 : style.fill.mode) === "off") return cesium.Color.WHITE.withAlpha(0);
+  return cesium.Color.CYAN.withAlpha(0.4);
+}
 class ShapeLayerBridge {
+  /**
+   * @param viewer Şekillerin taşınacağı Cesium görüntüleyicisi.
+   * @param deps `LayerManager`'dan gelen kayıt, stil ve dış hat işlemleri.
+   */
   constructor(viewer, deps) {
     this.viewer = viewer;
     this.deps = deps;
     this.drawnShapeCounters = /* @__PURE__ */ new Map();
   }
+  /** Katmanın sıralı "id" sayacını siler; katman yeniden oluşursa sayaç 1'den başlar. */
   deleteCounter(id) {
     this.drawnShapeCounters.delete(id);
   }
   /**
-   * DrawingManager'in tamamladığı bir şekli tek, kalıcı "Çizim Katmanı"na
-   * ekler (Map, draw:complete dinleyicisinde çağırır). Katman ilk çağrıda
-   * (henüz yoksa) boş bir CustomDataSource olarak oluşturulur; sonraki her
-   * çağrı AYNI katmana yeni bir entity ekler -- id her seferinde assertUniqueId'ye
+   * Hedef katman diyalogu acikken sekil, katmana eklendikten SONRAKI gorunumuyle
+   * (dis hat dahil) gorunsun diye alan sekillerine gecici bir dis hat cizgisi
+   * ekler; donen fonksiyon bu cizgiyi kaldirir. Katmana eklerken
+   * (addDrawnShape) gercek companion dis hat olusturuldugundan diyalog
+   * kapanirken mutlaka cagrilmalidir. Alan olmayan sekillerde no-op'tur.
+   */
+  previewDrawnShape(shape) {
+    var _a2, _b;
+    const hierarchy = (_b = (_a2 = shape.entity.polygon) == null ? void 0 : _a2.hierarchy) == null ? void 0 : _b.getValue(this.viewer.clock.currentTime);
+    const positions = hierarchy == null ? void 0 : hierarchy.positions;
+    const first = positions == null ? void 0 : positions[0];
+    if (positions === void 0 || first === void 0 || positions.length < 2) return () => void 0;
+    const outline = this.viewer.entities.add({
+      polyline: {
+        positions: [...positions, first],
+        width: 1,
+        material: cesium.Color.fromCssColorString(this.deps.defaultOutlineColorHex)
+      }
+    });
+    return () => {
+      this.viewer.entities.remove(outline);
+    };
+  }
+  /**
+   * DrawingManager'in tamamladığı bir şekli verilen kimlikteki "Çizim Katmanı"na
+   * ekler (Map, hedef katmanı `DrawingLayerRegistry` ile belirledikten sonra
+   * çağırır). Katman ilk çağrıda (henüz yoksa) boş bir CustomDataSource olarak
+   * oluşturulur; sonraki her çağrı AYNI katmana yeni bir entity ekler -- id her seferinde assertUniqueId'ye
    * takılmadan register() edilebilsin diye bu, public add() ÜZERİNDEN DEĞİL
    * doğrudan register() ile yapılır.
    *
@@ -4192,7 +5094,7 @@ class ShapeLayerBridge {
     const existing = this.deps.getItem(id);
     const dataSource = existing && "entities" in existing.cesiumObject ? existing.cesiumObject : new cesium.CustomDataSource(title);
     const currentStyle = existing ? this.deps.getStyle(id) : void 0;
-    const fillColor = (currentStyle == null ? void 0 : currentStyle.fill.mode) === "solid" ? cesium.Color.fromCssColorString(currentStyle.fill.color).withAlpha(currentStyle.fill.opacity) : cesium.Color.CYAN.withAlpha(0.4);
+    const fillColor = drawnFillColor(currentStyle);
     const initialOutline = (currentStyle == null ? void 0 : currentStyle.outline) ?? {
       enabled: true,
       color: this.deps.defaultOutlineColorHex,
@@ -4202,7 +5104,7 @@ class ShapeLayerBridge {
       // islevi de bu degere doner).
       width: 1
     };
-    this.deps.applyEntityStyle(entity, fillColor, initialOutline, true);
+    this.deps.applyEntityStyle(entity, fillColor, initialOutline, true, currentStyle == null ? void 0 : currentStyle.point);
     dataSource.entities.add(entity);
     if (entity.polygon !== void 0) {
       this.deps.addPolygonOutlineCompanion(
@@ -4212,6 +5114,8 @@ class ShapeLayerBridge {
         initialOutline.width,
         false
       );
+      const companion = dataSource.entities.getById(`${entity.id}::outline`);
+      if (companion !== void 0) this.deps.applyCompanionDash(companion, initialOutline);
     }
     if (existing) {
       this.deps.tagEntities(dataSource, id);
@@ -4220,7 +5124,7 @@ class ShapeLayerBridge {
     await this.viewer.dataSources.add(dataSource);
     const colorHex = cesium.Color.CYAN.toCssHexString();
     const managed = this.deps.register(id, title, "DRAWING", dataSource, false, colorHex);
-    this.deps.recordInitialStyle(managed.id, colorHex, 0.4, initialOutline);
+    this.deps.recordInitialStyle(managed.id, colorHex, 0.4, initialOutline, dataSource);
     return managed;
   }
   /**
@@ -4239,13 +5143,13 @@ class ShapeLayerBridge {
     const existing = this.deps.getItem(id);
     const dataSource = existing && "entities" in existing.cesiumObject ? existing.cesiumObject : new cesium.CustomDataSource(title);
     const currentStyle = existing ? this.deps.getStyle(id) : void 0;
-    const fillColor = (currentStyle == null ? void 0 : currentStyle.fill.mode) === "solid" ? cesium.Color.fromCssColorString(currentStyle.fill.color).withAlpha(currentStyle.fill.opacity) : cesium.Color.CYAN.withAlpha(0.4);
+    const fillColor = drawnFillColor(currentStyle);
     const initialOutline = (currentStyle == null ? void 0 : currentStyle.outline) ?? {
       enabled: true,
       color: this.deps.defaultOutlineColorHex,
       width: 1
     };
-    this.deps.applyEntityStyle(entity, fillColor, initialOutline, true);
+    this.deps.applyEntityStyle(entity, fillColor, initialOutline, true, currentStyle == null ? void 0 : currentStyle.point);
     dataSource.entities.add(entity);
     if (entity.polygon !== void 0) {
       this.deps.addPolygonOutlineCompanion(
@@ -4255,6 +5159,8 @@ class ShapeLayerBridge {
         initialOutline.width,
         false
       );
+      const companion = dataSource.entities.getById(`${entity.id}::outline`);
+      if (companion !== void 0) this.deps.applyCompanionDash(companion, initialOutline);
     }
     if (existing) {
       this.deps.tagEntities(dataSource, id);
@@ -4263,17 +5169,20 @@ class ShapeLayerBridge {
     await this.viewer.dataSources.add(dataSource);
     const colorHex = cesium.Color.CYAN.toCssHexString();
     const managed = this.deps.register(id, title, "MEASURE", dataSource, false, colorHex);
-    this.deps.recordInitialStyle(managed.id, colorHex, 0.4, initialOutline);
+    this.deps.recordInitialStyle(managed.id, colorHex, 0.4, initialOutline, dataSource);
     return managed;
   }
-  // TucbsDeleteTool -> DrawingManager.clearAll()/removeShape(), sekli KENDI
-  // viewer.entities'inden silmeye calisir (artik tasindigi icin bu cagri
-  // sessizce no-op olur); gercek silme Map'in draw:remove dinleyicisi
-  // uzerinden burada yapilir. Katman, son entity'si de silinince TAMAMEN
-  // kaldirilir -- "haritada cizim yoksa katman da olmamali" kurali boylece
-  // silme sonrasinda da gecerli kalir. Tamamen generic (sadece katman id'sine
-  // gore calisir) oldugundan Map, hem Cizim hem Olcu Katmani'nin draw:remove
-  // dinleyicisinde AYNI metodu (farkli id ile) cagirir.
+  /**
+   * Şekli (ve varsa dış hat eşlikçisini) katmandan siler; katmanın son şekli
+   * de silinince katman tamamen kaldırılır ("haritada çizim yoksa katman da
+   * olmamalı" kuralı).
+   *
+   * TucbsDeleteTool -> DrawingManager.clearAll()/removeShape(), şekli KENDİ
+   * viewer.entities'inden silmeye çalışır (artık taşındığı için bu çağrı
+   * sessizce no-op olur); gerçek silme Map'in draw:remove dinleyicisi
+   * üzerinden burada yapılır. Yalnız katman kimliğine göre çalıştığından Map,
+   * hem Çizim hem Ölçü Katmanı için AYNI metodu (farklı id ile) çağırır.
+   */
   removeDrawnShape(id, entity) {
     const existing = this.deps.getItem(id);
     if (!existing || !("entities" in existing.cesiumObject)) return;
@@ -4356,6 +5265,7 @@ function buildMeasuredShapeProperties(shape, sequentialId) {
 const _LayerManager = class _LayerManager extends EventEmitter {
   /** @param viewer - Katmanların yönetileceği Cesium `Viewer`. */
   constructor(viewer) {
+    var _a2;
     super();
     this.items = /* @__PURE__ */ new Map();
     this.analysisResultIds = /* @__PURE__ */ new Set();
@@ -4373,7 +5283,9 @@ const _LayerManager = class _LayerManager extends EventEmitter {
       getCurrentTime: () => this.viewer.clock.currentTime,
       requestRender: () => this.viewer.scene.requestRender(),
       emitStyle: (id, style) => this.emit("layer:style", { id, style }),
-      waitForRenderSettle: () => this.waitForRenderSettle()
+      waitForRenderSettle: () => this.waitForRenderSettle(),
+      // scene.pixelRatio Cesium'un public tip tanimlarinda yok (runtime'da var: devicePixelRatio * resolutionScale).
+      getPixelRatio: () => this.viewer.scene.pixelRatio ?? 1
     });
     this.localSourceLoader = new LocalSourceLoader(viewer, {
       styleEngine: this.styleEngine,
@@ -4388,11 +5300,12 @@ const _LayerManager = class _LayerManager extends EventEmitter {
     this.shapeLayerBridge = new ShapeLayerBridge(viewer, {
       getItem: (id) => this.items.get(id),
       getStyle: (id) => this.styleEngine.getStyle(id),
-      applyEntityStyle: (entity, color, outline, isShapeLayer) => this.applyEntityStyle(entity, color, outline, isShapeLayer),
+      applyEntityStyle: (entity, color, outline, isShapeLayer, pointSymbol) => this.applyEntityStyle(entity, color, outline, isShapeLayer, pointSymbol),
+      applyCompanionDash: (companion, outline) => this.styleEngine.applyCompanionDash(companion, outline),
       addPolygonOutlineCompanion: (dataSource, entity, color, width, clampToGround) => this.addPolygonOutlineCompanion(dataSource, entity, color, width, clampToGround),
       tagEntities: (dataSource, layerId) => this.tagEntities(dataSource, layerId),
       register: (id, title, layerType, cesiumObject, isBasemap, initialFillColor) => this.register(id, title, layerType, cesiumObject, isBasemap, initialFillColor),
-      recordInitialStyle: (id, colorHex, fillOpacity, outline) => this.styleEngine.recordInitialStyle(id, colorHex, fillOpacity, outline),
+      recordInitialStyle: (id, colorHex, fillOpacity, outline, dataSource) => this.styleEngine.recordInitialStyle(id, colorHex, fillOpacity, outline, dataSource),
       removeLayer: (id) => this.removeLayer(id),
       defaultOutlineColorHex: _LayerManager.DEFAULT_OUTLINE_COLOR_HEX
     });
@@ -4414,6 +5327,10 @@ const _LayerManager = class _LayerManager extends EventEmitter {
       requireLayer: (id) => this.requireLayer(id),
       getLayerStyle: (id) => this.getLayerStyle(id)
     });
+    this.removeMorphListener = (_a2 = viewer.scene.morphComplete) == null ? void 0 : _a2.addEventListener(() => {
+      const sources = viewer.dataSources;
+      this.syncPointHeightReferences(Array.from({ length: sources.length }, (_, index) => sources.get(index)));
+    });
   }
   /**
    * apiKey ile ilgili ayarlari (Map.ts constructor'indan) gec-yapilandirir.
@@ -4433,7 +5350,7 @@ const _LayerManager = class _LayerManager extends EventEmitter {
     return this.apiKeyPolicy.hasApiKey;
   }
   /**
-   * apiKey’e göre yetkili WMS/WFS/WMTS listesi — {@code GET /layers} + {@code X-API-Key}.
+   * apiKey’e göre yetkili WMS/WFS/WMTS listesi — `GET /layers` + `X-API-Key`.
    * Checklist: getLayerList eşdeğeri.
    *
    * @example
@@ -4645,15 +5562,27 @@ const _LayerManager = class _LayerManager extends EventEmitter {
    * katmanlarda çalışır. Gradient/bin modunda `min`/`max`'tan verilmeyen uç
    * getColumnRange() ile veri aralığından otomatik hesaplanır; verilen uç
    * aynen kullanılır (tucbs-react'teki "min===max===v her zaman" bug'ı burada
-   * YOK — bkz. project_ucbp_api_styleeditor_arastirma memory). Ters aralık
+   * YOK). Ters aralık
    * (`min` > `max`, uçlardan biri veriden gelince de oluşabilir) düzeltilmez;
    * geçerli bir aralık vermek çağıranın sorumluluğundadır.
+   *
+   * Semboloji alanları isteğe bağlıdır: `outline.dash` çizgi tipini (çizgiler
+   * ve kenarı ayrı çizilen alanlar), `outline.opacity` dış hat opaklığını
+   * (0-1), `point` nokta şeklini ve boyutunu belirler. `point` verilmezse
+   * noktalar mevcut görünümünde kalır; `dash` verilmezse çizgi düzdür.
    *
    * @example
    * ```ts
    * await map.layerManager.applyLayerStyle("katman-id", {
    *   fill: { mode: "solid", color: "#3388ff", opacity: 0.6 },
    *   outline: { enabled: true, color: "#1d4e89", width: 2 },
+   * });
+   *
+   * // Nokta katmanı: yıldız sembol, kesikli ve yarı saydam dış hat
+   * await map.layerManager.applyLayerStyle("nokta-katmani", {
+   *   fill: { mode: "solid", color: "#e4572e", opacity: 1 },
+   *   outline: { enabled: true, color: "#161616", width: 2, dash: "dashed", opacity: 0.5 },
+   *   point: { shape: "star", size: 20 },
    * });
    * ```
    */
@@ -4670,16 +5599,45 @@ const _LayerManager = class _LayerManager extends EventEmitter {
         `applyLayerStyle sadece vektör (Entity tabanlı) katmanlarda kullanılabilir: "${id}"`
       );
     }
-    await this.styleEngine.applyLayerStyle(
+    const settled = this.styleEngine.applyLayerStyle(
       id,
       managed.cesiumObject,
       managed.layerType === "DRAWING" || managed.layerType === "MEASURE",
       spec
     );
+    this.syncPointHeightReferences([managed.cesiumObject]);
+    await settled;
   }
-  /** Bir vektor katmana en son uygulanan stili döndürür (TucbsLegendPanel için). */
+  /**
+   * Bir vektör katmandaki geometri türlerini (nokta/çizgi/alan) döndürür;
+   * stil editörü sembol kontrollerini buna göre gösterir. Entity tabanlı
+   * olmayan (ImageryLayer) katmanlarda `undefined` döner.
+   *
+   * @example
+   * ```ts
+   * const kinds = map.layerManager.getGeometryKinds("katman-id");
+   * if (kinds?.point) { /* nokta sembolü seçilebilir *\/ }
+   * ```
+   */
+  getGeometryKinds(id) {
+    const managed = this.requireLayer(id);
+    if (!("entities" in managed.cesiumObject)) return void 0;
+    return this.styleEngine.getGeometryKinds(managed.cesiumObject);
+  }
+  /**
+   * Bir vektör katmana en son uygulanan stili döndürür (Stil Editörü, Lejant
+   * Paneli ve Katman Listesi bunu okur). Stilde nokta sembolü (`point`)
+   * hiç belirlenmemişse ve katmanda nokta varsa, noktaların haritadaki
+   * gerçek görünümü (daire ve boyutu) `point` alanı olarak eklenir.
+   * Henüz stil kaydı olmayan katmanda `undefined` döner.
+   */
   getLayerStyle(id) {
-    return this.styleEngine.getStyle(id);
+    var _a2;
+    const style = this.styleEngine.getStyle(id);
+    if (style === void 0 || style.point !== void 0) return style;
+    const cesiumObject = (_a2 = this.items.get(id)) == null ? void 0 : _a2.cesiumObject;
+    const point = cesiumObject !== void 0 && "entities" in cesiumObject ? this.styleEngine.inferPointSymbol(cesiumObject) : void 0;
+    return point === void 0 ? style : { ...style, point };
   }
   /** Katmana eklenirken atanan ilk (random) rengi döndürür — sonraki stil
    * değişikliklerinden etkilenmez. TucbsStyleEditor'ün "Sıfırla" işlevi
@@ -4807,9 +5765,7 @@ const _LayerManager = class _LayerManager extends EventEmitter {
   // ── Z-sıra ───────────────────────────────────────────────────────────────
   // raise/lower/raiseToTop/lowerToBottom birbirinin harfi harfine kopyasiydi
   // (tek fark cagrilan Cesium koleksiyon metodunun adiydi) -- Adim 9
-  // (Temizlik) kapsaminda tek bir ozel yardimciya indirildi (bkz
-  // project_ucbp_api_god_component_refactor_arastirma_ozeti, GC-01 2.2
-  // Ornek 3). imageryLayers/dataSources ayni metod isimlerini (raise/
+  // (Temizlik) kapsaminda tek bir ozel yardimciya indirildi. imageryLayers/dataSources ayni metod isimlerini (raise/
   // lower/raiseToTop/lowerToBottom/indexOf) FARKLI parametre tipleriyle
   // (ImageryLayer vs DataSource) bildirdigi icin TS statik olarak union
   // uzerinden guvenli cagrimayi dogrulayamiyor -- "as never" cast'i burada
@@ -5016,6 +5972,10 @@ const _LayerManager = class _LayerManager extends EventEmitter {
     return this.shapeLayerBridge.addDrawnShape(id, title, shape);
   }
   /** @internal */
+  _previewDrawnShape(shape) {
+    return this.shapeLayerBridge.previewDrawnShape(shape);
+  }
+  /** @internal */
   _addMeasuredShape(id, title, shape) {
     return this.shapeLayerBridge.addMeasuredShape(id, title, shape);
   }
@@ -5037,8 +5997,20 @@ const _LayerManager = class _LayerManager extends EventEmitter {
       ...initialFillColor !== void 0 ? { initialFillColor } : {}
     });
     this.items.set(id, managed);
+    if ("entities" in cesiumObject) this.syncPointHeightReferences([cesiumObject]);
     this.emit("layer:add", { layer: managed });
     return managed;
+  }
+  // Verilen DataSource'lardaki noktalari sahnenin guncel moduna uyarlar
+  // (2B'de yere yapistirma kaldirilir, 3B'de geri gelir; bkz B24).
+  syncPointHeightReferences(sources) {
+    const mode = this.viewer.scene.mode;
+    if (mode === void 0) return;
+    let changed = false;
+    for (const source of sources) {
+      if (syncPointHeightReferences(source.entities.values, mode, this.viewer.clock.currentTime)) changed = true;
+    }
+    if (changed) this.viewer.scene.requestRender();
   }
   // addWFS/addLocalKmlGeoJson/addShp -- UCUNUN de ensureGeoJsonCrsSupport()
   // sonucunu register()'dan hemen sonra AYNI sekilde event'e cevirmesi
@@ -5116,23 +6088,45 @@ const _LayerManager = class _LayerManager extends EventEmitter {
    * çeker. `TucbsServiceUpload` (GC-05) gibi ayrı bir `LayerManager`
    * referansına sahip tüketiciler de servis keşfi için bunu kullanır --
    * eskiden bu tüketiciler proxy/apiKey'den TAMAMEN habersiz çıplak `fetch`
-   * kullanıyordu (bkz project_ucbp_api_ogc_capabilities_uygulama_plani, ML-12).
+   * kullanıyordu (ML-12).
    * layers/ogc/OgcLayerFactory.ts'e delege (bkz Adim 8/Faz 2).
    */
   async getCapabilitiesDocument(baseUrl, serviceType, version, authToken) {
     return this.ogcLayerFactory.getCapabilitiesDocument(baseUrl, serviceType, version, authToken);
   }
+  // Faz 5b (ML-12'nin DescribeCoverage boslugu): eskiden bu istek proxy'siz
+  // gittigi icin CORS-korumali sunucularda sessizce basarisiz olup katmanlar
+  // global (-180,-90,180,90) dikdortgene dusuyordu.
+  // layers/ogc/OgcLayerFactory.ts'e delege (bkz Adim 8/Faz 2).
   /**
-   * Faz 5b (ML-12'nin DescribeCoverage boşluğu): WCS coverage'larının gerçek
-   * coğrafi kapsama alanlarını `getCapabilitiesDocument` ile AYNI apiKey/proxy
-   * politikasından geçirerek çeker -- eskiden bu istek proxy'siz gittiği için
-   * CORS-korumalı sunucularda sessizce başarısız olup katmanlar global
-   * (-180,-90,180,90) dikdörtgene düşüyordu (bkz
-   * project_ucbp_api_ogc_capabilities_uygulama_plani Faz 5b).
-   * layers/ogc/OgcLayerFactory.ts'e delege (bkz Adim 8/Faz 2).
+   * WCS kapsamalarının gerçek coğrafi kutularını, `getCapabilitiesDocument`
+   * ile aynı apiKey/proxy politikasından geçirerek getirir. İstek başarısız
+   * olursa hata fırlatmaz, boş sonuç döner.
+   *
+   * @param rawUrl WCS servisinin adresi.
+   * @param coverageIds Kutusu istenen kapsama kimlikleri.
+   * @param authToken İsteğe eklenecek yetki belirteci (isteğe bağlı).
+   * @returns Kapsama kimliğinden WGS84 kutusuna eşleme; kutusu okunamayanlar yer almaz.
    */
   async getWcsCoverageExtents(rawUrl, coverageIds, authToken) {
     return this.ogcLayerFactory.getWcsCoverageExtents(rawUrl, coverageIds, authToken);
+  }
+  // TUCBS1-1441: servis kesfi (TucbsServiceUpload) yalnizca GeoTIFF
+  // coverage'larini listeler. layers/ogc/OgcLayerFactory.ts'e delege.
+  /**
+   * WCS kapsamalarının coğrafi kutularını ve hangilerinin yükseklik modeli
+   * olduğunu, `getCapabilitiesDocument` ile aynı apiKey/proxy politikasından
+   * geçirerek getirir (bkz. `fetchWcsCoverageDescriptions`). İstek başarısız
+   * olursa hata fırlatmaz.
+   *
+   * @param rawUrl WCS servisinin adresi.
+   * @param coverageIds Sınıflandırılacak kapsama kimlikleri.
+   * @param unlocatedIds Kutusu henüz bilinmeyen (GetCapabilities'te kutusu olmayan) kapsama kimlikleri.
+   * @param authToken İsteğe eklenecek yetki belirteci (isteğe bağlı).
+   * @returns Kapsama kutuları ve yükseklik modeli sayılan kapsama kimlikleri.
+   */
+  async getWcsCoverageDescriptions(rawUrl, coverageIds, unlocatedIds, authToken) {
+    return this.ogcLayerFactory.getWcsCoverageDescriptions(rawUrl, coverageIds, unlocatedIds, authToken);
   }
   // Katman EKLENDIKTEN ya da genislik gibi GEOMETRI gerektiren bir stil
   // degisikligi UYGULANDIKTAN SONRA, Cesium GeometryVisualizer/
@@ -5222,8 +6216,8 @@ const _LayerManager = class _LayerManager extends EventEmitter {
   }
   // layers/style/LayerStyleEngine.ts'e delege (public -- _addDrawnShape/
   // _addMeasuredShape applyLayerStyle'dan BAGIMSIZ dogrudan cagirir).
-  applyEntityStyle(entity, color, outline, isShapeLayer) {
-    this.styleEngine.applyEntityStyle(entity, color, outline, isShapeLayer);
+  applyEntityStyle(entity, color, outline, isShapeLayer, pointSymbol) {
+    this.styleEngine.applyEntityStyle(entity, color, outline, isShapeLayer, pointSymbol);
   }
   // layers/style/OpacityController.ts'e delege.
   setDataSourceOpacity(dataSource, opacity) {
@@ -5232,6 +6226,8 @@ const _LayerManager = class _LayerManager extends EventEmitter {
   // ── Kaynak temizleme ─────────────────────────────────────────────────────
   /** Tüm event dinleyicilerini ve iç katman kaydını temizler (Cesium katmanlarının kendisini kaldırmaz). */
   destroy() {
+    var _a2;
+    (_a2 = this.removeMorphListener) == null ? void 0 : _a2.call(this);
     this.removeAllListeners();
     this.items.clear();
   }
@@ -5251,6 +6247,7 @@ class SelectionHighlight {
     this.source = null;
     this.generation = 0;
   }
+  /** Verilen feature'ları vurgular ve önceki vurguyu değiştirir; boş dizi vurguyu kaldırır. */
   show(features) {
     const generation = ++this.generation;
     if (features.length === 0) {
@@ -5259,6 +6256,7 @@ class SelectionHighlight {
     }
     void this.load(features, generation);
   }
+  /** Vurguyu kaldırır ve hâlâ yüklenmekte olan bir vurgunun eklenmesini engeller. */
   clear() {
     this.generation++;
     this.removeSource();
@@ -5278,6 +6276,7 @@ class SelectionHighlight {
     if (generation !== this.generation) return;
     this.removeSource();
     this.paint(source, fill, stroke);
+    syncPointHeightReferences(source.entities.values, this.viewer.scene.mode, cesium.JulianDate.now());
     this.viewer.dataSources.add(source);
     this.source = source;
   }
@@ -5493,7 +6492,13 @@ class InteractionManager extends EventEmitter {
   }
   /**
    * Kamerayı verilen coğrafi dikdörtgene (derece) top-down uçurur.
-   * @param duration - Uçuş süresi (saniye); verilmezse Cesium'un mesafeye göre otomatik hesapladığı süre kullanılır.
+   *
+   * @param west - Batı sınırı (boylam, derece).
+   * @param south - Güney sınırı (enlem, derece).
+   * @param east - Doğu sınırı (boylam, derece).
+   * @param north - Kuzey sınırı (enlem, derece).
+   * @param options - Uçuş seçenekleri (isteğe bağlı).
+   * @param options.duration - Uçuş süresi (saniye); verilmezse Cesium'un mesafeye göre otomatik hesapladığı süre kullanılır.
    *
    * @example
    * ```ts
@@ -6197,8 +7202,7 @@ class DrawingManager extends EventEmitter {
   // vertex isaretcilerimiz veya olcum etiketlerimiz gibi) isabet ettirirse
   // viewer.trackedEntity = o_entity atayip kamerayi o entity'yi takip etmeye
   // KILITLIYOR (nokta entity'lerin varsayilan takip kamerasi genelde duz/
-  // yataylasmis gorunuyor) -- gercek kullanimda bulundu (bkz
-  // project_ucbp_api_olcum_kamera_bug memory). Bu, bizim tamamlama
+  // yataylasmis gorunuyor) -- gercek kullanimda bulundu. Bu, bizim tamamlama
   // mantigimizdan (finishMultiVertexViaDoubleClick) BAGIMSIZ, ayni fiziksel
   // cift-tikta ayrica tetikleniyor. Duzeltme: trackedEntity'i sessizce geri
   // sifirliyoruz -- kamera takibi ancak render dongusunde (postUpdate/
@@ -6380,12 +7384,14 @@ class DrawingManager extends EventEmitter {
     const centerLonLat = this.toLonLat(center);
     return this.sampleCircleRing(centerLonLat, radius);
   }
-  // Ekvatorel-dikdortgen (equirectangular) izdusum — kucuk/orta olcekli
-  // alan/cevre hesaplari icin yeterli dogruluk sağlar (bkz v1 §5, area/perimeter
-  // Cartesian3 kirisim mesafesi + bu izdusumle tutarli tutulur).
+  // Lambert silindirik esit-alan izdusumu (x = R·boylam, y = R·sin(enlem)) +
+  // shoelace. Izdusum alani korudugundan sonuc cizime hangi koseden
+  // baslandigindan BAGIMSIZDIR (eski esdikdortgen izdusum boylam olcegini ilk
+  // kosenin enleminden aliyordu -> ayni poligon farkli alan veriyordu).
+  // Paralel/meridyen kenarli sekillerde (dikdortgen) kuresel alani tam verir.
+  // Bilesenlerdeki measureGeometry.polygonAreaMeters ile BIREBIR ayni tutulur.
   computeArea(coordinates) {
-    const lat0 = this.requireIndex(coordinates, 0)[1];
-    const projected = coordinates.map((c) => this.projectMeters(c, lat0));
+    const projected = coordinates.map((c) => this.projectEqualAreaMeters(c));
     let sum = 0;
     for (let i = 0; i < projected.length; i++) {
       const [x1, y1] = this.requireIndex(projected, i);
@@ -6404,9 +7410,9 @@ class DrawingManager extends EventEmitter {
     }
     return total;
   }
-  projectMeters(coordinate, lat0) {
-    const x = cesium.Math.toRadians(coordinate[0]) * Math.cos(cesium.Math.toRadians(lat0)) * EARTH_RADIUS_METERS;
-    const y = cesium.Math.toRadians(coordinate[1]) * EARTH_RADIUS_METERS;
+  projectEqualAreaMeters(coordinate) {
+    const x = cesium.Math.toRadians(coordinate[0]) * EARTH_RADIUS_METERS;
+    const y = Math.sin(cesium.Math.toRadians(coordinate[1])) * EARTH_RADIUS_METERS;
     return [x, y];
   }
   offsetMetersToLonLat(center, dx, dy) {
@@ -6567,6 +7573,7 @@ post_fn = async function(path, request) {
   return result;
 };
 const FALLBACK_IMAGE_FILENAME = "blue-marble-fallback.jpg";
+const FALLBACK_WORLD_ATTRIBUTION = "NASA Earth Observatory (Blue Marble)";
 const FALLBACK_WORLD_IMAGE = new URL(
   FALLBACK_IMAGE_FILENAME,
   typeof document === "undefined" ? require("url").pathToFileURL(__filename).href : _documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === "SCRIPT" && _documentCurrentScript.src || new URL("tucbs-core.cjs", document.baseURI).href
@@ -6664,10 +7671,19 @@ class BasemapController {
   get status() {
     return this._basemapStatus;
   }
+  /** Yedek dünya görüntüsü haritadaysa kaynak atfı, değilse `null`. */
+  get fallbackAttribution() {
+    return this._fallbackBasemapLayer !== null ? FALLBACK_WORLD_ATTRIBUTION : null;
+  }
   /** ML-03: apiKey rotasyonu sonrasi mevcut altligi yeniden kurmak icin Map'e gerekli. */
   get currentBasemapId() {
     return this._currentBasemapId;
   }
+  /**
+   * Altlık haritayı değiştirir; önceki altlığı, izleyicisini ve bekleyen karo isteklerini kaldırır.
+   *
+   * @param basemap Altlık kimliği ya da seçenekleri; `null` veya `undefined` altlığı kaldırır.
+   */
   set(basemap) {
     var _a2, _b;
     (_a2 = this._stopBasemapWatch) == null ? void 0 : _a2.call(this);
@@ -6719,6 +7735,7 @@ class BasemapController {
       provider
     );
   }
+  /** Altlık izleyicisini durdurur ve bekleyen karo isteklerini iptal eder; `Map.destroy()` çağırır. */
   // ML-02: basemap izleyicisi durdurulmazsa, harita bu zamanlayicilar
   // dolmadan (bkz BASEMAP_UNAVAILABLE_DELAY_MS) yok edilirse unavailableTimer
   // tetiklenip yok edilmis viewer'a dokunur ve Cesium "This object was
@@ -6751,7 +7768,7 @@ class BasemapController {
       url: FALLBACK_WORLD_IMAGE,
       tileWidth: 5400,
       tileHeight: 2700,
-      credit: "NASA Earth Observatory (Blue Marble)"
+      credit: FALLBACK_WORLD_ATTRIBUTION
     });
     const fallbackLayer = this.viewer.imageryLayers.addImageryProvider(
       fallbackProvider,
@@ -6785,16 +7802,20 @@ class BasemapController {
     } catch (error) {
       console.warn("[tucbs-core] Basemap yedek goruntusu eklenemedi:", error);
     }
+    if (this._fallbackBasemapLayer !== null) {
+      this.deps.emit("basemap:fallback-shown", { attribution: FALLBACK_WORLD_ATTRIBUTION });
+    }
   }
   clearFallbackBasemap() {
     if (this._fallbackBasemapLayer !== null) {
       this.viewer.imageryLayers.remove(this._fallbackBasemapLayer, true);
       this._fallbackBasemapLayer = null;
+      this.deps.emit("basemap:fallback-hidden", { attribution: FALLBACK_WORLD_ATTRIBUTION });
     }
   }
   /**
    * HGM altlık şablonu: proxyservice getByUrl. Cesium header taşımaz;
-   * apiKey varsa kardeş query {@code tucbsapikey} (tile başına DB yok, proxy cache).
+   * apiKey varsa kardeş query `tucbsapikey` (tile başına DB yok, proxy cache).
    * Kapı: `deps.getProxyBase()` (main.js `configureTucbs({ proxyBase })`, yoksa derleme yedeği).
    */
   resolveBasemapUrl(basemap) {
@@ -6816,7 +7837,7 @@ class BasemapController {
         return basemap.id;
     }
   }
-  /** getByUrl {@code url} paramına karışmadan tucbsapikey ekler; yoksa URL aynı. */
+  /** getByUrl `url` paramına karışmadan tucbsapikey ekler; yoksa URL aynı. */
   appendTucbsApiKeyQuery(url) {
     const apiKey = this.deps.getApiKey();
     if (!apiKey) {
@@ -6909,6 +7930,134 @@ async function zoomToLayer(viewer, layer) {
     new cesium.HeadingPitchRange(0, -cesium.Math.PI_OVER_TWO, 0)
   );
 }
+const DRAW_LAYER_KIND_LABELS = {
+  point: "Nokta",
+  line: "Çizgi",
+  area: "Alan"
+};
+function drawLayerKindOf(tool) {
+  switch (tool) {
+    case "point":
+      return "point";
+    case "polyline":
+    case "freehand":
+      return "line";
+    case "polygon":
+    case "rectangle":
+    case "circle":
+      return "area";
+  }
+}
+const DEFAULT_TITLE_PREFIX = "Çizim";
+function nextDrawLayerTitle(existingTitles) {
+  const used = new Set(existingTitles.map((title) => title.trim().toLocaleLowerCase("tr")));
+  let n = 1;
+  while (used.has(`${DEFAULT_TITLE_PREFIX} ${n}`.toLocaleLowerCase("tr"))) n++;
+  return `${DEFAULT_TITLE_PREFIX} ${n}`;
+}
+function validateDrawLayerTitle(title, existingTitles) {
+  const trimmed = title.trim();
+  if (trimmed === "") return "empty";
+  const key = trimmed.toLocaleLowerCase("tr");
+  return existingTitles.some((t) => t.trim().toLocaleLowerCase("tr") === key) ? "duplicate" : null;
+}
+class DrawingLayerRegistry extends EventEmitter {
+  constructor() {
+    super(...arguments);
+    this.entries = /* @__PURE__ */ new Map();
+    this.shapeLayers = /* @__PURE__ */ new Map();
+    this.seq = 0;
+  }
+  /** Yeni çizim katmanı kaydeder ve onu aktif yapar. */
+  create(title, kind) {
+    const info = { id: `__tucbs_drawing_layer_${++this.seq}__`, title: title.trim(), kind };
+    this.entries.set(info.id, info);
+    this.activeId = info.id;
+    this.emit("drawinglayers:change", { activeId: this.activeId });
+    return info;
+  }
+  /** Verilen kimlikte kayıtlı bir çizim katmanı olup olmadığını döndürür. */
+  has(id) {
+    return this.entries.has(id);
+  }
+  /** Verilen kimlikteki çizim katmanının bilgisini döndürür; kayıtlı değilse `undefined`. */
+  get(id) {
+    return this.entries.get(id);
+  }
+  /** Kayıtlı tüm çizim katmanlarını oluşturulma sırasıyla döndürür (yeni bir dizi). */
+  list() {
+    return [...this.entries.values()];
+  }
+  /** Yalnızca verilen geometri türündeki çizim katmanlarını oluşturulma sırasıyla döndürür. */
+  listByKind(kind) {
+    return this.list().filter((info) => info.kind === kind);
+  }
+  /** Aktif çizim katmanının kimliğini döndürür; aktif katman yoksa `undefined`. */
+  getActiveId() {
+    return this.activeId;
+  }
+  /** Aktif çizim katmanının bilgisini döndürür; aktif katman yoksa `undefined`. */
+  getActive() {
+    return this.activeId === void 0 ? void 0 : this.entries.get(this.activeId);
+  }
+  /** Kayıtlı bir katmanı aktif yapar; bilinmeyen id için `false` döner. */
+  setActive(id) {
+    if (!this.entries.has(id)) return false;
+    if (this.activeId !== id) {
+      this.activeId = id;
+      this.emit("drawinglayers:change", { activeId: this.activeId });
+    }
+    return true;
+  }
+  /** Katmanı ve ona bağlı şekil eşlemelerini siler; aktifse aktif katman kalmaz. */
+  remove(id) {
+    if (!this.entries.delete(id)) return;
+    for (const [shapeId, layerId] of this.shapeLayers) {
+      if (layerId === id) this.shapeLayers.delete(shapeId);
+    }
+    if (this.activeId === id) this.activeId = void 0;
+    this.emit("drawinglayers:change", { activeId: this.activeId });
+  }
+  /** Bir şekli bir çizim katmanına bağlar; şekil zaten bağlıysa eşleme güncellenir. */
+  assignShape(shapeId, layerId) {
+    this.shapeLayers.set(shapeId, layerId);
+  }
+  /** Şeklin bağlı olduğu çizim katmanının kimliğini döndürür; eşleme yoksa `undefined`. */
+  layerOfShape(shapeId) {
+    return this.shapeLayers.get(shapeId);
+  }
+  /** Şeklin katman eşlemesini kaldırır (şekil silindiğinde çağrılır); katmanın kendisi kalır. */
+  releaseShape(shapeId) {
+    this.shapeLayers.delete(shapeId);
+  }
+}
+function drawingLayerNeedsChoice(registry, tool) {
+  const active = registry.getActive();
+  return active === void 0 || active.kind !== drawLayerKindOf(tool);
+}
+async function resolveDrawingLayer(registry, tool, picker) {
+  const kind = drawLayerKindOf(tool);
+  if (!drawingLayerNeedsChoice(registry, tool)) return registry.getActive();
+  const layers = registry.listByKind(kind);
+  const existingTitles = registry.list().map((info) => info.title);
+  const suggestedTitle = nextDrawLayerTitle(existingTitles);
+  let choice;
+  if (picker !== void 0) {
+    choice = await picker({ tool, kind, layers, existingTitles, suggestedTitle });
+  } else {
+    const first = layers[0];
+    choice = first !== void 0 ? { type: "existing", layerId: first.id } : { type: "new", title: suggestedTitle };
+  }
+  if (choice === null) return null;
+  if (choice.type === "existing") {
+    const chosen = registry.get(choice.layerId);
+    if (chosen === void 0 || chosen.kind !== kind) return null;
+    registry.setActive(chosen.id);
+    return chosen;
+  }
+  if (validateDrawLayerTitle(choice.title, existingTitles) !== null) return null;
+  return registry.create(choice.title, kind);
+}
 function trimSlash(url) {
   return url.replace(/\/+$/, "");
 }
@@ -6962,8 +8111,6 @@ async function ensureEffectiveApiKeyValid(instanceApiKey, apiBase) {
   }
   await validateApiKey(effectiveKey, apiBase);
 }
-const DRAWING_LAYER_ID = "__tucbs_drawing_layer__";
-const DRAWING_LAYER_TITLE = "Çizim Katmanı";
 const MEASURE_LAYER_ID = "__tucbs_measure_layer__";
 const MEASURE_LAYER_TITLE = "Ölçü Katmanı";
 const MAX_ZOOM_DISTANCE_METERS = 25e6;
@@ -6978,6 +8125,12 @@ const DEFAULT_INITIAL_EXTENT = {
 };
 let Map$1 = (_a = class {
   /**
+   * Haritayı ve içindeki Cesium `Viewer`'ı oluşturur. Sayfada
+   * `window.CESIUM_BASE_URL` tanımlı değilse, paketin derlendiği Cesium
+   * sürümünün jsDelivr CDN klasörü atanır. `Widgets/widgets.css` sayfaya
+   * eklenmemişse o adresten eklenir. Cesium dosyalarını kendiniz
+   * sunuyorsanız `CESIUM_BASE_URL`'i haritadan önce tanımlayın.
+   *
    * @param container - Haritanın oluşturulacağı DOM elementi veya id'si.
    * @param options - Başlangıç harita seçenekleri.
    *
@@ -6993,14 +8146,17 @@ let Map$1 = (_a = class {
   constructor(container, options = {}) {
     // (4b) Sadece bu Map'in apiKey'i GLOBAL config'e bagimliysa (options.apiKey
     // verilmediyse) dolu -- configureTucbs() sonradan farkli bir degerle
-    // tekrar cagrilirsa bu instance'i canli guncellemek icin kullanilir (bkz
-    // project_ucbp_api_configuretucbs_4risk_kapatma_arastirma). destroy()
+    // tekrar cagrilirsa bu instance'i canli guncellemek icin kullanilir. destroy()
     // icinde cagrilmali, aksi halde registry'de sonsuza dek tutulur.
     __privateAdd(this, _unregisterApiKeyRefresh);
     __privateAdd(this, _removeLodSeamGuard);
     __privateAdd(this, _removeMinZoomScale);
     __privateAdd(this, _removeScaleWheelZoom);
     __privateAdd(this, _apiKey3);
+    __privateAdd(this, _drawingLayerPicker);
+    __privateAdd(this, _drawQueue);
+    __privateSet(this, _drawQueue, Promise.resolve());
+    this.drawingLayers = new DrawingLayerRegistry();
     ensureCesiumRuntime();
     const hiddenCreditContainer = document.createElement("div");
     hiddenCreditContainer.style.display = "none";
@@ -7043,18 +8199,8 @@ let Map$1 = (_a = class {
     if (options.apiKey === void 0) {
       this.registerGlobalApiKeyRotation(effectiveApiKey);
     }
-    this.wireShapeSource(
-      "draw",
-      DRAWING_LAYER_ID,
-      DRAWING_LAYER_TITLE,
-      (id, title, shape) => this.layerManager._addDrawnShape(id, title, shape)
-    );
-    this.wireShapeSource(
-      "measure",
-      MEASURE_LAYER_ID,
-      MEASURE_LAYER_TITLE,
-      (id, title, shape) => this.layerManager._addMeasuredShape(id, title, shape)
-    );
+    this.wireDrawingLayers();
+    this.wireMeasureLayer();
     if (options.camera !== void 0) {
       this.setView(options.camera);
     } else {
@@ -7308,6 +8454,19 @@ let Map$1 = (_a = class {
     return this.basemapController.status;
   }
   /**
+   * Yedek dünya görüntüsü (NASA Blue Marble) şu an haritadaysa kaynak atfı, değilse `null`.
+   * Değişimi `layerManager` üzerindeki `basemap:fallback-shown` ve `basemap:fallback-hidden`
+   * olaylarıyla izlenir; olaydan sonra bağlanan bileşen başlangıç durumunu buradan okur.
+   *
+   * @example
+   * ```ts
+   * const credit = map.fallbackAttribution; // "NASA Earth Observatory (Blue Marble)" ya da null
+   * ```
+   */
+  get fallbackAttribution() {
+    return this.basemapController.fallbackAttribution;
+  }
+  /**
    * Altlık haritayı ayarlar/değiştirir (`null`/`undefined` altlık haritayı tamamen kaldırır).
    *
    * @example
@@ -7319,7 +8478,11 @@ let Map$1 = (_a = class {
     this.basemapController.set(basemap);
   }
   // ── Mod & kalite ─────────────────────────────────────────────────────────
-  /** Sahne modunu 2D/3D arasında değiştirir (animasyonsuz, anında). */
+  /**
+   * Sahne modunu 2D/3D arasında değiştirir (animasyonsuz, anında). 2D'de yere
+   * yapıştırılmış noktalar düz çizilir (Cesium bunları 2D'de yanlış konuma
+   * çizdiği için); 3D'ye dönünce yeniden yere yapıştırılır.
+   */
   setMode(mode) {
     if (mode === "2D") {
       this.viewer.scene.morphTo2D(0);
@@ -7350,7 +8513,7 @@ let Map$1 = (_a = class {
    * ```
    */
   // tucbs-react RecordToolPanel.tsx'teki handleDownloadJpg/grabCanvasBlob'dan
-  // PORTE EDILDI (bkz project_ucbp_api_tucbstoolbar_mimarisi memory onyedinci tur).
+  // PORTE EDILDI.
   async exportJPEG(filename = "tucbs-harita", quality = 0.92) {
     const blob = await this.captureScreenshotBlob(quality);
     triggerDownload(blob, `${filename}-${Date.now()}.jpg`);
@@ -7360,8 +8523,7 @@ let Map$1 = (_a = class {
    * `<img>`'e `blob:` URL olarak verilmek üzere).
    * @param quality - JPEG sıkıştırma kalitesi (0-1).
    */
-  // TucbsPrintTool icin PORTE EDILDI (bkz project_ucbp_api_printtool_uygulama_plani
-  // memory) -- exportJPEG() ile AYNI yakalama mantigini indirme YAPMADAN disari
+  // TucbsPrintTool icin PORTE EDILDI -- exportJPEG() ile AYNI yakalama mantigini indirme YAPMADAN disari
   // acar (ör. bir <img>'e blob: URL olarak verilmek uzere).
   //
   // FAZ 1.5 KARARI: Faz 1.3/1.4'te burada, capture'i sayfa boyutuna gore
@@ -7396,7 +8558,7 @@ let Map$1 = (_a = class {
     return measureGroundMetersPerPixel(this.viewer);
   }
   // Viewer'a verilen kurucu secenekleri (Faz 2, constructor karmasikligi
-  // duzeltmesi -- bkz project_ucbp_api_map_constructor_dry_karmasiklik).
+  // duzeltmesi).
   // Buradaki her "?? false" ESLint'in complexity kuralinda AYRI bir dal
   // sayildigi icin (12 adet) constructor'in KENDI karmasikligina dogrudan
   // katkida bulunuyordu -- davranis AYNI, sadece ayri bir metoda tasindi.
@@ -7425,7 +8587,7 @@ let Map$1 = (_a = class {
     };
   }
   // (4b) apiKey-rotasyon kaydinin gerceklestirilmesi (Faz 3, constructor
-  // karmasikligi duzeltmesi -- bkz project_ucbp_api_map_constructor_dry_karmasiklik).
+  // karmasikligi duzeltmesi).
   // SADECE bu Map global apiKey'e bagimliysa (constructor'daki "options.apiKey
   // === undefined" kontrolunden SONRA) cagrilir.
   registerGlobalApiKeyRotation(effectiveApiKey) {
@@ -7452,21 +8614,84 @@ let Map$1 = (_a = class {
       }
     }));
   }
-  // draw:complete/draw:remove dinleyicilerinin "draw" (Cizim Katmani) ve
-  // "measure" (Olcu Katmani) source'lari icin BIREBIR AYNI olan kurulumunu
-  // (Faz 1, tekrarli kod DRY duzeltmesi -- bkz project_ucbp_api_map_constructor_dry_karmasiklik)
-  // tek yerde birlestirir -- addShape, cagiranin KENDI _addDrawnShape/
-  // _addMeasuredShape wrapper'ina isaret eder (diger sibling-module DI
-  // moduelleriyle ayni desen, ham LayerManager metoduna degil).
-  wireShapeSource(source, layerId, layerTitle, addShape) {
+  // Olcu Katmani: draw:complete/draw:remove dinleyicileri (source==="measure").
+  wireMeasureLayer() {
     this.drawingManager.on("draw:complete", ({ shape }) => {
-      if (shape.source !== source) return;
-      void addShape(layerId, layerTitle, shape);
+      if (shape.source !== "measure") return;
+      void this.layerManager._addMeasuredShape(MEASURE_LAYER_ID, MEASURE_LAYER_TITLE, shape);
     });
     this.drawingManager.on("draw:remove", ({ shape }) => {
-      if (shape.source !== source) return;
+      if (shape.source !== "measure") return;
+      this.layerManager._removeDrawnShape(MEASURE_LAYER_ID, shape.entity);
+    });
+  }
+  // Cizim Katmanlari (source==="draw"): biten sekil, aktif katman turuyle
+  // uyumluysa ona; degilse (aktif yok / tur farkli) `drawingLayerPicker`
+  // (diyalog) sorularak secilen/olusturulan katmana yazilir. Picker iptal
+  // ederse sekil atilir (arac cizim modunda kalir). Ardisik bitisler sirayla
+  // islenir ki ayni anda birden fazla diyalog acilmasin.
+  wireDrawingLayers() {
+    this.drawingManager.on("draw:complete", ({ shape }) => {
+      if (shape.source !== "draw") return;
+      __privateSet(this, _drawQueue, __privateGet(this, _drawQueue).then(() => this.placeDrawnShape(shape)).catch((error) => console.error("[tucbs] Çizim katmana eklenemedi:", error)));
+    });
+    this.drawingManager.on("draw:remove", ({ shape }) => {
+      if (shape.source !== "draw") return;
+      const layerId = this.drawingLayers.layerOfShape(shape.id);
+      if (layerId === void 0) return;
+      this.drawingLayers.releaseShape(shape.id);
       this.layerManager._removeDrawnShape(layerId, shape.entity);
     });
+    this.layerManager.on("layer:remove", ({ layer }) => this.drawingLayers.remove(layer.id));
+  }
+  // Sahnenin `n` kare cizmesini bekler (render durdurulmus olsa bile bir kare ister); cizim
+  // dongusu calismazsa takilmamak icin zaman asimi vardir.
+  waitForFrames(n) {
+    return new Promise((resolve) => {
+      let remaining = n;
+      const done = () => {
+        remove();
+        window.clearTimeout(timer);
+        resolve();
+      };
+      const remove = this.viewer.scene.postRender.addEventListener(() => {
+        if (--remaining <= 0) done();
+      });
+      const timer = window.setTimeout(done, 300);
+      this.viewer.scene.requestRender();
+    });
+  }
+  async placeDrawnShape(shape) {
+    let endPreview;
+    if (__privateGet(this, _drawingLayerPicker) !== void 0 && drawingLayerNeedsChoice(this.drawingLayers, shape.tool)) {
+      endPreview = this.layerManager._previewDrawnShape(shape);
+      await this.waitForFrames(2);
+    }
+    let target;
+    try {
+      target = await resolveDrawingLayer(this.drawingLayers, shape.tool, __privateGet(this, _drawingLayerPicker));
+    } finally {
+      endPreview == null ? void 0 : endPreview();
+    }
+    if (target === null) {
+      this.drawingManager.removeShape(shape.id);
+      return;
+    }
+    this.drawingLayers.assignShape(shape.id, target.id);
+    const existing = this.layerManager.getLayerById(target.id);
+    if (existing !== void 0 && !existing.cesiumObject.show) {
+      this.layerManager.setVisible(target.id, true);
+    }
+    await this.layerManager._addDrawnShape(target.id, target.title, shape);
+  }
+  /**
+   * Biten bir çizimin hangi Çizim Katmanı'na gideceği belirsizse (aktif katman
+   * yok ya da türü uyuşmuyor) sorulacak seçiciyi (diyalog) ayarlar. Seçici
+   * `null` döndürürse çizim atılır. Ayarlanmazsa uyumlu ilk katman, o da yoksa
+   * otomatik yeni katman kullanılır. `undefined` seçiciyi kaldırır.
+   */
+  setDrawingLayerPicker(picker) {
+    __privateSet(this, _drawingLayerPicker, picker);
   }
   /** Seçili geometriyi katman listesine yazmadan kırmızı gösterir. Boş dizi vurguyu kaldırır. */
   showSelectionHighlight(features) {
@@ -7491,7 +8716,7 @@ let Map$1 = (_a = class {
     this.layerManager.destroy();
     this.viewer.destroy();
   }
-}, _unregisterApiKeyRefresh = new WeakMap(), _removeLodSeamGuard = new WeakMap(), _removeMinZoomScale = new WeakMap(), _removeScaleWheelZoom = new WeakMap(), _apiKey3 = new WeakMap(), _a);
+}, _unregisterApiKeyRefresh = new WeakMap(), _removeLodSeamGuard = new WeakMap(), _removeMinZoomScale = new WeakMap(), _removeScaleWheelZoom = new WeakMap(), _apiKey3 = new WeakMap(), _drawingLayerPicker = new WeakMap(), _drawQueue = new WeakMap(), _a);
 const HGM_BASEMAP_IDS = [
   "hgm-temel",
   "hgm-ortofoto",
@@ -7503,33 +8728,50 @@ exports.AnalysisRequestError = AnalysisRequestError;
 exports.ApiKeyValidationError = ApiKeyValidationError;
 exports.DEFAULT_ANALYSIS_API_BASE = DEFAULT_UCBP_API_BASE;
 exports.DEFAULT_INITIAL_EXTENT = DEFAULT_INITIAL_EXTENT;
+exports.DEFAULT_POINT_SYMBOL = DEFAULT_POINT_SYMBOL;
 exports.DEFAULT_UCBP_API_BASE = DEFAULT_UCBP_API_BASE;
+exports.DRAW_LAYER_KIND_LABELS = DRAW_LAYER_KIND_LABELS;
+exports.DrawingLayerRegistry = DrawingLayerRegistry;
 exports.DrawingManager = DrawingManager;
 exports.GeometryError = GeometryError;
 exports.HGM_BASEMAP_IDS = HGM_BASEMAP_IDS;
 exports.InteractionManager = InteractionManager;
+exports.LINE_DASHES = LINE_DASHES;
+exports.LINE_DASH_LABELS = LINE_DASH_LABELS;
 exports.LayerManager = LayerManager;
 exports.LayerOperationError = LayerOperationError;
 exports.MEASURE_LAYER_ID = MEASURE_LAYER_ID;
 exports.Map = Map$1;
 exports.OgcRequestError = OgcRequestError;
+exports.POINT_SHAPES = POINT_SHAPES;
+exports.POINT_SHAPE_LABELS = POINT_SHAPE_LABELS;
+exports.POINT_SIZE_MAX = POINT_SIZE_MAX;
+exports.POINT_SIZE_MIN = POINT_SIZE_MIN;
 exports.TucbsError = TucbsError;
 exports.buildCapabilitiesUrl = buildCapabilitiesUrl;
+exports.clampPointSize = clampPointSize;
 exports.configureTucbs = configureTucbs;
+exports.dashArray = dashArray;
 exports.detectServiceType = detectServiceType;
+exports.drawLayerKindOf = drawLayerKindOf;
 exports.ensureEffectiveApiKeyValid = ensureEffectiveApiKeyValid;
 exports.entityToGeoJSON = entityToGeoJSON;
 exports.featureLabel = featureLabel;
+exports.fetchWcsCoverageDescriptions = fetchWcsCoverageDescriptions;
 exports.fetchWcsCoverageExtents = fetchWcsCoverageExtents;
 exports.getCapabilities = getCapabilities;
 exports.getErrorCodes = getErrorCodes;
 exports.getProxyBase = getProxyBase;
 exports.getUcbpApiBase = getUcbpApiBase;
+exports.intersectsServiceExtent = intersectsServiceExtent;
 exports.measureGround = measureGround;
+exports.nextDrawLayerTitle = nextDrawLayerTitle;
 exports.parseCapabilities = parseCapabilities;
 exports.parseWcsTiffFormat = parseWcsTiffFormat;
 exports.parseWmsTiffFormat = parseWmsTiffFormat;
+exports.pointSymbolSvg = pointSymbolSvg;
 exports.registerApiKeyRefresh = registerApiKeyRefresh;
 exports.snapScaleForDisplay = snapScaleForDisplay;
 exports.validateApiKey = validateApiKey;
+exports.validateDrawLayerTitle = validateDrawLayerTitle;
 exports.wcsRectangleFor = wcsRectangleFor;

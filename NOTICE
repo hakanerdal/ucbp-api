@@ -1,0 +1,29 @@
+UCBP API
+Copyright 2026 T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı
+
+Bu ürün Apache License, Version 2.0 ile lisanslanmıştır; lisans metni
+LICENSE dosyasındadır.
+This product is licensed under the Apache License, Version 2.0; see the
+LICENSE file.
+
+TUCBS adı ve logosu bu lisansın kapsamında değildir. Apache License 2.0
+Madde 6 uyarınca bu ad ve logo için kullanım izni verilmez.
+The TUCBS name and logo are not covered by this license. Under Section 6
+of the Apache License 2.0, no permission is granted to use them.
+
+Pakette yer alan aşağıdaki görseller de bu lisansın kapsamında değildir:
+- Altlık harita küçük resimleri: © Harita Genel Müdürlüğü.
+- Yedek dünya görüntüsü: NASA Earth Observatory, "Blue Marble: Next
+  Generation". ABD federal hükümeti üretimidir; NASA'nın onayı ya da
+  desteği ima edilmez.
+The following images in this package are not covered by this license
+either:
+- Basemap thumbnails: © General Directorate of Mapping (HGM).
+- Fallback world image: NASA Earth Observatory, "Blue Marble: Next
+  Generation". Produced by the U.S. federal government; no NASA
+  endorsement is implied.
+
+Pakete gömülü üçüncü taraf bileşenlerin ve görsellerin lisans
+bildirimleri THIRD_PARTY_NOTICES dosyasındadır.
+Notices for bundled third-party components and images are in the
+THIRD_PARTY_NOTICES file.

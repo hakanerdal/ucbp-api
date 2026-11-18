@@ -6,7 +6,9 @@ import { Map as TucbsMapInstance } from '@tucbs/core';
  * formunu gosteren, girilen koordinata kamerayi animasyonla goturup
  * haritaya pin dusuren arac. Panel acilinca haritayi (ve varsa toolbar'i)
  * panel genisligi kadar iter (bkz. PanelLayoutController); ayni tarafta
- * baska bir panel (Ayarlar/Analiz/Yazdir) acilirsa kapanir. Diger tum
+ * baska bir panel (Ayarlar/Analiz/Yazdir) acilirsa kapanir. Cizim/Olcum
+ * araclariyla da karsilikli dislayicidir: panel acilinca aktif cizim/olcum
+ * oturumu sonlanir, bir cizim/olcum baslayinca panel kapanir. Diger tum
  * tucbs-*-tool bilesenleri gibi `tucbs-toolbar` icinde
  * (`tools="...,goto-coordinate"`) kullanilabildigi gibi tek basina da embed
  * edilebilir.
@@ -39,6 +41,7 @@ export declare class TucbsGoToCoordinate extends LitElement {
     private readonly _layoutController;
     private _panelEl;
     private readonly _customCssState;
+    private readonly _onDrawStart;
     /** Paylasilan slide-over paneli olusturup `document.body`'ye portal eder (bkz. SlideOverPanel.ts WHY yorumu). */
     connectedCallback(): void;
     /** Haritadan/layout controller'dan ayrilir, pin'i temizler ve portal edilmis paneli kaldirir. */
@@ -47,11 +50,14 @@ export declare class TucbsGoToCoordinate extends LitElement {
     firstUpdated(): void;
     /** `customCss`/`map`/`panelWidth` degisimlerini isler ve panel icerigini yeniden render eder. */
     updated(changed: PropertyValues): void;
+    private _bindDrawingManager;
+    private _unbindDrawingManager;
     private _toggle;
     private _openPanel;
     private _close;
     private _isValid;
     private static _sanitizeCoordinateInput;
+    private static _splitCoordinatePair;
     private static _parseCoordinate;
     private _handleCoordInput;
     private _handleKeydown;

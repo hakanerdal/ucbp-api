@@ -30,3 +30,11 @@ Kurulum, hızlı başlangıç, API key kullanımı, örnek kodlar ve bileşen li
 ## Sürümler
 
 Sürüm geçmişi: [`CHANGELOG.md`](./CHANGELOG.md).
+
+## Lisans
+
+UCBP API, Apache License 2.0 ile lisanslanmıştır; lisans metni LICENSE dosyasındadır.
+Copyright 2026 T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı.
+
+TUCBS adı ve logosu bu lisansın kapsamında değildir (NOTICE).
+Paketlere gömülü üçüncü taraf bileşenlerin bildirimleri her paketin THIRD_PARTY_NOTICES dosyasındadır.

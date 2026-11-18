@@ -1,6 +1,7 @@
 {
   "name": "@tucbs/core",
-  "version": "0.2.3",
+  "version": "0.2.4",
+  "license": "Apache-2.0",
   "description": "TUCBS Core Map API — Cesium tabanlı harita, katman ve çizim yönetimi",
   "type": "module",
   "main": "./dist/tucbs-core.cjs",
@@ -14,7 +15,10 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES"
   ],
   "dependencies": {
     "ol": "^10.10.0",

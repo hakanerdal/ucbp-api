@@ -1,6 +1,7 @@
 import { PrintPreviewContent } from './PrintPreviewBuilder.js';
 /** Sayfa 1'de "Veri Setleri" sarmalayicisina (uyari kutusu+baslik+icerik) ayrilabilecek azami yukseklik (mm) -- `appendDatasetsSection()` ile PAYLASILIR. */
 export declare function computeLegendMaxHeightMm(content: PrintPreviewContent): number;
+/** "Veri Setleri" bölümünün üstündeki uyarı kutusu ve başlığın toplam yüksekliği (mm); lejant satırlarına kalan alandan düşülür. */
 export declare const DATASETS_HEADER_BLOCK_MM = 34;
 /** Sayfa 1'de LEJANT SATIRLARINA (uyari kutusu+baslik DUSULEREK) ayrilabilecek azami yukseklik (mm). */
 export declare function computeDatasetsListMaxHeightMm(content: PrintPreviewContent): number;

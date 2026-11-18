@@ -1,3 +1,10 @@
+/*!
+ * @license
+ * UCBP API yükleyici (import map)
+ * Copyright 2026 T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı
+ * SPDX-License-Identifier: Apache-2.0
+ * Lisans metni ve bildirimler: LICENSE, NOTICE
+ */
 // release-github.mjs uretir. Elle degistirmeyin.
 // Sayfa bunu module script'ten once yukler.
 (function () {
@@ -26,11 +33,12 @@
     "@carbon/web-components/es/components/data-table/index.js": lib("vendor/vendor-lite.js"),
     "@carbon/web-components/es/components/notification/index.js": lib("vendor/vendor-lite.js"),
     "@carbon/web-components/es/components/accordion/index.js": lib("vendor/vendor-lite.js"),
+    "@carbon/web-components/es/components/toggle/index.js": lib("vendor/vendor-lite.js"),
     "@carbon/icons": lib("vendor/vendor-lite.js"),
     "ol/format/WFS.js": lib("vendor/ol-wfs.js"),
     "ol/format/GeoJSON.js": lib("vendor/ol-geojson.js"),
-    "@tucbs/core": lib("tucbs-core.js?v=0.2.3"),
-    "@tucbs/components": lib("tucbs-components.es.js?v=0.2.3"),
+    "@tucbs/core": lib("tucbs-core.js?v=0.2.4"),
+    "@tucbs/components": lib("tucbs-components.es.js?v=0.2.4"),
   };
 
   document.write('<script type="importmap">' + JSON.stringify({ imports: imports }) + "</" + "script>");

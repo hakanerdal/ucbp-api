@@ -9,9 +9,19 @@ import { LayerManager } from '@tucbs/core';
  * `mapElementId`, sayfadaki `<tucbs-map>` elementinin `id`'siyle eşleşmelidir;
  * bileşen bu sayede haritaya (ve `LayerManager`'a) otomatik bağlanır (Senaryo 2).
  *
+ * Katman Listesi'nin "Veri Dosyası Ekle" düğmesiyle açılan pencere, sayfadaki
+ * `<tucbs-file-upload>` etiketinin `accepted-types`, `max-file-size-mb` ve
+ * `drag-drop` değerlerini kullanır; bu yüzden nitelikler o etikete yazılır.
+ *
  * @example
  * ```html
  * <tucbs-file-upload mapElementId="map" accepted-types="geojson,kml,shp"></tucbs-file-upload>
+ * ```
+ *
+ * @example
+ * ```html
+ * <!-- En fazla 20 MB, yalnızca tıklayıp seçerek -->
+ * <tucbs-file-upload mapElementId="map" max-file-size-mb="20" drag-drop="false"></tucbs-file-upload>
  * ```
  */
 export declare class TucbsFileUpload extends LitElement {
@@ -24,9 +34,9 @@ export declare class TucbsFileUpload extends LitElement {
     mapElementId: string;
     /** Virgülle ayrılmış dosya uzantıları (örn. `"geojson,kml"`). Boş ise desteklenen tüm formatlar (geojson, kml, kmz, shp ZIP paketi, csv) kabul edilir. */
     acceptedTypes: string;
-    /** Kabul edilen azami dosya boyutu (MB). */
+    /** Kabul edilen azami dosya boyutu (MB). `0` (varsayılan), boş ya da geçersiz değer: sınır yok. Sınırı aşan dosya yüklenmez, pencerede hata gösterilir. */
     maxFileSizeMb: number;
-    /** Sürükle-bırak ile dosya yüklemenin etkin olup olmadığı. */
+    /** Dosyanın kutuya sürüklenip bırakılarak eklenip eklenemeyeceği (varsayılan açık). Yalnızca `"false"` değeri kapatır; kapalıyken kutuya tıklayıp dosya seçme çalışmaya devam eder. */
     dragDrop: boolean;
     /** Tüketicinin, bileşen kaynağına dokunmadan shadow DOM'a enjekte edebileceği keyfi CSS metni (bkz `./internal/CustomCss.ts`). */
     customCss: string;
@@ -36,12 +46,18 @@ export declare class TucbsFileUpload extends LitElement {
     private readonly _drag;
     /** `layerManager` dışarıdan atanmamışsa, `mapElementId` üzerinden `tucbs-map`'e bağlanmayı dener. */
     firstUpdated(): void;
+    /** Pencere yeniden açılırken önceki denemenin hatasını render'dan önce temizler. */
+    willUpdate(changedProperties: PropertyValues<this>): void;
     /** Reactive property değişikliklerini işler: `customCss`'i uygular, `open` true yapıldığında sürüklemeden kalan konumu sıfırlar. */
     updated(changedProperties: PropertyValues<this>): void;
     /** Bileşen DOM'dan kaldırıldığında açık kalmış olabilecek toast'ı yok eder. */
     disconnectedCallback(): void;
     private _close;
     private _activeFormats;
+    /** "Sadece GeoJSON, KML dosyaları desteklenir." -- etkin biçimlerle. */
+    private _formatError;
+    private _sizeError;
+    private readonly _blockDropWhenDisabled;
     private _detectFormat;
     private _handleFileAdded;
     /** Bileşenin şablonunu render eder (yükleme sürerken bağımsız gösterge, `open` false ise boş şablon). */

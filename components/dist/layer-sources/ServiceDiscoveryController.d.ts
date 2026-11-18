@@ -1,5 +1,6 @@
 import { ReactiveController, ReactiveControllerHost } from 'lit';
 import { LayerManager, DiscoveredItem } from '@tucbs/core';
+/** Servis adresinden sorgu dizesini atıp yalnız köken ve yolu döndürür; adres ayrıştırılamazsa `?` öncesini döndürür. */
 export declare function baseServiceUrl(url: string): string;
 /** Servis keşfinin bileşen durumuna yazdığı yer (sırası korunarak çağrılır). */
 export interface DiscoverySink {
@@ -32,6 +33,8 @@ export declare class ServiceDiscoveryController implements ReactiveController {
     hostDisconnected(): void;
     /** Süren keşfin sonucunu geçersiz kılar (form değişince/sıfırlanınca). */
     invalidate(): void;
+    /** Servisin katmanlarını keşfeder; bilinen sürümleri en yeniden eskiye dener ve ilk başarılı sonucu forma yazar. */
     discover(serviceType: string, serviceUrl: string): Promise<void>;
+    private applyWcsItems;
 }
 //# sourceMappingURL=ServiceDiscoveryController.d.ts.map

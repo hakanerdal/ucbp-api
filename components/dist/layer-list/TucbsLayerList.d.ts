@@ -5,6 +5,12 @@ import { LayerManager, Map as TucbsMapInstance } from '@tucbs/core';
  * görünürlük/opaklık/stil/lejant/dışa-aktarma aksiyonları sunan panel (`<tucbs-layer-list>`).
  * `LayerManager`'ın `layer:*` event'lerini dinleyerek listeyi canlı senkronlar.
  *
+ * Satırdaki renk kutusu ve opaklık çubuğu katmanın dolgusunu gösterir ve
+ * değiştirir; yalnız çizgi içeren katmanda ise hattı (dış hat rengi ve
+ * opaklığı) gösterir, çünkü çizgiyi dolgu boyamaz. Dolgu kapalıyken renk
+ * kutusu boş görünür. Çizim katmanının tür ikonu seçilen nokta şeklini ve
+ * çizgi tipini yansıtır.
+ *
  * `mapElementId`, sayfadaki `<tucbs-map>` elementinin `id`'siyle eşleşmelidir;
  * bileşen bu sayede haritaya (ve `LayerManager`'a) otomatik bağlanır (Senaryo 2).
  *
@@ -15,8 +21,13 @@ import { LayerManager, Map as TucbsMapInstance } from '@tucbs/core';
  * <tucbs-layer-list
  *   mapElementId="map"
  *   panel-width="360px"
- *   collapsible
  * ></tucbs-layer-list>
+ * ```
+ *
+ * @example
+ * ```html
+ * <!-- Her zaman açık panel: Katmanları Göster düğmesi ve kapatma (X) yok -->
+ * <tucbs-layer-list mapElementId="map" collapsible="false"></tucbs-layer-list>
  * ```
  */
 export declare class TucbsLayerList extends LitElement {
@@ -30,17 +41,20 @@ export declare class TucbsLayerList extends LitElement {
     mapElementId: string;
     /** Harita apiKey'i — yalnızca yazılabilir; `get` güvenlik nedeniyle her zaman maskelenmiş döner (bkz yukarıdaki `#apiKeyState` WHY notu). */
     set apiKey(value: string);
+    /** apiKey tanımlıysa `"••••••"`, değilse boş metin döner; gerçek değer dışarıdan okunamaz. */
     get apiKey(): string;
     /** Panelin (ve açıldığında haritanın soldan daralacağı miktarın) genişliği. */
     panelWidth: string;
-    /** Panelin daraltılabilir olup olmadığı. */
+    /** Panelin kapatılabilir olup olmadığı (varsayılan `true`). Yalnızca `"false"` değeri kapatır: panel harita bağlanınca açılır, "Katmanları Göster" düğmesi ve paneldeki kapatma (X) düğmesi gösterilmez. Çalışırken `true` yapılırsa panel açık kalır, X geri gelir. */
     collapsible: boolean;
-    /** Tüketicinin, bileşen kaynağına dokunmadan shadow DOM içine enjekte edebileceği keyfi CSS metni (bkz {@link _applyCustomCss}). */
+    /** Tüketicinin, bileşen kaynağına dokunmadan shadow DOM içine enjekte edebileceği keyfi CSS metni (bkz `_applyCustomCss`). */
     customCss: string;
     private _open;
     private _layers;
+    /** Aktif Çizim Katmanı'nın id'si (yalnızca `map` verildiğinde dolar; Ölçü Katmanı asla aktif olmaz). */
+    private _activeDrawingLayerId;
     private _openMenuId;
-    private _geoTiffExportingId;
+    private _geoTiffExportingIds;
     private _uploadOpen;
     private _fileUploadAvailable;
     private _serviceUploadOpen;
@@ -72,6 +86,7 @@ export declare class TucbsLayerList extends LitElement {
     private _tooltipPortalEl;
     private readonly _colorById;
     private readonly _opacityById;
+    private readonly _lineOnlyById;
     private readonly _dragReorder;
     private readonly _overlayCoordinator;
     private readonly _customCssState;
@@ -84,6 +99,7 @@ export declare class TucbsLayerList extends LitElement {
     private readonly _onWindowScrollOrResize;
     private _showPortalTooltip;
     private _hidePortalTooltip;
+    private readonly _onDrawingLayersChange;
     private readonly _onLayerAdd;
     private readonly _onLayerRemove;
     private readonly _onLayerReorder;
@@ -97,11 +113,14 @@ export declare class TucbsLayerList extends LitElement {
     /** `layerManager`/`map` dışarıdan atanmamışsa, `mapElementId` üzerinden `tucbs-map`'e bağlanmayı dener. */
     firstUpdated(): void;
     /** Reactive property değişikliklerini (customCss/map/layerManager/apiKey vb.) işler ve bağlı Core JS API instance'larını senkronlar. */
+    /** `collapsible` false olunca paneli render'dan önce açar ("her zaman açık panel", backlog B4). */
+    willUpdate(changed: PropertyValues): void;
     updated(changed: PropertyValues): void;
     private _bindLayerManager;
     private _unbindLayerManager;
     private readonly _onApiKeyChange;
     private _syncFromLayerManager;
+    private _isLineOnly;
     private _toLayerItem;
     private _openPanel;
     private _closePanel;
@@ -140,6 +159,8 @@ export declare class TucbsLayerList extends LitElement {
     /** Bileşenin şablonunu render eder (`layerManager` bağlanmamışsa tamamen gizli kalır). */
     render(): import('lit').TemplateResult<1> | typeof nothing;
     private _renderHeader;
+    private _activateDrawingLayer;
+    private _renderLayerName;
     private _renderLayerRow;
 }
 //# sourceMappingURL=TucbsLayerList.d.ts.map

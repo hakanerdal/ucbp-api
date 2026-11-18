@@ -111,7 +111,7 @@ export declare class ApiKeyValidationError extends TucbsError {
 }
 
 /** `ApiKeyValidationError`'ın constructor'ına verilebilecek opsiyonel seçenekler. */
-declare interface ApiKeyValidationErrorOptions {
+export declare interface ApiKeyValidationErrorOptions {
     /** Hatanın kullanıcıya gösterilecek başlığı. @default "API Hatası" */
     title?: string;
     /** Doğrulamanın başarısız olma nedeni (backend'den geliyorsa). */
@@ -156,7 +156,8 @@ export declare interface BasemapOptions {
     readonly id: BasemapId;
 }
 
-declare type BasemapStatus = "loading" | "ready" | "unavailable";
+/** Altlık haritanın anlık durumu: `"loading"` yükleniyor, `"ready"` yüklendi, `"unavailable"` servise erişilemiyor. */
+export declare type BasemapStatus = "loading" | "ready" | "unavailable";
 
 /** `AnalysisManager`'ın backend'e gönderdiği tüm analiz isteklerinin ortak zarfı. */
 export declare interface BaseRequestDto<T> {
@@ -204,8 +205,11 @@ export declare interface BinFillStyle {
 
 /** Sınır: bbox veya dışbükey zarf; çıktı poligon veya çizgi. */
 export declare interface BoundaryAnalysisRequest {
+    /** Sınırı alınacak geometri (GeoJSON). */
     readonly geojson: object;
+    /** Sınır türü: `"bbox"` sınırlayıcı dikdörtgen, `"convex"` dışbükey zarf. */
     readonly boundaryType: "bbox" | "convex";
+    /** Çıktı geometrisi: `"polygon"` alan, `"line"` yalnız dış çizgi. */
     readonly outputGeometry: "polygon" | "line";
 }
 
@@ -229,6 +233,16 @@ export declare interface BufferAnalysisResult {
     readonly metricEpsg?: number;
 }
 
+/**
+ * Servis adresinden GetCapabilities isteği URL'si üretir. Adresteki diğer
+ * sorgu parametreleri korunur; yalnız `SERVICE`, `REQUEST` ve `VERSION`
+ * atanır veya üzerine yazılır.
+ *
+ * @param baseUrl Servisin adresi (sorgu parametreli olabilir).
+ * @param serviceType OGC servis türü: `"WMS"`, `"WMTS"`, `"WFS"` veya `"WCS"`.
+ * @param version İstenecek protokol sürümü (ör. `"1.3.0"`).
+ * @returns GetCapabilities isteği için tam URL.
+ */
 export declare function buildCapabilitiesUrl(baseUrl: string, serviceType: string, version: string): string;
 
 /** Kameranın konumu ve bakış açısı. */
@@ -246,6 +260,9 @@ export declare interface CameraOptions {
     /** Yatay eksen etrafında dönüş (derece). @default 0 */
     readonly roll?: number;
 }
+
+/** Verilen değeri geçerli nokta boyutu aralığına (POINT_SIZE_MIN-POINT_SIZE_MAX) çeker; sayı değilse varsayılanı döndürür. */
+export declare function clampPointSize(value: number): number;
 
 /**
  * `@tucbs/core`'a herhangi bir `Map`/component oluşturulmadan ÖNCE, uygulamanın
@@ -278,8 +295,17 @@ export declare interface CameraOptions {
  */
 export declare function configureTucbs(config: TucbsGlobalConfig): void;
 
+/**
+ * Çizgi tipinin SVG `stroke-dasharray` metni (önizlemeler için); düz çizgide `undefined`.
+ * Haritadaki kesikli çizgiyle aynı desenden türetilir.
+ */
+export declare function dashArray(dash: LineDash | undefined, width: number): string | undefined;
+
 /** `options.camera` ve `options.initialExtent` hiç verilmezse haritanın ilk açılışta ortalanacağı varsayılan bölge (Türkiye sınırı). */
 export declare const DEFAULT_INITIAL_EXTENT: MapExtent;
+
+/** Sembol verilmediğinde kullanılan varsayılan (mevcut görünümle uyumlu) nokta sembolü. */
+export declare const DEFAULT_POINT_SYMBOL: PointSymbol;
 
 /**
  * Build-time ucbp-api kökü — `packages/core/.env` → `VITE_ANALYSIS_API_BASE`.
@@ -288,13 +314,113 @@ declare const DEFAULT_UCBP_API_BASE: string;
 export { DEFAULT_UCBP_API_BASE as DEFAULT_ANALYSIS_API_BASE }
 export { DEFAULT_UCBP_API_BASE }
 
+/**
+ * GetCapabilities belgesinin kök elemanından hangi OGC servisine ait
+ * olduğunu tahmin eder.
+ *
+ * @param doc GetCapabilities XML belgesi.
+ * @returns `"WMS"`, `"WFS"`, `"WMTS"` veya `"WCS"`; tanınmazsa `undefined`.
+ */
 export declare function detectServiceType(doc: Document): string | undefined;
 
+/** GetCapabilities yanıtında bulunan tek bir katman (WMS/WFS/WMTS) veya kapsama (WCS). */
 export declare interface DiscoveredItem {
+    /** Katmanın servisteki adı/kimliği; katman eklerken kullanılır (WMS `Name`, WMTS/WCS `Identifier`). */
     identifier: string;
+    /** Katmanın okunur başlığı (yoksa `identifier`). */
     title: string;
+    /** WMTS katmanının kullanacağı TileMatrixSet kimliği; yalnız WMTS'te dolu. */
     tileMatrixSetID?: string;
+    /** Katmanın kapsama kutusu; WMS'te capabilities'ten, WCS'te capabilities'ten ya da `fetchWcsCoverageDescriptions` ile doldurulur. */
     geographicBoundingBox?: GeographicBoundingBox;
+}
+
+/** `DrawLayerKind` için kullanıcıya gösterilen Türkçe etiket. */
+export declare const DRAW_LAYER_KIND_LABELS: Record<DrawLayerKind, string>;
+
+/** Diyaloğun kullanıcıya sunduğu seçim: kayıtlı bir katman ya da yeni katman. */
+export declare type DrawingLayerChoice = {
+    /** Kayıtlı bir katman seçildi. */
+    readonly type: "existing";
+    /** Seçilen kayıtlı katmanın kimliği. */
+    readonly layerId: string;
+} | {
+    /** Yeni bir katman oluşturulması istendi. */
+    readonly type: "new";
+    /** Oluşturulacak katmanın adı. */
+    readonly title: string;
+};
+
+/** Kayıt defterindeki bir çizim katmanının bilgisi. */
+export declare interface DrawingLayerInfo {
+    /** Kayıt defterinde üretilen benzersiz kimlik; ilk şekil eklendiğinde `LayerManager`'da bu kimlikle katman oluşur. */
+    readonly id: string;
+    /** Katmanın kullanıcıya gösterilen adı (baştaki/sondaki boşluklar kırpılmış). */
+    readonly title: string;
+    /** Katmanın geometri türü; katmana yalnızca bu türdeki şekiller eklenir. */
+    readonly kind: DrawLayerKind;
+}
+
+/** `null` döndürmek (iptal) çizimi atar. */
+export declare type DrawingLayerPicker = (request: DrawingLayerPickRequest) => Promise<DrawingLayerChoice | null>;
+
+/** Hedef katman seçici (diyalog) isteği. */
+export declare interface DrawingLayerPickRequest {
+    /** Çizimi bitiren araç. */
+    readonly tool: DrawTool;
+    /** Aracın yazacağı katman türü (`drawLayerKindOf(tool)`). */
+    readonly kind: DrawLayerKind;
+    /** Aracın türüyle uyumlu kayıtlı katmanlar. */
+    readonly layers: readonly DrawingLayerInfo[];
+    /** Tüm çizim katmanlarının adları (ad çakışması denetimi için). */
+    readonly existingTitles: readonly string[];
+    /** Önerilen yeni katman adı ("Çizim N"). */
+    readonly suggestedTitle: string;
+}
+
+/**
+ * Çizim Katmanlarının (kullanıcının çizdiği şekillerin toplandığı katmanlar)
+ * türünü, aktif olanını ve şekil→katman eşlemesini tutar. Ölçüm Katmanı bu
+ * kayıt defterinin DIŞINDADIR (tek ve sabit olduğundan hedef seçilemez).
+ */
+export declare class DrawingLayerRegistry extends EventEmitter<DrawingLayerRegistryEventMap> {
+    private readonly entries;
+    private readonly shapeLayers;
+    private activeId;
+    private seq;
+    /** Yeni çizim katmanı kaydeder ve onu aktif yapar. */
+    create(title: string, kind: DrawLayerKind): DrawingLayerInfo;
+    /** Verilen kimlikte kayıtlı bir çizim katmanı olup olmadığını döndürür. */
+    has(id: string): boolean;
+    /** Verilen kimlikteki çizim katmanının bilgisini döndürür; kayıtlı değilse `undefined`. */
+    get(id: string): DrawingLayerInfo | undefined;
+    /** Kayıtlı tüm çizim katmanlarını oluşturulma sırasıyla döndürür (yeni bir dizi). */
+    list(): DrawingLayerInfo[];
+    /** Yalnızca verilen geometri türündeki çizim katmanlarını oluşturulma sırasıyla döndürür. */
+    listByKind(kind: DrawLayerKind): DrawingLayerInfo[];
+    /** Aktif çizim katmanının kimliğini döndürür; aktif katman yoksa `undefined`. */
+    getActiveId(): string | undefined;
+    /** Aktif çizim katmanının bilgisini döndürür; aktif katman yoksa `undefined`. */
+    getActive(): DrawingLayerInfo | undefined;
+    /** Kayıtlı bir katmanı aktif yapar; bilinmeyen id için `false` döner. */
+    setActive(id: string): boolean;
+    /** Katmanı ve ona bağlı şekil eşlemelerini siler; aktifse aktif katman kalmaz. */
+    remove(id: string): void;
+    /** Bir şekli bir çizim katmanına bağlar; şekil zaten bağlıysa eşleme güncellenir. */
+    assignShape(shapeId: string, layerId: string): void;
+    /** Şeklin bağlı olduğu çizim katmanının kimliğini döndürür; eşleme yoksa `undefined`. */
+    layerOfShape(shapeId: string): string | undefined;
+    /** Şeklin katman eşlemesini kaldırır (şekil silindiğinde çağrılır); katmanın kendisi kalır. */
+    releaseShape(shapeId: string): void;
+}
+
+/** `DrawingLayerRegistry`'nin yaydığı olaylar ve yükleri. */
+export declare interface DrawingLayerRegistryEventMap {
+    /** Katman eklendi/kaldırıldı veya aktif katman değişti. */
+    "drawinglayers:change": {
+        /** Değişiklikten sonraki aktif çizim katmanının kimliği; aktif katman yoksa `undefined`. */
+        readonly activeId: string | undefined;
+    };
 }
 
 /**
@@ -426,7 +552,7 @@ export declare class DrawingManager extends EventEmitter<DrawingManagerEventMap>
     private computeCircleRing;
     private computeArea;
     private computeLength;
-    private projectMeters;
+    private projectEqualAreaMeters;
     private offsetMetersToLonLat;
     private toCartesianFromLonLat;
     private toCartesian;
@@ -438,52 +564,80 @@ export declare class DrawingManager extends EventEmitter<DrawingManagerEventMap>
 export declare interface DrawingManagerEventMap {
     /** Bir çizim/ölçüm aracı etkinleştirildiğinde (çizim başladığında) yayılır. */
     "draw:start": {
+        /** Etkinleşen çizim aracı (ör. `"polygon"`). */
         readonly tool: DrawTool;
+        /** Aracı başlatan bileşenin etiketi (ör. `"draw"`, `"measure"`); verilmeyebilir. */
         readonly source?: string;
     };
     /** Çizime yeni bir vertex (nokta) eklendiğinde yayılır. */
     "draw:vertex": {
+        /** Kullanılan çizim aracı. */
         readonly tool: DrawTool;
+        /** Eklenen noktanın şekildeki sırası (0'dan başlar). */
         readonly index: number;
+        /** Eklenen noktanın konumu: `[boylam, enlem]` (WGS84, derece). */
         readonly coordinates: [number, number];
+        /** Eklenen noktanın ekran konumu (piksel). */
         readonly screenPos: {
+            /** Yatay ekran konumu (piksel). */
             readonly x: number;
+            /** Dikey ekran konumu (piksel). */
             readonly y: number;
         };
     };
     /** Aktif çizimin önizleme noktası (fare hareketi) güncellendiğinde yayılır. */
     "draw:move": {
+        /** Kullanılan çizim aracı. */
         readonly tool: DrawTool;
+        /** Önizleme noktasının konumu: `[boylam, enlem]` (WGS84, derece). */
         readonly coordinates: [number, number];
+        /** Önizleme noktasının ekran konumu (piksel). */
         readonly screenPos: {
+            /** Yatay ekran konumu (piksel). */
             readonly x: number;
+            /** Dikey ekran konumu (piksel). */
             readonly y: number;
         };
     };
     /** Bir şeklin çizimi tamamlandığında yayılır. */
     "draw:complete": {
+        /** Tamamlanan şekil. */
         readonly shape: DrawnShape;
     };
     /** Aktif çizim iptal edildiğinde (araç tamamen kapatıldığında) yayılır. */
     "draw:cancel": {
+        /** İptal edilen çizim aracı. */
         readonly tool: DrawTool;
+        /** Aracı başlatan bileşenin etiketi (ör. `"draw"`, `"measure"`); verilmeyebilir. */
         readonly source?: string;
     };
     /** Devam eden (tamamlanmamış) çizim Esc ile iptal edildiğinde yayılır; araç aktif kalır (çıkış için bkz. `draw:cancel`). */
     "draw:abort": {
+        /** Çizimi iptal edilen araç. */
         readonly tool: DrawTool;
+        /** Aracı başlatan bileşenin etiketi (ör. `"draw"`, `"measure"`); verilmeyebilir. */
         readonly source?: string;
     };
     /** Tamamlanmış bir şekil silindiğinde yayılır. */
     "draw:remove": {
+        /** Silinen şeklin kimliği. */
         readonly id: string;
+        /** Silinen şekil. */
         readonly shape: DrawnShape;
     };
 }
 
+/** `DrawingManager` event adlarının birleşimi (ör. `"draw:complete"`); `drawingManager.on(...)`'un ilk parametresi. */
 export declare type DrawingManagerEventName = keyof DrawingManagerEventMap;
 
+/** Verilen `DrawingManager` event adının dinleyiciye ilettiği veri tipi. */
 export declare type DrawingManagerEventPayload<K extends DrawingManagerEventName> = DrawingManagerEventMap[K];
+
+/** Çizim katmanının geometri türü; katmana yalnızca aynı türde şekil eklenir. */
+export declare type DrawLayerKind = "point" | "line" | "area";
+
+/** Çizim aracının hangi türdeki çizim katmanına yazacağını döndürür. */
+export declare function drawLayerKindOf(tool: DrawTool): DrawLayerKind;
 
 /** `DrawingManager` ile tamamlanmış bir çizim/ölçüm şeklinin tam kaydı. */
 export declare interface DrawnShape {
@@ -536,7 +690,9 @@ export declare interface EntityInteractionDetail extends PickedFeatureDetail {
     readonly position: [number, number];
     /** Etkileşimin gerçekleştiği noktanın ekran koordinatı (piksel). */
     readonly screenPos: {
+        /** Yatay ekran konumu (piksel). */
         readonly x: number;
+        /** Dikey ekran konumu (piksel). */
         readonly y: number;
     };
     /** Tıklanan noktadaki TÜM vektör feature'lar (drillPick); `entity` her zaman ilk sırada. */
@@ -628,29 +784,79 @@ declare class EventEmitter<TEventMap> {
 /** Bir GeoJSON `Feature`'ı için kısa, insan-okunur bir etiket üretir (ör. `"Point 42"`). */
 export declare function featureLabel(feature: Feature): string;
 
-export declare function fetchWcsCoverageExtents(rawUrl: string, coverageIds: readonly string[], authToken?: string, authContext?: {
-    mergeApiKeyHeader(headers: Record<string, string> | undefined, url: string): Record<string, string> | undefined;
-    buildAuthHeaders(authToken: string | undefined): Record<string, string> | undefined;
-}): Promise<Map<string, GeographicBoundingBox>>;
+/**
+ * WCS kapsamalarının coğrafi kutularını okur ve hangilerinin yükseklik modeli
+ * olduğunu belirler; ikisi de aynı DescribeCoverage yanıtından çıkarılır.
+ * Çok kapsamalı servislerde istek, adres uzunluk sınırını aşmasın diye
+ * birkaç parçaya bölünür ve parçalar paralel gönderilir. Kutusu okunamayan
+ * ve `unlocatedIds` içinde olan kapsamalar için WCS 1.0 GetCapabilities
+ * yanıtı da denenir. İstek başarısız olursa hata fırlatmaz: hiçbir kapsama
+ * yükseklik sayılmaz, kutusu okunamayanlar sonuçta yer almaz.
+ *
+ * @param rawUrl WCS servisinin adresi.
+ * @param coverageIds Sınıflandırılacak kapsama kimlikleri.
+ * @param unlocatedIds Kutusu henüz bilinmeyen (GetCapabilities'te kutusu olmayan) kapsama kimlikleri.
+ * @param authToken İsteğe eklenecek yetki belirteci (isteğe bağlı).
+ * @param authContext apiKey başlıklarını ekleyen yetki bağlamı (isteğe bağlı; `LayerManager` verir).
+ * @returns Kapsama kutuları ve yükseklik modeli sayılan kapsama kimlikleri.
+ */
+export declare function fetchWcsCoverageDescriptions(rawUrl: string, coverageIds: readonly string[], unlocatedIds: readonly string[], authToken?: string, authContext?: WcsAuthContext): Promise<WcsCoverageDescriptions>;
+
+/**
+ * WCS kapsamalarının gerçek coğrafi kutularını DescribeCoverage isteğiyle
+ * getirir. Çok kapsamalı servislerde istek, adres uzunluk sınırını aşmasın
+ * diye birkaç parçaya bölünür. Kutusu okunamayan kapsamalar için WCS 1.0
+ * GetCapabilities yanıtı da denenir. İstek başarısız olursa hata fırlatmaz,
+ * boş sonuç döner.
+ *
+ * @param rawUrl WCS servisinin adresi.
+ * @param coverageIds Kutusu istenen kapsama kimlikleri.
+ * @param authToken İsteğe eklenecek yetki belirteci (isteğe bağlı).
+ * @param authContext apiKey başlıklarını ekleyen yetki bağlamı (isteğe bağlı; `LayerManager` verir).
+ * @returns Kapsama kimliğinden WGS84 kutusuna eşleme; kutusu okunamayanlar yer almaz.
+ */
+export declare function fetchWcsCoverageExtents(rawUrl: string, coverageIds: readonly string[], authToken?: string, authContext?: WcsAuthContext): Promise<Map<string, GeographicBoundingBox>>;
 
 /** Bir katmanın dolgu stili — moda göre ayırt edilen 5 alternatiften biri. */
 export declare type FillStyle = SolidFillStyle | GradientFillStyle | BinFillStyle | EnumFillStyle | OffFillStyle;
 
+/** WGS84 (EPSG:4326) coğrafi kapsama kutusu, derece cinsinden. */
 export declare interface GeographicBoundingBox {
+    /** Batı sınırı (boylam). */
     west: number;
+    /** Güney sınırı (enlem). */
     south: number;
+    /** Doğu sınırı (boylam). */
     east: number;
+    /** Kuzey sınırı (enlem). */
     north: number;
 }
 
 /** Sınır, kırp, fark, çıkarma, birleştir ve kama tampon yanıtı. */
 export declare interface GeoJsonAnalysisResult {
+    /** Analizin ürettiği geometri (GeoJSON). */
     readonly geojson: object;
 }
 
 /** CRS/koordinat doğrulama hataları. */
 export declare class GeometryError extends TucbsError {
     constructor(code: TucbsErrorCode, message?: string, title?: string);
+}
+
+/** `LayerStyleEngine.getGeometryKinds` sonucu: katmanda hangi geometri turleri var. */
+export declare interface GeometryKinds {
+    /** Katmanda nokta geometrisi var mı. */
+    readonly point: boolean;
+    /** Katmanda çizgi geometrisi var mı (poligon dış hat çizgileri sayılmaz). */
+    readonly line: boolean;
+    /** Katmanda alan (poligon) geometrisi var mı. */
+    readonly area: boolean;
+    /**
+     * Cizgi tipi (kesikli vb.) uygulanabilir mi: cizgi geometrisi VAR veya
+     * poligon kenari ayri bir companion polyline ile cizilmis (Cesium'un native
+     * poligon outline'i kesikli cizilemez).
+     */
+    readonly dashable: boolean;
 }
 
 /**
@@ -727,16 +933,22 @@ export declare interface GradientFillStyle {
 
 /** Ekran merkezindeki zeminin olcegi (1/N paydasi) ve kameranin o noktaya uzakligi (m). */
 export declare interface GroundMeasure {
+    /** Ölçek paydası N (ölçek 1/N). */
     scale: number;
+    /** Kameranın ekran merkezindeki zemin noktasına uzaklığı (metre). */
     distance: number;
 }
 
 /** `BasemapId` union'ının, apiKey gerektiren HGM/Turksat proxy altlık haritalarının çalışma-zamanı karşılığı. */
 export declare const HGM_BASEMAP_IDS: readonly ["hgm-temel", "hgm-ortofoto", "hgm-siyasi", "hgm-yukseklik"];
 
-declare type HighlightFeature = {
+/** `Map.showSelectionHighlight()` ile vurgulanacak tek bir GeoJSON feature. */
+export declare type HighlightFeature = {
+    /** GeoJSON türü; her zaman `"Feature"`. */
     readonly type: "Feature";
+    /** Vurgulanacak geometri (GeoJSON `geometry` nesnesi, WGS84). */
     readonly geometry: object;
+    /** Feature'ın öznitelikleri (isteğe bağlı). */
     readonly properties?: object | null;
 };
 
@@ -750,6 +962,7 @@ export declare interface ImageryFeatureInfo {
     readonly properties: Record<string, unknown>;
     /** Sunucudan gelen ham HTML/metin yanıtı (`properties` boşsa bu alana düşülür). */
     readonly description: string | null;
+    /** Feature'ın gerçek geometrisinden hesaplanan "Yakınlaş" hedefi; geometri gelmediyse `undefined`. */
     readonly geometryHint?: ImageryGeometryHint | undefined;
 }
 
@@ -760,14 +973,22 @@ export declare interface ImageryFeatureInfo {
  * `InteractionManager.flyToExtent`, nokta için `InteractionManager.
  * flyToPosition` (tıklanan noktadan çok daha hassas bir koordinat verir). */
 export declare type ImageryGeometryHint = {
+    /** Hedef türü: alan. */
     readonly kind: "extent";
+    /** Alanın batı sınırı (boylam, derece). */
     readonly west: number;
+    /** Alanın güney sınırı (enlem, derece). */
     readonly south: number;
+    /** Alanın doğu sınırı (boylam, derece). */
     readonly east: number;
+    /** Alanın kuzey sınırı (enlem, derece). */
     readonly north: number;
 } | {
+    /** Hedef türü: tek nokta. */
     readonly kind: "point";
+    /** Noktanın boylamı (derece). */
     readonly longitude: number;
+    /** Noktanın enlemi (derece). */
     readonly latitude: number;
 };
 
@@ -777,7 +998,9 @@ export declare interface ImageryInteractionDetail {
     readonly position: [number, number];
     /** Etkileşimin gerçekleştiği noktanın ekran koordinatı (piksel). */
     readonly screenPos: {
+        /** Yatay ekran konumu (piksel). */
         readonly x: number;
+        /** Dikey ekran konumu (piksel). */
         readonly y: number;
     };
     /** Tıklanan noktadaki tüm raster katmanlar için `GetFeatureInfo` sonuçları. */
@@ -844,7 +1067,13 @@ export declare class InteractionManager extends EventEmitter<InteractionManagerE
     }): void;
     /**
      * Kamerayı verilen coğrafi dikdörtgene (derece) top-down uçurur.
-     * @param duration - Uçuş süresi (saniye); verilmezse Cesium'un mesafeye göre otomatik hesapladığı süre kullanılır.
+     *
+     * @param west - Batı sınırı (boylam, derece).
+     * @param south - Güney sınırı (enlem, derece).
+     * @param east - Doğu sınırı (boylam, derece).
+     * @param north - Kuzey sınırı (enlem, derece).
+     * @param options - Uçuş seçenekleri (isteğe bağlı).
+     * @param options.duration - Uçuş süresi (saniye); verilmezse Cesium'un mesafeye göre otomatik hesapladığı süre kullanılır.
      *
      * @example
      * ```ts
@@ -907,12 +1136,14 @@ export declare interface InteractionManagerEventMap {
     "map:mousemove": MapInteractionDetail;
     /** Fare tekerleği (zoom) çevrildiğinde yayılır. */
     "map:wheel": {
+        /** Tekerlek hareket miktarı (Cesium `WHEEL` değeri); işareti yönü belirtir. */
         readonly delta: number;
     };
     /** Dokunmatik pinch (yakınlaştırma) hareketi başladığında yayılır. */
     "map:pinchstart": MapInteractionDetail;
     /** Dokunmatik pinch hareketi devam ederken yayılır. */
     "map:pinchmove": MapInteractionDetail & {
+        /** İki parmak arasındaki doğrunun ekran yatayıyla yaptığı açı (radyan). */
         readonly angle: number;
     };
     /** Dokunmatik pinch hareketi bittiğinde yayılır. */
@@ -925,14 +1156,17 @@ export declare interface InteractionManagerEventMap {
     "camera:moveEnd": Record<string, never>;
     /** Kamera konumu belirgin şekilde değiştiğinde yayılır. */
     "camera:changed": {
+        /** Kameradaki değişim oranı (Cesium `camera.changed` yüzdesi, 0–1). */
         readonly percentage: number;
     };
     /** Her render karesinden önce yayılır. */
     "scene:preRender": {
+        /** Render edilecek karenin sahne zamanı. */
         readonly time: JulianDate;
     };
     /** Her render karesinden sonra yayılır. */
     "scene:postRender": {
+        /** Render edilen karenin sahne zamanı. */
         readonly time: JulianDate;
     };
     /** 2D/3D/Columbus View geçişi (morph) başladığında yayılır. */
@@ -941,8 +1175,10 @@ export declare interface InteractionManagerEventMap {
     "scene:morphComplete": Record<string, never>;
 }
 
+/** `InteractionManager` event adlarının birleşimi (ör. `"map:click"`); `interactionManager.on(...)`'un ilk parametresi. */
 export declare type InteractionManagerEventName = keyof InteractionManagerEventMap;
 
+/** Verilen `InteractionManager` event adının dinleyiciye ilettiği veri tipi. */
 export declare type InteractionManagerEventPayload<K extends InteractionManagerEventName> = InteractionManagerEventMap[K];
 
 /** `AnalysisManager.intersection()` için kesişim analizi isteği. */
@@ -958,6 +1194,14 @@ export declare interface IntersectionAnalysisResult {
     /** Kesişim geometrisi (GeoJSON). */
     readonly geojson: object;
 }
+
+/**
+ * Bir WGS84 kutusunun servis istek alaniyla (Turkiye extent'i) kesisip
+ * kesismedigini dondurur; servis kesfinde Turkiye disindaki katmanlari
+ * listelememek icin kullanilir.
+ * @param box - Katmanin kapsama alani (WGS84 derece).
+ */
+export declare function intersectsServiceExtent(box: MapExtent): boolean;
 
 /**
  * Haritadaki tüm katmanları (WMS/WMTS/WFS/WCS/GEOTIFF/GEOJSON/KML/KMZ/SHP/CSV,
@@ -984,6 +1228,7 @@ export declare class LayerManager extends EventEmitter<LayerManagerEventMap> {
     private static readonly DEFAULT_OUTLINE_COLOR;
     private readonly viewer;
     private readonly items;
+    private readonly removeMorphListener;
     private readonly analysisResultIds;
     private readonly outlineGeometry;
     private readonly opacityController;
@@ -1010,7 +1255,7 @@ export declare class LayerManager extends EventEmitter<LayerManagerEventMap> {
      * degil (gercek deger ApiKeyPolicy icinde #apiKey olarak kapali kalir). */
     get hasApiKey(): boolean;
     /**
-     * apiKey’e göre yetkili WMS/WFS/WMTS listesi — {@code GET /layers} + {@code X-API-Key}.
+     * apiKey’e göre yetkili WMS/WFS/WMTS listesi — `GET /layers` + `X-API-Key`.
      * Checklist: getLayerList eşdeğeri.
      *
      * @example
@@ -1126,17 +1371,22 @@ export declare class LayerManager extends EventEmitter<LayerManagerEventMap> {
     exportLayerAsGeoTiff(id: string, filename?: string): Promise<void>;
     /** Bir kolonun sayısal min/max aralığını döndürür (gradient/bin modunda min/max verilmezse otomatik kullanılır). */
     getColumnRange(id: string, column: string): {
-        min: number;
-        max: number;
+        /** Kolondaki en küçük sayısal değer. */ min: number;
+        /** Kolondaki en büyük sayısal değer. */ max: number;
     } | null;
     /**
      * Katmanın dolgu/dış-hat stilini uygular. Sadece Entity tabanlı (WFS/LOCAL)
      * katmanlarda çalışır. Gradient/bin modunda `min`/`max`'tan verilmeyen uç
      * getColumnRange() ile veri aralığından otomatik hesaplanır; verilen uç
      * aynen kullanılır (tucbs-react'teki "min===max===v her zaman" bug'ı burada
-     * YOK — bkz. project_ucbp_api_styleeditor_arastirma memory). Ters aralık
+     * YOK). Ters aralık
      * (`min` > `max`, uçlardan biri veriden gelince de oluşabilir) düzeltilmez;
      * geçerli bir aralık vermek çağıranın sorumluluğundadır.
+     *
+     * Semboloji alanları isteğe bağlıdır: `outline.dash` çizgi tipini (çizgiler
+     * ve kenarı ayrı çizilen alanlar), `outline.opacity` dış hat opaklığını
+     * (0-1), `point` nokta şeklini ve boyutunu belirler. `point` verilmezse
+     * noktalar mevcut görünümünde kalır; `dash` verilmezse çizgi düzdür.
      *
      * @example
      * ```ts
@@ -1144,10 +1394,35 @@ export declare class LayerManager extends EventEmitter<LayerManagerEventMap> {
      *   fill: { mode: "solid", color: "#3388ff", opacity: 0.6 },
      *   outline: { enabled: true, color: "#1d4e89", width: 2 },
      * });
+     *
+     * // Nokta katmanı: yıldız sembol, kesikli ve yarı saydam dış hat
+     * await map.layerManager.applyLayerStyle("nokta-katmani", {
+     *   fill: { mode: "solid", color: "#e4572e", opacity: 1 },
+     *   outline: { enabled: true, color: "#161616", width: 2, dash: "dashed", opacity: 0.5 },
+     *   point: { shape: "star", size: 20 },
+     * });
      * ```
      */
     applyLayerStyle(id: string, spec: LayerStyleSpec): Promise<void>;
-    /** Bir vektor katmana en son uygulanan stili döndürür (TucbsLegendPanel için). */
+    /**
+     * Bir vektör katmandaki geometri türlerini (nokta/çizgi/alan) döndürür;
+     * stil editörü sembol kontrollerini buna göre gösterir. Entity tabanlı
+     * olmayan (ImageryLayer) katmanlarda `undefined` döner.
+     *
+     * @example
+     * ```ts
+     * const kinds = map.layerManager.getGeometryKinds("katman-id");
+     * if (kinds?.point) { /* nokta sembolü seçilebilir *\/ }
+     * ```
+     */
+    getGeometryKinds(id: string): GeometryKinds | undefined;
+    /**
+     * Bir vektör katmana en son uygulanan stili döndürür (Stil Editörü, Lejant
+     * Paneli ve Katman Listesi bunu okur). Stilde nokta sembolü (`point`)
+     * hiç belirlenmemişse ve katmanda nokta varsa, noktaların haritadaki
+     * gerçek görünümü (daire ve boyutu) `point` alanı olarak eklenir.
+     * Henüz stil kaydı olmayan katmanda `undefined` döner.
+     */
     getLayerStyle(id: string): LayerStyleSpec | undefined;
     /** Katmana eklenirken atanan ilk (random) rengi döndürür — sonraki stil
      * değişikliklerinden etkilenmez. TucbsStyleEditor'ün "Sıfırla" işlevi
@@ -1349,9 +1624,11 @@ export declare class LayerManager extends EventEmitter<LayerManagerEventMap> {
     /* Excluded from this release type: _addBasemapImageryLayer */
     /* Excluded from this release type: _removeBasemapLayers */
     /* Excluded from this release type: _addDrawnShape */
+    /* Excluded from this release type: _previewDrawnShape */
     /* Excluded from this release type: _addMeasuredShape */
     /* Excluded from this release type: _removeDrawnShape */
     private register;
+    private syncPointHeightReferences;
     private emitCrsCheckResult;
     private tagEntities;
     private reindexLayerOrder;
@@ -1362,20 +1639,34 @@ export declare class LayerManager extends EventEmitter<LayerManagerEventMap> {
      * çeker. `TucbsServiceUpload` (GC-05) gibi ayrı bir `LayerManager`
      * referansına sahip tüketiciler de servis keşfi için bunu kullanır --
      * eskiden bu tüketiciler proxy/apiKey'den TAMAMEN habersiz çıplak `fetch`
-     * kullanıyordu (bkz project_ucbp_api_ogc_capabilities_uygulama_plani, ML-12).
+     * kullanıyordu (ML-12).
      * layers/ogc/OgcLayerFactory.ts'e delege (bkz Adim 8/Faz 2).
      */
     getCapabilitiesDocument(baseUrl: string, serviceType: "WMS" | "WMTS" | "WFS" | "WCS", version: string, authToken?: string): Promise<Document>;
     /**
-     * Faz 5b (ML-12'nin DescribeCoverage boşluğu): WCS coverage'larının gerçek
-     * coğrafi kapsama alanlarını `getCapabilitiesDocument` ile AYNI apiKey/proxy
-     * politikasından geçirerek çeker -- eskiden bu istek proxy'siz gittiği için
-     * CORS-korumalı sunucularda sessizce başarısız olup katmanlar global
-     * (-180,-90,180,90) dikdörtgene düşüyordu (bkz
-     * project_ucbp_api_ogc_capabilities_uygulama_plani Faz 5b).
-     * layers/ogc/OgcLayerFactory.ts'e delege (bkz Adim 8/Faz 2).
+     * WCS kapsamalarının gerçek coğrafi kutularını, `getCapabilitiesDocument`
+     * ile aynı apiKey/proxy politikasından geçirerek getirir. İstek başarısız
+     * olursa hata fırlatmaz, boş sonuç döner.
+     *
+     * @param rawUrl WCS servisinin adresi.
+     * @param coverageIds Kutusu istenen kapsama kimlikleri.
+     * @param authToken İsteğe eklenecek yetki belirteci (isteğe bağlı).
+     * @returns Kapsama kimliğinden WGS84 kutusuna eşleme; kutusu okunamayanlar yer almaz.
      */
     getWcsCoverageExtents(rawUrl: string, coverageIds: readonly string[], authToken?: string): Promise<Map<string, GeographicBoundingBox>>;
+    /**
+     * WCS kapsamalarının coğrafi kutularını ve hangilerinin yükseklik modeli
+     * olduğunu, `getCapabilitiesDocument` ile aynı apiKey/proxy politikasından
+     * geçirerek getirir (bkz. `fetchWcsCoverageDescriptions`). İstek başarısız
+     * olursa hata fırlatmaz.
+     *
+     * @param rawUrl WCS servisinin adresi.
+     * @param coverageIds Sınıflandırılacak kapsama kimlikleri.
+     * @param unlocatedIds Kutusu henüz bilinmeyen (GetCapabilities'te kutusu olmayan) kapsama kimlikleri.
+     * @param authToken İsteğe eklenecek yetki belirteci (isteğe bağlı).
+     * @returns Kapsama kutuları ve yükseklik modeli sayılan kapsama kimlikleri.
+     */
+    getWcsCoverageDescriptions(rawUrl: string, coverageIds: readonly string[], unlocatedIds: readonly string[], authToken?: string): Promise<WcsCoverageDescriptions>;
     private waitForRenderSettle;
     /** Bu entity'nin KENDİSİ bir outline companion'i mi (ayri bir polyline
      * olarak eklenmis, poligonun gercek bir ozelligi degil)? */
@@ -1399,67 +1690,102 @@ export declare class LayerManager extends EventEmitter<LayerManagerEventMap> {
 export declare interface LayerManagerEventMap {
     /** Bir katman haritaya eklendiğinde yayılır. */
     "layer:add": {
+        /** Eklenen katmanın yönetilen kaydı. */
         readonly layer: ManagedLayer;
     };
     /** Bir katman haritadan kaldırıldığında yayılır. */
     "layer:remove": {
+        /** Kaldırılan katmanın yönetilen kaydı. */
         readonly layer: ManagedLayer;
     };
     /** Altlık harita servisine erişilemediğinde (fallback görsel devreye girdiğinde) yayılır. */
     "basemap:error": {
+        /** Erişilemeyen altlık haritanın kimliği. */
         readonly id: BasemapId;
     };
     /** Altlık harita servisi `basemap:error`'dan sonra tekrar erişilebilir hale geldiğinde yayılır. */
     "basemap:recovered": {
+        /** Yeniden erişilebilir olan altlık haritanın kimliği. */
         readonly id: BasemapId;
+    };
+    /** Yedek dünya görüntüsü haritaya eklendiğinde yayılır; görüntünün kaynağını ekranda göstermek için dinlenir. */
+    "basemap:fallback-shown": {
+        /** Görüntünün kaynak atfı (ör. `"NASA Earth Observatory (Blue Marble)"`). */
+        readonly attribution: string;
+    };
+    /** Yedek dünya görüntüsü haritadan kaldırıldığında yayılır (altlık geri geldi ya da değişti). */
+    "basemap:fallback-hidden": {
+        /** Kaldırılan görüntünün kaynak atfı; `basemap:fallback-shown` ile aynı metin. */
+        readonly attribution: string;
     };
     /** Bir katmanın z-sırası (üst-alt konumu) değiştiğinde yayılır. */
     "layer:reorder": {
+        /** Konumu değişen katmanın kimliği. */
         readonly id: string;
+        /** Katmanın Cesium koleksiyonundaki eski sırası (0 = en arkada). */
         readonly oldIndex: number;
+        /** Katmanın Cesium koleksiyonundaki yeni sırası (0 = en arkada). */
         readonly newIndex: number;
+        /** Konumu değişen katmanın yönetilen kaydı. */
         readonly layer: ManagedLayer;
     };
     /** Bir katmanın görünürlüğü değiştiğinde yayılır. */
     "layer:visibility": {
+        /** Görünürlüğü değişen katmanın kimliği. */
         readonly id: string;
+        /** Katmanın yeni görünürlüğü; `true` görünür. */
         readonly visible: boolean;
     };
     /** Bir katmanın opaklığı değiştiğinde yayılır. */
     "layer:opacity": {
+        /** Opaklığı değişen katmanın kimliği. */
         readonly id: string;
+        /** Yeni opaklık, 0 (tam saydam) ile 1 (tam opak) arası. */
         readonly opacity: number;
     };
     /** Bir katmanın stili (`applyLayerStyle()`) değiştiğinde yayılır. */
     "layer:style": {
+        /** Stili değişen katmanın kimliği. */
         readonly id: string;
+        /** Katmana uygulanan yeni stil tanımı. */
         readonly style: LayerStyleSpec;
     };
     /** `LayerManager`'ın apiKey'i değiştiğinde yayılır. */
     "apiKey:change": {
+        /** Değişiklikten sonra bir apiKey tanımlı mı. */
         readonly hasApiKey: boolean;
     };
     /** Yüklenen katmanın koordinat sistemi otomatik olarak WGS84'e dönüştürüldüğünde yayılır. */
     "layer:crs-reprojected": {
+        /** Dönüştürülen katmanın kimliği. */
         readonly id: string;
+        /** Verinin kaynak koordinat sistemi (ör. `"EPSG:5254"`). */
         readonly fromEpsg: string;
+        /** Hedef koordinat sistemi; her zaman WGS84 (`"EPSG:4326"`). */
         readonly toEpsg: "EPSG:4326";
     };
     /** Katmanın koordinat sistemi çözülemediğinde (ham/varsayılan WGS84 kabulüyle yine de yüklendiğinde) yayılır. */
     "layer:crs-unresolved": {
+        /** Koordinat sistemi çözülemeyen katmanın kimliği. */
         readonly id: string;
+        /** Verideki `crs` alanında yazan, çözülemeyen ad. */
         readonly crsName: string;
     };
     /** WFS katmanının kayıt sayısı sunucu limitini aştığında (katman kısmi veriyle yüklendiğinde) yayılır. */
     "layer:features-truncated": {
+        /** Kısmi veriyle yüklenen WFS katmanının kimliği. */
         readonly id: string;
+        /** Sunucudaki toplam kayıt sayısı. */
         readonly totalCount: number;
+        /** Haritaya yüklenen kayıt sayısı (sunucu limiti). */
         readonly loadedCount: number;
     };
 }
 
+/** `LayerManager` event adlarının birleşimi (ör. `"layer:add"`); `layerManager.on(...)`'un ilk parametresi. */
 export declare type LayerManagerEventName = keyof LayerManagerEventMap;
 
+/** Verilen `LayerManager` event adının dinleyiciye ilettiği veri tipi. */
 export declare type LayerManagerEventPayload<K extends LayerManagerEventName> = LayerManagerEventMap[K];
 
 /** Katman ekleme/kaldırma/tip-kontrolü gibi ağ-dışı LayerManager hataları. */
@@ -1467,18 +1793,30 @@ export declare class LayerOperationError extends TucbsError {
     constructor(code: TucbsErrorCode, message?: string, title?: string);
 }
 
-/** `LayerManager.applyLayerStyle()`'a verilen tam katman stili (dolgu + dış hat). */
+/** `LayerManager.applyLayerStyle()`'a verilen tam katman stili (dolgu, dış hat ve isteğe bağlı nokta sembolü). */
 export declare interface LayerStyleSpec {
     /** Dolgu stili. */
     readonly fill: FillStyle;
     /** Dış hat stili. */
     readonly outline: OutlineStyle;
+    /** Nokta sembolü. Verilmezse noktalar katmanın mevcut (daire) görünümünde kalır. */
+    readonly point?: PointSymbol;
 }
 
 /** Bir katmanın veri kaynağı/servis türü. */
 export declare type LayerType = "WMS" | "WMTS" | "WFS" | "WCS" | "GEOJSON" | "KML" | "KMZ" | "SHP" | "CSV" | "GEOTIFF" | "XYZ" | "DRAWING" | "MEASURE";
 
-declare type Listener<TPayload> = (payload: TPayload) => void;
+/** Çizgi tiplerinin kullanıcıya gösterilen Türkçe etiketleri. */
+export declare const LINE_DASH_LABELS: Record<LineDash, string>;
+
+/** Seçilebilir çizgi tipleri (editör sırası). */
+export declare const LINE_DASHES: readonly LineDash[];
+
+/** Hazır çizgi tipleri. */
+export declare type LineDash = "solid" | "dashed" | "dotted" | "dash-dot" | "long-dash";
+
+/** `on`/`once`/`off`'a verilen dinleyici fonksiyonu; event'in verisini (payload) tek parametre olarak alır. */
+export declare type Listener<TPayload> = (payload: TPayload) => void;
 
 /** `LayerManager.add()` ile yerel dosyadan (GeoJSON/KML/KMZ/SHP/CSV) katman eklemek için seçenekler. */
 export declare interface LocalLayerOptions {
@@ -1490,7 +1828,12 @@ export declare interface LocalLayerOptions {
     readonly data: object | string | ArrayBuffer | File;
     /** Dosyanın formatı. */
     readonly layerType: "GEOJSON" | "KML" | "KMZ" | "SHP" | "CSV";
-    /** Geometrilerin yer yüzeyine (terrain) yapıştırılıp yapıştırılmayacağı. */
+    /**
+     * Geometrilerin yer yüzeyine (terrain) yapıştırılıp yapıştırılmayacağı (varsayılan `true`).
+     * 2B modda noktalar yapıştırılmaz: Cesium yere yapıştırılmış noktaları 2B'de yanlış
+     * konuma çizdiği için harita 2B'deyken noktalar düz çizilir, 3B'ye dönünce yeniden
+     * yapıştırılır. Alan ve çizgiler her iki modda da yapıştırılır.
+     */
     readonly clampToGround?: boolean;
 }
 
@@ -1517,6 +1860,11 @@ export declare interface ManagedLayer {
  * harita/marker/kamera yönetimini üstlenir ve `LayerManager`/
  * `InteractionManager`/`DrawingManager`/`AnalysisManager` alt sistemlerini
  * tek bir örnekte birleştirir.
+ *
+ * Harita kendi atıf (kaynak/telif) satırını göstermez; Cesium'un credit kutusu
+ * gizlidir. Altlık haritanın kaynağını (varsayılan HGM) ve gösteriliyorsa yedek
+ * dünya görüntüsünün kaynağını ({@link Map.fallbackAttribution}) sayfanızda siz
+ * gösterin.
  */
 declare class Map_2 {
     #private;
@@ -1533,7 +1881,15 @@ declare class Map_2 {
     readonly analysisManager: AnalysisManager;
     private readonly basemapController;
     private _removeMarker;
+    /** Çizim Katmanları'nın türü/aktifliği (Ölçü Katmanı bunun dışındadır). */
+    readonly drawingLayers: DrawingLayerRegistry;
     /**
+     * Haritayı ve içindeki Cesium `Viewer`'ı oluşturur. Sayfada
+     * `window.CESIUM_BASE_URL` tanımlı değilse, paketin derlendiği Cesium
+     * sürümünün jsDelivr CDN klasörü atanır. `Widgets/widgets.css` sayfaya
+     * eklenmemişse o adresten eklenir. Cesium dosyalarını kendiniz
+     * sunuyorsanız `CESIUM_BASE_URL`'i haritadan önce tanımlayın.
+     *
      * @param container - Haritanın oluşturulacağı DOM elementi veya id'si.
      * @param options - Başlangıç harita seçenekleri.
      *
@@ -1696,6 +2052,17 @@ declare class Map_2 {
     /** Altlık haritanın yükleme durumu (`"loading"`/`"ready"`/`"unavailable"`). */
     get basemapStatus(): BasemapStatus;
     /**
+     * Yedek dünya görüntüsü (NASA Blue Marble) şu an haritadaysa kaynak atfı, değilse `null`.
+     * Değişimi `layerManager` üzerindeki `basemap:fallback-shown` ve `basemap:fallback-hidden`
+     * olaylarıyla izlenir; olaydan sonra bağlanan bileşen başlangıç durumunu buradan okur.
+     *
+     * @example
+     * ```ts
+     * const credit = map.fallbackAttribution; // "NASA Earth Observatory (Blue Marble)" ya da null
+     * ```
+     */
+    get fallbackAttribution(): string | null;
+    /**
      * Altlık haritayı ayarlar/değiştirir (`null`/`undefined` altlık haritayı tamamen kaldırır).
      *
      * @example
@@ -1704,7 +2071,11 @@ declare class Map_2 {
      * ```
      */
     setBasemap(basemap?: BasemapOptions | BasemapId | null): void;
-    /** Sahne modunu 2D/3D arasında değiştirir (animasyonsuz, anında). */
+    /**
+     * Sahne modunu 2D/3D arasında değiştirir (animasyonsuz, anında). 2D'de yere
+     * yapıştırılmış noktalar düz çizilir (Cesium bunları 2D'de yanlış konuma
+     * çizdiği için); 3D'ye dönünce yeniden yere yapıştırılır.
+     */
     setMode(mode: "2D" | "3D"): void;
     /** Render çözünürlük ölçeğini ayarlar (`quality`: 0-100 arası yüzde, Cesium `resolutionScale`'e 0.1-1.0 arasına eşlenir — 0.1 alt sınırdır, aşırı bulanıklığı/performans düşüşünü önler). */
     setQuality(quality: number): void;
@@ -1735,7 +2106,17 @@ declare class Map_2 {
     measureGroundMetersPerPixel(): number | null;
     private buildViewerOptions;
     private registerGlobalApiKeyRotation;
-    private wireShapeSource;
+    private wireMeasureLayer;
+    private wireDrawingLayers;
+    private waitForFrames;
+    private placeDrawnShape;
+    /**
+     * Biten bir çizimin hangi Çizim Katmanı'na gideceği belirsizse (aktif katman
+     * yok ya da türü uyuşmuyor) sorulacak seçiciyi (diyalog) ayarlar. Seçici
+     * `null` döndürürse çizim atılır. Ayarlanmazsa uyumlu ilk katman, o da yoksa
+     * otomatik yeni katman kullanılır. `undefined` seçiciyi kaldırır.
+     */
+    setDrawingLayerPicker(picker: DrawingLayerPicker | undefined): void;
     /** Seçili geometriyi katman listesine yazmadan kırmızı gösterir. Boş dizi vurguyu kaldırır. */
     showSelectionHighlight(features: readonly HighlightFeature[]): void;
     /** Seçim vurgusunu haritadan kaldırır. */
@@ -1763,7 +2144,9 @@ export declare interface MapInteractionDetail {
     readonly position: [number, number];
     /** Etkileşimin gerçekleştiği noktanın ekran koordinatı (piksel). */
     readonly screenPos: {
+        /** Yatay ekran konumu (piksel). */
         readonly x: number;
+        /** Dikey ekran konumu (piksel). */
         readonly y: number;
     };
 }
@@ -1824,7 +2207,7 @@ export declare interface MapOptions {
 }
 
 /** `createMarkerOverlay` seçenekleri. */
-declare interface MarkerOverlayOptions {
+export declare interface MarkerOverlayOptions {
     /** İkonun ekrandaki genişliği (CSS px); verilmezse görüntünün kendi boyutu. */
     width?: number;
     /** İkonun ekrandaki yüksekliği (CSS px); verilmezse görüntünün kendi boyutu. */
@@ -1843,6 +2226,9 @@ export declare const MEASURE_LAYER_ID = "__tucbs_measure_layer__";
  * AYNI olcumu kullanir; yoksa adim hedefi ile gorunen olcek ayrisir.
  */
 export declare function measureGround(scene: Scene): GroundMeasure | null;
+
+/** Mevcut başlıklarda kullanılmayan en küçük "Çizim N" (N ≥ 1) önerisini döndürür. */
+export declare function nextDrawLayerTitle(existingTitles: readonly string[]): string;
 
 /** Dolgu kapalı — katman sadece dış hatla (outline) gösterilir. */
 export declare interface OffFillStyle {
@@ -1863,6 +2249,13 @@ export declare interface OutlineStyle {
     readonly color: string;
     /** Dış hat kalınlığı (piksel). */
     readonly width: number;
+    /** Dış hat opaklığı (0-1 arası). Verilmezse tam opak (1); eski kayıtlı stiller etkilenmez. */
+    readonly opacity?: number;
+    /**
+     * Çizgi tipi (çizgi geometrileri ve alan kenarları için). Verilmezse veya
+     * `"solid"` ise düz çizgi. Dış hat kapalıyken uygulanmaz.
+     */
+    readonly dash?: LineDash;
 }
 
 /**
@@ -1874,10 +2267,29 @@ export declare interface OutlineStyle {
  */
 export declare type PaletteKind = "sequential" | "diverging" | "qualitative";
 
+/**
+ * GetCapabilities belgesindeki katmanları servis türüne göre listeler.
+ *
+ * @param serviceType OGC servis türü: `"WMS"`, `"WMTS"`, `"WFS"` veya `"WCS"`.
+ * @param doc GetCapabilities XML belgesi.
+ * @returns Bulunan katmanlar; servis türü tanınmıyorsa boş dizi.
+ */
 export declare function parseCapabilities(serviceType: string, doc: Document): DiscoveredItem[];
 
+/**
+ * WCS 2.x GetCapabilities belgesinden GeoTIFF çıktı biçimini okur.
+ *
+ * @param doc WCS GetCapabilities XML belgesi.
+ * @returns `"image/geotiff"` veya `"image/tiff"`; sunucu GeoTIFF vermiyorsa `undefined`.
+ */
 export declare function parseWcsTiffFormat(doc: Document): string | undefined;
 
+/**
+ * WMS GetCapabilities belgesinden GeoTIFF çıktı biçimini okur.
+ *
+ * @param doc WMS GetCapabilities XML belgesi.
+ * @returns `"image/geotiff"` veya `"image/tiff"`; sunucu GeoTIFF vermiyorsa `undefined`.
+ */
 export declare function parseWmsTiffFormat(doc: Document): string | undefined;
 
 /** Haritada tıklanan/işaret edilen bir vektör (Entity tabanlı) feature'ın temel bilgisi. */
@@ -1890,6 +2302,61 @@ export declare interface PickedFeatureDetail {
     readonly featureId: string | null;
     /** Feature'ın öznitelik (attribute) değerleri. */
     readonly properties: Record<string, unknown>;
+}
+
+/** Nokta şekillerinin kullanıcıya gösterilen Türkçe etiketleri. */
+export declare const POINT_SHAPE_LABELS: Record<PointShape, string>;
+
+/** Seçilebilir nokta şekilleri (editör sırası). */
+export declare const POINT_SHAPES: readonly PointShape[];
+
+/** Nokta sembolü boyutunun üst sınırı (piksel). */
+export declare const POINT_SIZE_MAX = 48;
+
+/** Nokta sembolü boyutunun alt sınırı (piksel). */
+export declare const POINT_SIZE_MIN = 8;
+
+/** Hazır nokta sembol şekilleri (dışarıdan sembol kütüphanesi yüklenmez). */
+export declare type PointShape = "circle" | "square" | "triangle" | "diamond" | "cross" | "star";
+
+/** Nokta geometrileri için sembol: şekil ve boyut (piksel). */
+export declare interface PointSymbol {
+    /** Sembol şekli. */
+    readonly shape: PointShape;
+    /** Sembol boyutu (piksel). */
+    readonly size: number;
+}
+
+/**
+ * Nokta şeklini SVG metni olarak üretir (64x64 viewBox). Hem haritadaki
+ * billboard görseli hem editör/lejant önizlemeleri bunu kullanır.
+ */
+export declare function pointSymbolSvg(shape: PointShape, options: PointSymbolSvgOptions): string;
+
+/** {@link pointSymbolSvg} seçenekleri. */
+export declare interface PointSymbolSvgOptions {
+    /** Dolgu rengi (CSS rengi). */
+    readonly fill: string;
+    /** Dolgu opaklığı (0-1); kenar HER ZAMAN opak kalır. Verilmezse 1. */
+    readonly fillOpacity?: number;
+    /** Kenar rengi; verilmezse kenar çizilmez. */
+    readonly stroke?: string;
+    /** Kenar çizgi tipi; verilmezse/"solid" ise düz. Kenar yoksa etkisizdir. */
+    readonly strokeDash?: LineDash;
+    /** Kenar opaklığı (0-1); verilmezse 1. */
+    readonly strokeOpacity?: number;
+    /** Kenar kalınlığı (piksel; `size` ölçeğinde). */
+    readonly strokeWidth?: number;
+    /** Sembolün toplam (kenar dahil) hedef boyutu (piksel); kenar kalınlığını 64'lük çizim alanına ölçekler. */
+    readonly size: number;
+    /** SVG'nin `width`/`height` özniteliği (piksel); varsayılan 64 (çizim alanı). Önizleme ikonlarında küçük verilir. */
+    readonly renderSize?: number;
+    /**
+     * Şeklin etrafındaki şeffaf pay (çizim alanı birimi, 64 üzerinden; varsayılan 0).
+     * Doku atlasında komşu görsellerin kenar piksellerine sızmasını (dış hat kapalı
+     * şekilde kenarda siyah çizgi) önler; `renderSize` pay DAHİL toplam boyuttur.
+     */
+    readonly padding?: number;
 }
 
 /**
@@ -1970,7 +2437,7 @@ export declare class TucbsError extends Error {
 }
 
 /** `@tucbs/core` tarafından fırlatılabilecek tüm hataların semantik kodu (bkz `getErrorCodes()`). */
-export declare type TucbsErrorCode = "API_KEY_MISSING" | "API_KEY_INVALID" | "INTERNAL_INDEX_OUT_OF_RANGE" | "OGC_CAPABILITIES_REQUEST_FAILED" | "OGC_CAPABILITIES_EXCEPTION" | "OGC_CAPABILITIES_PARSE_FAILED" | "OGC_FEATURE_TYPE_NOT_FOUND" | "CRS_UNRESOLVED_UNSUPPORTED" | "CRS_CLAIMED_WGS84_INVALID" | "CRS_MISSING_UNSUPPORTED" | "ANALYSIS_API_KEY_MISSING" | "ANALYSIS_NETWORK_ERROR" | "ANALYSIS_REQUEST_FAILED" | "ANALYSIS_UNSUCCESSFUL" | "ANALYSIS_RESPONSE_MISSING_GEOJSON" | "LAYER_AUTHORIZED_LIST_API_KEY_MISSING" | "LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE" | "LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED" | "LAYER_STYLE_NOT_VECTOR" | "LAYER_TYPE_UNSUPPORTED_XYZ" | "LAYER_TYPE_UNSUPPORTED_DRAWING" | "LAYER_TYPE_UNSUPPORTED_MEASURE" | "LAYER_WMS_LAYERS_EMPTY" | "LAYER_GEOTIFF_UNSUPPORTED" | "LAYER_SHP_PACKAGE_MISSING" | "LAYER_CSV_PACKAGE_MISSING" | "LAYER_CSV_LATLON_NOT_FOUND" | "LAYER_NOT_FOUND" | "LAYER_ID_ALREADY_EXISTS" | "LAYER_TYPE_MISMATCH" | "LAYER_SERVICE_OPTIONS_NOT_FOUND" | "LAYER_NOT_RASTER" | "OGC_AUTHORIZED_LAYERS_REQUEST_FAILED" | "OGC_GEOTIFF_DOWNLOAD_FAILED" | "OGC_WFS_JSON_FORMAT_UNSUPPORTED" | "OGC_WFS_GEOJSON_REQUEST_FAILED" | "OGC_WFS_REQUEST_FAILED" | "OGC_WFS_EXCEPTION" | "OGC_WFS_OL_PACKAGE_MISSING" | "OGC_WCS_REQUEST_FAILED" | "OGC_WCS_MULTIPART_IMAGE_NOT_FOUND" | "LAYER_PREVIEW_UNSUPPORTED_XYZ" | "LAYER_PREVIEW_UNSUPPORTED_DRAWING" | "LAYER_PREVIEW_UNSUPPORTED_MEASURE" | "LAYER_MANAGER_NOT_READY" | "LAYER_AUTHORIZED_ADD_MISSING_INFO" | "OGC_SERVICE_DISCOVERY_PARSE_FAILED" | "LAYER_WMTS_TILEMATRIXSET_MISSING";
+export declare type TucbsErrorCode = "API_KEY_MISSING" | "API_KEY_INVALID" | "INTERNAL_INDEX_OUT_OF_RANGE" | "OGC_CAPABILITIES_REQUEST_FAILED" | "OGC_CAPABILITIES_EXCEPTION" | "OGC_CAPABILITIES_PARSE_FAILED" | "OGC_FEATURE_TYPE_NOT_FOUND" | "CRS_UNRESOLVED_UNSUPPORTED" | "CRS_CLAIMED_WGS84_INVALID" | "CRS_MISSING_UNSUPPORTED" | "ANALYSIS_API_KEY_MISSING" | "ANALYSIS_NETWORK_ERROR" | "ANALYSIS_REQUEST_FAILED" | "ANALYSIS_UNSUCCESSFUL" | "ANALYSIS_RESPONSE_MISSING_GEOJSON" | "LAYER_AUTHORIZED_LIST_API_KEY_MISSING" | "LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE" | "LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED" | "LAYER_STYLE_NOT_VECTOR" | "LAYER_TYPE_UNSUPPORTED_XYZ" | "LAYER_TYPE_UNSUPPORTED_DRAWING" | "LAYER_TYPE_UNSUPPORTED_MEASURE" | "LAYER_WMS_LAYERS_EMPTY" | "LAYER_GEOTIFF_UNSUPPORTED" | "LAYER_SHP_PACKAGE_MISSING" | "LAYER_CSV_PACKAGE_MISSING" | "LAYER_CSV_LATLON_NOT_FOUND" | "LAYER_NOT_FOUND" | "LAYER_ID_ALREADY_EXISTS" | "LAYER_TYPE_MISMATCH" | "LAYER_SERVICE_OPTIONS_NOT_FOUND" | "LAYER_NOT_RASTER" | "OGC_AUTHORIZED_LAYERS_REQUEST_FAILED" | "OGC_GEOTIFF_DOWNLOAD_FAILED" | "OGC_WFS_JSON_FORMAT_UNSUPPORTED" | "OGC_WFS_GEOJSON_REQUEST_FAILED" | "OGC_WFS_REQUEST_FAILED" | "OGC_WFS_EXCEPTION" | "OGC_WFS_OL_PACKAGE_MISSING" | "OGC_WCS_REQUEST_FAILED" | "OGC_WCS_MULTIPART_IMAGE_NOT_FOUND" | "LAYER_PREVIEW_UNSUPPORTED_XYZ" | "LAYER_PREVIEW_UNSUPPORTED_DRAWING" | "LAYER_PREVIEW_UNSUPPORTED_MEASURE" | "LAYER_MANAGER_NOT_READY" | "LAYER_AUTHORIZED_ADD_MISSING_INFO" | "OGC_SERVICE_DISCOVERY_PARSE_FAILED" | "LAYER_WMTS_TILEMATRIXSET_MISSING" | "LAYER_OUTSIDE_SERVICE_EXTENT";
 
 /** Bir hata kodunun `getErrorCodes()` registry'sindeki tam kaydı. */
 export declare interface TucbsErrorInfo {
@@ -2003,6 +2470,25 @@ export declare interface TucbsGlobalConfig {
  * Geçersizse {@link ApiKeyValidationError} (body = backend message).
  */
 export declare function validateApiKey(apiKey: string, apiBase?: string): Promise<void>;
+
+/** Yeni katman adını doğrular: boşsa `"empty"`, mevcut bir adla çakışıyorsa `"duplicate"`, geçerliyse `null`. */
+export declare function validateDrawLayerTitle(title: string, existingTitles: readonly string[]): "empty" | "duplicate" | null;
+
+declare type WcsAuthContext = Parameters<typeof getCapabilities>[2];
+
+/** `fetchWcsCoverageDescriptions` sonucu: kapsama başına WGS84 kutusu ve yükseklik verisi olan kapsamalar. */
+export declare interface WcsCoverageDescriptions {
+    /** Kutusu okunabilen kapsamalar (kapsama kimliği → WGS84 kutusu). */
+    extents: Map<string, GeographicBoundingBox>;
+    /**
+     * Yükseklik modeli (DEM/DTM/DSM gibi) sayılan kapsamaların kimlikleri. Bir
+     * kapsama tek bantlıysa ve kimliği ya da bant adı yükseklik bildiriyorsa
+     * (ör. "elevation", "dem", "dtm", "srtm", bant adında "height") bu kümeye
+     * girer. Çok bantlı (RGB gibi) ve bant tanımı olmayan kapsamalar görüntü
+     * sayılır.
+     */
+    elevationIds: Set<string>;
+}
 
 /** `LayerManager.add("WCS", ...)` için WCS katman seçenekleri. */
 export declare interface WCSLayerOptions {
@@ -2041,14 +2527,26 @@ export declare interface WCSLayerOptions {
     readonly maxSize?: number;
 }
 
+/**
+ * Keşfedilen WCS kapsamasının kutusunu Cesium `Rectangle`'a çevirir;
+ * `WCSLayerOptions.rectangle` olarak verilir.
+ *
+ * @param item Keşfedilen kapsama.
+ * @returns Kapsamanın dikdörtgeni; kutusu yoksa `undefined`.
+ */
 export declare function wcsRectangleFor(item: DiscoveredItem): Rectangle | undefined;
 
 /** Kama tampon: nokta, yarıçap (metre) ve açı aralığı (kuzey 0°). */
 export declare interface WedgeBufferAnalysisRequest {
+    /** Kamanın merkezi olan nokta geometrisi (GeoJSON). */
     readonly geojson: object;
+    /** Kama yarıçapı (metre). */
     readonly distanceM: number;
+    /** Başlangıç açısı (derece; 0° kuzey, saat yönünde: 90° doğu). */
     readonly startAngle: number;
+    /** Bitiş açısı (derece; 0° kuzey, saat yönünde); başlangıç açısından büyük olmalı. */
     readonly endAngle: number;
+    /** Hesaplamanın yapılacağı metrik EPSG kodu (verilmezse backend uygun bir UTM dilimi seçer). */
     readonly targetEpsg?: number;
 }
 
@@ -2072,7 +2570,12 @@ export declare interface WFSLayerOptions {
     readonly maxFeatures?: number;
     /** Servise erişim için kullanılacak yetkilendirme token'ı. */
     readonly authToken?: string;
-    /** Geometrilerin yer yüzeyine (terrain) yapıştırılıp yapıştırılmayacağı. */
+    /**
+     * Geometrilerin yer yüzeyine (terrain) yapıştırılıp yapıştırılmayacağı (varsayılan `true`).
+     * 2B modda noktalar yapıştırılmaz: Cesium yere yapıştırılmış noktaları 2B'de yanlış
+     * konuma çizdiği için harita 2B'deyken noktalar düz çizilir, 3B'ye dönünce yeniden
+     * yapıştırılır. Alan ve çizgiler her iki modda da yapıştırılır.
+     */
     readonly clampToGround?: boolean;
 }
 
@@ -2111,9 +2614,13 @@ export declare interface WMSLayerOptions {
      * icin BBOX/WIDTH-HEIGHT hesaplamasinda kullanilir (capabilities'teki
      * EX_GeographicBoundingBox/LatLonBoundingBox'tan turetilir). */
     readonly geographicBoundingBox?: {
+        /** Batı sınırı (boylam, derece). */
         readonly west: number;
+        /** Güney sınırı (enlem, derece). */
         readonly south: number;
+        /** Doğu sınırı (boylam, derece). */
         readonly east: number;
+        /** Kuzey sınırı (enlem, derece). */
         readonly north: number;
     };
 }

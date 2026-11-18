@@ -2,7 +2,9 @@ import { LitElement, PropertyValues } from 'lit';
 import { Map as TucbsMapInstance } from '@tucbs/core';
 /**
  * `tucbs-analysis-tool`: toolbar analiz girişi — sağdan slide-over panelde
- * `tucbs-analysis-panel`'i (tampon vb.) KENDİ İÇİNDE GÖMER. `tucbs-toolbar`
+ * `tucbs-analysis-panel`'i (tampon vb.) KENDİ İÇİNDE GÖMER. Çizim/Ölçüm
+ * araçlarıyla karşılıklı dışlayıcıdır: panel açılınca aktif çizim/ölçüm
+ * oturumu sonlanır, bir çizim/ölçüm başlayınca panel kapanır. `tucbs-toolbar`
  * içinde `analysis` id ile kullanılır; `TucbsApp`'in toolbar'ında koşulsuz
  * her zaman bulunur (harici bir `<tucbs-analysis-panel>` marker tag'i
  * ARANMAZ — bkz. `TucbsApp.ts`).
@@ -29,6 +31,7 @@ export declare class TucbsAnalysisTool extends LitElement {
     private readonly _layoutController;
     private _panelEl;
     private readonly _customCssState;
+    private readonly _onDrawStart;
     /** Analiz panelini (`tucbs-slide-over-panel`) `document.body`'ye ekler ve içeriğini ilk kez render eder. */
     connectedCallback(): void;
     /** Bileşen DOM'dan kaldırıldığında haritadan bağ çözer ve panel elementini DOM'dan kaldırır. */
@@ -38,6 +41,8 @@ export declare class TucbsAnalysisTool extends LitElement {
     /** `customCss`/`map`/`panelWidth` değişimlerini işler (shadow DOM'a stil uygulama, layout bağlama/panel genişliği) ve panel içeriğini yeniden render eder. */
     updated(changed: PropertyValues): void;
     private _renderIntoPanel;
+    private _bindDrawingManager;
+    private _unbindDrawingManager;
     private _toggle;
     /** Toolbar'daki dairesel "Coğrafi Analiz" butonunu render eder. */
     render(): import('lit').TemplateResult<1>;

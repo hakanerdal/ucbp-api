@@ -1,6 +1,7 @@
 /** React'te tucbs etiketlerinin tipi paketle birlikte gelsin. */
 export type { TucbsJsxTags } from './react-jsx.js';
 export { TucbsMap } from './map/TucbsMap.js';
+export type { ApiKeyAuthState } from './shared/util/bindTucbsMap.js';
 export { TucbsMapPreview, type PreviewLayerSpec } from './map/TucbsMapPreview.js';
 export { TucbsLayerList } from './layer-list/TucbsLayerList.js';
 export { TucbsAuthorizedLayers } from './layer-sources/TucbsAuthorizedLayers.js';
@@ -11,7 +12,7 @@ export { TucbsDrawTool } from './tools/TucbsDrawTool.js';
 export { TucbsDeleteTool } from './tools/TucbsDeleteTool.js';
 export { TucbsInfoBar } from './app/TucbsInfoBar.js';
 export { TucbsQualityBar } from './app/TucbsQualityBar.js';
-export { TucbsBasemapPicker } from './tools/TucbsBasemapPicker.js';
+export { TucbsBasemapPicker, type BasemapConfig } from './tools/TucbsBasemapPicker.js';
 export { TucbsApp } from './app/TucbsApp.js';
 export { TucbsFileUpload } from './layer-sources/TucbsFileUpload.js';
 export { TucbsServiceUpload } from './layer-sources/TucbsServiceUpload.js';

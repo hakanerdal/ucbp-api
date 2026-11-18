@@ -1,8 +1,12 @@
 import { LitElement, nothing, PropertyValues } from 'lit';
 import { Map as TucbsMapInstance, BasemapId } from '@tucbs/core';
-interface BasemapConfig {
+/** `TucbsBasemapPicker.basemaps` listesindeki tek bir altlık harita seçeneği. */
+export interface BasemapConfig {
+    /** Altlık harita kimliği (ör. `"hgm-temel"`). */
     readonly id: BasemapId;
+    /** Kartta görünen ad. */
     readonly label: string;
+    /** Kartta gösterilen önizleme görseli (URL veya data URI). */
     readonly thumbnail: string;
 }
 /**
@@ -103,5 +107,4 @@ export declare class TucbsBasemapPicker extends LitElement {
      */
     render(): import('lit').TemplateResult<1> | typeof nothing;
 }
-export {};
 //# sourceMappingURL=TucbsBasemapPicker.d.ts.map

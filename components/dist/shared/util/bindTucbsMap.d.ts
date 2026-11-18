@@ -3,10 +3,15 @@ import { InteractionManager, LayerManager, Map as TucbsMapInstance } from '@tucb
 export type ApiKeyAuthState = "none" | "pending" | "ok" | "failed";
 /** {@link TucbsMap} host elementi — mapElementId ile bağlanan bileşenler için. */
 export type TucbsMapElement = HTMLElement & {
+    /** Hazır olduğunda `@tucbs/core` `Map` örneği; hazır değilse `null` ya da yok. */
     map?: TucbsMapInstance | null;
+    /** Haritanın `LayerManager`'ı. */
     layerManager?: LayerManager;
+    /** Haritanın `InteractionManager`'ı. */
     interaction?: InteractionManager;
+    /** apiKey doğrulama durumu. */
     apiKeyAuthState?: ApiKeyAuthState;
+    /** Haritanın apiKey'ini hedef bileşenin yalnız yazılabilir `apiKey` alanına aktarır. */
     _grantApiKeyTo?: (target: {
         apiKey: string;
     }) => void;

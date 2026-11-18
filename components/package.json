@@ -1,6 +1,7 @@
 {
   "name": "@tucbs/components",
-  "version": "0.2.3",
+  "version": "0.2.4",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/tucbs-components.es.js",
   "module": "./dist/tucbs-components.es.js",
@@ -12,11 +13,14 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES"
   ],
   "peerDependencies": {
     "cesium": "^1.142.0",
-    "@tucbs/core": "^0.2.3"
+    "@tucbs/core": "^0.2.4"
   },
   "dependencies": {
     "@carbon/icons": "^11.84.0",

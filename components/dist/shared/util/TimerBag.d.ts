@@ -1,4 +1,5 @@
 import { ReactiveController, ReactiveControllerHost } from 'lit';
+/** Host'a bağlı `setTimeout`/`requestAnimationFrame` çağrılarını izler; host DOM'dan kaldırılınca hepsini iptal eder. */
 export declare class TimerBag implements ReactiveController {
     private readonly _timeoutIds;
     private readonly _frameIds;

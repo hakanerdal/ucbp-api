@@ -1,5 +1,6 @@
 /** `WriteOnlyApiKey`'i tutan host'un ihtiyaç duyduğu minimum Lit arayüzü. */
 export interface WriteOnlyApiKeyHost {
+    /** Lit'in yeniden çizim isteği; apiKey değişince çağrılır. */
     requestUpdate(name?: PropertyKey, oldValue?: unknown): void;
 }
 /**

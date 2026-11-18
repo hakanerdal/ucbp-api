@@ -28,6 +28,7 @@ export declare class TucbsServiceUpload extends LitElement {
     mapElementId: string;
     /** Harita apiKey'i — yalnızca yazılabilir; `get` güvenlik nedeniyle her zaman maskelenmiş döner (bkz yukarıdaki `#apiKey` WHY notu). */
     set apiKey(value: string);
+    /** apiKey tanımlıysa `"••••••"`, değilse boş metin döner; gerçek değer dışarıdan okunamaz. */
     get apiKey(): string;
     /** Tüketicinin, bileşen kaynağına dokunmadan shadow DOM'a enjekte edebileceği keyfi CSS metni (bkz `./internal/CustomCss.ts`). */
     customCss: string;

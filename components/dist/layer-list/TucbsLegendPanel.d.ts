@@ -4,8 +4,7 @@ import { LayerManager, LayerType } from '@tucbs/core';
  * WMS/WMTS icin gercek GetLegendGraphic (WMS) / capabilities <LegendURL>
  * (WMTS) gorseli, vektor (WFS/LOCAL) katmanlar icin ise LayerManager'a en son
  * uygulanan stile (bkz. TucbsStyleEditor -> applyLayerStyle) gore gradient
- * bari / bin araliklari / kategori listesi gosterir (bkz.
- * project_ucbp_api_styleeditor_arastirma memory). `mapElementId` YOK --
+ * bari / bin araliklari / kategori listesi gosterir. `mapElementId` YOK --
  * `layerManager`/`layerId`/`layerType`/`open` property'leri dogrudan
  * atanmalidir; gercek kullanimi genelde `TucbsLayerList`'in katman "⋮"
  * menusundeki "Lejant" secenegi uzerinden dolaylidir.

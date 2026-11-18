@@ -1,9 +1,15 @@
 import { Map as TucbsMapCore } from '@tucbs/core';
+/** Haritada tıklanıp analize seçilen nesne (GeoJSON Feature). */
 export type SelectedFeature = {
+    /** GeoJSON türü; her zaman `"Feature"`. */
     type: "Feature";
+    /** Nesnenin kimliği (varsa). */
     id?: string | number | undefined;
+    /** Nesnenin öznitelikleri. */
     properties: Record<string, unknown>;
+    /** GeoJSON geometrisi. */
     geometry: object & {
+        /** Geometri türü (ör. `"Polygon"`). */
         type?: string;
     };
 };
@@ -25,6 +31,7 @@ export declare class AnalysisMapBind {
     attach(): void;
     /** Dinleyiciyi ve identify askısını kaldırır. */
     detach(): void;
+    /** Bağlı haritayı döndürür; henüz bağlanmadıysa `map` ya da `mapElementId` üzerinden çözmeyi dener. */
     current(): TucbsMapCore | null;
     /** Seçili nesneleri kırmızı vurguyla gösterir. */
     highlight(features: SelectedFeature[]): void;

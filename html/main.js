@@ -1,3 +1,5 @@
+// Copyright 2026 T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı
+// SPDX-License-Identifier: Apache-2.0
 import { configureTucbs } from "@tucbs/core";
 
 configureTucbs({

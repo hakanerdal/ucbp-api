@@ -33,7 +33,9 @@ export declare class TucbsMapPreview extends LitElement {
     #private;
     private readonly _autoId;
     private get hostId();
+    /** Harita apiKey'i — yalnızca yazılabilir; okunan değer her zaman maskelidir. */
     set apiKey(value: string);
+    /** apiKey tanımlıysa `"••••••"`, değilse boş metin döner; gerçek değer dışarıdan okunamaz. */
     get apiKey(): string;
     /** Gösterilecek altlık harita (basemap) kimliği. */
     basemap: BasemapId;

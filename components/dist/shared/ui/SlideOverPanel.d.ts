@@ -47,6 +47,8 @@ export declare class TucbsSlideOverPanel extends LitElement {
     scrollBody: boolean;
     /** Panelin kendi kapatma (X) butonu tetiklendiğinde çağrılır. */
     onCloseRequest: (() => void) | undefined;
+    /** Başlıktaki kapatma (X) düğmesinin gösterilip gösterilmeyeceği (varsayılan `true`). */
+    closable: boolean;
     private readonly _customCssState;
     /** `customCss` değiştiğinde özel CSS'i shadow DOM'a yeniden uygular. */
     updated(changed: PropertyValues): void;

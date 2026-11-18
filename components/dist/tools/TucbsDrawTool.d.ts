@@ -13,7 +13,7 @@ import { Map as TucbsMapInstance } from '@tucbs/core';
  * "ayri bir `<tucbs-tool-group>` sarmalayici" onerisini degerlendirip
  * REDDETTI -- "aktif aracin ikonu ayni butonda gorunsun" gereksinimi
  * jenerik bir sarmalayicida DrawTool'a ozgu bilgi gerektirip coupling
- * yaratirdi. Bkz. project_ucbp_api_tucbstoolbar_mimarisi memory.
+ * yaratirdi.
  *
  * `mapElementId`, sayfadaki `<tucbs-map>` elementinin `id`'siyle eşleşmelidir;
  * bileşen bu sayede haritaya otomatik bağlanır (Senaryo 2).

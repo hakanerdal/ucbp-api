@@ -1,3 +1,9 @@
+/*!
+ * @license
+ * UCBP API vendor paketi
+ * Bu dosya üçüncü taraf açık kaynak bileşenleri içerir; her bileşen kendi
+ * lisansına tabidir. Lisans metinleri ve bildirimler: THIRD_PARTY_NOTICES
+ */
 function st(i, t) {
   if (!i)
     throw new Error(t);

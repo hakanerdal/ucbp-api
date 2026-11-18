@@ -56,8 +56,7 @@ export interface PreviewToolbarCallbacks {
  * handler KULLANILMAZ: (a) OWASP/XSS (v17 SS8.5) -- tuketiciden gelen
  * `printTitle`/`footerText` hep `textContent` ile yazilir; (b) host
  * uygulamanin CSP'sine `srcdoc` uzerinden kalitan `script-src` kisitlamasi
- * hic devreye girmez, cunku calisan hicbir inline script YOK (bkz
- * project_ucbp_api_printtool_arastirma CSP bulgusu).
+ * hic devreye girmez, cunku calisan hicbir inline script YOK.
  *
  * Baslik bloğu (`printTitle`+tarih) SADECE `printTitle` doluysa render edilir
  * -- 3dmap referansiyla (RecordToolPanel.tsx) birebir ayni kuplaj: baslik

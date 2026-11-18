@@ -1,6 +1,17 @@
 import { ReactiveControllerHost } from 'lit';
 import { Map as TucbsMapInstance } from '@tucbs/core';
 /**
+ * Bir elemanı (ör. `tucbs-info-bar`) panel yerleşimine kaydeder: panel(ler) açıldıkça/kapandıkça
+ * haritayla aynı genişlik ve sol boşluğu alır. Haritaya bağlı bir panel varsa o anki yerleşim hemen uygulanır.
+ * @param el - Kaydedilecek eleman.
+ */
+export declare function registerLayoutTarget(el: HTMLElement): void;
+/**
+ * Elemanın panel yerleşimi kaydını siler; eleman artık güncellenmez (stili olduğu gibi kalır).
+ * @param el - Kaydı silinecek eleman.
+ */
+export declare function unregisterLayoutTarget(el: HTMLElement): void;
+/**
  * Sagdan/soldan kayan bir panel (bkz. SlideOverPanel.ts) acildiginda
  * haritayi VE -sadece "right" tarafta, varsa- ata `tucbs-toolbar`'i panele
  * yer acacak sekilde "iten" mantik. `TucbsSettingsTool`'un "Ayarlar" paneli
@@ -60,7 +71,7 @@ export declare class PanelLayoutController {
     /** Sahibi tarafindan atanir: ayni taraftaki BASKA bir panel acilinca BU panelin de kapatilmasi gerektiginde cagrilir. */
     onExclusiveClose: (() => void) | null;
     constructor(hostForToolbarLookup: Element & ReactiveControllerHost, side?: "left" | "right");
-    /** Bu controller'ı bir `Map` instance'ına bağlar; harita container'ının (ve varsa `tucbs-info-bar`'ın) boyut geçişlerini/ResizeObserver'ını kurar. */
+    /** Bu controller'ı bir `Map` instance'ına bağlar; harita container'ının boyut geçişlerini/ResizeObserver'ını kurar (`tucbs-info-bar` kendini {@link registerLayoutTarget} ile kaydeder). */
     bindMap(map: TucbsMapInstance): void;
     /** Bu controller'ı haritadan ayırır: gözlemciyi/paylaşılan genişlik durumunu temizler ve haritayı son bir kez `resize()` eder. */
     unbindMap(map: TucbsMapInstance): void;

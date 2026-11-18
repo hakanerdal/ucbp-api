@@ -24,10 +24,22 @@ import { BasemapId } from '@tucbs/core';
  *   mode="3D"
  * ></tucbs-app>
  * ```
+ *
+ * @example
+ * Araç çubuğu ve bilgi çubuğu olmadan (yalnızca `"false"` değeri gizler):
+ * ```html
+ * <tucbs-app
+ *   api-key="YOUR_API_KEY"
+ *   show-toolbar="false"
+ *   show-info-bar="false"
+ * ></tucbs-app>
+ * ```
  */
 export declare class TucbsApp extends LitElement {
     #private;
+    /** Harita apiKey'i — yalnızca yazılabilir; okunan değer her zaman maskelidir. */
     set apiKey(value: string);
+    /** apiKey tanımlıysa `"••••••"`, değilse boş metin döner; gerçek değer dışarıdan okunamaz. */
     get apiKey(): string;
     /** Kullanilacak taban harita (basemap) kimligi. */
     basemap: BasemapId;
@@ -35,11 +47,11 @@ export declare class TucbsApp extends LitElement {
     mode: "2D" | "3D";
     /** Harita kalite/detay seviyesi (0-100). */
     quality: number;
-    /** Dahili `<tucbs-layer-list>` panelinin gosterilip gosterilmeyecegi. */
+    /** Dahili `<tucbs-layer-list>` panelinin gösterilip gösterilmeyeceği; HTML'de `show-layer-list="false"` gizler (varsayılan `true`). */
     showLayerList: boolean;
-    /** Dahili `<tucbs-toolbar>`'in gosterilip gosterilmeyecegi. */
+    /** Dahili `<tucbs-toolbar>`'ın gösterilip gösterilmeyeceği; HTML'de `show-toolbar="false"` gizler (varsayılan `true`). */
     showToolbar: boolean;
-    /** Dahili `<tucbs-info-bar>`'in gosterilip gosterilmeyecegi. */
+    /** Dahili `<tucbs-info-bar>`'ın gösterilip gösterilmeyeceği; HTML'de `show-info-bar="false"` gizler (varsayılan `true`). */
     showInfoBar: boolean;
     private _map;
     /** Shadow DOM yerine Light DOM kullanır (bkz yukarıdaki WHY yorumu). */

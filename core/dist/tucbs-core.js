@@ -1,3 +1,10 @@
+/*!
+ * @license
+ * UCBP API @tucbs/core
+ * Copyright 2026 T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı
+ * SPDX-License-Identifier: Apache-2.0
+ * Lisans metni ve bildirimler: LICENSE, NOTICE
+ */
 var __typeError = (msg) => {
   throw TypeError(msg);
 };
@@ -6,553 +13,1313 @@ var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read fr
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
-var _apiKey, _apiKey2, _AnalysisManager_instances, post_fn, _unregisterApiKeyRefresh, _removeLodSeamGuard, _removeMinZoomScale, _removeScaleWheelZoom, _apiKey3, _a;
-import { Math as _0x584e42, SceneMode, EllipsoidTerrainProvider, Cartesian2, Cartesian3, CameraEventType, Ellipsoid, JulianDate, Cartographic, ConstantProperty, PropertyBag, PolygonHierarchy, ColorMaterialProperty, Color, CallbackProperty, HeadingPitchRange, BoundingSphere, Entity, PolylineGraphics, ConstantPositionProperty, PointGraphics, CustomDataSource, GeoJsonDataSource, KmlDataSource, Rectangle, WebMapServiceImageryProvider, GetFeatureInfoFormat, Resource, WebMapTileServiceImageryProvider, WebMercatorTilingScheme, ImageryLayer, SingleTileImageryProvider, HeightReference, ScreenSpaceEventHandler, ScreenSpaceEventType, UrlTemplateImageryProvider, Viewer } from "cesium";
+var _apiKey, _apiKey2, _AnalysisManager_instances, post_fn, _unregisterApiKeyRefresh, _removeLodSeamGuard, _removeMinZoomScale, _removeScaleWheelZoom, _apiKey3, _drawingLayerPicker, _drawQueue, _a;
+import { Math as Math$1, SceneMode, EllipsoidTerrainProvider, Cartesian2, Cartesian3, CameraEventType, Ellipsoid, JulianDate, Cartographic, Rectangle, ConstantProperty, PropertyBag, PolygonHierarchy, ColorMaterialProperty, Color, PolylineDashMaterialProperty, CallbackProperty, HeadingPitchRange, BoundingSphere, Entity, PolylineGraphics, ConstantPositionProperty, PointGraphics, CustomDataSource, HeightReference, BillboardGraphics, GeoJsonDataSource, KmlDataSource, WebMapServiceImageryProvider, GetFeatureInfoFormat, Resource, WebMapTileServiceImageryProvider, WebMercatorTilingScheme, ImageryLayer, SingleTileImageryProvider, ScreenSpaceEventHandler, ScreenSpaceEventType, UrlTemplateImageryProvider, Viewer } from "cesium";
 function ensureCesiumRuntime() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
-  const _0x5064c4 = window;
-  !_0x5064c4["CESIUM_BASE_URL"] && (_0x5064c4["CESIUM_BASE_URL"] = "https://cdn.jsdelivr.net/npm/cesium@1.143.0/Build/Cesium/", console["info"]("[gizLog] cesium base url atandi surum=1.143.0"));
-  const _0x429ad4 = _0x5064c4["CESIUM_BASE_URL"]["replace"](/\/?$/, "/"), _0x1fcd6e = Array["from"](document["querySelectorAll"]("link"))["some"]((_0x3094b6) => (_0x3094b6["getAttribute"]("href") || "")["includes"]("Widgets/widgets.css"));
-  if (_0x1fcd6e) return;
-  const _0x34db8b = document["createElement"]("link");
-  _0x34db8b["rel"] = "stylesheet", _0x34db8b["href"] = _0x429ad4 + "Widgets/widgets.css", document["head"]["appendChild"](_0x34db8b), console["info"]("[gizLog] cesium widgets.css eklendi");
-}
-const MAX_LEVEL = 24, EARTH_RADIUS = 6371e3, CORNER_SAFETY = 1.15;
-function cornerDistanceRatio(_0x197b83, _0x36119e, _0x4819be) {
-  const _0x2f1d66 = Math["tan"](_0x197b83 / 2), _0x26d60f = _0x2f1d66 * _0x36119e, _0x3f19b7 = Math["atan"](Math["hypot"](_0x26d60f, _0x2f1d66)), _0x3a777c = EARTH_RADIUS + _0x4819be, _0x5b0dcd = EARTH_RADIUS * EARTH_RADIUS - _0x3a777c * _0x3a777c * Math["sin"](_0x3f19b7) ** 2, _0x3dc6e8 = _0x5b0dcd > 0 ? _0x3a777c * Math["cos"](_0x3f19b7) - Math["sqrt"](_0x5b0dcd) : Math["sqrt"](_0x3a777c * _0x3a777c - EARTH_RADIUS * EARTH_RADIUS);
-  return _0x3dc6e8 / _0x4819be * CORNER_SAFETY;
-}
-function lodTransitionDistances(_0x300860) {
-  const { drawingBufferHeight: _0x256642, sseDenominator: _0x15616f, maximumScreenSpaceError: _0xb90017, pixelRatio: _0x1f3463 } = _0x300860, _0x453983 = [];
-  for (let _0x3f7f85 = 0; _0x3f7f85 <= MAX_LEVEL; _0x3f7f85++) {
-    const _0x4c8b2d = _0x300860["geometricError"](_0x3f7f85) * _0x256642 / (_0x15616f * _0xb90017 * _0x1f3463);
-    if (Number["isFinite"](_0x4c8b2d) && _0x4c8b2d > 0) _0x453983["push"](_0x4c8b2d);
+  const host = window;
+  if (!host.CESIUM_BASE_URL) {
+    host.CESIUM_BASE_URL = `https://cdn.jsdelivr.net/npm/cesium@${"1.143.0"}/Build/Cesium/`;
   }
-  return _0x453983["sort"]((_0x12b361, _0x353294) => _0x12b361 - _0x353294);
+  const base = host.CESIUM_BASE_URL.replace(/\/?$/, "/");
+  const already = Array.from(document.querySelectorAll("link")).some(
+    (link2) => (link2.getAttribute("href") || "").includes("Widgets/widgets.css")
+  );
+  if (already) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = `${base}Widgets/widgets.css`;
+  document.head.appendChild(link);
+}
+const MAX_LEVEL = 24;
+const EARTH_RADIUS = 6371e3;
+const CORNER_SAFETY = 1.15;
+function cornerDistanceRatio(fovy, aspectRatio, height) {
+  const tanY = Math.tan(fovy / 2);
+  const tanX = tanY * aspectRatio;
+  const theta = Math.atan(Math.hypot(tanX, tanY));
+  const center = EARTH_RADIUS + height;
+  const discriminant = EARTH_RADIUS * EARTH_RADIUS - center * center * Math.sin(theta) ** 2;
+  const distance = discriminant > 0 ? center * Math.cos(theta) - Math.sqrt(discriminant) : Math.sqrt(center * center - EARTH_RADIUS * EARTH_RADIUS);
+  return distance / height * CORNER_SAFETY;
+}
+function lodTransitionDistances(params) {
+  const { drawingBufferHeight, sseDenominator, maximumScreenSpaceError, pixelRatio } = params;
+  const out = [];
+  for (let level = 0; level <= MAX_LEVEL; level++) {
+    const d = params.geometricError(level) * drawingBufferHeight / (sseDenominator * maximumScreenSpaceError * pixelRatio);
+    if (Number.isFinite(d) && d > 0) out.push(d);
+  }
+  return out.sort((a, b) => a - b);
 }
 const SEAM_MARGIN = 1.01;
-function seamFreeScreenSpaceError(_0x33ecb3, _0x347a92) {
-  const _0x3b4950 = _0x347a92["maximumScreenSpaceError"], _0x27b8e4 = cornerDistanceRatio(_0x347a92["fovy"], _0x347a92["aspectRatio"], _0x33ecb3);
-  for (const _0x5b1870 of lodTransitionDistances(_0x347a92)) {
-    if (_0x5b1870 > _0x33ecb3 && _0x5b1870 < _0x33ecb3 * _0x27b8e4) {
-      const _0x32b1df = _0x3b4950 * (_0x5b1870 / _0x33ecb3) * SEAM_MARGIN, _0x90b745 = _0x3b4950 * _0x5b1870 / (_0x33ecb3 * _0x27b8e4 * SEAM_MARGIN);
-      return Math["abs"](Math["log"](_0x32b1df / _0x3b4950)) <= Math["abs"](Math["log"](_0x90b745 / _0x3b4950)) ? _0x32b1df : _0x90b745;
+function seamFreeScreenSpaceError(height, params) {
+  const base = params.maximumScreenSpaceError;
+  const ratio = cornerDistanceRatio(params.fovy, params.aspectRatio, height);
+  for (const threshold of lodTransitionDistances(params)) {
+    if (threshold > height && threshold < height * ratio) {
+      const coarser = base * (threshold / height) * SEAM_MARGIN;
+      const finer = base * threshold / (height * ratio * SEAM_MARGIN);
+      return Math.abs(Math.log(coarser / base)) <= Math.abs(Math.log(finer / base)) ? coarser : finer;
     }
   }
-  return _0x3b4950;
+  return base;
 }
 const NADIR_TOLERANCE_DEGREES = 3;
-function installLodSeamGuard(_0x1b3349) {
-  const _0x47f37e = _0x1b3349["scene"], _0xd9685a = _0x47f37e["globe"];
-  if (!_0xd9685a) return () => void 0;
-  let _0xeafe9 = _0xd9685a["maximumScreenSpaceError"], _0x226d1d = _0xeafe9;
-  const _0x578d4e = (_0xda0daa) => {
-    if (_0xd9685a["maximumScreenSpaceError"] !== _0xda0daa) _0xd9685a["maximumScreenSpaceError"] = _0xda0daa;
-    _0x226d1d = _0xda0daa;
-  }, _0x2c7ab6 = () => {
-    if (_0xd9685a["maximumScreenSpaceError"] !== _0x226d1d) _0xeafe9 = _0xd9685a["maximumScreenSpaceError"];
-    const _0x1c27bf = _0x47f37e["camera"]["frustum"], _0x5b9723 = Math["abs"](_0x584e42["toDegrees"](_0x47f37e["camera"]["pitch"]) + 90) <= NADIR_TOLERANCE_DEGREES;
-    if (_0x47f37e["mode"] !== SceneMode["SCENE3D"] || !_0x5b9723 || !(_0x47f37e["terrainProvider"] instanceof EllipsoidTerrainProvider) || _0x1c27bf["fovy"] === void 0 || _0x1c27bf["aspectRatio"] === void 0 || _0x1c27bf["sseDenominator"] === void 0) {
-      _0x578d4e(_0xeafe9);
+function installLodSeamGuard(viewer) {
+  const scene = viewer.scene;
+  const globe = scene.globe;
+  if (!globe) return () => void 0;
+  let base = globe.maximumScreenSpaceError;
+  let applied = base;
+  const apply = (value) => {
+    if (globe.maximumScreenSpaceError !== value) globe.maximumScreenSpaceError = value;
+    applied = value;
+  };
+  const onPreRender = () => {
+    if (globe.maximumScreenSpaceError !== applied) base = globe.maximumScreenSpaceError;
+    const frustum = scene.camera.frustum;
+    const nadir = Math.abs(Math$1.toDegrees(scene.camera.pitch) + 90) <= NADIR_TOLERANCE_DEGREES;
+    if (scene.mode !== SceneMode.SCENE3D || !nadir || !(scene.terrainProvider instanceof EllipsoidTerrainProvider) || frustum.fovy === void 0 || frustum.aspectRatio === void 0 || frustum.sseDenominator === void 0) {
+      apply(base);
       return;
     }
-    const _0x534372 = _0x47f37e["terrainProvider"], _0x7eb56c = { "geometricError": (_0x77112e) => _0x534372["getLevelMaximumGeometricError"](_0x77112e), "drawingBufferHeight": _0x47f37e["drawingBufferHeight"], "sseDenominator": _0x1c27bf["sseDenominator"], "maximumScreenSpaceError": _0xeafe9, "pixelRatio": _0x47f37e["pixelRatio"] ?? 1, "fovy": _0x1c27bf["fovy"], "aspectRatio": _0x1c27bf["aspectRatio"] };
-    _0x578d4e(seamFreeScreenSpaceError(_0x47f37e["camera"]["positionCartographic"]["height"], _0x7eb56c));
-  }, _0x5bb00c = _0x47f37e["preRender"]["addEventListener"](_0x2c7ab6);
-  return () => {
-    _0x5bb00c(), !_0x47f37e["isDestroyed"]() && _0xd9685a["maximumScreenSpaceError"] === _0x226d1d && (_0xd9685a["maximumScreenSpaceError"] = _0xeafe9);
-  };
-}
-const SCREEN_DPI$1 = 96, METERS_PER_INCH$1 = 0.0254, REWRITE_TOLERANCE = 5e-3;
-function minZoomDistanceForScale(_0x4c09cf, _0x1a04e3, _0x277c72) {
-  const _0x2e4587 = Math["tan"](_0x277c72 / 2), _0x3ec49c = _0x4c09cf * METERS_PER_INCH$1 / SCREEN_DPI$1 * _0x1a04e3 / (2 * _0x2e4587);
-  return Number["isFinite"](_0x3ec49c) && _0x3ec49c > 0 ? _0x3ec49c : null;
-}
-const SNAP_WINDOW_RATIO = 1.06, MIN_SNAP_GAP_METERS = 1e-3, SNAP_DURATION_MS = 150;
-function snapToMinAmount(_0x976a70, _0x47984d) {
-  const _0x27e348 = _0x976a70 - _0x47984d;
-  if (!(_0x27e348 > MIN_SNAP_GAP_METERS) || _0x976a70 > _0x47984d * SNAP_WINDOW_RATIO) return 0;
-  return _0x27e348;
-}
-function installMinZoomScale(_0x4643e6, _0x2a5a35, _0x43435b) {
-  const _0x3d4176 = _0x4643e6["scene"], _0x40594d = _0x3d4176["screenSpaceCameraController"], _0x354b40 = () => {
-    const _0x39aa4a = _0x3d4176["camera"]["frustum"]["fovy"];
-    if (_0x39aa4a === void 0) return;
-    const _0xf81010 = _0x3d4176["canvas"]["clientHeight"], _0x3f1950 = minZoomDistanceForScale(_0x2a5a35, _0xf81010, _0x39aa4a);
-    if (_0x3f1950 !== null) {
-      const _0xede56a = _0x40594d["minimumZoomDistance"];
-      Math["abs"](_0xede56a - _0x3f1950) > _0xede56a * REWRITE_TOLERANCE && (_0x40594d["minimumZoomDistance"] = _0x3f1950);
-    }
-    const _0x3ea63a = minZoomDistanceForScale(_0x43435b, _0xf81010, _0x39aa4a);
-    if (_0x3ea63a === null) return;
-    const _0x565a66 = _0x40594d["maximumZoomDistance"];
-    Math["abs"](_0x565a66 - _0x3ea63a) > _0x565a66 * REWRITE_TOLERANCE && (_0x40594d["maximumZoomDistance"] = _0x3ea63a);
-  }, _0x5f102e = _0x3d4176["camera"], _0x55783a = _0x3d4176["canvas"];
-  let _0x2a2ed7;
-  const _0x437b94 = () => {
-    if (_0x2a2ed7 !== void 0) cancelAnimationFrame(_0x2a2ed7);
-    _0x2a2ed7 = void 0;
-  }, _0x4dc8d2 = () => {
-    if (_0x2a2ed7 !== void 0) return;
-    const _0x5c2a6d = snapToMinAmount(_0x5f102e["positionCartographic"]["height"], _0x40594d["minimumZoomDistance"]);
-    if (_0x5c2a6d <= 0) return;
-    const _0x1183aa = performance["now"]();
-    let _0x2cb2a1 = 0;
-    const _0x52962b = (_0x3742bd) => {
-      const _0x57066d = Math["min"](1, (_0x3742bd - _0x1183aa) / SNAP_DURATION_MS), _0x513f43 = _0x5c2a6d * (1 - (1 - _0x57066d) * (1 - _0x57066d));
-      if (_0x513f43 > _0x2cb2a1) _0x5f102e["zoomIn"](_0x513f43 - _0x2cb2a1);
-      _0x2cb2a1 = _0x513f43, _0x2a2ed7 = _0x57066d < 1 ? requestAnimationFrame(_0x52962b) : void 0;
+    const terrain = scene.terrainProvider;
+    const params = {
+      geometricError: (level) => terrain.getLevelMaximumGeometricError(level),
+      drawingBufferHeight: scene.drawingBufferHeight,
+      sseDenominator: frustum.sseDenominator,
+      maximumScreenSpaceError: base,
+      // Scene.pixelRatio calisma zamaninda public ama Cesium tip tanimlarinda yok.
+      pixelRatio: scene.pixelRatio ?? 1,
+      fovy: frustum.fovy,
+      aspectRatio: frustum.aspectRatio
     };
-    _0x2a2ed7 = requestAnimationFrame(_0x52962b);
+    apply(seamFreeScreenSpaceError(scene.camera.positionCartographic.height, params));
   };
-  _0x55783a["addEventListener"]("pointerdown", _0x437b94), _0x55783a["addEventListener"]("wheel", _0x437b94, { "passive": !![] });
-  const _0x19d422 = _0x3d4176["preRender"]["addEventListener"](_0x354b40), _0x5dd17d = _0x5f102e["moveEnd"]["addEventListener"](_0x4dc8d2);
+  const remove = scene.preRender.addEventListener(onPreRender);
   return () => {
-    _0x437b94(), _0x55783a["removeEventListener"]("pointerdown", _0x437b94), _0x55783a["removeEventListener"]("wheel", _0x437b94), _0x19d422(), _0x5dd17d();
+    remove();
+    if (!scene.isDestroyed() && globe.maximumScreenSpaceError === applied) {
+      globe.maximumScreenSpaceError = base;
+    }
   };
 }
-const ZOOM_SCALE_STEPS = [100, 250, 500, 1e3, 2500, 5e3, 1e4, 25e3, 5e4, 1e5, 25e4, 5e5, 1e6, 25e5, 5e6, 15e6, 25e6], ON_STEP_TOLERANCE = 0.03;
-function nextScaleStep(_0x410d18, _0x542a54) {
-  if (!(_0x410d18 > 0) || !Number["isFinite"](_0x410d18)) return null;
-  if (_0x542a54 === 1) {
-    const _0x1ea78b = _0x410d18 / (1 + ON_STEP_TOLERANCE);
-    return [...ZOOM_SCALE_STEPS]["reverse"]()["find"]((_0x56b7ed) => _0x56b7ed < _0x1ea78b) ?? null;
+const ZOOM_SCALE_STEPS = [
+  100,
+  250,
+  500,
+  1e3,
+  2500,
+  5e3,
+  1e4,
+  25e3,
+  5e4,
+  1e5,
+  25e4,
+  5e5,
+  1e6,
+  25e5,
+  5e6,
+  15e6,
+  25e6,
+  3e7,
+  4e7,
+  5e7,
+  75e6,
+  1e8,
+  15e7,
+  25e7,
+  5e8,
+  1e9
+];
+const ON_STEP_TOLERANCE = 0.03;
+function nextScaleStep(current, direction) {
+  if (!(current > 0) || !Number.isFinite(current)) return null;
+  if (direction === 1) {
+    const limit2 = current / (1 + ON_STEP_TOLERANCE);
+    return [...ZOOM_SCALE_STEPS].reverse().find((s) => s < limit2) ?? null;
   }
-  const _0x4a40c5 = _0x410d18 * (1 + ON_STEP_TOLERANCE);
-  return ZOOM_SCALE_STEPS["find"]((_0x4ff9bf) => _0x4ff9bf > _0x4a40c5) ?? Infinity;
+  const limit = current * (1 + ON_STEP_TOLERANCE);
+  return ZOOM_SCALE_STEPS.find((s) => s > limit) ?? Infinity;
 }
-const SCREEN_DPI = 96, METERS_PER_INCH = 0.0254;
-function measureGround(_0x4e7709) {
-  const _0x5f5992 = _0x4e7709["globe"];
-  if (!_0x5f5992) return null;
-  const _0x1d5f25 = _0x4e7709["camera"], _0x14b31a = _0x4e7709["canvas"]["clientWidth"] / 2, _0x2fe46f = _0x4e7709["canvas"]["clientHeight"] / 2, _0x1bad48 = _0x1d5f25["getPickRay"](new Cartesian2(_0x14b31a - 1, _0x2fe46f)), _0x3bd595 = _0x1d5f25["getPickRay"](new Cartesian2(_0x14b31a + 1, _0x2fe46f)), _0x5ed55c = _0x1d5f25["getPickRay"](new Cartesian2(_0x14b31a, _0x2fe46f));
-  if (!_0x1bad48 || !_0x3bd595 || !_0x5ed55c) return null;
-  const _0x49d697 = _0x5f5992["pick"](_0x1bad48, _0x4e7709), _0x559c7e = _0x5f5992["pick"](_0x3bd595, _0x4e7709), _0x111435 = _0x5f5992["pick"](_0x5ed55c, _0x4e7709);
-  if (!_0x49d697 || !_0x559c7e || !_0x111435) return null;
-  const _0x5c7cf0 = Cartesian3["distance"](_0x49d697, _0x559c7e) / 2;
-  return { "scale": _0x5c7cf0 * SCREEN_DPI / METERS_PER_INCH, "distance": Cartesian3["distance"](_0x1d5f25["position"], _0x111435) };
+const SCREEN_DPI$1 = 96;
+const METERS_PER_INCH$1 = 0.0254;
+function measureGround(scene) {
+  const globe = scene.globe;
+  if (!globe) return null;
+  const camera = scene.camera;
+  const x = scene.canvas.clientWidth / 2;
+  const y = scene.canvas.clientHeight / 2;
+  const left = camera.getPickRay(new Cartesian2(x - 1, y));
+  const right = camera.getPickRay(new Cartesian2(x + 1, y));
+  const middle = camera.getPickRay(new Cartesian2(x, y));
+  if (!left || !right || !middle) return null;
+  const leftPos = globe.pick(left, scene);
+  const rightPos = globe.pick(right, scene);
+  const middlePos = globe.pick(middle, scene);
+  if (!leftPos || !rightPos || !middlePos) return null;
+  const metersPerPixel = Cartesian3.distance(leftPos, rightPos) / 2;
+  return {
+    scale: metersPerPixel * SCREEN_DPI$1 / METERS_PER_INCH$1,
+    distance: Cartesian3.distance(camera.position, middlePos)
+  };
 }
 const DISPLAY_SNAP_TOLERANCE = 5e-3;
-function snapScaleForDisplay(_0x79c8e8) {
-  const _0x1b5bb6 = ZOOM_SCALE_STEPS["find"]((_0x10840d) => Math["abs"](_0x79c8e8 - _0x10840d) <= _0x10840d * DISPLAY_SNAP_TOLERANCE);
-  return _0x1b5bb6 ?? _0x79c8e8;
+function snapScaleForDisplay(scale) {
+  const near = ZOOM_SCALE_STEPS.find((s) => Math.abs(scale - s) <= s * DISPLAY_SNAP_TOLERANCE);
+  return near ?? scale;
 }
 const ZOOM_ANIMATION_SECONDS = 0.25;
-function easeOut(_0x1595bc) {
-  return 1 - Math["pow"](1 - _0x1595bc, 3);
+function easeOut(t) {
+  return 1 - Math.pow(1 - t, 3);
 }
 const pendingZooms = /* @__PURE__ */ new WeakMap();
-function planStepAmount(_0x2d0a89, _0x19d6e3, _0x350b90, _0x4945f2) {
-  const _0x1af315 = nextScaleStep(_0x2d0a89["scale"], _0x19d6e3);
-  if (_0x1af315 === null) return null;
-  let _0x25b5ae = _0x1af315 === Infinity ? Infinity : _0x2d0a89["distance"] * Math["abs"](1 - _0x1af315 / _0x2d0a89["scale"]);
-  if (_0x19d6e3 === -1) _0x25b5ae = Math["min"](_0x25b5ae, _0x4945f2 - _0x350b90);
-  return _0x25b5ae > 0 && Number["isFinite"](_0x25b5ae) ? _0x25b5ae : null;
+function planStepAmount(ground, direction, height, maxHeight) {
+  const next = nextScaleStep(ground.scale, direction);
+  if (next === null) return null;
+  let amount = next === Infinity ? Infinity : ground.distance * Math.abs(1 - next / ground.scale);
+  if (direction === -1) amount = Math.min(amount, maxHeight - height);
+  return amount > 0 && Number.isFinite(amount) ? amount : null;
 }
-function flyScaleStep(_0x4853be, _0x320fe1, _0xc260f9, _0x36912f) {
-  const _0x49a847 = pendingZooms["get"](_0x4853be), _0x38d107 = (_0x49a847 == null ? void 0 : _0x49a847["ground"]) ?? _0xc260f9();
-  if (!_0x38d107) return;
-  const _0x2c5eea = (_0x49a847 == null ? void 0 : _0x49a847["height"]) ?? _0x4853be["positionCartographic"]["height"], _0x41ff1e = planStepAmount(_0x38d107, _0x320fe1, _0x2c5eea, _0x36912f);
-  if (_0x41ff1e === null) return;
-  const _0x4ca58e = (_0x49a847 == null ? void 0 : _0x49a847["position"]) ?? _0x4853be["position"], _0x3ddeca = _0x4853be["direction"], _0x18fcfa = _0x4853be["position"]["clone"]();
-  _0x18fcfa["x"] = _0x4ca58e["x"] + _0x3ddeca["x"] * _0x41ff1e * _0x320fe1, _0x18fcfa["y"] = _0x4ca58e["y"] + _0x3ddeca["y"] * _0x41ff1e * _0x320fe1, _0x18fcfa["z"] = _0x4ca58e["z"] + _0x3ddeca["z"] * _0x41ff1e * _0x320fe1;
-  const _0x1993fa = _0x38d107["distance"] - _0x320fe1 * _0x41ff1e, _0x19b47b = { "ground": { "scale": _0x38d107["scale"] * _0x1993fa / _0x38d107["distance"], "distance": _0x1993fa }, "height": _0x2c5eea - _0x320fe1 * _0x41ff1e, "position": _0x18fcfa }, _0x5e3a0e = () => {
-    if (pendingZooms["get"](_0x4853be) === _0x19b47b) pendingZooms["delete"](_0x4853be);
+function flyScaleStep(camera, direction, measure, maxHeight) {
+  const pending = pendingZooms.get(camera);
+  const ground = (pending == null ? void 0 : pending.ground) ?? measure();
+  if (!ground) return;
+  const height = (pending == null ? void 0 : pending.height) ?? camera.positionCartographic.height;
+  const amount = planStepAmount(ground, direction, height, maxHeight);
+  if (amount === null) return;
+  const from = (pending == null ? void 0 : pending.position) ?? camera.position;
+  const dir = camera.direction;
+  const destination = camera.position.clone();
+  destination.x = from.x + dir.x * amount * direction;
+  destination.y = from.y + dir.y * amount * direction;
+  destination.z = from.z + dir.z * amount * direction;
+  const distance = ground.distance - direction * amount;
+  const target = {
+    ground: { scale: ground.scale * distance / ground.distance, distance },
+    height: height - direction * amount,
+    position: destination
   };
-  _0x4853be["flyTo"]({ "destination": _0x18fcfa, "orientation": { "direction": _0x3ddeca["clone"](), "up": _0x4853be["up"]["clone"]() }, "duration": ZOOM_ANIMATION_SECONDS, "easingFunction": easeOut, "complete": _0x5e3a0e, "cancel": _0x5e3a0e }), pendingZooms["set"](_0x4853be, _0x19b47b);
-}
-function scaleZoomStep(_0x1f2735, _0x40996e) {
-  const { camera: _0x45ae6c, scene: _0x4205c3 } = _0x1f2735;
-  flyScaleStep(_0x45ae6c, _0x40996e, () => measureGround(_0x4205c3), _0x4205c3["screenSpaceCameraController"]["maximumZoomDistance"]);
-}
-const WHEEL_STEP_THRESHOLD_PX = 40, WHEEL_SMALL_DELTA_LOCK_MS = 200, LINE_HEIGHT_PX = 16, PAGE_HEIGHT_PX = 400;
-function wheelDeltaPixels(_0x5db271, _0x37448a) {
-  if (_0x37448a === 1) return _0x5db271 * LINE_HEIGHT_PX;
-  if (_0x37448a === 2) return _0x5db271 * PAGE_HEIGHT_PX;
-  return _0x5db271;
-}
-function installScaleWheelZoom(_0x4c2f5a) {
-  const _0x6c7e56 = _0x4c2f5a["scene"]["canvas"], _0x29cb20 = _0x4c2f5a["scene"]["screenSpaceCameraController"], _0x52aa54 = _0x29cb20["zoomEventTypes"];
-  _0x29cb20["zoomEventTypes"] = [CameraEventType["MIDDLE_DRAG"], CameraEventType["PINCH"]];
-  let _0x15e1aa = 0, _0x336c23 = 0;
-  const _0x381d5a = (_0x11314f) => {
-    _0x11314f["preventDefault"]();
-    const _0x16d1e8 = wheelDeltaPixels(_0x11314f["deltaY"], _0x11314f["deltaMode"]);
-    if (_0x16d1e8 === 0) return;
-    const _0x4db6d5 = performance["now"]();
-    if (Math["abs"](_0x16d1e8) < WHEEL_STEP_THRESHOLD_PX && _0x4db6d5 < _0x336c23) return;
-    if (Math["sign"](_0x16d1e8) !== Math["sign"](_0x15e1aa)) _0x15e1aa = 0;
-    _0x15e1aa += _0x16d1e8;
-    if (Math["abs"](_0x15e1aa) < WHEEL_STEP_THRESHOLD_PX) return;
-    scaleZoomStep(_0x4c2f5a, _0x15e1aa < 0 ? 1 : -1), _0x15e1aa = 0, _0x336c23 = _0x4db6d5 + WHEEL_SMALL_DELTA_LOCK_MS;
+  const clear = () => {
+    if (pendingZooms.get(camera) === target) pendingZooms.delete(camera);
   };
-  return _0x6c7e56["addEventListener"]("wheel", _0x381d5a, { "passive": ![] }), () => {
-    _0x6c7e56["removeEventListener"]("wheel", _0x381d5a), _0x29cb20["zoomEventTypes"] = _0x52aa54;
+  camera.flyTo({
+    destination,
+    orientation: { direction: dir.clone(), up: camera.up.clone() },
+    duration: ZOOM_ANIMATION_SECONDS,
+    easingFunction: easeOut,
+    complete: clear,
+    cancel: clear
+  });
+  pendingZooms.set(camera, target);
+}
+function scaleZoomStep(viewer, direction) {
+  const { camera, scene } = viewer;
+  flyScaleStep(
+    camera,
+    direction,
+    () => measureGround(scene),
+    scene.screenSpaceCameraController.maximumZoomDistance
+  );
+}
+const WHEEL_STEP_THRESHOLD_PX = 40;
+const WHEEL_SMALL_DELTA_LOCK_MS = 200;
+const LINE_HEIGHT_PX = 16;
+const PAGE_HEIGHT_PX = 400;
+function wheelDeltaPixels(deltaY, deltaMode) {
+  if (deltaMode === 1) return deltaY * LINE_HEIGHT_PX;
+  if (deltaMode === 2) return deltaY * PAGE_HEIGHT_PX;
+  return deltaY;
+}
+function installScaleWheelZoom(viewer) {
+  const canvas = viewer.scene.canvas;
+  const controller = viewer.scene.screenSpaceCameraController;
+  const previousZoomTypes = controller.zoomEventTypes;
+  controller.zoomEventTypes = [CameraEventType.MIDDLE_DRAG, CameraEventType.PINCH];
+  let accumulated = 0;
+  let lockedUntil = 0;
+  const onWheel = (event) => {
+    event.preventDefault();
+    const delta = wheelDeltaPixels(event.deltaY, event.deltaMode);
+    if (delta === 0) return;
+    const now = performance.now();
+    if (Math.abs(delta) < WHEEL_STEP_THRESHOLD_PX && now < lockedUntil) return;
+    if (Math.sign(delta) !== Math.sign(accumulated)) accumulated = 0;
+    accumulated += delta;
+    if (Math.abs(accumulated) < WHEEL_STEP_THRESHOLD_PX) return;
+    scaleZoomStep(viewer, accumulated < 0 ? 1 : -1);
+    accumulated = 0;
+    lockedUntil = now + WHEEL_SMALL_DELTA_LOCK_MS;
+  };
+  canvas.addEventListener("wheel", onWheel, { passive: false });
+  return () => {
+    canvas.removeEventListener("wheel", onWheel);
+    controller.zoomEventTypes = previousZoomTypes;
   };
 }
-function createMarkerOverlay(_0x5909c8, _0x1df8a6, _0x52c7ce, _0x2c096a, _0x408a1d = {}) {
-  const _0x162cd4 = Cartesian3["fromDegrees"](_0x1df8a6, _0x52c7ce), _0x50719c = Ellipsoid["WGS84"]["geodeticSurfaceNormal"](_0x162cd4, new Cartesian3()), _0x9ee336 = new Cartesian3(), _0x21b488 = new Cartesian2(), _0x510ef9 = document["createElement"]("img");
-  _0x510ef9["src"] = _0x2c096a, _0x510ef9["alt"] = "", _0x510ef9["draggable"] = ![], Object["assign"](_0x510ef9["style"], { "position": "absolute", "left": "0", "top": "0", "display": "none", "pointerEvents": "none", "userSelect": "none", "zIndex": "1", "willChange": "transform", ..._0x408a1d["width"] === void 0 ? {} : { "width": _0x408a1d["width"] + "px" }, ..._0x408a1d["height"] === void 0 ? {} : { "height": _0x408a1d["height"] + "px" } }), _0x5909c8["container"]["appendChild"](_0x510ef9);
-  const _0x46770f = () => {
-    const { scene: _0x45156e } = _0x5909c8;
-    let _0x397505 = !![];
-    _0x45156e["mode"] === SceneMode["SCENE3D"] && (Cartesian3["subtract"](_0x45156e["camera"]["positionWC"], _0x162cd4, _0x9ee336), _0x397505 = Cartesian3["dot"](_0x50719c, _0x9ee336) > 0);
-    const _0x4fb502 = _0x397505 ? _0x45156e["cartesianToCanvasCoordinates"](_0x162cd4, _0x21b488) : void 0;
-    if (!_0x4fb502) {
-      _0x510ef9["style"]["display"] = "none";
+const SCREEN_DPI = 96;
+const METERS_PER_INCH = 0.0254;
+const REWRITE_TOLERANCE = 5e-3;
+function minZoomDistanceForScale(scaleDenominator, canvasHeightPx, fovy) {
+  const tanHalf = Math.tan(fovy / 2);
+  const distance = scaleDenominator * METERS_PER_INCH / SCREEN_DPI * canvasHeightPx / (2 * tanHalf);
+  return Number.isFinite(distance) && distance > 0 ? distance : null;
+}
+const EARTH_MAX_RADIUS_METERS = 6378137;
+const GLOBE_FIT_RATIO = 0.9;
+function globeFitDistance(canvasWidthPx, canvasHeightPx, fovy) {
+  if (!(canvasWidthPx > 0) || !(canvasHeightPx > 0)) return null;
+  const tanHalfY = Math.tan(fovy / 2);
+  const tanHalfX = tanHalfY * canvasWidthPx / canvasHeightPx;
+  const tanHalf = Math.min(tanHalfX, tanHalfY);
+  if (!(tanHalf > 0) || !Number.isFinite(tanHalf)) return null;
+  const angle = Math.atan(tanHalf * GLOBE_FIT_RATIO);
+  const distance = EARTH_MAX_RADIUS_METERS / Math.sin(angle) - EARTH_MAX_RADIUS_METERS;
+  return Number.isFinite(distance) && distance > 0 ? distance : null;
+}
+function maxZoomOutDistance(baseScaleDenominator, canvasWidthPx, canvasHeightPx, fovy) {
+  const baseDistance = minZoomDistanceForScale(baseScaleDenominator, canvasHeightPx, fovy);
+  if (baseDistance === null) return null;
+  const fit = globeFitDistance(canvasWidthPx, canvasHeightPx, fovy);
+  if (fit === null || baseDistance >= fit) return baseDistance;
+  for (const step of ZOOM_SCALE_STEPS) {
+    if (step <= baseScaleDenominator) continue;
+    const distance = minZoomDistanceForScale(step, canvasHeightPx, fovy);
+    if (distance !== null && distance >= fit) return distance;
+  }
+  return fit;
+}
+const SNAP_WINDOW_RATIO = 1.06;
+const MIN_SNAP_GAP_METERS = 1e-3;
+const SNAP_DURATION_MS = 150;
+function snapToMinAmount(height, minDistance) {
+  const gap = height - minDistance;
+  if (!(gap > MIN_SNAP_GAP_METERS) || height > minDistance * SNAP_WINDOW_RATIO) return 0;
+  return gap;
+}
+function installMinZoomScale(viewer, scaleDenominator, maxScaleDenominator) {
+  const scene = viewer.scene;
+  const controller = scene.screenSpaceCameraController;
+  const onPreRender = () => {
+    const fovy = scene.camera.frustum.fovy;
+    if (fovy === void 0) return;
+    const height = scene.canvas.clientHeight;
+    const distance = minZoomDistanceForScale(scaleDenominator, height, fovy);
+    if (distance !== null) {
+      const current = controller.minimumZoomDistance;
+      if (Math.abs(current - distance) > current * REWRITE_TOLERANCE) {
+        controller.minimumZoomDistance = distance;
+      }
+    }
+    const maxDistance = maxZoomOutDistance(maxScaleDenominator, scene.canvas.clientWidth, height, fovy);
+    if (maxDistance === null) return;
+    const currentMax = controller.maximumZoomDistance;
+    if (Math.abs(currentMax - maxDistance) > currentMax * REWRITE_TOLERANCE) {
+      controller.maximumZoomDistance = maxDistance;
+      if (scene.mode !== SceneMode.SCENE3D) return;
+      const camHeight = scene.camera.positionCartographic.height;
+      const wasAtMax = camHeight >= currentMax * (1 - REWRITE_TOLERANCE);
+      if (wasAtMax || camHeight > maxDistance) scene.camera.zoomIn(camHeight - maxDistance);
+    }
+  };
+  const camera = scene.camera;
+  const canvas = scene.canvas;
+  let frame;
+  const cancelSnap = () => {
+    if (frame !== void 0) cancelAnimationFrame(frame);
+    frame = void 0;
+  };
+  const onMoveEnd = () => {
+    if (frame !== void 0) return;
+    const total = snapToMinAmount(
+      camera.positionCartographic.height,
+      controller.minimumZoomDistance
+    );
+    if (total <= 0) return;
+    const start = performance.now();
+    let done = 0;
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / SNAP_DURATION_MS);
+      const target = total * (1 - (1 - t) * (1 - t));
+      if (target > done) camera.zoomIn(target - done);
+      done = target;
+      frame = t < 1 ? requestAnimationFrame(step) : void 0;
+    };
+    frame = requestAnimationFrame(step);
+  };
+  canvas.addEventListener("pointerdown", cancelSnap);
+  canvas.addEventListener("wheel", cancelSnap, { passive: true });
+  const removePreRender = scene.preRender.addEventListener(onPreRender);
+  const removeMoveEnd = camera.moveEnd.addEventListener(onMoveEnd);
+  return () => {
+    cancelSnap();
+    canvas.removeEventListener("pointerdown", cancelSnap);
+    canvas.removeEventListener("wheel", cancelSnap);
+    removePreRender();
+    removeMoveEnd();
+  };
+}
+function createMarkerOverlay(viewer, longitude, latitude, iconUrl, options = {}) {
+  const position = Cartesian3.fromDegrees(longitude, latitude);
+  const normal = Ellipsoid.WGS84.geodeticSurfaceNormal(position, new Cartesian3());
+  const toCamera = new Cartesian3();
+  const scratch = new Cartesian2();
+  const img = document.createElement("img");
+  img.src = iconUrl;
+  img.alt = "";
+  img.draggable = false;
+  Object.assign(img.style, {
+    position: "absolute",
+    left: "0",
+    top: "0",
+    display: "none",
+    pointerEvents: "none",
+    userSelect: "none",
+    zIndex: "1",
+    willChange: "transform",
+    ...options.width === void 0 ? {} : { width: `${options.width}px` },
+    ...options.height === void 0 ? {} : { height: `${options.height}px` }
+  });
+  viewer.container.appendChild(img);
+  const update = () => {
+    const { scene } = viewer;
+    let visible = true;
+    if (scene.mode === SceneMode.SCENE3D) {
+      Cartesian3.subtract(scene.camera.positionWC, position, toCamera);
+      visible = Cartesian3.dot(normal, toCamera) > 0;
+    }
+    const canvasPosition = visible ? scene.cartesianToCanvasCoordinates(position, scratch) : void 0;
+    if (!canvasPosition) {
+      img.style.display = "none";
       return;
     }
-    _0x510ef9["style"]["display"] = "block";
-    const _0x23d1ac = Math["round"](_0x4fb502["x"] - _0x510ef9["offsetWidth"] / 2), _0x1a01b5 = Math["round"](_0x4fb502["y"] - (_0x408a1d["anchor"] === "center" ? _0x510ef9["offsetHeight"] / 2 : _0x510ef9["offsetHeight"]));
-    _0x510ef9["style"]["transform"] = "translate(" + _0x23d1ac + "px, " + _0x1a01b5 + "px)";
-  }, _0xd94ebb = _0x5909c8["scene"]["postRender"]["addEventListener"](_0x46770f);
-  return _0x510ef9["addEventListener"]("load", _0x46770f), _0x46770f(), () => {
-    _0xd94ebb(), _0x510ef9["remove"]();
+    img.style.display = "block";
+    const x = Math.round(canvasPosition.x - img.offsetWidth / 2);
+    const y = Math.round(canvasPosition.y - (options.anchor === "center" ? img.offsetHeight / 2 : img.offsetHeight));
+    img.style.transform = `translate(${x}px, ${y}px)`;
+  };
+  const removeListener = viewer.scene.postRender.addEventListener(update);
+  img.addEventListener("load", update);
+  update();
+  return () => {
+    removeListener();
+    img.remove();
   };
 }
 class EventEmitter {
   constructor() {
-    this["listeners"] = {};
+    this.listeners = {};
   }
-  ["on"](_0x488dff, _0x3aa221) {
-    const _0x5999f6 = this["listeners"][_0x488dff];
-    return _0x5999f6 !== void 0 ? _0x5999f6["add"](_0x3aa221) : this["listeners"][_0x488dff] = /* @__PURE__ */ new Set([_0x3aa221]), this;
+  /**
+   * Bir event için dinleyici ekler.
+   * @param event - Dinlenecek event adı.
+   * @param listener - Event yayıldığında çağrılacak fonksiyon.
+   * @returns Zincirleme çağrılar için `this`.
+   */
+  on(event, listener) {
+    const existing = this.listeners[event];
+    if (existing !== void 0) {
+      existing.add(listener);
+    } else {
+      this.listeners[event] = /* @__PURE__ */ new Set([listener]);
+    }
+    return this;
   }
-  ["off"](_0xfcb12c, _0x2a6025) {
+  /**
+   * `on()` ile eklenmiş bir dinleyiciyi kaldırır.
+   * @param event - Dinleyicinin kayıtlı olduğu event adı.
+   * @param listener - Kaldırılacak dinleyici (referans eşitliğiyle bulunur).
+   * @returns Zincirleme çağrılar için `this`.
+   */
+  off(event, listener) {
     var _a2;
-    return (_a2 = this["listeners"][_0xfcb12c]) == null ? void 0 : _a2["delete"](_0x2a6025), this;
+    (_a2 = this.listeners[event]) == null ? void 0 : _a2.delete(listener);
+    return this;
   }
-  ["once"](_0x1e164a, _0xc53b65) {
-    const _0x1dfbde = (_0x407341) => {
-      _0xc53b65(_0x407341), this["off"](_0x1e164a, _0x1dfbde);
+  /**
+   * Bir event için, sadece BİR KEZ tetiklenecek bir dinleyici ekler; ilk
+   * tetiklenmenin ardından dinleyici otomatik olarak `off()` ile kaldırılır.
+   * @param event - Dinlenecek event adı.
+   * @param listener - Event ilk yayıldığında çağrılacak fonksiyon.
+   * @returns Zincirleme çağrılar için `this`.
+   */
+  once(event, listener) {
+    const wrapper = (payload) => {
+      listener(payload);
+      this.off(event, wrapper);
     };
-    return this["on"](_0x1e164a, _0x1dfbde);
+    return this.on(event, wrapper);
   }
-  ["emit"](_0x3473af, _0x8737b5) {
-    const _0x213fba = this["listeners"][_0x3473af];
-    if (_0x213fba === void 0) return;
-    for (const _0x50cf5d of _0x213fba) {
-      _0x50cf5d(_0x8737b5);
+  /**
+   * Bir event'i, verilen payload ile kayıtlı tüm dinleyicilere senkron olarak yayar.
+   * @param event - Yayılacak event adı.
+   * @param payload - Dinleyicilere iletilecek veri.
+   */
+  emit(event, payload) {
+    const set = this.listeners[event];
+    if (set === void 0) return;
+    for (const listener of set) {
+      listener(payload);
     }
   }
-  ["removeAllListeners"](_0x1ecf31) {
-    if (_0x1ecf31 !== void 0) delete this["listeners"][_0x1ecf31];
-    else for (const _0x22e623 of Object["keys"](this["listeners"])) {
-      delete this["listeners"][_0x22e623];
+  /**
+   * Dinleyicileri temizler.
+   * @param event - Verilirse SADECE bu event'in dinleyicileri; verilmezse TÜM event'lerin tüm dinleyicileri kaldırılır.
+   */
+  removeAllListeners(event) {
+    if (event !== void 0) {
+      delete this.listeners[event];
+    } else {
+      for (const key of Object.keys(this.listeners)) {
+        delete this.listeners[key];
+      }
     }
   }
-  ["listenerCount"](_0x2b5d8d) {
+  /**
+   * Bir event için kayıtlı dinleyici sayısını döner.
+   * @param event - Sayılacak event adı.
+   * @returns Kayıtlı dinleyici sayısı (hiç yoksa `0`).
+   */
+  listenerCount(event) {
     var _a2;
-    return ((_a2 = this["listeners"][_0x2b5d8d]) == null ? void 0 : _a2["size"]) ?? 0;
+    return ((_a2 = this.listeners[event]) == null ? void 0 : _a2.size) ?? 0;
   }
 }
-const GLOBAL_STATE_SLOT = Symbol["for"]("@tucbs/core/globalConfigState");
+const GLOBAL_STATE_SLOT = Symbol.for("@tucbs/core/globalConfigState");
 function getState() {
-  const _0x314c12 = globalThis;
-  let _0x4e64d8 = _0x314c12[GLOBAL_STATE_SLOT];
-  return !_0x4e64d8 && (_0x4e64d8 = { "apiKey": void 0, "apiBase": void 0, "proxyBase": void 0, "configured": ![], "refreshers": /* @__PURE__ */ new Set() }, Object["defineProperty"](globalThis, GLOBAL_STATE_SLOT, { "value": _0x4e64d8, "enumerable": ![], "configurable": ![], "writable": ![] })), _0x4e64d8;
+  const registry = globalThis;
+  let state = registry[GLOBAL_STATE_SLOT];
+  if (!state) {
+    state = {
+      apiKey: void 0,
+      apiBase: void 0,
+      proxyBase: void 0,
+      configured: false,
+      refreshers: /* @__PURE__ */ new Set()
+    };
+    Object.defineProperty(globalThis, GLOBAL_STATE_SLOT, {
+      value: state,
+      enumerable: false,
+      configurable: false,
+      writable: false
+    });
+  }
+  return state;
 }
-function configureTucbs(_0x119eb2) {
-  const _0x52d8e6 = getState();
-  if (_0x119eb2["apiBase"] !== void 0) {
-    const _0x2e15a8 = _0x119eb2["apiBase"]["trim"]()["replace"](/\/+$/, "");
-    _0x52d8e6["apiBase"] = _0x2e15a8 || void 0, _0x52d8e6["configured"] = !![];
+function configureTucbs(config) {
+  const state = getState();
+  if (config.apiBase !== void 0) {
+    const trimmed = config.apiBase.trim().replace(/\/+$/, "");
+    state.apiBase = trimmed || void 0;
+    state.configured = true;
   }
-  if (_0x119eb2["proxyBase"] !== void 0) {
-    const _0xb1bcfc = _0x119eb2["proxyBase"]["trim"]();
-    _0x52d8e6["proxyBase"] = _0xb1bcfc || void 0, _0x52d8e6["configured"] = !![];
+  if (config.proxyBase !== void 0) {
+    const trimmed = config.proxyBase.trim();
+    state.proxyBase = trimmed || void 0;
+    state.configured = true;
   }
-  if (_0x119eb2["apiKey"] === void 0) {
-    _0x52d8e6["configured"] && _0x52d8e6["refreshers"]["forEach"]((_0x595257) => _0x595257());
+  if (config.apiKey === void 0) {
+    if (state.configured) {
+      state.refreshers.forEach((refresh) => refresh());
+    }
     return;
   }
-  _0x52d8e6["apiKey"] !== void 0 && _0x119eb2["apiKey"] !== _0x52d8e6["apiKey"] && console["warn"]("[@tucbs/core] configureTucbs() daha once farkli bir apiKey ile cagrilmisti; deger degistirildi. Bu beklenmiyorsa sayfada birden fazla script'in ayni fonksiyonu cagirdigini kontrol edin."), _0x52d8e6["apiKey"] = _0x119eb2["apiKey"], _0x52d8e6["configured"] = !![], _0x52d8e6["refreshers"]["forEach"]((_0x1fef13) => _0x1fef13());
+  if (state.apiKey !== void 0 && config.apiKey !== state.apiKey) {
+    console.warn(
+      "[@tucbs/core] configureTucbs() daha once farkli bir apiKey ile cagrilmisti; deger degistirildi. Bu beklenmiyorsa sayfada birden fazla script'in ayni fonksiyonu cagirdigini kontrol edin."
+    );
+  }
+  state.apiKey = config.apiKey;
+  state.configured = true;
+  state.refreshers.forEach((refresh) => refresh());
 }
 function getGlobalApiBase() {
-  return getState()["apiBase"];
+  return getState().apiBase;
 }
 function getGlobalProxyBase() {
-  return getState()["proxyBase"];
+  return getState().proxyBase;
 }
 function getGlobalApiKey() {
-  return getState()["apiKey"];
+  return getState().apiKey;
 }
-function registerApiKeyRefresh(_0x3b07c1) {
-  const { refreshers: _0x5b2840 } = getState();
-  return _0x5b2840["add"](_0x3b07c1), () => _0x5b2840["delete"](_0x3b07c1);
+function registerApiKeyRefresh(fn) {
+  const { refreshers } = getState();
+  refreshers.add(fn);
+  return () => refreshers.delete(fn);
 }
-const DEFAULT_UCBP_API_BASE = ("http://localhost:8094/ucbp-api" == null ? void 0 : "http://localhost:8094/ucbp-api"["trim"]()) || "/ucbp-api";
-function trimSlash$2(_0x49725a) {
-  return _0x49725a["replace"](/\/+$/, "");
+const DEFAULT_UCBP_API_BASE = ("http://localhost:8094/ucbp-api" == null ? void 0 : "http://localhost:8094/ucbp-api".trim()) || "/ucbp-api";
+function trimSlash$2(url) {
+  return url.replace(/\/+$/, "");
 }
 function getUcbpApiBase() {
-  const _0x432adb = getGlobalApiBase();
-  if (_0x432adb) return trimSlash$2(_0x432adb);
+  const runtime = getGlobalApiBase();
+  if (runtime) {
+    return trimSlash$2(runtime);
+  }
   return trimSlash$2(DEFAULT_UCBP_API_BASE);
 }
 function getProxyBase() {
-  const _0x430b7e = getGlobalProxyBase();
-  if (_0x430b7e) return _0x430b7e;
-  return console["warn"]("proxyBase yok; configureTucbs({ proxyBase }) verilmedi. main.js'te verilmeli."), "";
+  const runtime = getGlobalProxyBase();
+  if (runtime) {
+    return runtime;
+  }
+  console.warn("proxyBase yok; configureTucbs({ proxyBase }) verilmedi. main.js'te verilmeli.");
+  return "";
 }
-const ERROR_REGISTRY = { "API_KEY_MISSING": { "code": "API_KEY_MISSING", "number": "E001", "title": "API Anahtarı Eksik", "description": "Ne instance ne configureTucbs() ile ayarlanmış global apiKey sağlanmış." }, "API_KEY_INVALID": { "code": "API_KEY_INVALID", "number": "E002", "title": "API Anahtarı Geçersiz", "description": "Sağlanan apiKey backend tarafından reddedildi veya doğrulama isteği başarısız oldu." }, "INTERNAL_INDEX_OUT_OF_RANGE": { "code": "INTERNAL_INDEX_OUT_OF_RANGE", "number": "E003", "title": "İç Durum Hatası", "description": "Beklenen bir dizi indeksi bulunamadı (iç tutarlılık hatası)." }, "OGC_CAPABILITIES_REQUEST_FAILED": { "code": "OGC_CAPABILITIES_REQUEST_FAILED", "number": "E201", "title": "GetCapabilities İsteği Başarısız", "description": "WFS GetCapabilities isteği HTTP hata koduyla döndü." }, "OGC_CAPABILITIES_EXCEPTION": { "code": "OGC_CAPABILITIES_EXCEPTION", "number": "E202", "title": "GetCapabilities OGC Exception", "description": "WFS GetCapabilities yanıtı bir OGC ExceptionReport/ServiceExceptionReport döndürdü." }, "OGC_CAPABILITIES_PARSE_FAILED": { "code": "OGC_CAPABILITIES_PARSE_FAILED", "number": "E203", "title": "GetCapabilities Ayrıştırma Hatası", "description": "WFS GetCapabilities yanıtı geçerli XML olarak ayrıştırılamadı." }, "OGC_FEATURE_TYPE_NOT_FOUND": { "code": "OGC_FEATURE_TYPE_NOT_FOUND", "number": "E204", "title": "FeatureType Bulunamadı", "description": "WFS GetCapabilities yanıtında hiç FeatureType bulunamadı." }, "CRS_UNRESOLVED_UNSUPPORTED": { "code": "CRS_UNRESOLVED_UNSUPPORTED", "number": "E401", "title": "Koordinat Sistemi Tanınamadı", "description": "GeoJSON'daki koordinat sistemi (CRS) çözülemedi ve koordinatlar WGS84 ile uyumlu değil." }, "CRS_CLAIMED_WGS84_INVALID": { "code": "CRS_CLAIMED_WGS84_INVALID", "number": "E402", "title": "Koordinatlar WGS84 İle Uyumsuz", "description": "GeoJSON WGS84/CRS84 olduğunu belirtiyor ama koordinatlar geçerli bir enlem/boylam aralığında değil." }, "CRS_MISSING_UNSUPPORTED": { "code": "CRS_MISSING_UNSUPPORTED", "number": "E403", "title": "Koordinat Sistemi Bilgisi Yok", "description": "GeoJSON'da CRS bilgisi yok ve koordinatlar geçerli bir enlem/boylam aralığında değil." }, "ANALYSIS_API_KEY_MISSING": { "code": "ANALYSIS_API_KEY_MISSING", "number": "E301", "title": "Analiz İçin API Anahtarı Eksik", "description": "AnalysisManager'a apiKey tanımlanmadan analiz isteği yapıldı." }, "ANALYSIS_NETWORK_ERROR": { "code": "ANALYSIS_NETWORK_ERROR", "number": "E302", "title": "Analiz Ağ Hatası", "description": "Analiz isteği ağ seviyesinde (fetch) başarısız oldu." }, "ANALYSIS_REQUEST_FAILED": { "code": "ANALYSIS_REQUEST_FAILED", "number": "E303", "title": "Analiz İsteği Başarısız", "description": "Analiz backend'i HTTP hata koduyla döndü." }, "ANALYSIS_UNSUCCESSFUL": { "code": "ANALYSIS_UNSUCCESSFUL", "number": "E304", "title": "Analiz Başarısız", "description": "Analiz backend'i HTTP 200 döndü ama isSuccess/success=false işaretledi." }, "ANALYSIS_RESPONSE_MISSING_GEOJSON": { "code": "ANALYSIS_RESPONSE_MISSING_GEOJSON", "number": "E305", "title": "Analiz Yanıtı Eksik", "description": "Analiz backend'i başarılı yanıt döndü ama sonuç geojson içermiyor." }, "LAYER_AUTHORIZED_LIST_API_KEY_MISSING": { "code": "LAYER_AUTHORIZED_LIST_API_KEY_MISSING", "number": "E101", "title": "Yetkili Katman Listesi İçin API Anahtarı Gerekli", "description": "getAuthorizedLayers() apiKey ayarlanmadan çağrıldı." }, "LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE": { "code": "LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE", "number": "E102", "title": "GeoTIFF Export Desteklenmiyor", "description": "GeoTIFF export sadece WMS/WCS katmanlarında desteklenir." }, "LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED": { "code": "LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED", "number": "E103", "title": "GeoTIFF Export Yapılandırılmamış", "description": "Katman GeoTIFF export için gerekli tiffFormat seçeneğine sahip değil." }, "LAYER_STYLE_NOT_VECTOR": { "code": "LAYER_STYLE_NOT_VECTOR", "number": "E104", "title": "Stil Sadece Vektör Katmanlarda", "description": "applyLayerStyle() sadece vektör (Entity tabanlı) katmanlarda kullanılabilir." }, "LAYER_TYPE_UNSUPPORTED_XYZ": { "code": "LAYER_TYPE_UNSUPPORTED_XYZ", "number": "E105", "title": "XYZ Katmanı add() İle Desteklenmiyor", "description": "XYZ katmanı add() ile eklenemez, Map.setBasemap() kullanılmalı." }, "LAYER_TYPE_UNSUPPORTED_DRAWING": { "code": "LAYER_TYPE_UNSUPPORTED_DRAWING", "number": "E106", "title": "DRAWING Katmanı add() İle Desteklenmiyor", "description": "DRAWING katmanı DrawingManager tarafından otomatik eklenir, add() ile eklenemez." }, "LAYER_TYPE_UNSUPPORTED_MEASURE": { "code": "LAYER_TYPE_UNSUPPORTED_MEASURE", "number": "E107", "title": "MEASURE Katmanı add() İle Desteklenmiyor", "description": "MEASURE katmanı DrawingManager tarafından otomatik eklenir, add() ile eklenemez." }, "LAYER_WMS_LAYERS_EMPTY": { "code": "LAYER_WMS_LAYERS_EMPTY", "number": "E108", "title": "WMS layers Parametresi Boş", "description": "WMS katmanı eklenirken layers (ogcLayerName) parametresi boş." }, "LAYER_GEOTIFF_UNSUPPORTED": { "code": "LAYER_GEOTIFF_UNSUPPORTED", "number": "E109", "title": "GeoTIFF Katmanı Desteklenmiyor", "description": "GeoTIFF katmanı mevcut Cesium sürümünde desteklenmiyor." }, "LAYER_SHP_PACKAGE_MISSING": { "code": "LAYER_SHP_PACKAGE_MISSING", "number": "E110", "title": "shpjs Paketi Eksik", "description": 'SHP katmanı için gereken "shpjs" paketi tüketici uygulamaya eklenmemiş.' }, "LAYER_CSV_PACKAGE_MISSING": { "code": "LAYER_CSV_PACKAGE_MISSING", "number": "E111", "title": "papaparse Paketi Eksik", "description": 'CSV katmanı için gereken "papaparse" paketi tüketici uygulamaya eklenmemiş.' }, "LAYER_CSV_LATLON_NOT_FOUND": { "code": "LAYER_CSV_LATLON_NOT_FOUND", "number": "E112", "title": "CSV'de lat/lon Sütunu Bulunamadı", "description": "CSV içinde lat/lon sütunları otomatik tespit edilemedi." }, "LAYER_NOT_FOUND": { "code": "LAYER_NOT_FOUND", "number": "E113", "title": "Katman Bulunamadı", "description": "Verilen id'ye sahip bir katman yönetimde kayıtlı değil." }, "LAYER_ID_ALREADY_EXISTS": { "code": "LAYER_ID_ALREADY_EXISTS", "number": "E114", "title": "Katman ID'si Zaten Kayıtlı", "description": "Verilen id ile zaten bir katman eklenmiş." }, "LAYER_TYPE_MISMATCH": { "code": "LAYER_TYPE_MISMATCH", "number": "E115", "title": "Katman Tipi Uyuşmuyor", "description": "Katman beklenen tipte (WMS/WMTS) değil." }, "LAYER_SERVICE_OPTIONS_NOT_FOUND": { "code": "LAYER_SERVICE_OPTIONS_NOT_FOUND", "number": "E116", "title": "Servis Seçenekleri Bulunamadı", "description": "Katman için orijinal servis seçenekleri (serviceLayerOptions) bulunamadı." }, "LAYER_NOT_RASTER": { "code": "LAYER_NOT_RASTER", "number": "E117", "title": "Katman Raster Değil", "description": "İşlem sadece raster (ImageryLayer) katmanlarda desteklenir." }, "OGC_AUTHORIZED_LAYERS_REQUEST_FAILED": { "code": "OGC_AUTHORIZED_LAYERS_REQUEST_FAILED", "number": "E205", "title": "Yetkili Katman Listesi Alınamadı", "description": "getAuthorizedLayers() isteği HTTP hata koduyla döndü." }, "OGC_GEOTIFF_DOWNLOAD_FAILED": { "code": "OGC_GEOTIFF_DOWNLOAD_FAILED", "number": "E206", "title": "GeoTIFF İndirilemedi", "description": "GeoTIFF export isteği HTTP hata koduyla döndü." }, "OGC_WFS_JSON_FORMAT_UNSUPPORTED": { "code": "OGC_WFS_JSON_FORMAT_UNSUPPORTED", "number": "E207", "title": "WFS JSON Format İlan Etmiyor", "description": "WFS sunucusu GetCapabilities yanıtında JSON çıktı formatı ilan etmiyor." }, "OGC_WFS_GEOJSON_REQUEST_FAILED": { "code": "OGC_WFS_GEOJSON_REQUEST_FAILED", "number": "E208", "title": "WFS GeoJSON İsteği Başarısız", "description": "WFS GetFeature (GeoJSON çıktı) isteği başarısız oldu." }, "OGC_WFS_REQUEST_FAILED": { "code": "OGC_WFS_REQUEST_FAILED", "number": "E209", "title": "WFS İsteği Başarısız", "description": "WFS GetFeature (GML çıktı) isteği HTTP hata koduyla döndü." }, "OGC_WFS_EXCEPTION": { "code": "OGC_WFS_EXCEPTION", "number": "E210", "title": "WFS OGC Exception", "description": "WFS GetFeature yanıtı bir OGC ExceptionReport döndürdü." }, "OGC_WFS_OL_PACKAGE_MISSING": { "code": "OGC_WFS_OL_PACKAGE_MISSING", "number": "E211", "title": "ol Paketi Eksik", "description": 'WFS GML yanıtını okumak için gereken "ol" paketi tüketici uygulamaya eklenmemiş.' }, "OGC_WCS_REQUEST_FAILED": { "code": "OGC_WCS_REQUEST_FAILED", "number": "E212", "title": "WCS İsteği Başarısız", "description": "WCS GetCoverage isteği HTTP hata koduyla döndü." }, "OGC_WCS_MULTIPART_IMAGE_NOT_FOUND": { "code": "OGC_WCS_MULTIPART_IMAGE_NOT_FOUND", "number": "E213", "title": "WCS Multipart Görsel Bulunamadı", "description": "Multipart WCS yanıtında görsel (image) parçası bulunamadı." }, "LAYER_PREVIEW_UNSUPPORTED_XYZ": { "code": "LAYER_PREVIEW_UNSUPPORTED_XYZ", "number": "E118", "title": "XYZ Katmanı Önizlemede Desteklenmiyor", "description": "TucbsMapPreview XYZ katman tipini önizlemede desteklemiyor." }, "LAYER_PREVIEW_UNSUPPORTED_DRAWING": { "code": "LAYER_PREVIEW_UNSUPPORTED_DRAWING", "number": "E119", "title": "DRAWING Katmanı Önizlemede Desteklenmiyor", "description": "TucbsMapPreview DRAWING katman tipini önizlemede desteklemiyor." }, "LAYER_PREVIEW_UNSUPPORTED_MEASURE": { "code": "LAYER_PREVIEW_UNSUPPORTED_MEASURE", "number": "E120", "title": "MEASURE Katmanı Önizlemede Desteklenmiyor", "description": "TucbsMapPreview MEASURE katman tipini önizlemede desteklemiyor." }, "LAYER_MANAGER_NOT_READY": { "code": "LAYER_MANAGER_NOT_READY", "number": "E121", "title": "Harita Hazır Değil", "description": "Katman eklenmeye çalışıldığında LayerManager henüz hazır değildi." }, "LAYER_AUTHORIZED_ADD_MISSING_INFO": { "code": "LAYER_AUTHORIZED_ADD_MISSING_INFO", "number": "E122", "title": "Yetkili Katman Eklenemedi", "description": "Yetkili katman için gerekli servis bilgisi (ör. WMTS TileMatrixSet) eksik." }, "OGC_SERVICE_DISCOVERY_PARSE_FAILED": { "code": "OGC_SERVICE_DISCOVERY_PARSE_FAILED", "number": "E214", "title": "Servis Keşfi Ayrıştırma Hatası", "description": "TucbsServiceUpload'da GetCapabilities yanıtı geçerli XML olarak ayrıştırılamadı." }, "LAYER_WMTS_TILEMATRIXSET_MISSING": { "code": "LAYER_WMTS_TILEMATRIXSET_MISSING", "number": "E123", "title": "TileMatrixSet Bilgisi Bulunamadı", "description": "Keşfedilen WMTS katmanı için TileMatrixSet bilgisi bulunamadı." } };
+const ERROR_REGISTRY = {
+  API_KEY_MISSING: {
+    code: "API_KEY_MISSING",
+    number: "E001",
+    title: "API Anahtarı Eksik",
+    description: "Ne instance ne configureTucbs() ile ayarlanmış global apiKey sağlanmış."
+  },
+  API_KEY_INVALID: {
+    code: "API_KEY_INVALID",
+    number: "E002",
+    title: "API Anahtarı Geçersiz",
+    description: "Sağlanan apiKey backend tarafından reddedildi veya doğrulama isteği başarısız oldu."
+  },
+  INTERNAL_INDEX_OUT_OF_RANGE: {
+    code: "INTERNAL_INDEX_OUT_OF_RANGE",
+    number: "E003",
+    title: "İç Durum Hatası",
+    description: "Beklenen bir dizi indeksi bulunamadı (iç tutarlılık hatası)."
+  },
+  OGC_CAPABILITIES_REQUEST_FAILED: {
+    code: "OGC_CAPABILITIES_REQUEST_FAILED",
+    number: "E201",
+    title: "GetCapabilities İsteği Başarısız",
+    description: "WFS GetCapabilities isteği HTTP hata koduyla döndü."
+  },
+  OGC_CAPABILITIES_EXCEPTION: {
+    code: "OGC_CAPABILITIES_EXCEPTION",
+    number: "E202",
+    title: "GetCapabilities OGC Exception",
+    description: "WFS GetCapabilities yanıtı bir OGC ExceptionReport/ServiceExceptionReport döndürdü."
+  },
+  OGC_CAPABILITIES_PARSE_FAILED: {
+    code: "OGC_CAPABILITIES_PARSE_FAILED",
+    number: "E203",
+    title: "GetCapabilities Ayrıştırma Hatası",
+    description: "WFS GetCapabilities yanıtı geçerli XML olarak ayrıştırılamadı."
+  },
+  OGC_FEATURE_TYPE_NOT_FOUND: {
+    code: "OGC_FEATURE_TYPE_NOT_FOUND",
+    number: "E204",
+    title: "FeatureType Bulunamadı",
+    description: "WFS GetCapabilities yanıtında hiç FeatureType bulunamadı."
+  },
+  CRS_UNRESOLVED_UNSUPPORTED: {
+    code: "CRS_UNRESOLVED_UNSUPPORTED",
+    number: "E401",
+    title: "Koordinat Sistemi Tanınamadı",
+    description: "GeoJSON'daki koordinat sistemi (CRS) çözülemedi ve koordinatlar WGS84 ile uyumlu değil."
+  },
+  CRS_CLAIMED_WGS84_INVALID: {
+    code: "CRS_CLAIMED_WGS84_INVALID",
+    number: "E402",
+    title: "Koordinatlar WGS84 İle Uyumsuz",
+    description: "GeoJSON WGS84/CRS84 olduğunu belirtiyor ama koordinatlar geçerli bir enlem/boylam aralığında değil."
+  },
+  CRS_MISSING_UNSUPPORTED: {
+    code: "CRS_MISSING_UNSUPPORTED",
+    number: "E403",
+    title: "Koordinat Sistemi Bilgisi Yok",
+    description: "GeoJSON'da CRS bilgisi yok ve koordinatlar geçerli bir enlem/boylam aralığında değil."
+  },
+  ANALYSIS_API_KEY_MISSING: {
+    code: "ANALYSIS_API_KEY_MISSING",
+    number: "E301",
+    title: "Analiz İçin API Anahtarı Eksik",
+    description: "AnalysisManager'a apiKey tanımlanmadan analiz isteği yapıldı."
+  },
+  ANALYSIS_NETWORK_ERROR: {
+    code: "ANALYSIS_NETWORK_ERROR",
+    number: "E302",
+    title: "Analiz Ağ Hatası",
+    description: "Analiz isteği ağ seviyesinde (fetch) başarısız oldu."
+  },
+  ANALYSIS_REQUEST_FAILED: {
+    code: "ANALYSIS_REQUEST_FAILED",
+    number: "E303",
+    title: "Analiz İsteği Başarısız",
+    description: "Analiz backend'i HTTP hata koduyla döndü."
+  },
+  ANALYSIS_UNSUCCESSFUL: {
+    code: "ANALYSIS_UNSUCCESSFUL",
+    number: "E304",
+    title: "Analiz Başarısız",
+    description: "Analiz backend'i HTTP 200 döndü ama isSuccess/success=false işaretledi."
+  },
+  ANALYSIS_RESPONSE_MISSING_GEOJSON: {
+    code: "ANALYSIS_RESPONSE_MISSING_GEOJSON",
+    number: "E305",
+    title: "Analiz Yanıtı Eksik",
+    description: "Analiz backend'i başarılı yanıt döndü ama sonuç geojson içermiyor."
+  },
+  LAYER_AUTHORIZED_LIST_API_KEY_MISSING: {
+    code: "LAYER_AUTHORIZED_LIST_API_KEY_MISSING",
+    number: "E101",
+    title: "Yetkili Katman Listesi İçin API Anahtarı Gerekli",
+    description: "getAuthorizedLayers() apiKey ayarlanmadan çağrıldı."
+  },
+  LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE: {
+    code: "LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE",
+    number: "E102",
+    title: "GeoTIFF Export Desteklenmiyor",
+    description: "GeoTIFF export sadece WMS/WCS katmanlarında desteklenir."
+  },
+  LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED: {
+    code: "LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED",
+    number: "E103",
+    title: "GeoTIFF Export Yapılandırılmamış",
+    description: "Katman GeoTIFF export için gerekli tiffFormat seçeneğine sahip değil."
+  },
+  LAYER_STYLE_NOT_VECTOR: {
+    code: "LAYER_STYLE_NOT_VECTOR",
+    number: "E104",
+    title: "Stil Sadece Vektör Katmanlarda",
+    description: "applyLayerStyle() sadece vektör (Entity tabanlı) katmanlarda kullanılabilir."
+  },
+  LAYER_TYPE_UNSUPPORTED_XYZ: {
+    code: "LAYER_TYPE_UNSUPPORTED_XYZ",
+    number: "E105",
+    title: "XYZ Katmanı add() İle Desteklenmiyor",
+    description: "XYZ katmanı add() ile eklenemez, Map.setBasemap() kullanılmalı."
+  },
+  LAYER_TYPE_UNSUPPORTED_DRAWING: {
+    code: "LAYER_TYPE_UNSUPPORTED_DRAWING",
+    number: "E106",
+    title: "DRAWING Katmanı add() İle Desteklenmiyor",
+    description: "DRAWING katmanı DrawingManager tarafından otomatik eklenir, add() ile eklenemez."
+  },
+  LAYER_TYPE_UNSUPPORTED_MEASURE: {
+    code: "LAYER_TYPE_UNSUPPORTED_MEASURE",
+    number: "E107",
+    title: "MEASURE Katmanı add() İle Desteklenmiyor",
+    description: "MEASURE katmanı DrawingManager tarafından otomatik eklenir, add() ile eklenemez."
+  },
+  LAYER_WMS_LAYERS_EMPTY: {
+    code: "LAYER_WMS_LAYERS_EMPTY",
+    number: "E108",
+    title: "WMS layers Parametresi Boş",
+    description: "WMS katmanı eklenirken layers (ogcLayerName) parametresi boş."
+  },
+  LAYER_GEOTIFF_UNSUPPORTED: {
+    code: "LAYER_GEOTIFF_UNSUPPORTED",
+    number: "E109",
+    title: "GeoTIFF Katmanı Desteklenmiyor",
+    description: "GeoTIFF katmanı mevcut Cesium sürümünde desteklenmiyor."
+  },
+  LAYER_SHP_PACKAGE_MISSING: {
+    code: "LAYER_SHP_PACKAGE_MISSING",
+    number: "E110",
+    title: "shpjs Paketi Eksik",
+    description: `SHP katmanı için gereken "shpjs" paketi yüklenemedi (kurulu değil ya da importmap'te tanımlı değil).`
+  },
+  LAYER_CSV_PACKAGE_MISSING: {
+    code: "LAYER_CSV_PACKAGE_MISSING",
+    number: "E111",
+    title: "papaparse Paketi Eksik",
+    description: `CSV katmanı için gereken "papaparse" paketi yüklenemedi (kurulu değil ya da importmap'te tanımlı değil).`
+  },
+  LAYER_CSV_LATLON_NOT_FOUND: {
+    code: "LAYER_CSV_LATLON_NOT_FOUND",
+    number: "E112",
+    title: "CSV'de lat/lon Sütunu Bulunamadı",
+    description: "CSV içinde lat/lon sütunları otomatik tespit edilemedi."
+  },
+  LAYER_NOT_FOUND: {
+    code: "LAYER_NOT_FOUND",
+    number: "E113",
+    title: "Katman Bulunamadı",
+    description: "Verilen id'ye sahip bir katman yönetimde kayıtlı değil."
+  },
+  LAYER_ID_ALREADY_EXISTS: {
+    code: "LAYER_ID_ALREADY_EXISTS",
+    number: "E114",
+    title: "Katman ID'si Zaten Kayıtlı",
+    description: "Verilen id ile zaten bir katman eklenmiş."
+  },
+  LAYER_TYPE_MISMATCH: {
+    code: "LAYER_TYPE_MISMATCH",
+    number: "E115",
+    title: "Katman Tipi Uyuşmuyor",
+    description: "Katman beklenen tipte (WMS/WMTS) değil."
+  },
+  LAYER_SERVICE_OPTIONS_NOT_FOUND: {
+    code: "LAYER_SERVICE_OPTIONS_NOT_FOUND",
+    number: "E116",
+    title: "Servis Seçenekleri Bulunamadı",
+    description: "Katman için orijinal servis seçenekleri (serviceLayerOptions) bulunamadı."
+  },
+  LAYER_NOT_RASTER: {
+    code: "LAYER_NOT_RASTER",
+    number: "E117",
+    title: "Katman Raster Değil",
+    description: "İşlem sadece raster (ImageryLayer) katmanlarda desteklenir."
+  },
+  OGC_AUTHORIZED_LAYERS_REQUEST_FAILED: {
+    code: "OGC_AUTHORIZED_LAYERS_REQUEST_FAILED",
+    number: "E205",
+    title: "Yetkili Katman Listesi Alınamadı",
+    description: "getAuthorizedLayers() isteği HTTP hata koduyla döndü."
+  },
+  OGC_GEOTIFF_DOWNLOAD_FAILED: {
+    code: "OGC_GEOTIFF_DOWNLOAD_FAILED",
+    number: "E206",
+    title: "GeoTIFF İndirilemedi",
+    description: "GeoTIFF export isteği HTTP hata koduyla döndü."
+  },
+  OGC_WFS_JSON_FORMAT_UNSUPPORTED: {
+    code: "OGC_WFS_JSON_FORMAT_UNSUPPORTED",
+    number: "E207",
+    title: "WFS JSON Format İlan Etmiyor",
+    description: "WFS sunucusu GetCapabilities yanıtında JSON çıktı formatı ilan etmiyor."
+  },
+  OGC_WFS_GEOJSON_REQUEST_FAILED: {
+    code: "OGC_WFS_GEOJSON_REQUEST_FAILED",
+    number: "E208",
+    title: "WFS GeoJSON İsteği Başarısız",
+    description: "WFS GetFeature (GeoJSON çıktı) isteği başarısız oldu."
+  },
+  OGC_WFS_REQUEST_FAILED: {
+    code: "OGC_WFS_REQUEST_FAILED",
+    number: "E209",
+    title: "WFS İsteği Başarısız",
+    description: "WFS GetFeature (GML çıktı) isteği HTTP hata koduyla döndü."
+  },
+  OGC_WFS_EXCEPTION: {
+    code: "OGC_WFS_EXCEPTION",
+    number: "E210",
+    title: "WFS OGC Exception",
+    description: "WFS GetFeature yanıtı bir OGC ExceptionReport döndürdü."
+  },
+  OGC_WFS_OL_PACKAGE_MISSING: {
+    code: "OGC_WFS_OL_PACKAGE_MISSING",
+    number: "E211",
+    title: "ol Paketi Eksik",
+    description: `WFS GML yanıtını okumak için gereken "ol" paketi yüklenemedi (kurulu değil ya da importmap'te tanımlı değil).`
+  },
+  OGC_WCS_REQUEST_FAILED: {
+    code: "OGC_WCS_REQUEST_FAILED",
+    number: "E212",
+    title: "WCS İsteği Başarısız",
+    description: "WCS GetCoverage isteği HTTP hata koduyla döndü."
+  },
+  OGC_WCS_MULTIPART_IMAGE_NOT_FOUND: {
+    code: "OGC_WCS_MULTIPART_IMAGE_NOT_FOUND",
+    number: "E213",
+    title: "WCS Multipart Görsel Bulunamadı",
+    description: "Multipart WCS yanıtında görsel (image) parçası bulunamadı."
+  },
+  LAYER_PREVIEW_UNSUPPORTED_XYZ: {
+    code: "LAYER_PREVIEW_UNSUPPORTED_XYZ",
+    number: "E118",
+    title: "XYZ Katmanı Önizlemede Desteklenmiyor",
+    description: "TucbsMapPreview XYZ katman tipini önizlemede desteklemiyor."
+  },
+  LAYER_PREVIEW_UNSUPPORTED_DRAWING: {
+    code: "LAYER_PREVIEW_UNSUPPORTED_DRAWING",
+    number: "E119",
+    title: "DRAWING Katmanı Önizlemede Desteklenmiyor",
+    description: "TucbsMapPreview DRAWING katman tipini önizlemede desteklemiyor."
+  },
+  LAYER_PREVIEW_UNSUPPORTED_MEASURE: {
+    code: "LAYER_PREVIEW_UNSUPPORTED_MEASURE",
+    number: "E120",
+    title: "MEASURE Katmanı Önizlemede Desteklenmiyor",
+    description: "TucbsMapPreview MEASURE katman tipini önizlemede desteklemiyor."
+  },
+  LAYER_MANAGER_NOT_READY: {
+    code: "LAYER_MANAGER_NOT_READY",
+    number: "E121",
+    title: "Harita Hazır Değil",
+    description: "Katman eklenmeye çalışıldığında LayerManager henüz hazır değildi."
+  },
+  LAYER_AUTHORIZED_ADD_MISSING_INFO: {
+    code: "LAYER_AUTHORIZED_ADD_MISSING_INFO",
+    number: "E122",
+    title: "Yetkili Katman Eklenemedi",
+    description: "Yetkili katman için gerekli servis bilgisi (ör. WMTS TileMatrixSet) eksik."
+  },
+  OGC_SERVICE_DISCOVERY_PARSE_FAILED: {
+    code: "OGC_SERVICE_DISCOVERY_PARSE_FAILED",
+    number: "E214",
+    title: "Servis Keşfi Ayrıştırma Hatası",
+    description: "TucbsServiceUpload'da GetCapabilities yanıtı geçerli XML olarak ayrıştırılamadı."
+  },
+  LAYER_WMTS_TILEMATRIXSET_MISSING: {
+    code: "LAYER_WMTS_TILEMATRIXSET_MISSING",
+    number: "E123",
+    title: "TileMatrixSet Bilgisi Bulunamadı",
+    description: "Keşfedilen WMTS katmanı için TileMatrixSet bilgisi bulunamadı."
+  },
+  LAYER_OUTSIDE_SERVICE_EXTENT: {
+    code: "LAYER_OUTSIDE_SERVICE_EXTENT",
+    number: "E124",
+    title: "Katman Türkiye Sınırları Dışında",
+    description: "Servis katmanının kapsama alanı Türkiye extent'i ile kesişmiyor; servis istekleri yalnızca Türkiye extent'iyle sınırlı olduğu için katman eklenemedi."
+  }
+};
 function getErrorCodes() {
   return ERROR_REGISTRY;
 }
 class TucbsError extends Error {
-  constructor(_0x53eda4, _0x30e01c, _0x5d2089) {
-    const _0x297c7d = ERROR_REGISTRY[_0x53eda4];
-    super(_0x30e01c ?? _0x297c7d["description"]), this["name"] = "TucbsError", this["code"] = _0x53eda4, this["number"] = _0x297c7d["number"], this["title"] = _0x5d2089 ?? _0x297c7d["title"];
+  constructor(code, message, title) {
+    const info = ERROR_REGISTRY[code];
+    super(message ?? info.description);
+    this.name = "TucbsError";
+    this.code = code;
+    this.number = info.number;
+    this.title = title ?? info.title;
   }
 }
 class LayerOperationError extends TucbsError {
-  constructor(_0x266a51, _0x29d6f6, _0x121bf0) {
-    super(_0x266a51, _0x29d6f6, _0x121bf0), this["name"] = "LayerOperationError";
+  constructor(code, message, title) {
+    super(code, message, title);
+    this.name = "LayerOperationError";
   }
 }
 class OgcRequestError extends TucbsError {
-  constructor(_0x5441af, _0x3034ef, _0x568eef) {
-    super(_0x5441af, _0x3034ef, _0x568eef), this["name"] = "OgcRequestError";
+  constructor(code, message, title) {
+    super(code, message, title);
+    this.name = "OgcRequestError";
   }
 }
 class AnalysisRequestError extends TucbsError {
-  constructor(_0xbd8bbe, _0x482101, _0x122f0e) {
-    super(_0xbd8bbe, _0x482101, _0x122f0e), this["name"] = "AnalysisRequestError";
+  constructor(code, message, title) {
+    super(code, message, title);
+    this.name = "AnalysisRequestError";
   }
 }
 class GeometryError extends TucbsError {
-  constructor(_0x45fd88, _0x585c06, _0x3ae9ee) {
-    super(_0x45fd88, _0x585c06, _0x3ae9ee), this["name"] = "GeometryError";
+  constructor(code, message, title) {
+    super(code, message, title);
+    this.name = "GeometryError";
   }
 }
 class ApiKeyValidationError extends TucbsError {
-  constructor(_0x39e404, _0x384881) {
-    super((_0x384881 == null ? void 0 : _0x384881["code"]) ?? "API_KEY_INVALID", _0x39e404, (_0x384881 == null ? void 0 : _0x384881["title"]) ?? "API Hatası"), this["name"] = "ApiKeyValidationError";
-    if ((_0x384881 == null ? void 0 : _0x384881["reason"]) !== void 0) this["reason"] = _0x384881["reason"];
-    if ((_0x384881 == null ? void 0 : _0x384881["detail"]) !== void 0) this["detail"] = _0x384881["detail"];
+  constructor(message, opts) {
+    super((opts == null ? void 0 : opts.code) ?? "API_KEY_INVALID", message, (opts == null ? void 0 : opts.title) ?? "API Hatası");
+    this.name = "ApiKeyValidationError";
+    if ((opts == null ? void 0 : opts.reason) !== void 0) this.reason = opts.reason;
+    if ((opts == null ? void 0 : opts.detail) !== void 0) this.detail = opts.detail;
   }
 }
 const _ApiKeyPolicy = class _ApiKeyPolicy {
-  constructor(_0x54e3b7) {
+  constructor(options) {
+    // Map.ts uzerinden configure() ile atanir. undefined ise apiKey mekanizmasi
+    // tamamen devre disi kalir (mevcut authToken/Bearer davranisi degismez).
+    // GERCEK (ES private) bir field -- TypeScript'in `private`
+    // anahtar sozcugu sadece derleme-zamaninda kontrol eder, derlenen JS'te
+    // silinir ve disaridan (ör. sayfada calisan baska bir script, XSS
+    // payload'i) runtime'da hala okunabilir kalirdi. # ile gercekten
+    // disaridan erisilemez hale gelir.
     __privateAdd(this, _apiKey);
-    this["getApiBase"] = _0x54e3b7["apiBase"];
+    this.getApiBase = options.apiBase;
   }
-  ["configure"](_0x1a114f) {
-    _0x1a114f["apiKey"] !== void 0 && __privateSet(this, _apiKey, _0x1a114f["apiKey"]), _0x1a114f["trustedApiKeyHosts"] !== void 0 && (this["trustedApiKeyHosts"] = _0x1a114f["trustedApiKeyHosts"]), _0x1a114f["apiKeyDiscoveryUrl"] !== void 0 && (this["apiKeyDiscoveryUrl"] = _0x1a114f["apiKeyDiscoveryUrl"]);
+  /**
+   * apiKey ile ilgili ayarlari (Map.ts constructor'indan) gec-yapilandirir.
+   * Sadece verilen alanlar guncellenir, digerleri oldugu gibi kalir --
+   * boylece Map.ts, MapOptions'ta apiKey verilmemisse bu metodu hic
+   * cagirmayabilir ya da kismi bir nesne geciebilir.
+   */
+  configure(options) {
+    if (options.apiKey !== void 0) {
+      __privateSet(this, _apiKey, options.apiKey);
+    }
+    if (options.trustedApiKeyHosts !== void 0) {
+      this.trustedApiKeyHosts = options.trustedApiKeyHosts;
+    }
+    if (options.apiKeyDiscoveryUrl !== void 0) {
+      this.apiKeyDiscoveryUrl = options.apiKeyDiscoveryUrl;
+    }
   }
-  get ["hasApiKey"]() {
+  /** apiKey configure() ile atanmis mi -- SADECE varligi, degerin kendisi
+   * degil (#apiKey gercek private field olarak kapali kalir). */
+  get hasApiKey() {
     return __privateGet(this, _apiKey) !== void 0;
   }
-  async ["getAuthorizedLayers"]() {
-    if (__privateGet(this, _apiKey) === void 0) throw new LayerOperationError("LAYER_AUTHORIZED_LIST_API_KEY_MISSING", "getAuthorizedLayers() icin apiKey gerekli — Map/LayerManager.configure({apiKey}) ile atayin.");
-    const _0x1c4f9e = this["apiKeyDiscoveryUrl"] ?? this["getApiBase"]()["replace"](/\/+$/, "") + "/layers", _0xcbde2 = await fetch(_0x1c4f9e, { "headers": { [_ApiKeyPolicy["API_KEY_HEADER_NAME"]]: __privateGet(this, _apiKey) } });
-    if (!_0xcbde2["ok"]) throw new OgcRequestError("OGC_AUTHORIZED_LAYERS_REQUEST_FAILED", "Yetkili katman listesi alinamadi: " + _0xcbde2["status"] + " " + _0xcbde2["statusText"]);
-    const _0x535c20 = await _0xcbde2["json"](), _0x1e5aa5 = Array["isArray"](_0x535c20) ? _0x535c20 : _0x535c20["object"] ?? [];
-    return _0x1e5aa5["map"]((_0x4daf12) => this["normalizeAuthorizedLayer"](_0x4daf12));
+  /** {@link LayerManager.getAuthorizedLayers} implementasyonu -- apiKey'e
+   * gore yetkili WMS/WFS/WMTS listesi, `GET /layers` + `X-API-Key`. */
+  async getAuthorizedLayers() {
+    if (__privateGet(this, _apiKey) === void 0) {
+      throw new LayerOperationError(
+        "LAYER_AUTHORIZED_LIST_API_KEY_MISSING",
+        "getAuthorizedLayers() icin apiKey gerekli — Map/LayerManager.configure({apiKey}) ile atayin."
+      );
+    }
+    const discoveryUrl = this.apiKeyDiscoveryUrl ?? `${this.getApiBase().replace(/\/+$/, "")}/layers`;
+    const response = await fetch(discoveryUrl, {
+      headers: { [_ApiKeyPolicy.API_KEY_HEADER_NAME]: __privateGet(this, _apiKey) }
+    });
+    if (!response.ok) {
+      throw new OgcRequestError(
+        "OGC_AUTHORIZED_LAYERS_REQUEST_FAILED",
+        `Yetkili katman listesi alinamadi: ${response.status} ${response.statusText}`
+      );
+    }
+    const data = await response.json();
+    const raw = Array.isArray(data) ? data : data.object ?? [];
+    return raw.map((item) => this.normalizeAuthorizedLayer(item));
   }
-  async ["getLayerList"]() {
-    return this["getAuthorizedLayers"]();
+  /** {@link getAuthorizedLayers} alias (checklist getLayerList). */
+  async getLayerList() {
+    return this.getAuthorizedLayers();
   }
-  ["canAddAuthorizedLayer"](_0x56ba3d) {
+  /**
+   * {@link LayerManager.canAddAuthorizedLayer} implementasyonu -- bir
+   * AuthorizedLayerInfo'nun {@link resolveAddOptions}/`LayerManager.add()`
+   * ile eklenebilir olup olmadigini bildirir (GC-03 Adim 3 kapsaminda
+   * `TucbsAuthorizedLayers.ts`'teki ORIJINAL `_authorizedCanAdd`'in TEK
+   * SATIR davranis degisikligi olmadan buraya tasinmis hali -- artik hem
+   * Lit bilesen hem baska bir UI katmani (ör. React) AYNI kaynagi kullanir).
+   */
+  canAddAuthorizedLayer(info) {
     var _a2, _b;
-    const _0x5d2c5e = (_0x56ba3d["servisTuru"] || "")["toUpperCase"]();
-    if (!((_a2 = _0x56ba3d["servisUrl"]) == null ? void 0 : _a2["trim"]()) || !this["resolveOgcLayerName"](_0x56ba3d["ogcLayerName"], _0x56ba3d["katmanAdi"])) return ![];
-    if (_0x5d2c5e === "WMTS") return !!((_b = _0x56ba3d["wmtsTileMatrixSet"]) == null ? void 0 : _b["trim"]());
-    return _0x5d2c5e === "WMS" || _0x5d2c5e === "WFS";
+    const tur = (info.servisTuru || "").toUpperCase();
+    if (!((_a2 = info.servisUrl) == null ? void 0 : _a2.trim()) || !this.resolveOgcLayerName(info.ogcLayerName, info.katmanAdi)) {
+      return false;
+    }
+    if (tur === "WMTS") return !!((_b = info.wmtsTileMatrixSet) == null ? void 0 : _b.trim());
+    return tur === "WMS" || tur === "WFS";
   }
-  ["resolveAddOptions"](_0x514724) {
+  /**
+   * {@link LayerManager.addAuthorizedLayer} implementasyonu -- bir
+   * AuthorizedLayerInfo'yu `LayerManager.add()`'in bekledigi
+   * `{layerType, options}` ciftine cozer (ORIJINAL
+   * `_resolvedOgcLayerName`+`_addOneAuthorizedLayer`'in options-eslestirme
+   * kismi, AYNI sekilde tasinmistir). {@link canAddAuthorizedLayer} false
+   * donuyorsa `LayerOperationError` firlatir -- `add()`'i KENDISI cagirmaz,
+   * caller (`LayerManager.addAuthorizedLayer`) sonucu mevcut `add()`
+   * dispatcher'ina verir.
+   */
+  resolveAddOptions(info) {
     var _a2;
-    if (!this["canAddAuthorizedLayer"](_0x514724)) throw new LayerOperationError("LAYER_AUTHORIZED_ADD_MISSING_INFO", ((_a2 = _0x514724["servisTuru"]) == null ? void 0 : _a2["toUpperCase"]()) === "WMTS" ? "WMTS için TileMatrixSet eksik." : "Eksik servis bilgisi.");
-    const _0x5867fe = _0x514724["servisTuru"]["toUpperCase"](), _0x4d8eac = "authorized-" + this["authorizedLayerKey"](_0x514724) + "-" + Date["now"](), _0x33d470 = this["resolveOgcLayerName"](_0x514724["ogcLayerName"], _0x514724["katmanAdi"]), _0x5a7903 = _0x514724["katmanAdi"] || _0x33d470;
-    if (_0x5867fe === "WMS") return { "layerType": "WMS", "options": { "id": _0x4d8eac, "title": _0x5a7903, "url": _0x514724["servisUrl"], "layers": _0x33d470 } };
-    if (_0x5867fe === "WFS") return { "layerType": "WFS", "options": { "id": _0x4d8eac, "title": _0x5a7903, "url": _0x514724["servisUrl"], "typeName": _0x33d470 } };
-    return { "layerType": "WMTS", "options": { "id": _0x4d8eac, "title": _0x5a7903, "url": _0x514724["servisUrl"], "layer": _0x33d470, "tileMatrixSetID": _0x514724["wmtsTileMatrixSet"] } };
+    if (!this.canAddAuthorizedLayer(info)) {
+      throw new LayerOperationError(
+        "LAYER_AUTHORIZED_ADD_MISSING_INFO",
+        ((_a2 = info.servisTuru) == null ? void 0 : _a2.toUpperCase()) === "WMTS" ? "WMTS için TileMatrixSet eksik." : "Eksik servis bilgisi."
+      );
+    }
+    const tur = info.servisTuru.toUpperCase();
+    const id = `authorized-${this.authorizedLayerKey(info)}-${Date.now()}`;
+    const layerName = this.resolveOgcLayerName(info.ogcLayerName, info.katmanAdi);
+    const title = info.katmanAdi || layerName;
+    if (tur === "WMS") {
+      return { layerType: "WMS", options: { id, title, url: info.servisUrl, layers: layerName } };
+    }
+    if (tur === "WFS") {
+      return { layerType: "WFS", options: { id, title, url: info.servisUrl, typeName: layerName } };
+    }
+    return {
+      layerType: "WMTS",
+      options: {
+        id,
+        title,
+        url: info.servisUrl,
+        layer: layerName,
+        tileMatrixSetID: info.wmtsTileMatrixSet
+      }
+    };
   }
-  ["authorizedLayerKey"](_0x1a7360) {
-    return _0x1a7360["id"] ?? _0x1a7360["servisTuru"] + "|" + _0x1a7360["servisUrl"] + "|" + _0x1a7360["ogcLayerName"];
+  // ORIJINAL _authorizedKey (TucbsAuthorizedLayers.ts) ile AYNI anahtar
+  // formatu -- sadece resolveAddOptions()'in id uretimi icin, UI'daki
+  // secim-listesi anahtarindan (checkbox kimligi) BAGIMSIZ bir amac.
+  authorizedLayerKey(info) {
+    return info.id ?? `${info.servisTuru}|${info.servisUrl}|${info.ogcLayerName}`;
   }
-  ["normalizeAuthorizedLayer"](_0x3910f9) {
-    const _0x401a87 = this["resolveOgcLayerName"](_0x3910f9["ogcLayerName"], _0x3910f9["katmanAdi"]), _0x58a5b6 = this["rewriteOpaqueOgcUrl"](_0x3910f9["servisUrl"]), _0x4261fc = _0x3910f9["servisTuru"]["toUpperCase"]();
-    return { ..._0x3910f9, "servisTuru": _0x4261fc, ..._0x401a87 && _0x401a87 !== _0x3910f9["ogcLayerName"] ? { "ogcLayerName": _0x401a87 } : {}, ..._0x58a5b6 !== _0x3910f9["servisUrl"] ? { "servisUrl": _0x58a5b6 } : {} };
+  normalizeAuthorizedLayer(item) {
+    const ogc = this.resolveOgcLayerName(item.ogcLayerName, item.katmanAdi);
+    const servisUrl = this.rewriteOpaqueOgcUrl(item.servisUrl);
+    const servisTuru = item.servisTuru.toUpperCase();
+    return {
+      ...item,
+      servisTuru,
+      ...ogc && ogc !== item.ogcLayerName ? { ogcLayerName: ogc } : {},
+      ...servisUrl !== item.servisUrl ? { servisUrl } : {}
+    };
   }
-  ["resolveOgcLayerName"](_0x1970f3, _0x5f5b5f) {
-    for (const _0x996531 of [_0x1970f3, _0x5f5b5f]) {
-      if (!_0x996531) continue;
-      const _0x8c00b4 = _0x996531["trim"]();
-      if (!_0x8c00b4 || _0x8c00b4["toLowerCase"]() === "undefined" || _0x8c00b4["toLowerCase"]() === "null") continue;
-      return _0x8c00b4;
+  resolveOgcLayerName(ogcLayerName, katmanAdi) {
+    for (const raw of [ogcLayerName, katmanAdi]) {
+      if (!raw) continue;
+      const t = raw.trim();
+      if (!t || t.toLowerCase() === "undefined" || t.toLowerCase() === "null") {
+        continue;
+      }
+      return t;
     }
     return "";
   }
-  ["isTrustedApiKeyHost"](_0x15b4db) {
-    if (__privateGet(this, _apiKey) === void 0) return ![];
-    return this["isKnownGatedUrl"](_0x15b4db);
+  // ── apiKey ic yardimcilari ───────────────────────────────────────────────
+  /**
+   * Verilen URL'in host'u trustedApiKeyHosts listesinde mi kontrol eder.
+   * URL ayristirilamazsa (goreli/bicimsiz URL) GUVENLI TARAFTA kalinir --
+   * host bilinmiyorsa apiKey EKLENMEZ (fail-closed).
+   */
+  isTrustedApiKeyHost(url) {
+    if (__privateGet(this, _apiKey) === void 0) return false;
+    return this.isKnownGatedUrl(url);
   }
-  ["layerRequiresApiKey"](_0x160f33) {
-    return this["isKnownGatedUrl"](_0x160f33);
+  /**
+   * URL'in apiKey gerektiren bir servis deseni (ucbp-api OGC proxy veya
+   * configure edilmis trustedApiKeyHosts) tasiyip tasimadigini, apiKey'in
+   * o an var olup olmadigindan BAGIMSIZ olarak bildirir. Tuketiciler
+   * (ör. TucbsMapPreview) bunu, apiKey yok/gecersizken bir katmanin
+   * gercekten acik olup olmadigina karar vermek icin kullanir.
+   */
+  layerRequiresApiKey(url) {
+    return this.isKnownGatedUrl(url);
   }
-  ["isKnownGatedUrl"](_0x4dd27a) {
-    if (this["isOwnBackendUrl"](_0x4dd27a)) return !![];
-    if (this["trustedApiKeyHosts"] === void 0 || this["trustedApiKeyHosts"]["length"] === 0) return ![];
+  isKnownGatedUrl(url) {
+    if (this.isOwnBackendUrl(url)) return true;
+    if (this.trustedApiKeyHosts === void 0 || this.trustedApiKeyHosts.length === 0) {
+      return false;
+    }
     try {
-      return this["trustedApiKeyHosts"]["includes"](new URL(_0x4dd27a)["hostname"]);
+      return this.trustedApiKeyHosts.includes(new URL(url).hostname);
     } catch {
-      return ![];
+      return false;
     }
   }
-  ["isOwnBackendUrl"](_0x5ed5e6) {
+  /**
+   * ML-07 DUZELTMESI (Faz 3): eskiden burada `url.includes("/wms-proxy/") ||
+   * url.includes("/ogc/")` gibi TUM URL dizgesine bakan bir alt-dizge
+   * (substring) kisayolu vardi -- path'inde tesaduf eseri "/ogc/" veya
+   * "/wms-proxy/" gecen UCUNCU TARAF bir sunucu (ör. OGC API Features
+   * konvansiyonunu kullanan bircok gercek GIS sunucusu) yanlislikla
+   * "kendi backend'imiz" sayilip apiKey o sunucuya sizdirilabiliyordu.
+   * Simdi HOST karsilastirmasi yapilir (asagidaki trustedApiKeyHosts
+   * kontrolüyle AYNI desen, `new URL(..., window.location.origin)` --
+   * apiBase() goreli bir yol da olabilir, bkz wfsCapabilities.ts:54'teki
+   * ayni cozumleme deseni) -- host eslesmiyorsa artik path'te ne yazarsa
+   * yazsin GUVENLI TARAFTA (apiKey eklenmez) kalinir.
+   */
+  isOwnBackendUrl(url) {
     try {
-      const _0x3fc647 = new URL(_0x5ed5e6, window["location"]["origin"]), _0x451ae0 = new URL(this["getApiBase"](), window["location"]["origin"]);
-      if (_0x3fc647["hostname"] !== _0x451ae0["hostname"]) return ![];
-      return _0x3fc647["pathname"]["includes"]("/wms-proxy/") || _0x3fc647["pathname"]["includes"]("/ogc/");
+      const target = new URL(url, window.location.origin);
+      const base = new URL(this.getApiBase(), window.location.origin);
+      if (target.hostname !== base.hostname) return false;
+      return target.pathname.includes("/wms-proxy/") || target.pathname.includes("/ogc/");
     } catch {
-      return ![];
+      return false;
     }
   }
-  ["rewriteOpaqueOgcUrl"](_0x179ccd) {
-    if (!(_0x179ccd == null ? void 0 : _0x179ccd["includes"]("/ogc/"))) return _0x179ccd ?? "";
-    const _0x5070bc = _0x179ccd["indexOf"]("/ogc/"), _0x1be1ad = _0x179ccd["substring"](_0x5070bc), _0xdf5744 = this["getApiBase"]()["replace"](/\/+$/, "");
-    return "" + _0xdf5744 + _0x1be1ad;
+  /**
+   * /layers servisUrl sunucuda api-public-base-url ile üretilir (dev URL kalabilir).
+   * Opaque /ogc/ yollarını her zaman apiBase() ile hizalar.
+   */
+  rewriteOpaqueOgcUrl(url) {
+    if (!(url == null ? void 0 : url.includes("/ogc/"))) {
+      return url ?? "";
+    }
+    const ogcIdx = url.indexOf("/ogc/");
+    const pathAndQuery = url.substring(ogcIdx);
+    const base = this.getApiBase().replace(/\/+$/, "");
+    return `${base}${pathAndQuery}`;
   }
-  ["resolveOgcProxyUrl"](_0xd64194, _0xd843ec) {
-    if (__privateGet(this, _apiKey) === void 0) return _0xd843ec;
-    if (_0xd843ec["includes"]("/ogc/")) return this["rewriteOpaqueOgcUrl"](_0xd843ec);
-    if (_0xd843ec["includes"]("/wms-proxy/")) return _0xd843ec;
-    const _0xe36cc7 = this["getApiBase"]()["replace"](/\/+$/, "") + "/wms-proxy/" + _0xd64194, _0x5eaca3 = _0xe36cc7["includes"]("?") ? "&" : "?";
-    return "" + _0xe36cc7 + _0x5eaca3 + "url=" + encodeURIComponent(_0xd843ec);
+  /**
+   * apiKey varsa opaque `/ogc/{type}/{id}` veya legacy `/wms-proxy/{type}?url=` kullanır.
+   */
+  resolveOgcProxyUrl(serviceType, upstreamUrl) {
+    if (__privateGet(this, _apiKey) === void 0) return upstreamUrl;
+    if (upstreamUrl.includes("/ogc/")) {
+      return this.rewriteOpaqueOgcUrl(upstreamUrl);
+    }
+    if (upstreamUrl.includes("/wms-proxy/")) {
+      return upstreamUrl;
+    }
+    const base = `${this.getApiBase().replace(/\/+$/, "")}/wms-proxy/${serviceType}`;
+    const sep = base.includes("?") ? "&" : "?";
+    return `${base}${sep}url=${encodeURIComponent(upstreamUrl)}`;
   }
-  ["mergeApiKeyHeader"](_0x35ccf0, _0x1e51cd) {
-    if (!this["isTrustedApiKeyHost"](_0x1e51cd)) return _0x35ccf0;
-    return { ..._0x35ccf0, [_ApiKeyPolicy["API_KEY_HEADER_NAME"]]: __privateGet(this, _apiKey) };
+  /**
+   * fetch/Resource-tabanli (header tasiyabilen) istekler icin: host
+   * guvenilirse mevcut header'lara apiKey'i EKLER, degilse header'lari
+   * OLDUGU GIBI dondurur. WMS/WMTS tile, WFS GetFeature, WCS GetCoverage ve
+   * ortak GetCapabilities istekleri bu yolu kullanir -- bu istekler zaten
+   * fetch()/Cesium Resource uzerinden gittigi icin header EKLENMESI, bu
+   * gelistirme kapsaminda UCTAN UCA calisir (backend'de ayrica bir proxy
+   * gerektirmez, ilgili sunucu header'i okuyabilir).
+   */
+  mergeApiKeyHeader(headers, url) {
+    if (!this.isTrustedApiKeyHost(url)) return headers;
+    return { ...headers, [_ApiKeyPolicy.API_KEY_HEADER_NAME]: __privateGet(this, _apiKey) };
   }
-  ["attachApiKeyToUrl"](_0x33485b) {
-    if (!this["isTrustedApiKeyHost"](_0x33485b)) return _0x33485b;
-    const _0x5e5e5c = _0x33485b["includes"]("?") ? "&" : "?";
-    return "" + _0x33485b + _0x5e5e5c + _ApiKeyPolicy["API_KEY_QUERY_PARAM_NAME"] + "=" + encodeURIComponent(__privateGet(this, _apiKey));
+  /**
+   * Header TASIYAMAYAN istekler (WMS/WMTS GetLegendGraphic — tarayicida
+   * `<img src>` ile cekilir) icin: host guvenilirse apiKey'i query-string
+   * parametresi (tucbsapikey) olarak URL'e ekler. NOT: bu SADECE URL'i dogru
+   * bicimde olusturur -- gercek bir sunucudan anahtara gore dogrulanmis yanit
+   * alinmasi, backend'deki WMS/WMTS Proxy katmani (ayri, henuz onaylanmamis
+   * bir gelistirme) hazir olduguna baglidir.
+   */
+  attachApiKeyToUrl(url) {
+    if (!this.isTrustedApiKeyHost(url)) return url;
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}${_ApiKeyPolicy.API_KEY_QUERY_PARAM_NAME}=${encodeURIComponent(__privateGet(this, _apiKey))}`;
   }
-  ["buildAuthHeaders"](_0x10ab88) {
-    if (_0x10ab88 === void 0) return void 0;
-    return { "Authorization": "Bearer " + _0x10ab88 };
+  /** Kullanıcı jetonu verilmişse `Authorization: Bearer …` başlığını üretir; yoksa `undefined` döner. */
+  buildAuthHeaders(authToken) {
+    if (authToken === void 0) return void 0;
+    return { Authorization: `Bearer ${authToken}` };
   }
 };
 _apiKey = new WeakMap();
-_ApiKeyPolicy["API_KEY_HEADER_NAME"] = "X-API-Key";
-_ApiKeyPolicy["API_KEY_QUERY_PARAM_NAME"] = "tucbsapikey";
+_ApiKeyPolicy.API_KEY_HEADER_NAME = "X-API-Key";
+_ApiKeyPolicy.API_KEY_QUERY_PARAM_NAME = "tucbsapikey";
 let ApiKeyPolicy = _ApiKeyPolicy;
-function cartesianToLonLat(_0x25872d) {
-  const _0x38c4df = Cartographic["fromCartesian"](_0x25872d);
-  return [_0x584e42["toDegrees"](_0x38c4df["longitude"]), _0x584e42["toDegrees"](_0x38c4df["latitude"])];
+function cartesianToLonLat(cartesian) {
+  const c = Cartographic.fromCartesian(cartesian);
+  return [Math$1.toDegrees(c.longitude), Math$1.toDegrees(c.latitude)];
 }
-function closeRing$1(_0x425b97) {
-  if (_0x425b97["length"] === 0) return _0x425b97;
-  const _0x1fbb2f = _0x425b97[0], _0x3b1091 = _0x425b97[_0x425b97["length"] - 1];
-  if (_0x1fbb2f[0] === _0x3b1091[0] && _0x1fbb2f[1] === _0x3b1091[1]) return _0x425b97;
-  return [..._0x425b97, _0x1fbb2f];
+function closeRing$1(ring) {
+  if (ring.length === 0) return ring;
+  const first = ring[0];
+  const last = ring[ring.length - 1];
+  if (first[0] === last[0] && first[1] === last[1]) return ring;
+  return [...ring, first];
 }
-function entityToGeoJSON(_0x130868, _0x48925b = JulianDate["now"]()) {
+function entityToGeoJSON(entity, time = JulianDate.now()) {
   var _a2, _b, _c;
-  const _0x3822bd = ((_a2 = _0x130868["properties"]) == null ? void 0 : _a2["getValue"](_0x48925b)) ?? {}, _0x3033c5 = { ..._0x3822bd };
-  delete _0x3033c5["layerId"], delete _0x3033c5["featureId"];
-  let _0x36459e = null;
-  if ((_b = _0x130868["polygon"]) == null ? void 0 : _b["hierarchy"]) {
-    const _0x4ba92c = _0x130868["polygon"]["hierarchy"]["getValue"](_0x48925b), _0x53d71a = _0x4ba92c == null ? void 0 : _0x4ba92c["positions"];
-    if (_0x53d71a && _0x53d71a["length"] >= 3) {
-      const _0x3b3aec = closeRing$1(_0x53d71a["map"](cartesianToLonLat));
-      _0x36459e = { "type": "Polygon", "coordinates": [_0x3b3aec] };
+  const rawProps = ((_a2 = entity.properties) == null ? void 0 : _a2.getValue(time)) ?? {};
+  const properties = { ...rawProps };
+  delete properties.layerId;
+  delete properties.featureId;
+  let geometry = null;
+  if ((_b = entity.polygon) == null ? void 0 : _b.hierarchy) {
+    const hierarchy = entity.polygon.hierarchy.getValue(time);
+    const positions = hierarchy == null ? void 0 : hierarchy.positions;
+    if (positions && positions.length >= 3) {
+      const ring = closeRing$1(positions.map(cartesianToLonLat));
+      geometry = { type: "Polygon", coordinates: [ring] };
     }
-  } else {
-    if ((_c = _0x130868["polyline"]) == null ? void 0 : _c["positions"]) {
-      const _0x2e8f5b = _0x130868["polyline"]["positions"]["getValue"](_0x48925b);
-      _0x2e8f5b && _0x2e8f5b["length"] >= 2 && (_0x36459e = { "type": "LineString", "coordinates": _0x2e8f5b["map"](cartesianToLonLat) });
-    } else {
-      if (_0x130868["position"]) {
-        const _0x4404ae = _0x130868["position"]["getValue"](_0x48925b);
-        _0x4404ae && (_0x36459e = { "type": "Point", "coordinates": cartesianToLonLat(_0x4404ae) });
-      }
+  } else if ((_c = entity.polyline) == null ? void 0 : _c.positions) {
+    const positions = entity.polyline.positions.getValue(time);
+    if (positions && positions.length >= 2) {
+      geometry = {
+        type: "LineString",
+        coordinates: positions.map(cartesianToLonLat)
+      };
+    }
+  } else if (entity.position) {
+    const pos = entity.position.getValue(time);
+    if (pos) {
+      geometry = { type: "Point", coordinates: cartesianToLonLat(pos) };
     }
   }
-  if (!_0x36459e) return null;
-  return { "type": "Feature", "id": _0x130868["id"], "properties": _0x3033c5, "geometry": _0x36459e };
+  if (!geometry) return null;
+  return {
+    type: "Feature",
+    id: entity.id,
+    properties,
+    geometry
+  };
 }
-function featureLabel(_0x54a342) {
+function featureLabel(feature) {
   var _a2;
-  const _0x3e0c9f = ((_a2 = _0x54a342["geometry"]) == null ? void 0 : _a2["type"]) ?? "Feature", _0x1fa97d = _0x54a342["id"] != null ? String(_0x54a342["id"]) : "";
-  return _0x1fa97d ? _0x3e0c9f + " " + _0x1fa97d : _0x3e0c9f;
+  const geomType = ((_a2 = feature.geometry) == null ? void 0 : _a2.type) ?? "Feature";
+  const id = feature.id != null ? String(feature.id) : "";
+  return id ? `${geomType} ${id}` : geomType;
 }
-function triggerDownload(_0x5837ac, _0x338984) {
-  const _0x41d3f4 = URL["createObjectURL"](_0x5837ac), _0x31aea5 = document["createElement"]("a");
-  _0x31aea5["href"] = _0x41d3f4, _0x31aea5["download"] = _0x338984, document["body"]["appendChild"](_0x31aea5), _0x31aea5["click"](), _0x31aea5["remove"](), setTimeout(() => URL["revokeObjectURL"](_0x41d3f4), 1e3);
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1e3);
 }
-function featureCollectionToKml(_0x452cf8) {
-  const _0xd9b236 = _0x452cf8["features"]["map"]((_0x13db77, _0x2f5ace) => featureToKml(_0x13db77, _0x2f5ace))["join"]("");
-  return '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document>' + _0xd9b236 + "</Document></kml>";
+function featureCollectionToKml(geojson) {
+  const placemarks = geojson.features.map((feature, index) => featureToKml(feature, index)).join("");
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document>${placemarks}</Document></kml>`;
 }
-function featureCollectionToShapefileZip(_0x597121) {
-  const _0x21cba5 = collectShpRecords(_0x597121), _0x4b39c7 = writeShp(_0x21cba5), _0x4a3f3c = writeShx(_0x21cba5), _0x57711d = writeDbf(_0x21cba5["map"]((_0x26e0ec) => _0x26e0ec["name"]));
-  return zipStore([{ "name": "export.shp", "data": _0x4b39c7 }, { "name": "export.shx", "data": _0x4a3f3c }, { "name": "export.dbf", "data": _0x57711d }]);
+function featureCollectionToShapefileZip(geojson) {
+  const records = collectShpRecords(geojson);
+  const shp = writeShp(records);
+  const shx = writeShx(records);
+  const dbf = writeDbf(records.map((record) => record.name));
+  return zipStore([
+    { name: "export.shp", data: shp },
+    { name: "export.shx", data: shx },
+    { name: "export.dbf", data: dbf }
+  ]);
 }
-function featureToKml(_0x4ea659, _0x1ca42d) {
-  const _0x670bfb = xmlEscape(featureName(_0x4ea659, _0x1ca42d)), _0x29ba44 = geometryToKml(_0x4ea659["geometry"]);
-  if (!_0x29ba44) return "";
-  return "<Placemark><name>" + _0x670bfb + "</name>" + _0x29ba44 + "</Placemark>";
+function featureToKml(feature, index) {
+  const name = xmlEscape(featureName(feature, index));
+  const body = geometryToKml(feature.geometry);
+  if (!body) return "";
+  return `<Placemark><name>${name}</name>${body}</Placemark>`;
 }
-function geometryToKml(_0x584b16) {
-  if (!_0x584b16) return "";
-  switch (_0x584b16["type"]) {
+function geometryToKml(geometry) {
+  if (!geometry) return "";
+  switch (geometry.type) {
     case "Point":
-      return "<Point><coordinates>" + coord(_0x584b16["coordinates"]) + "</coordinates></Point>";
+      return `<Point><coordinates>${coord(geometry.coordinates)}</coordinates></Point>`;
     case "MultiPoint":
-      return "<MultiGeometry>" + _0x584b16["coordinates"]["map"]((_0x18159e) => "<Point><coordinates>" + coord(_0x18159e) + "</coordinates></Point>")["join"]("") + "</MultiGeometry>";
+      return `<MultiGeometry>${geometry.coordinates.map((position) => `<Point><coordinates>${coord(position)}</coordinates></Point>`).join("")}</MultiGeometry>`;
     case "LineString":
-      return "<LineString><coordinates>" + line(_0x584b16["coordinates"]) + "</coordinates></LineString>";
+      return `<LineString><coordinates>${line(geometry.coordinates)}</coordinates></LineString>`;
     case "MultiLineString":
-      return "<MultiGeometry>" + _0x584b16["coordinates"]["map"]((_0x477034) => "<LineString><coordinates>" + line(_0x477034) + "</coordinates></LineString>")["join"]("") + "</MultiGeometry>";
+      return `<MultiGeometry>${geometry.coordinates.map((part) => `<LineString><coordinates>${line(part)}</coordinates></LineString>`).join("")}</MultiGeometry>`;
     case "Polygon":
-      return polygonKml(_0x584b16["coordinates"]);
+      return polygonKml(geometry.coordinates);
     case "MultiPolygon":
-      return "<MultiGeometry>" + _0x584b16["coordinates"]["map"]((_0x54dfb8) => polygonKml(_0x54dfb8))["join"]("") + "</MultiGeometry>";
+      return `<MultiGeometry>${geometry.coordinates.map((polygon) => polygonKml(polygon)).join("")}</MultiGeometry>`;
     case "GeometryCollection":
-      return "<MultiGeometry>" + _0x584b16["geometries"]["map"]((_0x44fe0f) => geometryToKml(_0x44fe0f))["join"]("") + "</MultiGeometry>";
+      return `<MultiGeometry>${geometry.geometries.map((child) => geometryToKml(child)).join("")}</MultiGeometry>`;
     default:
       return "";
   }
 }
-function polygonKml(_0x279983) {
-  const [_0x408ded, ..._0x3488e3] = _0x279983;
-  if (!_0x408ded) return "";
-  const _0x4dc79d = _0x3488e3["map"]((_0x22d074) => "<innerBoundaryIs><LinearRing><coordinates>" + line(_0x22d074) + "</coordinates></LinearRing></innerBoundaryIs>")["join"]("");
-  return "<Polygon><outerBoundaryIs><LinearRing><coordinates>" + line(_0x408ded) + "</coordinates></LinearRing></outerBoundaryIs>" + _0x4dc79d + "</Polygon>";
+function polygonKml(rings) {
+  const [outer, ...holes] = rings;
+  if (!outer) return "";
+  const holeXml = holes.map((ring) => `<innerBoundaryIs><LinearRing><coordinates>${line(ring)}</coordinates></LinearRing></innerBoundaryIs>`).join("");
+  return `<Polygon><outerBoundaryIs><LinearRing><coordinates>${line(outer)}</coordinates></LinearRing></outerBoundaryIs>${holeXml}</Polygon>`;
 }
-function coord(_0x41bb15) {
-  return _0x41bb15[0] + "," + _0x41bb15[1] + ",0";
+function coord(position) {
+  return `${position[0]},${position[1]},0`;
 }
-function line(_0x337715) {
-  return _0x337715["map"](coord)["join"](" ");
+function line(positions) {
+  return positions.map(coord).join(" ");
 }
-function xmlEscape(_0x568fac) {
-  return _0x568fac["replaceAll"]("&", "&amp;")["replaceAll"]("<", "&lt;")["replaceAll"](">", "&gt;")["replaceAll"]('"', "&quot;");
+function xmlEscape(value) {
+  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
-function collectShpRecords(_0x3c1d9b) {
-  const _0x5a5afc = firstKind(_0x3c1d9b);
-  if (!_0x5a5afc) return [];
-  const _0x2d4576 = [];
-  return _0x3c1d9b["features"]["forEach"]((_0x532834, _0x5374df) => {
-    for (const _0x84cec4 of ringsForKind(_0x532834["geometry"], _0x5a5afc)) {
-      const _0x1dab0b = _0x84cec4["map"](closeRing), _0x31caa7 = _0x5a5afc === 5 ? orientPolygon(_0x1dab0b) : _0x1dab0b;
-      _0x2d4576["push"]({ "kind": _0x5a5afc, "name": featureName(_0x532834, _0x5374df), "rings": _0x31caa7, "bbox": bboxOf(_0x31caa7) });
+function collectShpRecords(geojson) {
+  const kind = firstKind(geojson);
+  if (!kind) return [];
+  const records = [];
+  geojson.features.forEach((feature, index) => {
+    for (const rings of ringsForKind(feature.geometry, kind)) {
+      const closed = rings.map(closeRing);
+      const oriented = kind === 5 ? orientPolygon(closed) : closed;
+      records.push({
+        kind,
+        name: featureName(feature, index),
+        rings: oriented,
+        bbox: bboxOf(oriented)
+      });
     }
-  }), _0x2d4576;
+  });
+  return records;
 }
-function firstKind(_0x5ac2cd) {
-  for (const _0x216013 of _0x5ac2cd["features"]) {
-    const _0x4482ac = kindOf(_0x216013["geometry"]);
-    if (_0x4482ac) return _0x4482ac;
+function firstKind(geojson) {
+  for (const feature of geojson.features) {
+    const kind = kindOf(feature.geometry);
+    if (kind) return kind;
   }
   return null;
 }
-function kindOf(_0x2876b5) {
-  if (!_0x2876b5) return null;
-  switch (_0x2876b5["type"]) {
+function kindOf(geometry) {
+  if (!geometry) return null;
+  switch (geometry.type) {
     case "Point":
     case "MultiPoint":
       return 1;
@@ -563,2862 +1330,7425 @@ function kindOf(_0x2876b5) {
     case "MultiPolygon":
       return 5;
     case "GeometryCollection":
-      for (const _0x5c5a53 of _0x2876b5["geometries"]) {
-        const _0x13faf3 = kindOf(_0x5c5a53);
-        if (_0x13faf3) return _0x13faf3;
+      for (const child of geometry.geometries) {
+        const kind = kindOf(child);
+        if (kind) return kind;
       }
       return null;
     default:
       return null;
   }
 }
-function ringsForKind(_0x457a49, _0x5973b2) {
-  if (!_0x457a49 || kindOf(_0x457a49) !== _0x5973b2) {
-    if ((_0x457a49 == null ? void 0 : _0x457a49["type"]) === "GeometryCollection") return _0x457a49["geometries"]["flatMap"]((_0x53bba0) => ringsForKind(_0x53bba0, _0x5973b2));
+function ringsForKind(geometry, kind) {
+  if (!geometry || kindOf(geometry) !== kind) {
+    if ((geometry == null ? void 0 : geometry.type) === "GeometryCollection") {
+      return geometry.geometries.flatMap((child) => ringsForKind(child, kind));
+    }
     return [];
   }
-  switch (_0x457a49["type"]) {
+  switch (geometry.type) {
     case "Point":
-      return [[[_0x457a49["coordinates"]]]];
+      return [[[geometry.coordinates]]];
     case "MultiPoint":
-      return _0x457a49["coordinates"]["map"]((_0x47684c) => [[_0x47684c]]);
+      return geometry.coordinates.map((position) => [[position]]);
     case "LineString":
-      return [[_0x457a49["coordinates"]]];
+      return [[geometry.coordinates]];
     case "MultiLineString":
-      return [_0x457a49["coordinates"]];
+      return [geometry.coordinates];
     case "Polygon":
-      return [_0x457a49["coordinates"]];
+      return [geometry.coordinates];
     case "MultiPolygon":
-      return _0x457a49["coordinates"];
+      return geometry.coordinates;
     default:
       return [];
   }
 }
-function closeRing(_0x3530d0) {
-  const _0x5a9676 = _0x3530d0[0], _0x4c6202 = _0x3530d0[_0x3530d0["length"] - 1];
-  if (!_0x5a9676 || !_0x4c6202) return _0x3530d0;
-  if (_0x5a9676[0] === _0x4c6202[0] && _0x5a9676[1] === _0x4c6202[1]) return _0x3530d0;
-  return [..._0x3530d0, _0x5a9676];
+function closeRing(ring) {
+  const first = ring[0];
+  const last = ring[ring.length - 1];
+  if (!first || !last) return ring;
+  if (first[0] === last[0] && first[1] === last[1]) return ring;
+  return [...ring, first];
 }
-function orientPolygon(_0x3e07e5) {
-  return _0x3e07e5["map"]((_0x1c658b, _0x3fd0e0) => {
-    const _0x40154b = signedArea(_0x1c658b), _0x3df57e = _0x3fd0e0 === 0, _0x1804b6 = _0x40154b < 0;
-    if (_0x3df57e === _0x1804b6) return _0x1c658b;
-    return [..._0x1c658b]["reverse"]();
+function orientPolygon(rings) {
+  return rings.map((ring, index) => {
+    const area = signedArea(ring);
+    const outer = index === 0;
+    const clockwise = area < 0;
+    if (outer === clockwise) return ring;
+    return [...ring].reverse();
   });
 }
-function signedArea(_0x202d89) {
-  let _0x171a16 = 0;
-  for (let _0x30f91c = 0; _0x30f91c < _0x202d89["length"] - 1; _0x30f91c++) {
-    const _0x1fe2ef = _0x202d89[_0x30f91c], _0x28fccb = _0x202d89[_0x30f91c + 1], _0x21d519 = _0x1fe2ef == null ? void 0 : _0x1fe2ef[0], _0x1f6cfb = _0x1fe2ef == null ? void 0 : _0x1fe2ef[1], _0x1c993e = _0x28fccb == null ? void 0 : _0x28fccb[0], _0xef78b = _0x28fccb == null ? void 0 : _0x28fccb[1];
-    if (_0x21d519 === void 0 || _0x1f6cfb === void 0 || _0x1c993e === void 0 || _0xef78b === void 0) continue;
-    _0x171a16 += _0x21d519 * _0xef78b - _0x1c993e * _0x1f6cfb;
+function signedArea(ring) {
+  let sum = 0;
+  for (let i = 0; i < ring.length - 1; i++) {
+    const current = ring[i];
+    const next = ring[i + 1];
+    const x1 = current == null ? void 0 : current[0];
+    const y1 = current == null ? void 0 : current[1];
+    const x2 = next == null ? void 0 : next[0];
+    const y2 = next == null ? void 0 : next[1];
+    if (x1 === void 0 || y1 === void 0 || x2 === void 0 || y2 === void 0) continue;
+    sum += x1 * y2 - x2 * y1;
   }
-  return _0x171a16 / 2;
+  return sum / 2;
 }
-function bboxOf(_0x3b9f66) {
-  let _0xb4096b = Infinity, _0x240630 = Infinity, _0x1df488 = -Infinity, _0x49ff15 = -Infinity;
-  for (const _0x136a1a of _0x3b9f66) {
-    for (const _0x29be51 of _0x136a1a) {
-      const [_0x2b7d10, _0x339489] = xy(_0x29be51);
-      _0xb4096b = Math["min"](_0xb4096b, _0x2b7d10), _0x240630 = Math["min"](_0x240630, _0x339489), _0x1df488 = Math["max"](_0x1df488, _0x2b7d10), _0x49ff15 = Math["max"](_0x49ff15, _0x339489);
+function bboxOf(rings) {
+  let xmin = Infinity;
+  let ymin = Infinity;
+  let xmax = -Infinity;
+  let ymax = -Infinity;
+  for (const ring of rings) {
+    for (const position of ring) {
+      const [x, y] = xy(position);
+      xmin = Math.min(xmin, x);
+      ymin = Math.min(ymin, y);
+      xmax = Math.max(xmax, x);
+      ymax = Math.max(ymax, y);
     }
   }
-  if (!Number["isFinite"](_0xb4096b)) return [0, 0, 0, 0];
-  return [_0xb4096b, _0x240630, _0x1df488, _0x49ff15];
+  if (!Number.isFinite(xmin)) return [0, 0, 0, 0];
+  return [xmin, ymin, xmax, ymax];
 }
-function featureName(_0x27a9bc, _0xb8c283) {
-  const _0x11858f = _0x27a9bc["properties"], _0x335946 = _0x11858f && typeof _0x11858f["name"] === "string" ? _0x11858f["name"] : "";
-  return _0x335946 || "feature-" + (_0xb8c283 + 1);
+function featureName(feature, index) {
+  const props = feature.properties;
+  const named = props && typeof props.name === "string" ? props.name : "";
+  return named || `feature-${index + 1}`;
 }
-function writeShp(_0x2b1f19) {
-  const _0x184e10 = _0x2b1f19["map"](recordBody), _0x3eb336 = _0x184e10["reduce"]((_0x1c6cd8, _0x4fed04) => _0x1c6cd8 + 8 + _0x4fed04["length"], 0), _0x587c36 = new Uint8Array(100 + _0x3eb336), _0x70f8ea = new DataView(_0x587c36["buffer"]);
-  writeHeader(_0x70f8ea, _0x587c36["length"], _0x2b1f19);
-  let _0x2c1263 = 100;
-  return _0x184e10["forEach"]((_0x15b7a6, _0xbd93c3) => {
-    _0x70f8ea["setInt32"](_0x2c1263, _0xbd93c3 + 1, ![]), _0x70f8ea["setInt32"](_0x2c1263 + 4, _0x15b7a6["length"] / 2, ![]), _0x587c36["set"](_0x15b7a6, _0x2c1263 + 8), _0x2c1263 += 8 + _0x15b7a6["length"];
-  }), _0x587c36;
-}
-function writeShx(_0x2b8eec) {
-  const _0x38eaf0 = new Uint8Array(100 + _0x2b8eec["length"] * 8), _0x2c2654 = new DataView(_0x38eaf0["buffer"]);
-  writeHeader(_0x2c2654, _0x38eaf0["length"], _0x2b8eec);
-  let _0x19e224 = 50;
-  return _0x2b8eec["forEach"]((_0x5a0989, _0x208f83) => {
-    const _0x443223 = recordBody(_0x5a0989)["length"] / 2;
-    _0x2c2654["setInt32"](100 + _0x208f83 * 8, _0x19e224, ![]), _0x2c2654["setInt32"](100 + _0x208f83 * 8 + 4, _0x443223, ![]), _0x19e224 += 4 + _0x443223;
-  }), _0x38eaf0;
-}
-function writeHeader(_0x247ffe, _0x253859, _0x1c6743) {
-  var _a2;
-  _0x247ffe["setInt32"](0, 9994, ![]), _0x247ffe["setInt32"](24, _0x253859 / 2, ![]), _0x247ffe["setInt32"](28, 1e3, !![]), _0x247ffe["setInt32"](32, ((_a2 = _0x1c6743[0]) == null ? void 0 : _a2["kind"]) ?? 5, !![]);
-  const _0x571b14 = unionBbox(_0x1c6743);
-  _0x247ffe["setFloat64"](36, _0x571b14[0], !![]), _0x247ffe["setFloat64"](44, _0x571b14[1], !![]), _0x247ffe["setFloat64"](52, _0x571b14[2], !![]), _0x247ffe["setFloat64"](60, _0x571b14[3], !![]);
-}
-function unionBbox(_0x54bd47) {
-  if (_0x54bd47["length"] === 0) return [0, 0, 0, 0];
-  let _0x4e8ceb = Infinity, _0x3ea1bb = Infinity, _0x2778aa = -Infinity, _0x1825ad = -Infinity;
-  for (const _0x17982e of _0x54bd47) {
-    _0x4e8ceb = Math["min"](_0x4e8ceb, _0x17982e["bbox"][0]), _0x3ea1bb = Math["min"](_0x3ea1bb, _0x17982e["bbox"][1]), _0x2778aa = Math["max"](_0x2778aa, _0x17982e["bbox"][2]), _0x1825ad = Math["max"](_0x1825ad, _0x17982e["bbox"][3]);
-  }
-  return [_0x4e8ceb, _0x3ea1bb, _0x2778aa, _0x1825ad];
-}
-function xy(_0xc07606) {
-  return [_0xc07606[0] ?? 0, _0xc07606[1] ?? 0];
-}
-function recordBody(_0x17c564) {
-  var _a2;
-  if (_0x17c564["kind"] === 1) {
-    const _0x4efe03 = new Uint8Array(20), _0x1ce0ad = new DataView(_0x4efe03["buffer"]);
-    _0x1ce0ad["setInt32"](0, 1, !![]);
-    const [_0x832c97, _0x4f621e] = xy(((_a2 = _0x17c564["rings"][0]) == null ? void 0 : _a2[0]) ?? [0, 0]);
-    return _0x1ce0ad["setFloat64"](4, _0x832c97, !![]), _0x1ce0ad["setFloat64"](12, _0x4f621e, !![]), _0x4efe03;
-  }
-  const _0x1678fb = _0x17c564["rings"]["reduce"]((_0x5b87d4, _0x3b5524) => _0x5b87d4 + _0x3b5524["length"], 0), _0x19e834 = new Uint8Array(44 + _0x17c564["rings"]["length"] * 4 + _0x1678fb * 16), _0x595508 = new DataView(_0x19e834["buffer"]);
-  _0x595508["setInt32"](0, _0x17c564["kind"], !![]), _0x595508["setFloat64"](4, _0x17c564["bbox"][0], !![]), _0x595508["setFloat64"](12, _0x17c564["bbox"][1], !![]), _0x595508["setFloat64"](20, _0x17c564["bbox"][2], !![]), _0x595508["setFloat64"](28, _0x17c564["bbox"][3], !![]), _0x595508["setInt32"](36, _0x17c564["rings"]["length"], !![]), _0x595508["setInt32"](40, _0x1678fb, !![]);
-  let _0x3bc358 = 0;
-  _0x17c564["rings"]["forEach"]((_0x52997e, _0x6fa4fb) => {
-    _0x595508["setInt32"](44 + _0x6fa4fb * 4, _0x3bc358, !![]), _0x3bc358 += _0x52997e["length"];
+function writeShp(records) {
+  const bodies = records.map(recordBody);
+  const contentBytes = bodies.reduce((sum, body) => sum + 8 + body.length, 0);
+  const file = new Uint8Array(100 + contentBytes);
+  const view = new DataView(file.buffer);
+  writeHeader(view, file.length, records);
+  let offset = 100;
+  bodies.forEach((body, index) => {
+    view.setInt32(offset, index + 1, false);
+    view.setInt32(offset + 4, body.length / 2, false);
+    file.set(body, offset + 8);
+    offset += 8 + body.length;
   });
-  let _0x1ab3a0 = 44 + _0x17c564["rings"]["length"] * 4;
-  for (const _0x30690e of _0x17c564["rings"]) {
-    for (const _0x3d6065 of _0x30690e) {
-      const [_0x3c3441, _0x2a6c2d] = xy(_0x3d6065);
-      _0x595508["setFloat64"](_0x1ab3a0, _0x3c3441, !![]), _0x595508["setFloat64"](_0x1ab3a0 + 8, _0x2a6c2d, !![]), _0x1ab3a0 += 16;
+  return file;
+}
+function writeShx(records) {
+  const file = new Uint8Array(100 + records.length * 8);
+  const view = new DataView(file.buffer);
+  writeHeader(view, file.length, records);
+  let wordOffset = 50;
+  records.forEach((record, index) => {
+    const bodyWords = recordBody(record).length / 2;
+    view.setInt32(100 + index * 8, wordOffset, false);
+    view.setInt32(100 + index * 8 + 4, bodyWords, false);
+    wordOffset += 4 + bodyWords;
+  });
+  return file;
+}
+function writeHeader(view, byteLength, records) {
+  var _a2;
+  view.setInt32(0, 9994, false);
+  view.setInt32(24, byteLength / 2, false);
+  view.setInt32(28, 1e3, true);
+  view.setInt32(32, ((_a2 = records[0]) == null ? void 0 : _a2.kind) ?? 5, true);
+  const bbox = unionBbox(records);
+  view.setFloat64(36, bbox[0], true);
+  view.setFloat64(44, bbox[1], true);
+  view.setFloat64(52, bbox[2], true);
+  view.setFloat64(60, bbox[3], true);
+}
+function unionBbox(records) {
+  if (records.length === 0) return [0, 0, 0, 0];
+  let xmin = Infinity;
+  let ymin = Infinity;
+  let xmax = -Infinity;
+  let ymax = -Infinity;
+  for (const record of records) {
+    xmin = Math.min(xmin, record.bbox[0]);
+    ymin = Math.min(ymin, record.bbox[1]);
+    xmax = Math.max(xmax, record.bbox[2]);
+    ymax = Math.max(ymax, record.bbox[3]);
+  }
+  return [xmin, ymin, xmax, ymax];
+}
+function xy(position) {
+  return [position[0] ?? 0, position[1] ?? 0];
+}
+function recordBody(record) {
+  var _a2;
+  if (record.kind === 1) {
+    const body2 = new Uint8Array(20);
+    const view2 = new DataView(body2.buffer);
+    view2.setInt32(0, 1, true);
+    const [x, y] = xy(((_a2 = record.rings[0]) == null ? void 0 : _a2[0]) ?? [0, 0]);
+    view2.setFloat64(4, x, true);
+    view2.setFloat64(12, y, true);
+    return body2;
+  }
+  const pointCount = record.rings.reduce((sum, ring) => sum + ring.length, 0);
+  const body = new Uint8Array(44 + record.rings.length * 4 + pointCount * 16);
+  const view = new DataView(body.buffer);
+  view.setInt32(0, record.kind, true);
+  view.setFloat64(4, record.bbox[0], true);
+  view.setFloat64(12, record.bbox[1], true);
+  view.setFloat64(20, record.bbox[2], true);
+  view.setFloat64(28, record.bbox[3], true);
+  view.setInt32(36, record.rings.length, true);
+  view.setInt32(40, pointCount, true);
+  let partIndex = 0;
+  record.rings.forEach((ring, index) => {
+    view.setInt32(44 + index * 4, partIndex, true);
+    partIndex += ring.length;
+  });
+  let pointOffset = 44 + record.rings.length * 4;
+  for (const ring of record.rings) {
+    for (const position of ring) {
+      const [x, y] = xy(position);
+      view.setFloat64(pointOffset, x, true);
+      view.setFloat64(pointOffset + 8, y, true);
+      pointOffset += 16;
     }
   }
-  return _0x19e834;
+  return body;
 }
-function writeDbf(_0x4fbf4f) {
-  const _0x3b458e = 32 + 32 + 1, _0x559f81 = 1 + 80, _0x41cb81 = new Uint8Array(_0x3b458e + _0x4fbf4f["length"] * _0x559f81 + 1), _0xae3a0b = new DataView(_0x41cb81["buffer"]);
-  _0x41cb81[0] = 3, _0xae3a0b["setUint32"](4, _0x4fbf4f["length"], !![]), _0xae3a0b["setUint16"](8, _0x3b458e, !![]), _0xae3a0b["setUint16"](10, _0x559f81, !![]);
-  const _0x42dd4d = new TextEncoder()["encode"]("NAME");
-  _0x41cb81["set"](_0x42dd4d, 32), _0x41cb81[32 + 11] = "C"["charCodeAt"](0), _0x41cb81[32 + 16] = 80, _0x41cb81[32 + 32] = 13;
-  const _0x1904a5 = new TextEncoder();
-  return _0x4fbf4f["forEach"]((_0x351419, _0x47b7d7) => {
-    const _0x2946ea = _0x3b458e + _0x47b7d7 * _0x559f81;
-    _0x41cb81[_0x2946ea] = 32;
-    const _0xe72fa7 = _0x1904a5["encode"](_0x351419)["slice"](0, 80);
-    _0x41cb81["set"](_0xe72fa7, _0x2946ea + 1);
-    for (let _0x400788 = 1 + _0xe72fa7["length"]; _0x400788 < _0x559f81; _0x400788++) _0x41cb81[_0x2946ea + _0x400788] = 32;
-  }), _0x41cb81[_0x41cb81["length"] - 1] = 26, _0x41cb81;
+function writeDbf(names) {
+  const headerLength = 32 + 32 + 1;
+  const recordLength = 1 + 80;
+  const file = new Uint8Array(headerLength + names.length * recordLength + 1);
+  const view = new DataView(file.buffer);
+  file[0] = 3;
+  view.setUint32(4, names.length, true);
+  view.setUint16(8, headerLength, true);
+  view.setUint16(10, recordLength, true);
+  const fieldName = new TextEncoder().encode("NAME");
+  file.set(fieldName, 32);
+  file[32 + 11] = "C".charCodeAt(0);
+  file[32 + 16] = 80;
+  file[32 + 32] = 13;
+  const encoder = new TextEncoder();
+  names.forEach((name, index) => {
+    const start = headerLength + index * recordLength;
+    file[start] = 32;
+    const bytes = encoder.encode(name).slice(0, 80);
+    file.set(bytes, start + 1);
+    for (let i = 1 + bytes.length; i < recordLength; i++) file[start + i] = 32;
+  });
+  file[file.length - 1] = 26;
+  return file;
 }
-function zipStore(_0x916733) {
-  const _0x939149 = new TextEncoder(), _0x29d513 = [], _0x4dce30 = [];
-  let _0xef1bcd = 0;
-  for (const _0x1b4e6f of _0x916733) {
-    const _0x138780 = _0x939149["encode"](_0x1b4e6f["name"]), _0x30228e = crc32(_0x1b4e6f["data"]), _0x1e667f = new Uint8Array(30 + _0x138780["length"] + _0x1b4e6f["data"]["length"]), _0x562c84 = new DataView(_0x1e667f["buffer"]);
-    _0x562c84["setUint32"](0, 67324752, !![]), _0x562c84["setUint16"](4, 20, !![]), _0x562c84["setUint16"](8, 0, !![]), _0x562c84["setUint32"](14, _0x30228e, !![]), _0x562c84["setUint32"](18, _0x1b4e6f["data"]["length"], !![]), _0x562c84["setUint32"](22, _0x1b4e6f["data"]["length"], !![]), _0x562c84["setUint16"](26, _0x138780["length"], !![]), _0x1e667f["set"](_0x138780, 30), _0x1e667f["set"](_0x1b4e6f["data"], 30 + _0x138780["length"]), _0x29d513["push"](_0x1e667f);
-    const _0x1c82ad = new Uint8Array(46 + _0x138780["length"]), _0x4b77bb = new DataView(_0x1c82ad["buffer"]);
-    _0x4b77bb["setUint32"](0, 33639248, !![]), _0x4b77bb["setUint16"](4, 20, !![]), _0x4b77bb["setUint16"](6, 20, !![]), _0x4b77bb["setUint16"](10, 0, !![]), _0x4b77bb["setUint32"](16, _0x30228e, !![]), _0x4b77bb["setUint32"](20, _0x1b4e6f["data"]["length"], !![]), _0x4b77bb["setUint32"](24, _0x1b4e6f["data"]["length"], !![]), _0x4b77bb["setUint16"](28, _0x138780["length"], !![]), _0x4b77bb["setUint32"](42, _0xef1bcd, !![]), _0x1c82ad["set"](_0x138780, 46), _0x4dce30["push"](_0x1c82ad), _0xef1bcd += _0x1e667f["length"];
+function zipStore(files) {
+  const encoder = new TextEncoder();
+  const locals = [];
+  const centrals = [];
+  let offset = 0;
+  for (const file of files) {
+    const name = encoder.encode(file.name);
+    const crc = crc32(file.data);
+    const local = new Uint8Array(30 + name.length + file.data.length);
+    const view = new DataView(local.buffer);
+    view.setUint32(0, 67324752, true);
+    view.setUint16(4, 20, true);
+    view.setUint16(8, 0, true);
+    view.setUint32(14, crc, true);
+    view.setUint32(18, file.data.length, true);
+    view.setUint32(22, file.data.length, true);
+    view.setUint16(26, name.length, true);
+    local.set(name, 30);
+    local.set(file.data, 30 + name.length);
+    locals.push(local);
+    const central = new Uint8Array(46 + name.length);
+    const centralView = new DataView(central.buffer);
+    centralView.setUint32(0, 33639248, true);
+    centralView.setUint16(4, 20, true);
+    centralView.setUint16(6, 20, true);
+    centralView.setUint16(10, 0, true);
+    centralView.setUint32(16, crc, true);
+    centralView.setUint32(20, file.data.length, true);
+    centralView.setUint32(24, file.data.length, true);
+    centralView.setUint16(28, name.length, true);
+    centralView.setUint32(42, offset, true);
+    central.set(name, 46);
+    centrals.push(central);
+    offset += local.length;
   }
-  const _0x2a34a9 = _0x4dce30["reduce"]((_0x3fb3d2, _0x3be24e) => _0x3fb3d2 + _0x3be24e["length"], 0), _0x190ae3 = new Uint8Array(22), _0x213127 = new DataView(_0x190ae3["buffer"]);
-  return _0x213127["setUint32"](0, 101010256, !![]), _0x213127["setUint16"](8, _0x916733["length"], !![]), _0x213127["setUint16"](10, _0x916733["length"], !![]), _0x213127["setUint32"](12, _0x2a34a9, !![]), _0x213127["setUint32"](16, _0xef1bcd, !![]), concat([..._0x29d513, ..._0x4dce30, _0x190ae3]);
+  const centralSize = centrals.reduce((sum, part) => sum + part.length, 0);
+  const end = new Uint8Array(22);
+  const endView = new DataView(end.buffer);
+  endView.setUint32(0, 101010256, true);
+  endView.setUint16(8, files.length, true);
+  endView.setUint16(10, files.length, true);
+  endView.setUint32(12, centralSize, true);
+  endView.setUint32(16, offset, true);
+  return concat([...locals, ...centrals, end]);
 }
-function crc32(_0x170ad4) {
-  let _0x5d1e3f = 4294967295;
-  for (const _0x56f647 of _0x170ad4) {
-    _0x5d1e3f ^= _0x56f647;
-    for (let _0x158803 = 0; _0x158803 < 8; _0x158803++) {
-      _0x5d1e3f = _0x5d1e3f >>> 1 ^ ((_0x5d1e3f & 1) === 1 ? 3988292384 : 0);
+function crc32(data) {
+  let crc = 4294967295;
+  for (const byte of data) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit++) {
+      crc = crc >>> 1 ^ ((crc & 1) === 1 ? 3988292384 : 0);
     }
   }
-  return (_0x5d1e3f ^ 4294967295) >>> 0;
+  return (crc ^ 4294967295) >>> 0;
 }
-function concat(_0x418bea) {
-  const _0xec4f04 = _0x418bea["reduce"]((_0x507a65, _0x2078a2) => _0x507a65 + _0x2078a2["length"], 0), _0x4b54c4 = new Uint8Array(_0xec4f04);
-  let _0x1061d6 = 0;
-  for (const _0xdb9f12 of _0x418bea) {
-    _0x4b54c4["set"](_0xdb9f12, _0x1061d6), _0x1061d6 += _0xdb9f12["length"];
+function concat(parts) {
+  const total = parts.reduce((sum, part) => sum + part.length, 0);
+  const out = new Uint8Array(total);
+  let offset = 0;
+  for (const part of parts) {
+    out.set(part, offset);
+    offset += part.length;
   }
-  return _0x4b54c4;
+  return out;
 }
-function getLayerGeoJSON(_0x3579eb, _0x111c4f, _0x3f6f89) {
-  if (!("entities" in _0x3579eb["cesiumObject"])) return void 0;
-  const _0xf6035d = _0x3579eb["cesiumObject"]["entities"]["values"]["filter"]((_0x205b32) => !_0x3f6f89(_0x205b32))["map"]((_0x5df249) => entityToGeoJSON(_0x5df249, _0x111c4f))["filter"]((_0x322de2) => _0x322de2 !== null);
-  return { "type": "FeatureCollection", "features": _0xf6035d };
+function extractEpsgCode(srsName) {
+  if (!/EPSG/i.test(srsName)) return void 0;
+  const trimmed = srsName.trim();
+  let end = trimmed.length;
+  while (end > 0 && trimmed.charCodeAt(end - 1) >= 48 && trimmed.charCodeAt(end - 1) <= 57) {
+    end--;
+  }
+  const digits = trimmed.slice(end);
+  return digits.length > 0 ? digits : void 0;
 }
-function exportLayerVector(_0x40b82d, _0x5a2644, _0x4fb5a1) {
-  if (!_0x40b82d) return;
-  const _0x57155b = vectorFile(_0x40b82d, _0x4fb5a1);
-  triggerDownload(_0x57155b["blob"], _0x5a2644 + "-" + Date["now"]() + "." + _0x57155b["extension"]);
+const proj4DefRequests = /* @__PURE__ */ new Map();
+const tmerc = (lon0, ellps) => `+proj=tmerc +lat_0=0 +lon_0=${lon0} +k=1 +x_0=500000 +y_0=0 +ellps=${ellps} +units=m +no_defs +type=crs`;
+const utm = (zone, datum) => `+proj=utm +zone=${zone} ${datum} +units=m +no_defs +type=crs`;
+const TUREF = "GRS80 +towgs84=0,0,0,0,0,0,0";
+const ED50 = "intl +towgs84=-87,-98,-121,0,0,0,0";
+const TM_CENTRAL_MERIDIANS = [27, 30, 33, 36, 39, 42, 45];
+const UTM_ZONES = [35, 36, 37, 38];
+const BUNDLED_PROJ4_DEFS = Object.freeze({
+  ...Object.fromEntries(TM_CENTRAL_MERIDIANS.map((lon0, i) => [String(5253 + i), tmerc(lon0, TUREF)])),
+  ...Object.fromEntries(TM_CENTRAL_MERIDIANS.map((lon0, i) => [String(2319 + i), tmerc(lon0, ED50)])),
+  ...Object.fromEntries(UTM_ZONES.map((zone) => [String(23e3 + zone), utm(zone, `+ellps=${ED50}`)])),
+  ...Object.fromEntries(UTM_ZONES.map((zone) => [String(32600 + zone), utm(zone, "+datum=WGS84")]))
+});
+async function registerProj4Def(proj4, epsgCode) {
+  const name = `EPSG:${epsgCode}`;
+  if (proj4.defs(name)) return true;
+  const bundled = BUNDLED_PROJ4_DEFS[epsgCode];
+  if (bundled) {
+    proj4.defs(name, bundled);
+    return true;
+  }
+  let pending = proj4DefRequests.get(epsgCode);
+  if (!pending) {
+    pending = (async () => {
+      try {
+        const response = await fetch(`https://epsg.io/${epsgCode}.proj4`);
+        if (!response.ok) return response.status === 404 ? "missing" : "transient-failure";
+        const def = (await response.text()).trim();
+        if (!def) return "missing";
+        proj4.defs(name, def);
+        return "registered";
+      } catch {
+        return "transient-failure";
+      }
+    })();
+    proj4DefRequests.set(epsgCode, pending);
+  }
+  const result = await pending;
+  if (result === "transient-failure" && proj4DefRequests.get(epsgCode) === pending) {
+    proj4DefRequests.delete(epsgCode);
+  }
+  return result === "registered";
 }
-function exportLayerGeoJSON(_0x5110a7, _0x2b6c12) {
-  exportLayerVector(_0x5110a7, _0x2b6c12, "geojson");
+async function ensureProj4Def(epsgCode) {
+  let proj4;
+  try {
+    ({ default: proj4 } = await import("proj4"));
+  } catch {
+    console.warn(
+      `[ogc/proj4Defs] EPSG:${epsgCode} icin koordinat donusumu atlandi -- "proj4" paketi yuklu degil (peer dependency olarak eklenmemis). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir.`
+    );
+    return void 0;
+  }
+  if (!await registerProj4Def(proj4, epsgCode)) {
+    console.warn(
+      `[ogc/proj4Defs] EPSG:${epsgCode} icin proj4 tanimi epsg.io'dan alinamadi (agsizlik veya gecersiz/desteklenmeyen kod olabilir). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir.`
+    );
+    return void 0;
+  }
+  return proj4;
 }
-function exportLayerKml(_0x21040c, _0xbb7c5c) {
-  exportLayerVector(_0x21040c, _0xbb7c5c, "kml");
+const SERVICE_REQUEST_EXTENT = Object.freeze({
+  west: 22.94,
+  south: 34.05,
+  east: 47.39,
+  north: 42.7
+});
+function clipToServiceExtent(box) {
+  const extent = SERVICE_REQUEST_EXTENT;
+  if (!box) return { ...extent };
+  const clipped = {
+    west: Math.max(box.west, extent.west),
+    south: Math.max(box.south, extent.south),
+    east: Math.min(box.east, extent.east),
+    north: Math.min(box.north, extent.north)
+  };
+  if (clipped.west >= clipped.east || clipped.south >= clipped.north) return void 0;
+  return clipped;
 }
-function exportLayerShapefile(_0x41336b, _0x538daf) {
-  exportLayerVector(_0x41336b, _0x538daf, "shp");
+function intersectsServiceExtent(box) {
+  return clipToServiceExtent(box) !== void 0;
 }
-function bytesAsBuffer(_0x4adac5) {
-  return _0x4adac5["buffer"]["slice"](_0x4adac5["byteOffset"], _0x4adac5["byteOffset"] + _0x4adac5["byteLength"]);
+function clipRectangleToServiceExtent(rectangle) {
+  const { west, south, east, north } = SERVICE_REQUEST_EXTENT;
+  const extent = Rectangle.fromDegrees(west, south, east, north);
+  if (!rectangle) return extent;
+  return Rectangle.intersection(rectangle, extent);
 }
-function vectorFile(_0x433054, _0x27474f) {
-  if (_0x27474f === "kml") return { "blob": new Blob([featureCollectionToKml(_0x433054)], { "type": "application/vnd.google-earth.kml+xml" }), "extension": "kml" };
-  if (_0x27474f === "shp") return { "blob": new Blob([bytesAsBuffer(featureCollectionToShapefileZip(_0x433054))], { "type": "application/zip" }), "extension": "zip" };
-  return { "blob": new Blob([JSON["stringify"](_0x433054, null, 2)], { "type": "application/geo+json" }), "extension": "geojson" };
+async function wfsBboxParam(version, nativeSrs, box) {
+  if (!version.startsWith("1.0")) {
+    return `${box.south},${box.west},${box.north},${box.east},urn:ogc:def:crs:EPSG::4326`;
+  }
+  const epsgCode = nativeSrs ? extractEpsgCode(nativeSrs) : void 0;
+  if (!epsgCode || epsgCode === "4326") {
+    return `${box.west},${box.south},${box.east},${box.north}`;
+  }
+  const proj4 = await ensureProj4Def(epsgCode);
+  if (!proj4) return void 0;
+  const STEPS = 32;
+  const points = [];
+  for (let i = 0; i <= STEPS; i++) {
+    const lon = box.west + (box.east - box.west) * i / STEPS;
+    const lat = box.south + (box.north - box.south) * i / STEPS;
+    points.push([lon, box.south], [lon, box.north], [box.west, lat], [box.east, lat]);
+  }
+  const projected = points.map((point) => proj4("EPSG:4326", `EPSG:${epsgCode}`, point));
+  const xs = projected.map(([x]) => x);
+  const ys = projected.map(([, y]) => y);
+  const [minX, minY, maxX, maxY] = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+  const padX = (maxX - minX) * 0.01;
+  const padY = (maxY - minY) * 0.01;
+  const values = [minX - padX, minY - padY, maxX + padX, maxY + padY];
+  return values.every(Number.isFinite) ? values.join(",") : void 0;
+}
+function getLayerGeoJSON(managed, currentTime, isOutlineCompanion) {
+  if (!("entities" in managed.cesiumObject)) return void 0;
+  const features = managed.cesiumObject.entities.values.filter((entity) => !isOutlineCompanion(entity)).map((entity) => entityToGeoJSON(entity, currentTime)).filter((feature) => feature !== null);
+  return { type: "FeatureCollection", features };
+}
+function exportLayerVector(geojson, filename, format) {
+  if (!geojson) return;
+  const file = vectorFile(geojson, format);
+  triggerDownload(file.blob, `${filename}-${Date.now()}.${file.extension}`);
+}
+function exportLayerGeoJSON(geojson, filename) {
+  exportLayerVector(geojson, filename, "geojson");
+}
+function exportLayerKml(geojson, filename) {
+  exportLayerVector(geojson, filename, "kml");
+}
+function exportLayerShapefile(geojson, filename) {
+  exportLayerVector(geojson, filename, "shp");
+}
+function bytesAsBuffer(bytes) {
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+}
+function vectorFile(geojson, format) {
+  if (format === "kml") {
+    return {
+      blob: new Blob([featureCollectionToKml(geojson)], { type: "application/vnd.google-earth.kml+xml" }),
+      extension: "kml"
+    };
+  }
+  if (format === "shp") {
+    return {
+      blob: new Blob([bytesAsBuffer(featureCollectionToShapefileZip(geojson))], { type: "application/zip" }),
+      extension: "zip"
+    };
+  }
+  return {
+    blob: new Blob([JSON.stringify(geojson, null, 2)], { type: "application/geo+json" }),
+    extension: "geojson"
+  };
 }
 const GEOTIFF_EXPORT_MAX_WMS_DIMENSION = 2048;
-function geoTiffExportDimensions(_0x3a6203, _0x477449) {
-  if (!_0x3a6203) return { "width": _0x477449, "height": Math["round"](_0x477449 / 2) };
-  const _0x1dd2c9 = Math["max"](_0x3a6203["east"] - _0x3a6203["west"], 1e-6), _0xa86bc1 = Math["max"](_0x3a6203["north"] - _0x3a6203["south"], 1e-6), _0x18b979 = _0x1dd2c9 >= _0xa86bc1 ? _0x477449 : Math["max"](64, Math["round"](_0x477449 * _0x1dd2c9 / _0xa86bc1)), _0xb2ee72 = _0xa86bc1 >= _0x1dd2c9 ? _0x477449 : Math["max"](64, Math["round"](_0x477449 * _0xa86bc1 / _0x1dd2c9));
-  return { "width": _0x18b979, "height": _0xb2ee72 };
+function geoTiffExportDimensions(bbox, maxDimension) {
+  if (!bbox) return { width: maxDimension, height: Math.round(maxDimension / 2) };
+  const lonSpan = Math.max(bbox.east - bbox.west, 1e-6);
+  const latSpan = Math.max(bbox.north - bbox.south, 1e-6);
+  const width = lonSpan >= latSpan ? maxDimension : Math.max(64, Math.round(maxDimension * lonSpan / latSpan));
+  const height = latSpan >= lonSpan ? maxDimension : Math.max(64, Math.round(maxDimension * latSpan / lonSpan));
+  return { width, height };
 }
-function buildWmsGeoTiffExportUrl(_0x3e37bf, _0x41f7d0) {
-  const _0x4164dd = _0x41f7d0("wms", _0x3e37bf["url"]), { width: _0x196cef, height: _0x1cd83b } = geoTiffExportDimensions(_0x3e37bf["geographicBoundingBox"], GEOTIFF_EXPORT_MAX_WMS_DIMENSION), _0x275097 = _0x3e37bf["geographicBoundingBox"], _0x1360e6 = new URLSearchParams({ "SERVICE": "WMS", "REQUEST": "GetMap", "VERSION": "1.3.0", "LAYERS": _0x3e37bf["layers"], "STYLES": "", "FORMAT": _0x3e37bf["tiffFormat"], "TRANSPARENT": "false", "WIDTH": String(_0x196cef), "HEIGHT": String(_0x1cd83b), "CRS": "CRS:84", "BBOX": _0x275097 ? _0x275097["west"] + "," + _0x275097["south"] + "," + _0x275097["east"] + "," + _0x275097["north"] : "-180,-90,180,90" }), _0x4fdf18 = _0x4164dd["includes"]("?") ? "&" : "?";
-  return "" + _0x4164dd + _0x4fdf18 + _0x1360e6["toString"]();
-}
-function buildWcsGeoTiffExportUrl(_0x49906e, _0x447e20) {
-  const _0x51806c = _0x447e20("wcs", _0x49906e["url"]), _0x1a9676 = _0x49906e["version"] ?? "2.0.1", _0x30176c = { "service": "WCS", "version": _0x1a9676, "request": "GetCoverage", "coverageId": _0x49906e["coverageId"], "format": _0x49906e["tiffFormat"] };
-  if (_0x1a9676["startsWith"]("2.")) {
-    const _0x3718fd = _0x49906e["maxSize"] ?? 2048;
-    if (Number["isFinite"](_0x3718fd)) _0x30176c["SCALESIZE"] = "x(" + _0x3718fd + "),y(" + _0x3718fd + ")";
+function buildWmsGeoTiffExportUrl(options, resolveOgcProxyUrl) {
+  const base = resolveOgcProxyUrl("wms", options.url);
+  const bbox = clipToServiceExtent(options.geographicBoundingBox);
+  if (!bbox) {
+    throw new LayerOperationError(
+      "LAYER_OUTSIDE_SERVICE_EXTENT",
+      `Katmanın kapsama alanı Türkiye sınırları dışında — id=${options.id}`
+    );
   }
-  const _0x18acec = _0x51806c["includes"]("?") ? "&" : "?";
-  return "" + _0x51806c + _0x18acec + new URLSearchParams(_0x30176c)["toString"]();
+  const { width, height } = geoTiffExportDimensions(bbox, GEOTIFF_EXPORT_MAX_WMS_DIMENSION);
+  const params = new URLSearchParams({
+    SERVICE: "WMS",
+    REQUEST: "GetMap",
+    VERSION: "1.3.0",
+    LAYERS: options.layers,
+    STYLES: "",
+    FORMAT: options.tiffFormat,
+    TRANSPARENT: "false",
+    WIDTH: String(width),
+    HEIGHT: String(height),
+    CRS: "CRS:84",
+    BBOX: `${bbox.west},${bbox.south},${bbox.east},${bbox.north}`
+  });
+  const sep = base.includes("?") ? "&" : "?";
+  return `${base}${sep}${params.toString()}`;
 }
-function isGeoTiffExportAvailable(_0xf4242a, _0x45046f) {
-  if (!_0xf4242a || _0xf4242a["layerType"] !== "WMS" && _0xf4242a["layerType"] !== "WCS") return ![];
-  return !!_0x45046f && "tiffFormat" in _0x45046f && !!_0x45046f["tiffFormat"];
+function buildWcsGeoTiffExportUrl(options, resolveOgcProxyUrl) {
+  const base = resolveOgcProxyUrl("wcs", options.url);
+  const version = options.version ?? "2.0.1";
+  const params = {
+    service: "WCS",
+    version,
+    request: "GetCoverage",
+    coverageId: options.coverageId,
+    format: options.tiffFormat
+  };
+  if (version.startsWith("2.")) {
+    const max = options.maxSize ?? 2048;
+    if (Number.isFinite(max)) params["SCALESIZE"] = `x(${max}),y(${max})`;
+  }
+  const sep = base.includes("?") ? "&" : "?";
+  return `${base}${sep}${new URLSearchParams(params).toString()}`;
 }
-async function exportLayerAsGeoTiff(_0xa099be, _0x357929, _0x2791d3, _0x184ea4, _0x8f9681) {
-  if (_0xa099be["layerType"] !== "WMS" && _0xa099be["layerType"] !== "WCS") throw new LayerOperationError("LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE", 'Katman WMS/WCS değil, GeoTIFF export desteklenmiyor: "' + _0xa099be["id"] + '"');
-  if (!_0x357929 || !("tiffFormat" in _0x357929) || !_0x357929["tiffFormat"]) throw new LayerOperationError("LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED", 'Katman GeoTIFF export desteklemiyor: "' + _0xa099be["id"] + '"');
-  const _0x290fd1 = _0xa099be["layerType"] === "WMS" ? buildWmsGeoTiffExportUrl(_0x357929, _0x184ea4) : buildWcsGeoTiffExportUrl(_0x357929, _0x184ea4), _0x143fd9 = _0x8f9681["mergeApiKeyHeader"](_0x8f9681["buildAuthHeaders"](_0x357929["authToken"]), _0x290fd1), _0x5167d2 = await fetch(_0x290fd1, _0x143fd9 ? { "headers": _0x143fd9 } : void 0);
-  if (!_0x5167d2["ok"]) throw new OgcRequestError("OGC_GEOTIFF_DOWNLOAD_FAILED", "GeoTIFF indirilemedi: " + _0x5167d2["status"] + " " + _0x5167d2["statusText"]);
-  const _0x2d4566 = _0x5167d2["headers"]["get"]("content-type") ?? "", _0x3e0952 = await _0x5167d2["arrayBuffer"](), _0xc65409 = /boundary="?([^";]+)"?/i["exec"](_0x2d4566);
-  let _0x5b0fc7;
-  if (_0x2d4566["includes"]("multipart/") && _0xc65409) {
-    const { bytes: _0x22e800, mimeType: _0x11d744 } = extractMultipartImage(new Uint8Array(_0x3e0952), _0xc65409[1]), _0x12c8dc = _0x22e800["buffer"]["slice"](_0x22e800["byteOffset"], _0x22e800["byteOffset"] + _0x22e800["byteLength"]);
-    _0x5b0fc7 = new Blob([_0x12c8dc], { "type": _0x11d744 });
-  } else _0x5b0fc7 = new Blob([_0x3e0952], { "type": _0x2d4566 || _0x357929["tiffFormat"] });
-  triggerDownload(_0x5b0fc7, _0x2791d3 + "-" + Date["now"]() + ".tif");
+function isGeoTiffExportAvailable(managed, options) {
+  if (!managed || managed.layerType !== "WMS" && managed.layerType !== "WCS") {
+    return false;
+  }
+  return !!options && "tiffFormat" in options && !!options.tiffFormat;
 }
-function extractMultipartImage(_0x1dce09, _0x19ad94) {
+async function exportLayerAsGeoTiff(managed, options, filename, resolveOgcProxyUrl, authContext) {
+  if (managed.layerType !== "WMS" && managed.layerType !== "WCS") {
+    throw new LayerOperationError("LAYER_GEOTIFF_EXPORT_UNSUPPORTED_TYPE", `Katman WMS/WCS değil, GeoTIFF export desteklenmiyor: "${managed.id}"`);
+  }
+  if (!options || !("tiffFormat" in options) || !options.tiffFormat) {
+    throw new LayerOperationError("LAYER_GEOTIFF_EXPORT_NOT_CONFIGURED", `Katman GeoTIFF export desteklemiyor: "${managed.id}"`);
+  }
+  const url = managed.layerType === "WMS" ? buildWmsGeoTiffExportUrl(options, resolveOgcProxyUrl) : buildWcsGeoTiffExportUrl(options, resolveOgcProxyUrl);
+  const headers = authContext.mergeApiKeyHeader(authContext.buildAuthHeaders(options.authToken), url);
+  const response = await fetch(url, headers ? { headers } : void 0);
+  if (!response.ok) {
+    throw new OgcRequestError("OGC_GEOTIFF_DOWNLOAD_FAILED", `GeoTIFF indirilemedi: ${response.status} ${response.statusText}`);
+  }
+  const contentType = response.headers.get("content-type") ?? "";
+  const buffer = await response.arrayBuffer();
+  const boundaryMatch = /boundary="?([^";]+)"?/i.exec(contentType);
+  let blob;
+  if (contentType.includes("multipart/") && boundaryMatch) {
+    const { bytes, mimeType } = extractMultipartImage(
+      new Uint8Array(buffer),
+      boundaryMatch[1]
+    );
+    const imageBuffer = bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength
+    );
+    blob = new Blob([imageBuffer], { type: mimeType });
+  } else {
+    blob = new Blob([buffer], { type: contentType || options.tiffFormat });
+  }
+  triggerDownload(blob, `${filename}-${Date.now()}.tif`);
+}
+function extractMultipartImage(bytes, boundary) {
   var _a2;
-  const _0x4bb28a = new TextDecoder("iso-8859-1")["decode"](_0x1dce09), _0x549e86 = "--" + _0x19ad94;
-  let _0x3f4e0e = 0;
-  while (_0x3f4e0e < _0x4bb28a["length"]) {
-    const _0x3adf01 = _0x4bb28a["indexOf"](_0x549e86, _0x3f4e0e);
-    if (_0x3adf01 === -1) break;
-    const _0x3a2d3a = _0x3adf01 + _0x549e86["length"], _0x21cbd0 = _0x4bb28a["indexOf"](_0x549e86, _0x3a2d3a);
-    if (_0x21cbd0 === -1) break;
-    const _0x251a1e = _0x4bb28a["indexOf"]("\r\n\r\n", _0x3a2d3a), _0x518967 = _0x4bb28a["indexOf"]("\n\n", _0x3a2d3a), _0x2b6234 = _0x251a1e !== -1 && (_0x518967 === -1 || _0x251a1e <= _0x518967) ? _0x251a1e : _0x518967, _0x14956c = _0x2b6234 === _0x251a1e ? 4 : 2;
-    if (_0x2b6234 === -1 || _0x2b6234 >= _0x21cbd0) {
-      _0x3f4e0e = _0x21cbd0;
+  const text = new TextDecoder("iso-8859-1").decode(bytes);
+  const boundaryMarker = `--${boundary}`;
+  let searchFrom = 0;
+  while (searchFrom < text.length) {
+    const partStart = text.indexOf(boundaryMarker, searchFrom);
+    if (partStart === -1) break;
+    const contentStart = partStart + boundaryMarker.length;
+    const nextBoundary = text.indexOf(boundaryMarker, contentStart);
+    if (nextBoundary === -1) break;
+    const sepCrlf = text.indexOf("\r\n\r\n", contentStart);
+    const sepLf = text.indexOf("\n\n", contentStart);
+    const headerEnd = sepCrlf !== -1 && (sepLf === -1 || sepCrlf <= sepLf) ? sepCrlf : sepLf;
+    const sepLen = headerEnd === sepCrlf ? 4 : 2;
+    if (headerEnd === -1 || headerEnd >= nextBoundary) {
+      searchFrom = nextBoundary;
       continue;
     }
-    const _0x12a743 = /content-type:\s*([^\r\n;]+)/i["exec"](_0x4bb28a["slice"](_0x3a2d3a, _0x2b6234)), _0x2f7e59 = (_a2 = _0x12a743 == null ? void 0 : _0x12a743[1]) == null ? void 0 : _a2["trim"]();
-    if (_0x2f7e59 == null ? void 0 : _0x2f7e59["startsWith"]("image/")) {
-      const _0x1aa3a5 = _0x2b6234 + _0x14956c;
-      let _0x25bbd8 = _0x21cbd0;
-      if (_0x4bb28a[_0x25bbd8 - 2] === "\r" && _0x4bb28a[_0x25bbd8 - 1] === "\n") _0x25bbd8 -= 2;
-      else {
-        if (_0x4bb28a[_0x25bbd8 - 1] === "\n") _0x25bbd8 -= 1;
-      }
-      return { "bytes": _0x1dce09["slice"](_0x1aa3a5, _0x25bbd8), "mimeType": _0x2f7e59 };
+    const mimeMatch = /content-type:\s*([^\r\n;]+)/i.exec(
+      text.slice(contentStart, headerEnd)
+    );
+    const mimeType = (_a2 = mimeMatch == null ? void 0 : mimeMatch[1]) == null ? void 0 : _a2.trim();
+    if (mimeType == null ? void 0 : mimeType.startsWith("image/")) {
+      const bodyStart = headerEnd + sepLen;
+      let bodyEnd = nextBoundary;
+      if (text[bodyEnd - 2] === "\r" && text[bodyEnd - 1] === "\n") bodyEnd -= 2;
+      else if (text[bodyEnd - 1] === "\n") bodyEnd -= 1;
+      return { bytes: bytes.slice(bodyStart, bodyEnd), mimeType };
     }
-    _0x3f4e0e = _0x21cbd0;
+    searchFrom = nextBoundary;
   }
   throw new OgcRequestError("OGC_WCS_MULTIPART_IMAGE_NOT_FOUND", "Multipart WCS yanıtında görsel parçası bulunamadı.");
 }
-const POLE_SLICE_DEGREES = 90, POLE_LATITUDE_LIMIT = 89.9;
-function clipRingToLongitude(_0x59f686, _0x5bb037, _0x34f2a0) {
-  const _0x34442b = (_0x76fa) => _0x34f2a0 * (_0x76fa[0] - _0x5bb037) >= 0, _0x56a344 = [], _0xc5beb1 = (_0x4c4d36) => {
-    const _0x2ffdeb = _0x56a344[_0x56a344["length"] - 1];
-    if (_0x2ffdeb === void 0 || _0x2ffdeb[0] !== _0x4c4d36[0] || _0x2ffdeb[1] !== _0x4c4d36[1]) _0x56a344["push"]([_0x4c4d36[0], _0x4c4d36[1]]);
+const POLE_SLICE_DEGREES = 90;
+const POLE_LATITUDE_LIMIT = 89.9;
+function clipRingToLongitude(ring, lon, side) {
+  const inside = (p) => side * (p[0] - lon) >= 0;
+  const out = [];
+  const push = (p) => {
+    const last = out[out.length - 1];
+    if (last === void 0 || last[0] !== p[0] || last[1] !== p[1]) out.push([p[0], p[1]]);
   };
-  for (let _0x3b1992 = 0; _0x3b1992 < _0x59f686["length"] - 1; _0x3b1992++) {
-    const _0x3f0ed0 = _0x59f686[_0x3b1992], _0x5b0f73 = _0x59f686[_0x3b1992 + 1];
-    if (_0x34442b(_0x3f0ed0)) _0xc5beb1(_0x3f0ed0);
-    if (_0x34442b(_0x3f0ed0) !== _0x34442b(_0x5b0f73)) {
-      const _0x995302 = (_0x5bb037 - _0x3f0ed0[0]) / (_0x5b0f73[0] - _0x3f0ed0[0]);
-      _0xc5beb1([_0x5bb037, _0x3f0ed0[1] + _0x995302 * (_0x5b0f73[1] - _0x3f0ed0[1])]);
+  for (let i = 0; i < ring.length - 1; i++) {
+    const a = ring[i];
+    const b = ring[i + 1];
+    if (inside(a)) push(a);
+    if (inside(a) !== inside(b)) {
+      const t = (lon - a[0]) / (b[0] - a[0]);
+      push([lon, a[1] + t * (b[1] - a[1])]);
     }
   }
-  if (_0x56a344["length"] > 0) _0xc5beb1(_0x56a344[0]);
-  return _0x56a344;
+  if (out.length > 0) push(out[0]);
+  return out;
 }
 const _OutlineGeometry = class _OutlineGeometry {
-  constructor(_0x23ac31) {
-    this["outlineCompanionEntities"] = /* @__PURE__ */ new WeakSet(), this["entitiesWithOutlineCompanion"] = /* @__PURE__ */ new WeakSet(), this["entitiesWithRiskyOutline"] = /* @__PURE__ */ new WeakSet(), this["getCurrentTime"] = _0x23ac31["getCurrentTime"];
+  constructor(options) {
+    this.outlineCompanionEntities = /* @__PURE__ */ new WeakSet();
+    this.entitiesWithOutlineCompanion = /* @__PURE__ */ new WeakSet();
+    this.entitiesWithRiskyOutline = /* @__PURE__ */ new WeakSet();
+    this.getCurrentTime = options.getCurrentTime;
   }
-  ["isOutlineCompanion"](_0x405732) {
-    return this["outlineCompanionEntities"]["has"](_0x405732);
+  /** Bu entity'nin KENDİSİ bir outline companion'i mi (ayri bir polyline
+   * olarak eklenmis, poligonun gercek bir ozelligi degil)? */
+  isOutlineCompanion(entity) {
+    return this.outlineCompanionEntities.has(entity);
   }
-  ["hasOutlineCompanion"](_0x1d46bc) {
-    return this["entitiesWithOutlineCompanion"]["has"](_0x1d46bc);
+  /** Bu (poligon) entity'nin bir outline companion'i VAR mi -- varsa native
+   * polygon.outline/outlineColor/outlineWidth alanlarina DOKUNULMAMALI. */
+  hasOutlineCompanion(entity) {
+    return this.entitiesWithOutlineCompanion.has(entity);
   }
-  ["hasRiskyOutline"](_0x28407b) {
-    return this["entitiesWithRiskyOutline"]["has"](_0x28407b);
+  /** Bu (poligon) entity antimeridyen/kutup crash riski tasidigi icin native
+   * outline'i BILEREK kapatilmis mi -- tekrar acilmamali. */
+  hasRiskyOutline(entity) {
+    return this.entitiesWithRiskyOutline.has(entity);
   }
-  ["addPolygonOutlines"](_0x419a24, _0x540da7, _0x1398f6) {
-    const _0xd02470 = _0x419a24["entities"]["values"]["filter"]((_0x40ed64) => _0x40ed64["polygon"] !== void 0 && !this["entitiesWithRiskyOutline"]["has"](_0x40ed64));
-    _0x419a24["entities"]["suspendEvents"]();
-    for (const _0x45adb8 of _0xd02470) {
-      this["addPolygonOutlineCompanion"](_0x419a24, _0x45adb8, _0x540da7, _0x1398f6, !![]);
+  /** Katmandaki tüm poligonlara görünür dış hat için eşlikçi (companion) polyline entity'si ekler; antimeridyen/kutup riski taşıyan poligonlar atlanır. */
+  // clampToGround poligonlarda Cesium'un outline'i framework seviyesinde
+  // kapatmasinin (bkz addPolygonOutlineCompanion) workaround'u olarak
+  // eklenen companion polyline entity'lerini isaretler -- applyLayerStyle()'in
+  // per-feature dolgu-renklendirme dongusu bunlari atlamali.
+  addPolygonOutlines(dataSource, color, width) {
+    const polygonEntities = dataSource.entities.values.filter(
+      (entity) => entity.polygon !== void 0 && !this.entitiesWithRiskyOutline.has(entity)
+    );
+    dataSource.entities.suspendEvents();
+    for (const entity of polygonEntities) {
+      this.addPolygonOutlineCompanion(dataSource, entity, color, width, true);
     }
-    _0x419a24["entities"]["resumeEvents"]();
+    dataSource.entities.resumeEvents();
   }
-  ["addPolygonOutlineCompanion"](_0x231886, _0x2e6288, _0x52d6f6, _0x11c4c6, _0xaf85bc) {
+  /** Tek bir poligon entity'sine, köşe koordinatlarından üretilen ayrı bir dış hat polyline entity'si (`<id>::outline`) ekler. */
+  // Bir poligon entity'sinin kose koordinatlarindan AYRI bir polyline
+  // "outline" entity'si ekler (bkz yukaridaki addPolygonOutlines yorumu) --
+  // hem TOPLU ilk yukleme (addPolygonOutlines) HEM DE Cizim Katmani'na TEK
+  // TEK eklenen poligonlar (_addDrawnShape, clampToGround:false) bu ORTAK
+  // helper'i kullanir. Companion, applyLayerStyle()'daki mevcut
+  // outlineCompanionEntities dongusu tarafindan otomatik olarak
+  // renk/genislik guncellemesi alir.
+  addPolygonOutlineCompanion(dataSource, entity, color, width, clampToGround) {
     var _a2;
-    const _0x2d3695 = this["getCurrentTime"](), _0x359461 = (_a2 = _0x2e6288["polygon"]["hierarchy"]) == null ? void 0 : _a2["getValue"](_0x2d3695), _0x266342 = _0x359461 == null ? void 0 : _0x359461["positions"], _0x58c8bd = _0x266342 == null ? void 0 : _0x266342[0];
-    if (_0x266342 === void 0 || _0x266342["length"] < 2 || _0x58c8bd === void 0) return;
-    _0x2e6288["polygon"]["outline"] = new ConstantProperty(![]), this["entitiesWithOutlineCompanion"]["add"](_0x2e6288);
-    const _0x4eab11 = _OutlineGeometry["simplifyOutlinePositions"]([..._0x266342, _0x58c8bd]), _0x9e7f8d = _0x231886["entities"]["add"]({ "id": _0x2e6288["id"] + "::outline", "polyline": { "positions": _0x4eab11, "clampToGround": _0xaf85bc, "width": _0x11c4c6, "material": _0x52d6f6 } });
-    this["outlineCompanionEntities"]["add"](_0x9e7f8d), _0x9e7f8d["properties"] = new PropertyBag({ "__tucbsOutlineOf": _0x2e6288["id"] });
+    const time = this.getCurrentTime();
+    const hierarchy = (_a2 = entity.polygon.hierarchy) == null ? void 0 : _a2.getValue(time);
+    const positions = hierarchy == null ? void 0 : hierarchy.positions;
+    const firstPosition = positions == null ? void 0 : positions[0];
+    if (positions === void 0 || positions.length < 2 || firstPosition === void 0)
+      return;
+    entity.polygon.outline = new ConstantProperty(false);
+    this.entitiesWithOutlineCompanion.add(entity);
+    const outlinePositions = _OutlineGeometry.simplifyOutlinePositions([
+      ...positions,
+      firstPosition
+    ]);
+    const outlineEntity = dataSource.entities.add({
+      id: `${entity.id}::outline`,
+      polyline: {
+        positions: outlinePositions,
+        clampToGround,
+        width,
+        material: color
+      }
+    });
+    this.outlineCompanionEntities.add(outlineEntity);
+    outlineEntity.properties = new PropertyBag({
+      __tucbsOutlineOf: entity.id
+    });
   }
-  ["disableRiskyPolygonOutlines"](_0x22a715) {
+  /** Antimeridyeni geçen ya da kutba çok yakın poligonların native dış hattını kapatır (Cesium'un render'ı durduran tessellation hatasına karşı); dolgu etkilenmez. */
+  // Antimeridyeni (-180/180 boylam) gecen ya da kutuba (enlem ~=90) cok
+  // yakin poligonlarda (orn. Rusya, Antarktika gibi genis kapsamli WFS/
+  // GeoJSON katmanlarinda) Cesium'un KENDI outline tessellation'i
+  // (subdivideRhumbLine, createPolygonOutlineGeometry icinde) "RangeError:
+  // Invalid array length" ile TUM render'i durduran, henuz yamanmamis
+  // BILINEN bir hatasi var (bkz kullanici bildirimi: "World continents"
+  // WFS katmani; community.cesium.com/t/invalid-array-length-error,
+  // GitHub CesiumGS/cesium#11269/#4760). CRS/koordinat sorunuyla ilgisi
+  // YOK -- gecerli WGS84 veride de olusabilir. En guvenilir/basit dogrulanmis
+  // cozum SADECE bu riskli poligonlarin outline'ini (kenar cizgisini)
+  // kapatmaktir -- dolgu (fill) etkilenmez, katman yine gorunur kalir.
+  disableRiskyPolygonOutlines(dataSource) {
     var _a2, _b;
-    const _0x69c604 = JulianDate["now"]();
-    _0x22a715["entities"]["suspendEvents"]();
-    for (const _0x2807ac of [..._0x22a715["entities"]["values"]]) {
-      const _0x3b4ed9 = _0x2807ac["polygon"], _0x5874f9 = (_a2 = _0x3b4ed9 == null ? void 0 : _0x3b4ed9["hierarchy"]) == null ? void 0 : _a2["getValue"](_0x69c604);
-      if (_0x3b4ed9 !== void 0 && this["risksAntimeridianOrPoleBug"](_0x5874f9 == null ? void 0 : _0x5874f9["positions"])) {
-        _0x3b4ed9["outline"] = new ConstantProperty(![]), this["entitiesWithRiskyOutline"]["add"](_0x2807ac);
-        if (_0x5874f9 !== void 0 && this["splitPoleEnclosingPolygon"](_0x22a715, _0x2807ac, _0x5874f9, _0x69c604)) continue;
-        _0x3b4ed9["height"] === void 0 && ((_b = _0x3b4ed9["perPositionHeight"]) == null ? void 0 : _b["getValue"](_0x69c604)) !== !![] && (_0x3b4ed9["height"] = new ConstantProperty(0));
+    const now = JulianDate.now();
+    dataSource.entities.suspendEvents();
+    for (const entity of [...dataSource.entities.values]) {
+      const polygon = entity.polygon;
+      const hierarchy = (_a2 = polygon == null ? void 0 : polygon.hierarchy) == null ? void 0 : _a2.getValue(now);
+      if (polygon !== void 0 && this.risksAntimeridianOrPoleBug(hierarchy == null ? void 0 : hierarchy.positions)) {
+        polygon.outline = new ConstantProperty(false);
+        this.entitiesWithRiskyOutline.add(entity);
+        if (hierarchy !== void 0 && this.splitPoleEnclosingPolygon(dataSource, entity, hierarchy, now)) {
+          continue;
+        }
+        if (polygon.height === void 0 && ((_b = polygon.perPositionHeight) == null ? void 0 : _b.getValue(now)) !== true) {
+          polygon.height = new ConstantProperty(0);
+        }
       }
     }
-    _0x22a715["entities"]["resumeEvents"]();
+    dataSource.entities.resumeEvents();
   }
-  ["splitPoleEnclosingPolygon"](_0x51e521, _0x16c3e6, _0x1afccb, _0xcd49dd) {
+  // Kutbu icine alan (boylamda ~360 derece donen, antimeridyen atlamasi
+  // OLMAYAN, deliksiz) bir poligonu boylamda 90 derecelik 4 dilime boler:
+  // ilk dilim entity'nin KENDI poligonu olur, digerleri ayni grafik ve
+  // ozniteliklerle `${id}::part-N` entity'leri olarak eklenir (stil/identify
+  // ozniteliklerden calistigi icin dilimler ayni feature gibi davranir).
+  // GeoJsonDataSource kenarlari RHUMB cizgi olarak cizdigi icin boylam/enlem
+  // duzleminde kirpmak geometriyi degistirmez. Kutup kenari Cesium'un
+  // kaldirabilecegi -89.9/89.9 enlemine cekilir. Bolemezse false doner.
+  splitPoleEnclosingPolygon(dataSource, entity, hierarchy, now) {
     var _a2;
-    const _0x26973b = _0x16c3e6["polygon"];
-    if (_0x26973b === void 0 || _0x1afccb["holes"]["length"] > 0) return ![];
-    const _0x8ff487 = _0x1afccb["positions"]["map"]((_0x9947eb) => {
-      const _0x3ca5c6 = Cartographic["fromCartesian"](_0x9947eb);
-      return [_0x584e42["toDegrees"](_0x3ca5c6["longitude"]), _0x584e42["toDegrees"](_0x3ca5c6["latitude"])];
+    const polygon = entity.polygon;
+    if (polygon === void 0 || hierarchy.holes.length > 0) return false;
+    const ring = hierarchy.positions.map((position) => {
+      const c = Cartographic.fromCartesian(position);
+      return [Math$1.toDegrees(c.longitude), Math$1.toDegrees(c.latitude)];
     });
-    let _0x1bf136 = Infinity, _0x22dd46 = -Infinity;
-    for (let _0x5158e5 = 0; _0x5158e5 < _0x8ff487["length"]; _0x5158e5++) {
-      const [_0x3dbf4f] = _0x8ff487[_0x5158e5];
-      if (_0x5158e5 > 0 && Math["abs"](_0x3dbf4f - _0x8ff487[_0x5158e5 - 1][0]) > 180) return ![];
-      _0x1bf136 = Math["min"](_0x1bf136, _0x3dbf4f), _0x22dd46 = Math["max"](_0x22dd46, _0x3dbf4f);
+    let minLon = Infinity;
+    let maxLon = -Infinity;
+    for (let i = 0; i < ring.length; i++) {
+      const [lon] = ring[i];
+      if (i > 0 && Math.abs(lon - ring[i - 1][0]) > 180) return false;
+      minLon = Math.min(minLon, lon);
+      maxLon = Math.max(maxLon, lon);
     }
-    if (_0x22dd46 - _0x1bf136 < 359) return ![];
-    const _0x4d891e = [..._0x8ff487, _0x8ff487[0]]["map"](([_0x1aaef1, _0x3ae8ae]) => [_0x1aaef1, Math["max"](-POLE_LATITUDE_LIMIT, Math["min"](POLE_LATITUDE_LIMIT, _0x3ae8ae))]), _0x243abc = [];
-    for (let _0x103752 = -180; _0x103752 < 180; _0x103752 += POLE_SLICE_DEGREES) {
-      const _0x2448ee = clipRingToLongitude(clipRingToLongitude(_0x4d891e, _0x103752, 1), _0x103752 + POLE_SLICE_DEGREES, -1)["slice"](0, -1);
-      if (_0x2448ee["length"] >= 3) _0x243abc["push"](Cartesian3["fromDegreesArray"](_0x2448ee["flat"]()));
+    if (maxLon - minLon < 359) return false;
+    const closed = [...ring, ring[0]].map(
+      ([lon, lat]) => [lon, Math.max(-POLE_LATITUDE_LIMIT, Math.min(POLE_LATITUDE_LIMIT, lat))]
+    );
+    const slices = [];
+    for (let lo = -180; lo < 180; lo += POLE_SLICE_DEGREES) {
+      const slice = clipRingToLongitude(clipRingToLongitude(closed, lo, 1), lo + POLE_SLICE_DEGREES, -1).slice(0, -1);
+      if (slice.length >= 3) slices.push(Cartesian3.fromDegreesArray(slice.flat()));
     }
-    if (_0x243abc["length"] === 0) return ![];
-    const _0x5efd48 = (_a2 = _0x16c3e6["properties"]) == null ? void 0 : _a2["getValue"](_0xcd49dd);
-    return _0x243abc["forEach"]((_0x4477bf, _0x42a126) => {
-      const _0x1d41f8 = new ConstantProperty(new PolygonHierarchy(_0x4477bf));
-      if (_0x42a126 === 0) {
-        _0x26973b["hierarchy"] = _0x1d41f8;
+    if (slices.length === 0) return false;
+    const properties = (_a2 = entity.properties) == null ? void 0 : _a2.getValue(now);
+    slices.forEach((positions, index) => {
+      const hierarchyProperty = new ConstantProperty(new PolygonHierarchy(positions));
+      if (index === 0) {
+        polygon.hierarchy = hierarchyProperty;
         return;
       }
-      const _0x538206 = _0x26973b["clone"]();
-      _0x538206["hierarchy"] = _0x1d41f8;
-      const _0x34e5cf = _0x51e521["entities"]["add"]({ "id": _0x16c3e6["id"] + "::part-" + _0x42a126, ..._0x16c3e6["name"] !== void 0 ? { "name": _0x16c3e6["name"] } : {}, "polygon": _0x538206 });
-      if (_0x5efd48 !== void 0) _0x34e5cf["properties"] = new PropertyBag(_0x5efd48);
-      this["entitiesWithRiskyOutline"]["add"](_0x34e5cf);
-    }), !![];
+      const part = polygon.clone();
+      part.hierarchy = hierarchyProperty;
+      const partEntity = dataSource.entities.add({
+        id: `${entity.id}::part-${index}`,
+        ...entity.name !== void 0 ? { name: entity.name } : {},
+        polygon: part
+      });
+      if (properties !== void 0) partEntity.properties = new PropertyBag(properties);
+      this.entitiesWithRiskyOutline.add(partEntity);
+    });
+    return true;
   }
-  ["risksAntimeridianOrPoleBug"](_0xc2ab58) {
-    if (!_0xc2ab58 || _0xc2ab58["length"] < 2) return ![];
-    let _0x5b3935;
-    for (const _0x204504 of _0xc2ab58) {
-      const _0x4461e7 = Cartographic["fromCartesian"](_0x204504), _0x5af9c7 = _0x584e42["toDegrees"](_0x4461e7["latitude"]);
-      if (Math["abs"](_0x5af9c7) > 89) return !![];
-      const _0x436ea9 = _0x584e42["toDegrees"](_0x4461e7["longitude"]);
-      if (_0x5b3935 !== void 0 && Math["abs"](_0x436ea9 - _0x5b3935) > 180) return !![];
-      _0x5b3935 = _0x436ea9;
-    }
-    return ![];
-  }
-  ["flattenSuspiciousGeometry"](_0x3a2d0a) {
-    _0x3a2d0a["entities"]["suspendEvents"]();
-    for (const _0x4ba153 of _0x3a2d0a["entities"]["values"]) {
-      if (_0x4ba153["polygon"] !== void 0) _0x4ba153["polygon"]["granularity"] = new ConstantProperty(Math["PI"]);
-      if (_0x4ba153["polyline"] !== void 0) _0x4ba153["polyline"]["granularity"] = new ConstantProperty(Math["PI"]);
-    }
-    _0x3a2d0a["entities"]["resumeEvents"]();
-  }
-  static ["douglasPeucker"](_0x53dcdb, _0x4898ff) {
-    const _0x1c38dd = new Array(_0x53dcdb["length"])["fill"](![]);
-    _0x1c38dd[0] = !![], _0x1c38dd[_0x53dcdb["length"] - 1] = !![];
-    const _0x2970dd = [[0, _0x53dcdb["length"] - 1]];
-    while (_0x2970dd["length"] > 0) {
-      const [_0x44fa62, _0x246d51] = _0x2970dd["pop"]();
-      if (_0x246d51 <= _0x44fa62 + 1) continue;
-      let _0x949f53 = -1, _0x26c1f0 = -1;
-      for (let _0x29a7c4 = _0x44fa62 + 1; _0x29a7c4 < _0x246d51; _0x29a7c4++) {
-        const _0xaccb71 = _OutlineGeometry["perpendicularDistance"](_0x53dcdb[_0x29a7c4], _0x53dcdb[_0x44fa62], _0x53dcdb[_0x246d51]);
-        _0xaccb71 > _0x949f53 && (_0x949f53 = _0xaccb71, _0x26c1f0 = _0x29a7c4);
+  // Ardisik iki koseden HERHANGI birinin boylam farki >180 derece ise
+  // (antimeridyen atlamasi -- orn. Rusya'nin -179/+179 arasi kosesi) ya da
+  // herhangi bir kose kutba (|enlem|>89) cok yakinsa true doner.
+  risksAntimeridianOrPoleBug(positions) {
+    if (!positions || positions.length < 2) return false;
+    let previousLongitudeDeg;
+    for (const position of positions) {
+      const cartographic = Cartographic.fromCartesian(position);
+      const latitudeDeg = Math$1.toDegrees(cartographic.latitude);
+      if (Math.abs(latitudeDeg) > 89) return true;
+      const longitudeDeg = Math$1.toDegrees(cartographic.longitude);
+      if (previousLongitudeDeg !== void 0 && Math.abs(longitudeDeg - previousLongitudeDeg) > 180) {
+        return true;
       }
-      _0x949f53 > _0x4898ff && (_0x1c38dd[_0x26c1f0] = !![], _0x2970dd["push"]([_0x44fa62, _0x26c1f0], [_0x26c1f0, _0x246d51]));
+      previousLongitudeDeg = longitudeDeg;
     }
-    return _0x53dcdb["filter"]((_0x17847c, _0x4ece69) => _0x1c38dd[_0x4ece69]);
+    return false;
   }
-  static ["perpendicularDistance"](_0x469a44, _0x104267, _0x547b05) {
-    const _0x57080c = Cartesian3["subtract"](_0x547b05, _0x104267, new Cartesian3()), _0xa65298 = Cartesian3["magnitudeSquared"](_0x57080c);
-    if (_0xa65298 === 0) return Cartesian3["distance"](_0x469a44, _0x104267);
-    const _0x446524 = Cartesian3["subtract"](_0x469a44, _0x104267, new Cartesian3()), _0x293bc4 = _0x584e42["clamp"](Cartesian3["dot"](_0x446524, _0x57080c) / _0xa65298, 0, 1), _0x31e1fc = Cartesian3["add"](_0x104267, Cartesian3["multiplyByScalar"](_0x57080c, _0x293bc4, _0x57080c), _0x57080c);
-    return Cartesian3["distance"](_0x469a44, _0x31e1fc);
-  }
-  static ["uniformDecimate"](_0x1a84f6, _0x1aca4b) {
-    if (_0x1a84f6["length"] <= _0x1aca4b) return [..._0x1a84f6];
-    const _0x4b61f5 = (_0x1a84f6["length"] - 1) / (_0x1aca4b - 1);
-    return Array["from"]({ "length": _0x1aca4b }, (_0x42a72e, _0x101a69) => _0x1a84f6[Math["round"](_0x101a69 * _0x4b61f5)]);
-  }
-  static ["polygonExtentMeters"](_0x586a1a) {
-    let _0x8062bb = Infinity, _0x1889de = Infinity, _0x4d9b4e = Infinity, _0x1938f9 = -Infinity, _0x4229c0 = -Infinity, _0x3288db = -Infinity;
-    for (const _0x1fe027 of _0x586a1a) {
-      if (_0x1fe027["x"] < _0x8062bb) _0x8062bb = _0x1fe027["x"];
-      if (_0x1fe027["x"] > _0x1938f9) _0x1938f9 = _0x1fe027["x"];
-      if (_0x1fe027["y"] < _0x1889de) _0x1889de = _0x1fe027["y"];
-      if (_0x1fe027["y"] > _0x4229c0) _0x4229c0 = _0x1fe027["y"];
-      if (_0x1fe027["z"] < _0x4d9b4e) _0x4d9b4e = _0x1fe027["z"];
-      if (_0x1fe027["z"] > _0x3288db) _0x3288db = _0x1fe027["z"];
+  /** Şüpheli koordinat sistemiyle yüklenen katmanda poligon ve çizgilerin `granularity` değerini π yaparak ek alt bölüm noktası üretilmesini engeller. */
+  // bkz isSuspiciousCrsResult WHY yorumu -- supheli (cozulemeyen/gecersiz
+  // aralikta) koordinatlarla yuklenen bir katmanda kucuk bir gercek
+  // parselin (birkaç metre) kenarlari yanlislikla BINLERCE KM'lik "geodesic"
+  // yaylara donusebilir; Cesium bu kenarlari uzunluklarina gore (granularity
+  // parametresine bolerek) ADAPTIF olarak alt-bolumlere ayirir -- clampToGround
+  // KAPALI olsa bile bu tessellation tek basina tarayiciyi donduren/coken bir
+  // maliyete yol acabilir. granularity'yi olasi en buyuk anlamli deger olan
+  // PI (yarim cember -- iki nokta arasindaki olasi EN UZUN geodesic/rhumb
+  // mesafe) yaparak HICBIR ek alt-bolum noktasi uretilmemesini garantiliyoruz
+  // -- zaten anlamsiz/yanlis konumdaki bu geometri icin gorsel bir kayip
+  // degildir. (Ilk denemede arcType=NONE kullanilmisti, ama Cesium'un
+  // PolygonOutlineGeometry'si SADECE GEODESIC/RHUMB kabul ediyor --
+  // "DeveloperError: Invalid arcType" ile render'i tamamen durduruyordu;
+  // granularity arcType'a hic dokunmadigi icin bu kisitlamayla CAKISMIYOR.)
+  // (Bu yorum eskiden LayerManager.ts'teki yonlendirme metodunun ustundeydi.)
+  flattenSuspiciousGeometry(dataSource) {
+    dataSource.entities.suspendEvents();
+    for (const entity of dataSource.entities.values) {
+      if (entity.polygon !== void 0) entity.polygon.granularity = new ConstantProperty(Math.PI);
+      if (entity.polyline !== void 0) entity.polyline.granularity = new ConstantProperty(Math.PI);
     }
-    return Math["sqrt"]((_0x1938f9 - _0x8062bb) ** 2 + (_0x4229c0 - _0x1889de) ** 2 + (_0x3288db - _0x4d9b4e) ** 2);
+    dataSource.entities.resumeEvents();
   }
-  static ["simplifyOutlinePositions"](_0x2988f3) {
-    const _0x9b36ac = _OutlineGeometry["polygonExtentMeters"](_0x2988f3), _0x30ef33 = _0x584e42["clamp"](_0x9b36ac * _OutlineGeometry["OUTLINE_SIMPLIFY_TOLERANCE_FACTOR"], _OutlineGeometry["OUTLINE_SIMPLIFY_MIN_TOLERANCE_METERS"], _OutlineGeometry["OUTLINE_SIMPLIFY_MAX_TOLERANCE_METERS"]), _0x5ed2f8 = _OutlineGeometry["douglasPeucker"](_0x2988f3, _0x30ef33);
-    return _0x5ed2f8["length"] > _OutlineGeometry["OUTLINE_MAX_VERTICES"] ? _OutlineGeometry["uniformDecimate"](_0x5ed2f8, _OutlineGeometry["OUTLINE_MAX_VERTICES"]) : _0x5ed2f8;
+  // Douglas-Peucker: iki "ucu sabit" nokta arasinda, dogruya en uzak noktayi
+  // bulup toleransi asiyorsa iki alt segmente bolerek YİNELİ olarak devam
+  // eder; toleransin altinda kalan araki noktalar (neredeyse duz bir cizgi
+  // uzerindeler) tamamen atilir. Cartesian3 (ECEF/metre) uzayinda calisir --
+  // bkz OUTLINE_SIMPLIFY_TOLERANCE_FACTOR yorumu (sadece companion dis hat
+  // icin kullanilir, poligonun ASIL dolgu geometrisine HIC dokunulmaz).
+  static douglasPeucker(points, toleranceMeters) {
+    const keep = new Array(points.length).fill(false);
+    keep[0] = true;
+    keep[points.length - 1] = true;
+    const stack = [[0, points.length - 1]];
+    while (stack.length > 0) {
+      const [start, end] = stack.pop();
+      if (end <= start + 1) continue;
+      let maxDistance = -1;
+      let maxIndex = -1;
+      for (let i = start + 1; i < end; i++) {
+        const distance = _OutlineGeometry.perpendicularDistance(
+          points[i],
+          points[start],
+          points[end]
+        );
+        if (distance > maxDistance) {
+          maxDistance = distance;
+          maxIndex = i;
+        }
+      }
+      if (maxDistance > toleranceMeters) {
+        keep[maxIndex] = true;
+        stack.push([start, maxIndex], [maxIndex, end]);
+      }
+    }
+    return points.filter((_, i) => keep[i]);
+  }
+  // "point"in, "lineStart"-"lineEnd" DOGRU PARCASINA (segmente, sonsuz
+  // dogruya degil) en kisa mesafesi -- projeksiyon [0,1] disina duserse en
+  // yakin uc noktaya kenetlenir.
+  static perpendicularDistance(point, lineStart, lineEnd) {
+    const lineVector = Cartesian3.subtract(lineEnd, lineStart, new Cartesian3());
+    const lineLengthSquared = Cartesian3.magnitudeSquared(lineVector);
+    if (lineLengthSquared === 0) return Cartesian3.distance(point, lineStart);
+    const pointVector = Cartesian3.subtract(point, lineStart, new Cartesian3());
+    const t = Math$1.clamp(
+      Cartesian3.dot(pointVector, lineVector) / lineLengthSquared,
+      0,
+      1
+    );
+    const projection = Cartesian3.add(
+      lineStart,
+      Cartesian3.multiplyByScalar(lineVector, t, lineVector),
+      lineVector
+    );
+    return Cartesian3.distance(point, projection);
+  }
+  // Douglas-Peucker sonrasi bile OUTLINE_MAX_VERTICES'i asan (kaynak veri
+  // son derece yogunsa) bir diziyi, sekli KABACA koruyarak (esit araliklarla
+  // orneklem alarak) sabit bir tavana indirir -- bkz o sabitin yorumu.
+  static uniformDecimate(points, maxCount) {
+    if (points.length <= maxCount) return [...points];
+    const step = (points.length - 1) / (maxCount - 1);
+    return Array.from({ length: maxCount }, (_, i) => points[Math.round(i * step)]);
+  }
+  // Poligonun bounding-box KOSEGENI (Cartesian3/ECEF metre) -- tolerans
+  // buradan TUREYECEGI icin O(n) tek geciste eksen-hizali min/max yeterli,
+  // gercek en-uzak-nokta-cifti (O(n^2)) hesaplamaya gerek yok.
+  static polygonExtentMeters(positions) {
+    let minX = Infinity;
+    let minY = Infinity;
+    let minZ = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    let maxZ = -Infinity;
+    for (const p of positions) {
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+      if (p.z < minZ) minZ = p.z;
+      if (p.z > maxZ) maxZ = p.z;
+    }
+    return Math.sqrt((maxX - minX) ** 2 + (maxY - minY) ** 2 + (maxZ - minZ) ** 2);
+  }
+  static simplifyOutlinePositions(positions) {
+    const extent = _OutlineGeometry.polygonExtentMeters(positions);
+    const tolerance = Math$1.clamp(
+      extent * _OutlineGeometry.OUTLINE_SIMPLIFY_TOLERANCE_FACTOR,
+      _OutlineGeometry.OUTLINE_SIMPLIFY_MIN_TOLERANCE_METERS,
+      _OutlineGeometry.OUTLINE_SIMPLIFY_MAX_TOLERANCE_METERS
+    );
+    const simplified = _OutlineGeometry.douglasPeucker(positions, tolerance);
+    return simplified.length > _OutlineGeometry.OUTLINE_MAX_VERTICES ? _OutlineGeometry.uniformDecimate(simplified, _OutlineGeometry.OUTLINE_MAX_VERTICES) : simplified;
   }
 };
-_OutlineGeometry["OUTLINE_SIMPLIFY_TOLERANCE_FACTOR"] = 7e-5;
-_OutlineGeometry["OUTLINE_SIMPLIFY_MIN_TOLERANCE_METERS"] = 0.25;
-_OutlineGeometry["OUTLINE_SIMPLIFY_MAX_TOLERANCE_METERS"] = 150;
-_OutlineGeometry["OUTLINE_MAX_VERTICES"] = 1200;
+_OutlineGeometry.OUTLINE_SIMPLIFY_TOLERANCE_FACTOR = 7e-5;
+_OutlineGeometry.OUTLINE_SIMPLIFY_MIN_TOLERANCE_METERS = 0.25;
+_OutlineGeometry.OUTLINE_SIMPLIFY_MAX_TOLERANCE_METERS = 150;
+_OutlineGeometry.OUTLINE_MAX_VERTICES = 1200;
 let OutlineGeometry = _OutlineGeometry;
 class OpacityController {
-  constructor(_0x289593) {
-    this["dataSourceOpacityStates"] = /* @__PURE__ */ new WeakMap(), this["dataSourceOpacityProperties"] = /* @__PURE__ */ new WeakMap(), this["requestRender"] = _0x289593["requestRender"];
+  constructor(options) {
+    this.dataSourceOpacityStates = /* @__PURE__ */ new WeakMap();
+    this.dataSourceOpacityProperties = /* @__PURE__ */ new WeakMap();
+    this.requestRender = options.requestRender;
   }
-  ["getWrappedBaseColor"](_0x74ff68) {
-    return this["dataSourceOpacityProperties"]["get"](_0x74ff68);
+  /** current property zaten bir opaklik sarmalayicisiysa, ICINDEKI mutable
+   * baz rengi dondurur -- LayerManager.updateColorProperty bunu DOGRUDAN
+   * mutasyona ugratarak property nesnesinin (ve dolayisiyla entity alaninin
+   * referansinin) HIC degismemesini saglar. */
+  getWrappedBaseColor(colorProperty) {
+    return this.dataSourceOpacityProperties.get(colorProperty);
   }
-  ["prepareDataSourceOpacity"](_0x22dd73) {
-    var _a2, _b;
-    const _0x455b42 = this["getDataSourceOpacityState"](_0x22dd73), _0x273b8d = JulianDate["now"]();
-    _0x22dd73["entities"]["suspendEvents"]();
-    for (const _0xac7182 of _0x22dd73["entities"]["values"]) {
-      if (((_a2 = _0xac7182["polygon"]) == null ? void 0 : _a2["material"]) instanceof ColorMaterialProperty) {
-        const _0x2073f2 = _0xac7182["polygon"]["material"];
-        this["installOpacityColorProperty"](_0x2073f2["color"], _0x455b42, _0x273b8d, new Color(1, 1, 1, 0.5), (_0x132b22) => _0x2073f2["color"] = _0x132b22);
+  /** Katmandaki tüm entity renklerini bir kez, katmanın opaklık durumunu okuyan dinamik property'lere çevirir. */
+  // DataSource opacity degistiginde tum entity'leri tekrar dolasmak pahali.
+  // Her entity rengi bir kez dinamik property'ye cevrilir; slider suruklenirken
+  // yalnizca katmanin opacity state'i guncellenir.
+  prepareDataSourceOpacity(dataSource) {
+    var _a2, _b, _c;
+    const state = this.getDataSourceOpacityState(dataSource);
+    const time = JulianDate.now();
+    dataSource.entities.suspendEvents();
+    for (const entity of dataSource.entities.values) {
+      if (((_a2 = entity.polygon) == null ? void 0 : _a2.material) instanceof ColorMaterialProperty) {
+        const material = entity.polygon.material;
+        this.installOpacityColorProperty(
+          material.color,
+          state,
+          time,
+          new Color(1, 1, 1, 0.5),
+          (property) => material.color = property
+        );
       }
-      if (((_b = _0xac7182["polyline"]) == null ? void 0 : _b["material"]) instanceof ColorMaterialProperty) {
-        const _0x29e04b = _0xac7182["polyline"]["material"];
-        this["installOpacityColorProperty"](_0x29e04b["color"], _0x455b42, _0x273b8d, Color["WHITE"], (_0x4816be) => _0x29e04b["color"] = _0x4816be);
+      if (((_b = entity.polyline) == null ? void 0 : _b.material) instanceof ColorMaterialProperty || ((_c = entity.polyline) == null ? void 0 : _c.material) instanceof PolylineDashMaterialProperty) {
+        const material = entity.polyline.material;
+        this.installOpacityColorProperty(
+          material.color,
+          state,
+          time,
+          Color.WHITE,
+          (property) => material.color = property
+        );
       }
-      _0xac7182["point"] !== void 0 && this["installOpacityColorProperty"](_0xac7182["point"]["color"], _0x455b42, _0x273b8d, Color["WHITE"], (_0x15cbdd) => _0xac7182["point"]["color"] = _0x15cbdd), _0xac7182["billboard"] !== void 0 && this["installOpacityColorProperty"](_0xac7182["billboard"]["color"], _0x455b42, _0x273b8d, Color["WHITE"], (_0x5a839d) => _0xac7182["billboard"]["color"] = _0x5a839d);
+      if (entity.point !== void 0) {
+        this.installOpacityColorProperty(
+          entity.point.color,
+          state,
+          time,
+          Color.WHITE,
+          (property) => entity.point.color = property
+        );
+      }
+      if (entity.billboard !== void 0) {
+        this.installOpacityColorProperty(
+          entity.billboard.color,
+          state,
+          time,
+          Color.WHITE,
+          (property) => entity.billboard.color = property
+        );
+      }
     }
-    _0x22dd73["entities"]["resumeEvents"]();
+    dataSource.entities.resumeEvents();
   }
-  ["ensureDynamicFillColor"](_0x54b0fc, _0x1ecd53) {
+  /** Poligonun dolgu rengini paylaşılan opaklık durumuna bağlı dinamik bir `CallbackProperty`'ye çevirir; dolgu `ColorMaterialProperty` değilse no-op. */
+  // OutlineGeometry'nin companion-outline teknigi (bkz LayerManager.
+  // addPolygonOutlines/addPolygonOutlineCompanion) ile birlikte kullanilan
+  // poligonlarda, dolgu rengi HER ZAMAN (setOpacity() hic cagrilmasa, deger
+  // 1 kalsa dahi) dinamik bir CallbackProperty OLMALI -- deneyle dogrulandi:
+  // Cesium'un ground-clamped GroundPrimitive/GroundPolylinePrimitive
+  // compositing'i, STATIK (ConstantProperty) bir dolgu materyalini companion
+  // polyline ile yanlis derinlik/compositing sirasina sokup companion'i
+  // gorunmez kiliyor (kullanici bildirimi: "opaklığı maksimum yaptığımda
+  // poligon geometri sınırları gözükmez hale geliyor"); dinamik (isConstant:
+  // false) bir materyalde bu sorun OLUŞMUYOR. SADECE poligonun dolgu rengi
+  // hedeflenir -- companion'in KENDI rengine dokunmaya gerek YOK (izole
+  // deneyle dogrulandi). Paylasilan opaklik state'ini KULLANIR (ayri/notr
+  // bir state DEGIL) -- boylece setOpacity() sonradan cagrilirsa bu zaten-
+  // sarili property dogru sekilde tepki verir.
+  ensureDynamicFillColor(dataSource, entity) {
     var _a2;
-    if (!(((_a2 = _0x1ecd53["polygon"]) == null ? void 0 : _a2["material"]) instanceof ColorMaterialProperty)) return;
-    const _0x17dddf = this["getDataSourceOpacityState"](_0x54b0fc), _0x1772d1 = _0x1ecd53["polygon"]["material"];
-    this["installOpacityColorProperty"](_0x1772d1["color"], _0x17dddf, JulianDate["now"](), new Color(1, 1, 1, 0.5), (_0x13fd09) => _0x1772d1["color"] = _0x13fd09);
+    if (!(((_a2 = entity.polygon) == null ? void 0 : _a2.material) instanceof ColorMaterialProperty)) return;
+    const state = this.getDataSourceOpacityState(dataSource);
+    const material = entity.polygon.material;
+    this.installOpacityColorProperty(
+      material.color,
+      state,
+      JulianDate.now(),
+      new Color(1, 1, 1, 0.5),
+      (property) => material.color = property
+    );
   }
-  ["setDataSourceOpacity"](_0x125c2f, _0x104670) {
-    const _0x29496b = this["getDataSourceOpacityState"](_0x125c2f);
-    if (_0x29496b["opacity"] === _0x104670) return;
-    _0x29496b["opacity"] = _0x104670, !_0x29496b["wrapped"] && _0x104670 !== 1 && (this["prepareDataSourceOpacity"](_0x125c2f), _0x29496b["wrapped"] = !![]), this["requestRender"]();
+  /**
+   * Katmanın opaklığını (0–1) değiştirir ve yeniden çizim ister; değer aynıysa no-op.
+   *
+   * Renkleri dinamik property'ye çevirme (bkz. `prepareDataSourceOpacity`) yalnız opaklık ilk kez 1'den farklı olduğunda, bir kez yapılır.
+   */
+  setDataSourceOpacity(dataSource, opacity) {
+    const state = this.getDataSourceOpacityState(dataSource);
+    if (state.opacity === opacity) return;
+    state.opacity = opacity;
+    if (!state.wrapped && opacity !== 1) {
+      this.prepareDataSourceOpacity(dataSource);
+      state.wrapped = true;
+    }
+    this.requestRender();
   }
-  ["getDataSourceOpacityState"](_0x34d548) {
-    let _0x350a65 = this["dataSourceOpacityStates"]["get"](_0x34d548);
-    return _0x350a65 === void 0 && (_0x350a65 = { "opacity": 1, "wrapped": ![] }, this["dataSourceOpacityStates"]["set"](_0x34d548, _0x350a65)), _0x350a65;
+  getDataSourceOpacityState(dataSource) {
+    let state = this.dataSourceOpacityStates.get(dataSource);
+    if (state === void 0) {
+      state = { opacity: 1, wrapped: false };
+      this.dataSourceOpacityStates.set(dataSource, state);
+    }
+    return state;
   }
-  ["installOpacityColorProperty"](_0x5976ac, _0x18b8e9, _0x2a9169, _0x5a32fc, _0x55e8cf) {
-    if (_0x5976ac !== void 0 && this["dataSourceOpacityProperties"]["has"](_0x5976ac)) return;
-    const _0x9f5ea6 = this["readColorProperty"](_0x5976ac, _0x2a9169, _0x5a32fc), _0x5aee06 = this["createOpacityColorProperty"](_0x9f5ea6, _0x18b8e9);
-    _0x55e8cf(_0x5aee06);
+  installOpacityColorProperty(colorProperty, state, time, fallbackColor, assign) {
+    if (colorProperty !== void 0 && this.dataSourceOpacityProperties.has(colorProperty)) {
+      return;
+    }
+    const baseColor = this.readColorProperty(
+      colorProperty,
+      time,
+      fallbackColor
+    );
+    const opacityProperty = this.createOpacityColorProperty(baseColor, state);
+    assign(opacityProperty);
   }
-  ["readColorProperty"](_0xb065e5, _0x4abacd, _0x229bb7) {
-    const _0x28d74f = _0xb065e5 == null ? void 0 : _0xb065e5["getValue"](_0x4abacd);
-    return _0x28d74f instanceof Color ? Color["clone"](_0x28d74f, new Color()) : Color["clone"](_0x229bb7, new Color());
+  readColorProperty(colorProperty, time, fallbackColor) {
+    const value = colorProperty == null ? void 0 : colorProperty.getValue(time);
+    return value instanceof Color ? Color.clone(value, new Color()) : Color.clone(fallbackColor, new Color());
   }
-  ["createOpacityColorProperty"](_0x5a12a3, _0x20b95b) {
-    const _0x2af2b2 = Color["clone"](_0x5a12a3, new Color()), _0x5362c1 = new CallbackProperty((_0x5cc9a7, _0x1ba4f7) => {
-      const _0x415a14 = _0x1ba4f7 instanceof Color ? _0x1ba4f7 : new Color();
-      return _0x415a14["red"] = _0x2af2b2["red"], _0x415a14["green"] = _0x2af2b2["green"], _0x415a14["blue"] = _0x2af2b2["blue"], _0x415a14["alpha"] = _0x2af2b2["alpha"] * _0x20b95b["opacity"], _0x415a14;
-    }, ![]);
-    return this["dataSourceOpacityProperties"]["set"](_0x5362c1, _0x2af2b2), _0x5362c1;
+  createOpacityColorProperty(baseColor, state) {
+    const color = Color.clone(baseColor, new Color());
+    const opacityProperty = new CallbackProperty((_time, result) => {
+      const next = result instanceof Color ? result : new Color();
+      next.red = color.red;
+      next.green = color.green;
+      next.blue = color.blue;
+      next.alpha = color.alpha * state.opacity;
+      return next;
+    }, false);
+    this.dataSourceOpacityProperties.set(opacityProperty, color);
+    return opacityProperty;
   }
 }
 const _CameraHighlight = class _CameraHighlight {
-  constructor(_0x286a18, _0x1868c0) {
-    this["viewer"] = _0x286a18, this["deps"] = _0x1868c0;
+  constructor(viewer, deps) {
+    this.viewer = viewer;
+    this.deps = deps;
   }
-  async ["zoomToLayer"](_0x301075) {
-    const _0x3e3889 = this["deps"]["requireLayer"](_0x301075);
-    return this["viewer"]["zoomTo"](_0x3e3889["cesiumObject"], new HeadingPitchRange(0, -_0x584e42["PI_OVER_TWO"], 0));
+  /**
+   * Kamerayı, katmanın tüm görünür alanına (extent) düz tepeden bakışla yakınlaştırır.
+   *
+   * @example
+   * ```ts
+   * await map.layerManager.zoomToLayer("katman-id");
+   * ```
+   */
+  // viewer.zoomTo hem ImageryLayer hem DataSource kabul ettigi icin katmanin
+  // turune bakmadan extent'ine (gorunur alanina) zoom yapar. Offset verilmezse
+  // Cesium egik bir aciyla yaklasir; duz tepeden goruntu icin heading=0,
+  // pitch=-90 derece kullanilir (range=0 -> tum katman otomatik sigacak sekilde).
+  async zoomToLayer(id) {
+    const managed = this.deps.requireLayer(id);
+    return this.viewer.zoomTo(
+      managed.cesiumObject,
+      new HeadingPitchRange(0, -Math$1.PI_OVER_TWO, 0)
+    );
   }
-  async ["zoomToEntity"](_0x413712, _0xca93a) {
+  /** Kamerayı, tek bir entity'nin çerçevesine düz tepeden bakışla yakınlaştırır. */
+  // zoomToLayer ile AYNI top-down yaklasma (bkz yukaridaki yorum) ama TUM
+  // katman yerine TEK bir entity'nin cercevesine -- TucbsIdentifyPanel'in
+  // oznitelik tablosundaki "Yakınlaş" butonu icin (bkz PickedFeatureDetail.entity):
+  // bir katmanda birden fazla feature varsa katmanin tamamina degil, sadece
+  // TIKLANAN feature'a yakinlasmak istenir.
+  //
+  // viewer.zoomTo(entity, HeadingPitchRange(...range=0)) -- Cesium'un KENDI
+  // otomatik mesafe hesabi -- entity'nin TUM visualizer'larindan (DataSourceDisplay)
+  // derledigi bir bounding sphere kullanir; bu, entity'nin SADECE geometrisini
+  // degil (varsa) ekran-uzayi boyutlu gorselleri (point/billboard/label pixelSize)
+  // de kapsar ve bunlarin metreye cevirisi O ANKI kamera mesafesine baglidir --
+  // identify tiklamasi genelde genis bir gorunumde yapildigindan bu cevirim
+  // ABARTILI bir yaricap/mesafe uretebiliyordu (bkz kullanici geri bildirimi:
+  // "GeoJSON feature'lara cok uzaktan zoomluyor... zoom to extent yapmiyor
+  // musun"). Bunun yerine polygon/polyline geometrisi varsa bounding sphere
+  // DOGRUDAN GERCEK KOORDINATLARDAN hesaplanip flyToBoundingSphere ile
+  // gidilir -- sonuc SADECE feature'in gercek boyutuna bagli, kamera
+  // mesafesinden BAGIMSIZDIR. Sadece nokta geometrisi olan (polygon/polyline
+  // YOK) entity'lerde "extent" anlamsiz oldugundan eski davranis (Cesium'un
+  // kendi zoomTo'su) korunur.
+  async zoomToEntity(entity, options) {
     var _a2, _b;
-    const _0x482ae3 = this["viewer"]["clock"]["currentTime"];
-    let _0x48c2d6;
-    if (((_a2 = _0x413712["polygon"]) == null ? void 0 : _a2["hierarchy"]) !== void 0) {
-      const _0x3627ed = _0x413712["polygon"]["hierarchy"]["getValue"](_0x482ae3);
-      _0x48c2d6 = _0x3627ed == null ? void 0 : _0x3627ed["positions"];
-    } else ((_b = _0x413712["polyline"]) == null ? void 0 : _b["positions"]) !== void 0 && (_0x48c2d6 = _0x413712["polyline"]["positions"]["getValue"](_0x482ae3));
-    if (_0x48c2d6 !== void 0 && _0x48c2d6["length"] > 0) {
-      const _0x28c2ac = BoundingSphere["fromPoints"](_0x48c2d6), _0x47cec1 = Math["max"](_0x28c2ac["radius"] * 2, 50);
-      return new Promise((_0xc0ecde) => {
-        this["viewer"]["camera"]["flyToBoundingSphere"](_0x28c2ac, { "offset": new HeadingPitchRange(0, -_0x584e42["PI_OVER_TWO"], _0x47cec1), ...(_0xca93a == null ? void 0 : _0xca93a["duration"]) !== void 0 ? { "duration": _0xca93a["duration"] } : {}, "complete": () => _0xc0ecde(!![]), "cancel": () => _0xc0ecde(![]) });
+    const time = this.viewer.clock.currentTime;
+    let positions;
+    if (((_a2 = entity.polygon) == null ? void 0 : _a2.hierarchy) !== void 0) {
+      const hierarchy = entity.polygon.hierarchy.getValue(time);
+      positions = hierarchy == null ? void 0 : hierarchy.positions;
+    } else if (((_b = entity.polyline) == null ? void 0 : _b.positions) !== void 0) {
+      positions = entity.polyline.positions.getValue(time);
+    }
+    if (positions !== void 0 && positions.length > 0) {
+      const boundingSphere = BoundingSphere.fromPoints(positions);
+      const range = Math.max(boundingSphere.radius * 2, 50);
+      return new Promise((resolve) => {
+        this.viewer.camera.flyToBoundingSphere(boundingSphere, {
+          offset: new HeadingPitchRange(0, -Math$1.PI_OVER_TWO, range),
+          // Cesium'un mesafeye gore OTOMATIK hesapladigi sure (uzak bir
+          // noktadan yakinlasirken birkac saniyeye kadar cikabiliyor) yerine,
+          // verilmisse SABIT/kisa bir sure kullanilir (bkz kullanici geri
+          // bildirimi: "bu zoom'lama işi daha hızlı olsun").
+          ...(options == null ? void 0 : options.duration) !== void 0 ? { duration: options.duration } : {},
+          complete: () => resolve(true),
+          cancel: () => resolve(false)
+        });
       });
     }
-    return this["viewer"]["zoomTo"](_0x413712, new HeadingPitchRange(0, -_0x584e42["PI_OVER_TWO"], 0));
+    return this.viewer.zoomTo(
+      entity,
+      new HeadingPitchRange(0, -Math$1.PI_OVER_TWO, 0)
+    );
   }
-  static ["elevate"](_0x158d07, _0x4d3878) {
-    return _0x158d07["map"]((_0x1ad603) => {
-      const _0x527703 = Cartographic["fromCartesian"](_0x1ad603);
-      return Cartesian3["fromRadians"](_0x527703["longitude"], _0x527703["latitude"], _0x527703["height"] + _0x4d3878);
+  // Bir entity'yi gorsel olarak vurgular -- TucbsIdentifyPanel'in "Yakınlaş"
+  // butonu, kamera feature'a ulastiktan sonra HANGI feature'in bu oldugunu
+  // gostermek icin zoomToEntity ile BIRLIKTE cagirir. Entity'nin KENDI
+  // stilini (StyleEditor'un uyguladigi fill/outline) HIC DEGISTIRMEZ --
+  // bunun yerine AYNI geometriyi izleyen, SABIT (animasyonsuz) bir GECICI
+  // "stroke feature" ekler (this.highlightDataSource, bkz field yorumu).
+  // Zamanlayiciyla KENDI KENDINE kaldirilmaz -- cagiran taraf (diyalog
+  // kapaninca TucbsIdentifyPanel) clearHighlight()'i ACIKCA cagirmali (bkz
+  // kullanici geri bildirimi: "En son diyaloğu kapanınca geçici feature'ı
+  // kaldır"). Boylece orijinal entity'nin stilini "kaydet/geri yukle" gibi
+  // riskli bir islem hic gerekmez.
+  //
+  // Vurgu rengi HER ZAMAN SABIT (HIGHLIGHT_COLOR, #00FFFF) -- katmanin/
+  // feature'in KENDI dis hat rengi ARTIK kullanilmiyor (bkz kullanici geri
+  // bildirimi: "highlight rengi sabit #00FFFF olsun" -- ONCEKI "kendi dış
+  // hat renginde highlight edelim" karari BUNUNLA degistirildi). Genislik
+  // hala entity'nin AIT OLDUGU katmanin O ANKI dis hat kalinligina gore
+  // hesaplanir (appliedLayerStyles) -- mevcut dis hattin ustune SABIT bir
+  // pay (+4px) eklenir, ust/alt sinir YOK (bkz kullanici geri bildirimi:
+  // "6-16px arası sınırlı demişsin, kaldır") -- daha KALIN bir ikinci
+  // cizgi, aynen ustunde durdugu icin kenarlardan tasarak zaten dikkat
+  // ceker, animasyona GEREK KALMAZ.
+  //
+  // ONEMLI: nabiz animasyonu (CallbackProperty, isConstant:false) BILEREK
+  // KALDIRILDI -- HER KAREDE yeniden degerlendirilen canli bir materyal,
+  // "Yakınlaş" butonuna ust uste basildiginda (durationMs dolmadan) render
+  // dongusunu tikayip sekmeyi/tarayiciyi dondurebiliyordu (bkz kullanici
+  // geri bildirimi: "birkaç kez zoom yapınca tamamen donuyor"). Statik bir
+  // ColorMaterialProperty (sabit Color, CallbackProperty DEGIL) bu riski
+  // TAMAMEN ortadan kaldirir -- kac kez ust uste cagrilirsa cagrilsin
+  // maliyeti SABITTIR (tek seferlik olusturma, GPU'ya SIFIR ek yuk).
+  //
+  // Nokta vurgusu disableDepthTestDistance:Infinity ile (derinlik testi
+  // TAMAMEN devre disi -- her kosulda cizilir) her zaman ustte kalir.
+  // Cizgi/poligon vurgusu icin de ayni garantiyi vermek uzere bir ara
+  // denemede clampToGround:true + yuksek sabit zIndex (GroundPolylinePrimitive)
+  // kullanilmisti -- ama bu teknik, egik/acili kamera bakislarinda cizgiyi
+  // GOZLE GORULUR sekilde soluklastiriyordu (bkz kullanici geri bildirimi:
+  // "silik silik gözüküyor" -- Cesium'un ground-primitive render tekniginin
+  // BILINEN bir sinirlamasi). Kullanici NETLIGI tercih etti (bkz "Netlik
+  // öncelikli" karari): bu yuzden cizgi/poligon vurgusu clampToGround
+  // KULLANMAZ, SADECE depthFailMaterial ile terrain (arazi/tepe) tarafindan
+  // ortulmeye karsi korunur -- bu uygulamada 3D bina/tileset olmadigindan
+  // (SADECE 2D vektor katmanlar + arazi var) pratikte "her zaman ustte"
+  // ihtiyacinin tamamini karsilar, cizgi de HER acida crisp/canli kalir.
+  // Her pozisyonu KENDI yerel "yukari" yonunde (Cartographic.height + N metre)
+  // kaldirir -- bkz HIGHLIGHT_ELEVATION_METERS WHY yorumu.
+  static elevate(positions, meters) {
+    return positions.map((position) => {
+      const carto = Cartographic.fromCartesian(position);
+      return Cartesian3.fromRadians(
+        carto.longitude,
+        carto.latitude,
+        carto.height + meters
+      );
     });
   }
-  ["highlightEntity"](_0xd283bd) {
+  /** Bir entity'yi, kendi stiline dokunmadan sabit renkli bir "outline" ile geçici olarak vurgular (bkz yukarıdaki WHY notları). */
+  highlightEntity(entity) {
     var _a2, _b, _c;
-    const _0x2325fe = this["viewer"]["clock"]["currentTime"], _0x146e43 = (_a2 = _0xd283bd["properties"]) == null ? void 0 : _a2["getValue"](_0x2325fe), _0x41b163 = _0x146e43 == null ? void 0 : _0x146e43["layerId"], _0x345437 = _0x41b163 !== void 0 ? this["deps"]["getLayerStyle"](_0x41b163) : void 0, _0x3740ca = _CameraHighlight["HIGHLIGHT_COLOR"], _0x14ce6a = ((_0x345437 == null ? void 0 : _0x345437["outline"]["width"]) ?? 2) + 4, _0x381852 = new ColorMaterialProperty(_0x3740ca), _0x480bdd = new Entity();
-    if (((_b = _0xd283bd["polygon"]) == null ? void 0 : _b["hierarchy"]) !== void 0) {
-      const _0x40c6f9 = _0xd283bd["polygon"]["hierarchy"]["getValue"](_0x2325fe), _0x24a9d1 = _0x40c6f9 == null ? void 0 : _0x40c6f9["positions"];
-      if (_0x24a9d1 === void 0 || _0x24a9d1["length"] < 2) return;
-      const _0x57467e = Cartesian3["equals"](_0x24a9d1[0], _0x24a9d1[_0x24a9d1["length"] - 1]) ? _0x24a9d1 : [..._0x24a9d1, _0x24a9d1[0]];
-      _0x480bdd["polyline"] = new PolylineGraphics({ "positions": _CameraHighlight["elevate"](_0x57467e, _CameraHighlight["HIGHLIGHT_ELEVATION_METERS"]), "width": _0x14ce6a, "material": _0x381852, "depthFailMaterial": _0x381852 });
+    const time = this.viewer.clock.currentTime;
+    const props = (_a2 = entity.properties) == null ? void 0 : _a2.getValue(time);
+    const layerId = props == null ? void 0 : props.layerId;
+    const style = layerId !== void 0 ? this.deps.getLayerStyle(layerId) : void 0;
+    const strokeColor = _CameraHighlight.HIGHLIGHT_COLOR;
+    const strokeWidth = ((style == null ? void 0 : style.outline.width) ?? 2) + 4;
+    const strokeMaterial = new ColorMaterialProperty(strokeColor);
+    const highlight = new Entity();
+    if (((_b = entity.polygon) == null ? void 0 : _b.hierarchy) !== void 0) {
+      const hierarchy = entity.polygon.hierarchy.getValue(time);
+      const positions = hierarchy == null ? void 0 : hierarchy.positions;
+      if (positions === void 0 || positions.length < 2) return;
+      const ring = Cartesian3.equals(positions[0], positions[positions.length - 1]) ? positions : [...positions, positions[0]];
+      highlight.polyline = new PolylineGraphics({
+        positions: _CameraHighlight.elevate(ring, _CameraHighlight.HIGHLIGHT_ELEVATION_METERS),
+        width: strokeWidth,
+        material: strokeMaterial,
+        depthFailMaterial: strokeMaterial
+      });
+    } else if (((_c = entity.polyline) == null ? void 0 : _c.positions) !== void 0) {
+      const positions = entity.polyline.positions.getValue(time);
+      if (positions === void 0 || positions.length < 2) return;
+      highlight.polyline = new PolylineGraphics({
+        positions: _CameraHighlight.elevate(positions, _CameraHighlight.HIGHLIGHT_ELEVATION_METERS),
+        width: strokeWidth,
+        material: strokeMaterial,
+        depthFailMaterial: strokeMaterial
+      });
+    } else if (entity.position !== void 0) {
+      const position = entity.position.getValue(time);
+      if (position === void 0) return;
+      highlight.position = new ConstantPositionProperty(position);
+      highlight.point = new PointGraphics({
+        pixelSize: strokeWidth + 12,
+        color: strokeColor,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY
+      });
     } else {
-      if (((_c = _0xd283bd["polyline"]) == null ? void 0 : _c["positions"]) !== void 0) {
-        const _0x5757d1 = _0xd283bd["polyline"]["positions"]["getValue"](_0x2325fe);
-        if (_0x5757d1 === void 0 || _0x5757d1["length"] < 2) return;
-        _0x480bdd["polyline"] = new PolylineGraphics({ "positions": _CameraHighlight["elevate"](_0x5757d1, _CameraHighlight["HIGHLIGHT_ELEVATION_METERS"]), "width": _0x14ce6a, "material": _0x381852, "depthFailMaterial": _0x381852 });
-      } else {
-        if (_0xd283bd["position"] !== void 0) {
-          const _0xe15a58 = _0xd283bd["position"]["getValue"](_0x2325fe);
-          if (_0xe15a58 === void 0) return;
-          _0x480bdd["position"] = new ConstantPositionProperty(_0xe15a58), _0x480bdd["point"] = new PointGraphics({ "pixelSize": _0x14ce6a + 12, "color": _0x3740ca, "disableDepthTestDistance": Number["POSITIVE_INFINITY"] });
-        } else return;
-      }
+      return;
     }
-    !this["highlightDataSource"] ? (this["highlightDataSource"] = new CustomDataSource("__tucbs_highlight__"), void this["viewer"]["dataSources"]["add"](this["highlightDataSource"])) : this["highlightDataSource"]["entities"]["removeAll"](), this["highlightDataSource"]["entities"]["add"](_0x480bdd);
+    if (!this.highlightDataSource) {
+      this.highlightDataSource = new CustomDataSource("__tucbs_highlight__");
+      void this.viewer.dataSources.add(this.highlightDataSource);
+    } else {
+      this.highlightDataSource.entities.removeAll();
+    }
+    this.highlightDataSource.entities.add(highlight);
   }
-  ["clearHighlight"]() {
+  /** {@link highlightEntity} ile eklenen geçici vurguyu kaldırır (aktif vurgu yoksa no-op). */
+  // TucbsIdentifyPanel oznitelik tablosu diyalogu KAPANDIGINDA cagirir
+  // (bkz kullanici geri bildirimi).
+  clearHighlight() {
     var _a2;
-    (_a2 = this["highlightDataSource"]) == null ? void 0 : _a2["entities"]["removeAll"]();
+    (_a2 = this.highlightDataSource) == null ? void 0 : _a2.entities.removeAll();
   }
 };
-_CameraHighlight["HIGHLIGHT_COLOR"] = Color["fromCssColorString"]("#00FFFF");
-_CameraHighlight["HIGHLIGHT_ELEVATION_METERS"] = 0.5;
+_CameraHighlight.HIGHLIGHT_COLOR = Color.fromCssColorString("#00FFFF");
+_CameraHighlight.HIGHLIGHT_ELEVATION_METERS = 0.5;
 let CameraHighlight = _CameraHighlight;
-const SEAM_COVER_WIDTH = 1, OUTLINE_ID_SUFFIX = "::outline";
-class LayerStyleEngine {
-  constructor(_0xa0c6c1) {
-    this["appliedLayerStyles"] = /* @__PURE__ */ new Map(), this["appliedCompanionWidths"] = /* @__PURE__ */ new Map(), this["outlineGeometry"] = _0xa0c6c1["outlineGeometry"], this["opacityController"] = _0xa0c6c1["opacityController"], this["getCurrentTime"] = _0xa0c6c1["getCurrentTime"], this["requestRender"] = _0xa0c6c1["requestRender"], this["emitStyle"] = _0xa0c6c1["emitStyle"], this["waitForRenderSettle"] = _0xa0c6c1["waitForRenderSettle"];
+const originals = /* @__PURE__ */ new WeakMap();
+function graphicsOf(entity) {
+  return [entity.billboard, entity.point].filter(
+    (graphics) => graphics !== void 0
+  );
+}
+function syncPointHeightReferences(entities, mode, time) {
+  var _a2;
+  let changed = false;
+  for (const entity of entities) {
+    const graphics = graphicsOf(entity);
+    if (graphics.length === 0) continue;
+    if (mode === SceneMode.SCENE2D) {
+      for (const item of graphics) {
+        const current = (_a2 = item.heightReference) == null ? void 0 : _a2.getValue(time);
+        if (current === void 0 || current === HeightReference.NONE) continue;
+        if (!originals.has(entity)) originals.set(entity, current);
+        item.heightReference = HeightReference.NONE;
+        changed = true;
+      }
+    } else {
+      const original = originals.get(entity);
+      if (original === void 0) continue;
+      for (const item of graphics) item.heightReference = original;
+      originals.delete(entity);
+      changed = true;
+    }
   }
-  async ["applyLayerStyle"](_0x34259f, _0x559f6a, _0x5e7273, _0x19d9b3) {
-    var _a2;
-    const _0x5c2fbd = this["appliedCompanionWidths"]["get"](_0x34259f) ?? ((_a2 = this["appliedLayerStyles"]["get"](_0x34259f)) == null ? void 0 : _a2["outline"]["width"]), _0x1ca8ad = this["getCurrentTime"](), _0x30e940 = this["resolveStyleRange"](_0x559f6a, _0x1ca8ad, _0x19d9b3["fill"]), _0x4b7f5f = [], _0x2db988 = /* @__PURE__ */ new Map();
-    _0x559f6a["entities"]["suspendEvents"]();
-    for (const _0x3b6e37 of _0x559f6a["entities"]["values"]) {
-      if (this["outlineGeometry"]["isOutlineCompanion"](_0x3b6e37)) {
-        _0x4b7f5f["push"](_0x3b6e37);
+  return changed;
+}
+const POINT_SHAPES = [
+  "circle",
+  "square",
+  "triangle",
+  "diamond",
+  "cross",
+  "star"
+];
+const LINE_DASHES = [
+  "solid",
+  "dashed",
+  "dotted",
+  "dash-dot",
+  "long-dash"
+];
+const POINT_SHAPE_LABELS = {
+  circle: "Daire",
+  square: "Kare",
+  triangle: "Üçgen",
+  diamond: "Elmas",
+  cross: "Artı",
+  star: "Yıldız"
+};
+const LINE_DASH_LABELS = {
+  solid: "Düz",
+  dashed: "Kesikli",
+  dotted: "Noktalı",
+  "dash-dot": "Çizgi-nokta",
+  "long-dash": "Uzun kesikli"
+};
+const DEFAULT_POINT_SYMBOL = { shape: "circle", size: 12 };
+const POINT_SIZE_MIN = 8;
+const POINT_SIZE_MAX = 48;
+function clampPointSize(value) {
+  if (!Number.isFinite(value)) return DEFAULT_POINT_SYMBOL.size;
+  return Math.min(POINT_SIZE_MAX, Math.max(POINT_SIZE_MIN, value));
+}
+const POINT_SHAPE_VISUAL_SCALE = {
+  circle: 1,
+  square: 1,
+  triangle: 1.35,
+  diamond: 1.25,
+  cross: 1.22,
+  star: 1.5
+};
+function shapeBoxSize(shape, size) {
+  return size * POINT_SHAPE_VISUAL_SCALE[shape];
+}
+const DASH_DEFS = {
+  // bit 4-11 açık (8), kalanı kapalı.
+  dashed: { pattern: 4080, unitMultiplier: 8 },
+  // bit 2-13 açık (12).
+  "long-dash": { pattern: 16380, unitMultiplier: 12 },
+  // bit 6-9 açık (4): nokta.
+  dotted: { pattern: 960, unitMultiplier: 4 },
+  // bit 5-10 çizgi (6), bit 15 ve 0 nokta (2, döngüde bitişik), aralarda 4'er boşluk.
+  "dash-dot": { pattern: 34785, unitMultiplier: 12 }
+};
+const MIN_DASH_UNIT = 1.5;
+function dashParams(dash, width) {
+  if (dash === void 0 || dash === "solid") return void 0;
+  const def = DASH_DEFS[dash];
+  const unit = Math.max(Number.isFinite(width) ? width : 1, MIN_DASH_UNIT);
+  return { dashLength: def.unitMultiplier * unit, dashPattern: def.pattern };
+}
+function dashLengths(dash, width) {
+  const params = dashParams(dash, width);
+  if (params === void 0) return void 0;
+  const bitLength = params.dashLength / 16;
+  const bits = Array.from({ length: 16 }, (_, i) => (params.dashPattern >> i & 1) === 1);
+  const start = bits.findIndex((on, i) => on && !bits[(i + 15) % 16]);
+  const rotated = start < 0 ? bits : [...bits.slice(start), ...bits.slice(0, start)];
+  const runs = [];
+  let current = rotated[0];
+  let count = 0;
+  for (const on of rotated) {
+    if (on === current) {
+      count++;
+    } else {
+      runs.push(count * bitLength);
+      current = on;
+      count = 1;
+    }
+  }
+  runs.push(count * bitLength);
+  if (runs.length % 2 === 1) runs.push(0);
+  return runs;
+}
+function dashArray(dash, width) {
+  const lengths = dashLengths(dash, width);
+  return lengths == null ? void 0 : lengths.map((value) => Number(value.toFixed(2))).join(" ");
+}
+const VIEW = 64;
+const MAX_STROKE_UNITS = 24;
+function starPoints() {
+  const cx = 32;
+  const cy = 33.5;
+  const outer = 32;
+  const inner = 13;
+  const points = [];
+  for (let i = 0; i < 10; i++) {
+    const radius = i % 2 === 0 ? outer : inner;
+    const angle = -Math.PI / 2 + i * Math.PI / 5;
+    points.push(`${(cx + radius * Math.cos(angle)).toFixed(2)},${(cy + radius * Math.sin(angle)).toFixed(2)}`);
+  }
+  return points.join(" ");
+}
+const STAR_POINTS = starPoints();
+const POLYGON_POINTS = {
+  triangle: "32,4.3 64,59.7 0,59.7",
+  diamond: "32,0 64,32 32,64 0,32",
+  cross: "22,0 42,0 42,22 64,22 64,42 42,42 42,64 22,64 22,42 0,42 0,22 22,22",
+  star: STAR_POINTS
+};
+function pointSymbolSvg(shape, options) {
+  const hasStroke = options.stroke !== void 0 && (options.strokeWidth ?? 0) > 0;
+  const strokeUnits = hasStroke ? Math.min(MAX_STROKE_UNITS, (options.strokeWidth ?? 0) * VIEW / Math.max(options.size, 1)) : 0;
+  const scale = (VIEW - strokeUnits) / VIEW;
+  const strokeOpacity = options.strokeOpacity ?? 1;
+  const strokeOpacityAttr = strokeOpacity < 1 ? ` stroke-opacity="${Number(Math.max(0, strokeOpacity).toFixed(2))}"` : "";
+  const dashLengthsRendered = hasStroke ? dashLengths(options.strokeDash, strokeUnits) : void 0;
+  const dashAttr = dashLengthsRendered !== void 0 ? ` stroke-dasharray="${dashLengthsRendered.map((v) => Number((v / scale).toFixed(2))).join(" ")}"` : "";
+  const strokeAttrs = hasStroke ? ` stroke="${options.stroke}" stroke-width="${Number((strokeUnits / scale).toFixed(2))}" stroke-linejoin="round"${strokeOpacityAttr}${dashAttr}` : "";
+  const transform = strokeUnits > 0 ? ` transform="translate(32 32) scale(${Number(scale.toFixed(4))}) translate(-32 -32)"` : "";
+  const fillOpacity = options.fillOpacity ?? 1;
+  const opacityAttr = fillOpacity < 1 ? ` fill-opacity="${Number(Math.max(0, fillOpacity).toFixed(2))}"` : "";
+  const common = `fill="${options.fill}"${opacityAttr}${strokeAttrs}${transform}`;
+  let body;
+  switch (shape) {
+    case "circle":
+      body = `<circle cx="32" cy="32" r="32" ${common}/>`;
+      break;
+    case "square":
+      body = `<rect x="0" y="0" width="64" height="64" ${common}/>`;
+      break;
+    default:
+      body = `<polygon points="${POLYGON_POINTS[shape]}" ${common}/>`;
+  }
+  const renderSize = options.renderSize ?? VIEW;
+  const pad = Math.max(0, options.padding ?? 0);
+  const origin = Number((-pad).toFixed(3));
+  const extent = Number((VIEW + 2 * pad).toFixed(3));
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${origin} ${origin} ${extent} ${extent}" width="${renderSize}" height="${renderSize}">${body}</svg>`;
+}
+function pointSymbolDataUri(shape, options) {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(pointSymbolSvg(shape, options))}`;
+}
+const SEAM_COVER_WIDTH = 1;
+const OUTLINE_ID_SUFFIX = "::outline";
+const BILLBOARD_COLOR_STEP = 4;
+const TEXTURE_PADDING_PX = 2;
+class LayerStyleEngine {
+  constructor(options) {
+    this.appliedLayerStyles = /* @__PURE__ */ new Map();
+    this.appliedCompanionWidths = /* @__PURE__ */ new Map();
+    this.symbolPoints = /* @__PURE__ */ new WeakMap();
+    this.outlineGeometry = options.outlineGeometry;
+    this.opacityController = options.opacityController;
+    this.getCurrentTime = options.getCurrentTime;
+    this.requestRender = options.requestRender;
+    this.emitStyle = options.emitStyle;
+    this.waitForRenderSettle = options.waitForRenderSettle;
+    this.getPixelRatio = options.getPixelRatio ?? (() => 1);
+  }
+  /**
+   * Katmana dolgu (solid/gradient/bin/enum) ve dış hat stilini uygular, stili kaydedip `layer:style` olayını yayar.
+   *
+   * Dönen Promise dış hat genişliği değiştiyse render oturunca, aksi halde hemen çözülür.
+   */
+  // Donen Promise, GENISLIK gercekten degistiyse (bkz asagidaki widthChanged)
+  // waitForRenderSettle() ile cozulur -- cagiran taraf (TucbsStyleEditor)
+  // bu Promise'i "Uygulanıyor…" gostergesini ne kadar sure tutacagini
+  // bilmek icin kullanabilir. Renk/opaklik gibi geometriye dokunmayan
+  // degisikliklerde HEMEN cozulur (yapay bir bekleme EKLENMEZ).
+  async applyLayerStyle(id, dataSource, isShapeLayer, spec) {
+    var _a2, _b;
+    const previousWidth = this.appliedCompanionWidths.get(id) ?? ((_a2 = this.appliedLayerStyles.get(id)) == null ? void 0 : _a2.outline.width);
+    const previousDash = ((_b = this.appliedLayerStyles.get(id)) == null ? void 0 : _b.outline.dash) ?? "solid";
+    const time = this.getCurrentTime();
+    const range = this.resolveStyleRange(dataSource, time, spec.fill);
+    const outlineCompanions = [];
+    const fillColors = /* @__PURE__ */ new Map();
+    dataSource.entities.suspendEvents();
+    for (const entity of dataSource.entities.values) {
+      if (this.outlineGeometry.isOutlineCompanion(entity)) {
+        outlineCompanions.push(entity);
         continue;
       }
-      const _0x42aa75 = this["resolveFillColor"](_0x3b6e37, _0x19d9b3["fill"], _0x30e940, _0x1ca8ad);
-      if (_0x3b6e37["polygon"] !== void 0 && _0x42aa75 !== void 0) _0x2db988["set"](_0x3b6e37["id"], _0x42aa75);
-      this["applyEntityStyle"](_0x3b6e37, _0x42aa75, _0x19d9b3["outline"], _0x5e7273);
+      const color = this.resolveFillColor(entity, spec.fill, range, time);
+      if (entity.polygon !== void 0 && color !== void 0) fillColors.set(entity.id, color);
+      this.applyEntityStyle(entity, color, spec.outline, isShapeLayer, spec.point);
     }
-    const _0x34acf4 = this["styleOutlineCompanions"](_0x4b7f5f, _0x19d9b3["outline"], _0x5e7273, _0x2db988);
-    _0x559f6a["entities"]["resumeEvents"]();
-    const _0x5dfae8 = _0x30e940 !== null && (_0x19d9b3["fill"]["mode"] === "gradient" || _0x19d9b3["fill"]["mode"] === "bin") ? { ..._0x19d9b3, "fill": { ..._0x19d9b3["fill"], "min": _0x30e940["min"], "max": _0x30e940["max"] } } : _0x19d9b3;
-    this["appliedLayerStyles"]["set"](_0x34259f, _0x5dfae8), this["requestRender"](), this["emitStyle"](_0x34259f, _0x5dfae8), this["appliedCompanionWidths"]["set"](_0x34259f, _0x34acf4);
-    const _0x16dd2a = _0x5c2fbd === void 0 || _0x5c2fbd !== _0x34acf4;
-    if (_0x16dd2a) await this["waitForRenderSettle"]();
+    const companionWidth = this.styleOutlineCompanions(
+      outlineCompanions,
+      spec.outline,
+      isShapeLayer,
+      fillColors
+    );
+    dataSource.entities.resumeEvents();
+    const resolvedSpec = range !== null && (spec.fill.mode === "gradient" || spec.fill.mode === "bin") ? { ...spec, fill: { ...spec.fill, min: range.min, max: range.max } } : spec;
+    this.appliedLayerStyles.set(id, resolvedSpec);
+    this.requestRender();
+    this.emitStyle(id, resolvedSpec);
+    this.appliedCompanionWidths.set(id, companionWidth);
+    const widthChanged = previousWidth === void 0 || previousWidth !== companionWidth || previousDash !== (spec.outline.dash ?? "solid");
+    if (widthChanged) await this.waitForRenderSettle();
   }
-  ["styleOutlineCompanions"](_0xd45fed, _0x31954d, _0xf85066, _0x52a7c2) {
-    const _0x14704f = _0x31954d["enabled"] ? Color["fromCssColorString"](_0x31954d["color"]) : void 0, _0x525081 = _0x31954d["enabled"] ? _0x31954d["width"] : SEAM_COVER_WIDTH;
-    for (const _0x4b56a8 of _0xd45fed) {
-      const _0x257dc1 = _0x31954d["enabled"] || _0xf85066 ? void 0 : _0x52a7c2["get"](LayerStyleEngine["outlineOwnerId"](_0x4b56a8)), _0x454a0a = _0x257dc1 !== void 0 && _0x257dc1["alpha"] >= 1;
-      _0x4b56a8["show"] = _0x31954d["enabled"] || _0x454a0a;
-      const _0x5716e1 = _0x14704f ?? (_0x454a0a ? _0x257dc1 : void 0);
-      _0x5716e1 !== void 0 && _0x4b56a8["polyline"] !== void 0 && (_0x4b56a8["polyline"]["material"] = this["updateColorMaterial"](_0x4b56a8["polyline"]["material"], _0x5716e1), _0x4b56a8["polyline"]["width"] = LayerStyleEngine["updateConstantProperty"](_0x4b56a8["polyline"]["width"], _0x525081));
+  // God component refactor Faz 3.6b: applyLayerStyle'in companion (dis hat)
+  // dongusu buraya tasindi (applyLayerStyle karmasikligi 23 -> <20); davranis
+  // DEGISMEDI. Donus: companion'lara FIILEN uygulanan genislik (dis hat
+  // kapaliyken SEAM_COVER_WIDTH) -- applyLayerStyle bunu render-bekleme
+  // karari icin saklar (bkz widthChanged).
+  styleOutlineCompanions(companions, outline, isShapeLayer, fillColors) {
+    const outlineColor = outline.enabled ? LayerStyleEngine.outlineColor(outline) : void 0;
+    const companionWidth = outline.enabled ? outline.width : SEAM_COVER_WIDTH;
+    for (const companion of companions) {
+      const seamColor = outline.enabled || isShapeLayer ? void 0 : fillColors.get(LayerStyleEngine.outlineOwnerId(companion));
+      const seamCover = seamColor !== void 0 && seamColor.alpha >= 1;
+      companion.show = outline.enabled || seamCover;
+      const color = outlineColor ?? (seamCover ? seamColor : void 0);
+      if (color !== void 0 && companion.polyline !== void 0) {
+        companion.polyline.material = this.updateLineMaterial(
+          companion.polyline.material,
+          color,
+          outline.enabled ? outline.dash : void 0,
+          companionWidth
+        );
+        companion.polyline.width = LayerStyleEngine.updateConstantProperty(
+          companion.polyline.width,
+          companionWidth
+        );
+      }
     }
-    return _0x525081;
+    return companionWidth;
   }
-  static ["outlineOwnerId"](_0x25535d) {
-    return _0x25535d["id"]["endsWith"](OUTLINE_ID_SUFFIX) ? _0x25535d["id"]["slice"](0, -OUTLINE_ID_SUFFIX["length"]) : _0x25535d["id"];
+  // Dis hat rengi + opakligi (OutlineStyle.opacity; verilmezse tam opak).
+  static outlineColor(outline) {
+    return Color.fromCssColorString(outline.color).withAlpha(LayerStyleEngine.outlineOpacity(outline));
   }
-  ["getStyle"](_0x1a117b) {
-    return this["appliedLayerStyles"]["get"](_0x1a117b);
+  static outlineOpacity(outline) {
+    const opacity = outline.opacity ?? 1;
+    return Number.isFinite(opacity) ? Math.min(1, Math.max(0, opacity)) : 1;
   }
-  ["deleteStyle"](_0x383c78) {
-    this["appliedLayerStyles"]["delete"](_0x383c78), this["appliedCompanionWidths"]["delete"](_0x383c78);
+  // OutlineGeometry.addPolygonOutlineCompanion companion id'sini
+  // `${poligonId}::outline` olarak verir.
+  static outlineOwnerId(companion) {
+    return companion.id.endsWith(OUTLINE_ID_SUFFIX) ? companion.id.slice(0, -OUTLINE_ID_SUFFIX.length) : companion.id;
   }
-  ["recordInitialStyle"](_0x8d0769, _0x48c648, _0x419fb1, _0x1f8852) {
-    const _0x16cd08 = { "fill": { "mode": "solid", "color": _0x48c648, "opacity": _0x419fb1 }, "outline": _0x1f8852 };
-    this["appliedLayerStyles"]["set"](_0x8d0769, _0x16cd08), this["emitStyle"](_0x8d0769, _0x16cd08);
-  }
-  ["randomLayerColor"]() {
-    return Color["fromRandom"]({ "alpha": 1 });
-  }
-  ["applyEntityColor"](_0x4a7628, _0x4b0ace) {
-    _0x4a7628["entities"]["suspendEvents"]();
-    for (const _0x176908 of _0x4a7628["entities"]["values"]) {
-      _0x176908["polygon"] !== void 0 && (_0x176908["polygon"]["material"] = new ColorMaterialProperty(new ConstantProperty(_0x4b0ace["withAlpha"](0.5)))), _0x176908["polyline"] !== void 0 && (_0x176908["polyline"]["material"] = new ColorMaterialProperty(new ConstantProperty(_0x4b0ace))), _0x176908["point"] !== void 0 && (_0x176908["point"]["color"] = new ConstantProperty(_0x4b0ace)), _0x176908["billboard"] !== void 0 && (_0x176908["billboard"]["color"] = new ConstantProperty(_0x4b0ace));
+  /**
+   * Sembolu hic belirlenmemis bir katmandaki noktalarin GERCEK gorunumunu
+   * (daire + toplam piksel boyutu) cikarir: pixelSize + dis hat payi. Editor
+   * "Boyut" alaninda bunu gosterir; boylece varsayilan daire de, secilen diger
+   * sekiller gibi ayni "dis hat dahil toplam piksel" tanimiyla konusur.
+   */
+  inferPointSymbol(dataSource) {
+    var _a2, _b;
+    const time = this.getCurrentTime();
+    for (const entity of dataSource.entities.values) {
+      if (this.outlineGeometry.isOutlineCompanion(entity)) continue;
+      const point = entity.point;
+      if (point === void 0) continue;
+      const pixelSize = (_a2 = point.pixelSize) == null ? void 0 : _a2.getValue(time);
+      if (typeof pixelSize !== "number") return void 0;
+      const outlineWidth = (_b = point.outlineWidth) == null ? void 0 : _b.getValue(time);
+      const share = typeof outlineWidth === "number" && outlineWidth > 0 ? 2 * outlineWidth : 0;
+      return { shape: "circle", size: Math.round(clampPointSize(pixelSize + share)) };
     }
-    _0x4a7628["entities"]["resumeEvents"]();
+    return void 0;
   }
-  ["convertMarkersToPoints"](_0x175067, _0x4cde1d) {
-    _0x175067["entities"]["suspendEvents"]();
-    for (const _0x4a9fa0 of _0x175067["entities"]["values"]) {
-      if (_0x4a9fa0["billboard"] === void 0) continue;
-      const _0x46c3bf = _0x4a9fa0["billboard"]["heightReference"];
-      _0x4a9fa0["point"] = new PointGraphics({ "pixelSize": 8, "color": _0x4cde1d, ..._0x46c3bf !== void 0 ? { "heightReference": _0x46c3bf } : {} }), _0x4a9fa0["billboard"] = void 0;
+  /** Bir vektor katmana en son uygulanan stili döndürür (TucbsLegendPanel için). */
+  getStyle(id) {
+    return this.appliedLayerStyles.get(id);
+  }
+  /** Katman silinirken (LayerManager.remove) son uygulanan stil kaydini da temizler. */
+  deleteStyle(id) {
+    this.appliedLayerStyles.delete(id);
+    this.appliedCompanionWidths.delete(id);
+  }
+  /** Katman eklenirken atanan rengi "solid" ilk stil olarak kaydeder ve `layer:style` olayını yayar. */
+  // Katman eklenirken atanan random rengi appliedLayerStyles'a "solid" stil
+  // olarak kaydeder ve layer:style event'ini emit eder — TucbsStyleEditor ve
+  // TucbsLayerList katman eklendigi an getLayerStyle() ile gercek/guncel
+  // rengi okuyabilsin diye (bkz. ManagedLayer.initialFillColor: bu kayit
+  // SONRAKI applyLayerStyle() cagrilariyla degisir, initialFillColor ise
+  // sabit kalir ve "Sifirla" icin referans noktasidir).
+  //
+  // `dataSource` verilirse ve katmanda nokta varsa, noktalar ILK andan itibaren
+  // varsayilan sembolle (daire, DEFAULT_POINT_SYMBOL.size) ve bu dis hatla,
+  // yani tum sekillerle AYNI hattan cizilir. Aksi halde noktalar eski Cesium
+  // noktasi olarak kalir, editor ise tahminden boyut gosterirdi ("10" gosterip
+  // daha buyuk cizilmesi).
+  recordInitialStyle(id, colorHex, fillOpacity, outline, dataSource) {
+    const point = dataSource !== void 0 ? this.applyInitialPointSymbol(dataSource, colorHex, outline) : void 0;
+    if (dataSource !== void 0) this.applyInitialLineStyle(dataSource, colorHex, outline);
+    const style = {
+      fill: { mode: "solid", color: colorHex, opacity: fillOpacity },
+      outline,
+      ...point !== void 0 ? { point } : {}
+    };
+    this.appliedLayerStyles.set(id, style);
+    this.emitStyle(id, style);
+  }
+  // Katmandaki cizgilere BASLANGIC stilini (Hat rengi/kalinligi) uygular. Yuklemede cizgiler
+  // rastgele katman rengiyle boyaniyor (bkz applyEntityColor), oysa kaydedilen stil "Hat = varsayilan
+  // mavi" diyor; liste/editor mavi gosterirken harita mor kaliyordu (ilk duzenlemeye kadar).
+  applyInitialLineStyle(dataSource, colorHex, outline) {
+    const fill = Color.fromCssColorString(colorHex);
+    const outlineColor = outline.enabled ? LayerStyleEngine.outlineColor(outline) : void 0;
+    dataSource.entities.suspendEvents();
+    for (const entity of dataSource.entities.values) {
+      if (this.outlineGeometry.isOutlineCompanion(entity) || entity.polyline === void 0) continue;
+      this.applyPolylineStyle(entity.polyline, fill, outline, outlineColor, false);
     }
-    _0x175067["entities"]["resumeEvents"]();
+    dataSource.entities.resumeEvents();
   }
-  ["applyEntityStyle"](_0x3c5f0f, _0x9e904e, _0x380672, _0x1bdf73) {
-    const _0x159b8e = _0x380672["enabled"] ? Color["fromCssColorString"](_0x380672["color"]) : void 0;
-    _0x3c5f0f["polygon"] !== void 0 && (_0x3c5f0f["polygon"]["material"] = this["updateColorMaterial"](_0x3c5f0f["polygon"]["material"], _0x9e904e ?? Color["WHITE"]["withAlpha"](0)), !this["outlineGeometry"]["hasOutlineCompanion"](_0x3c5f0f) && !this["outlineGeometry"]["hasRiskyOutline"](_0x3c5f0f) && (_0x3c5f0f["polygon"]["outline"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["polygon"]["outline"], _0x380672["enabled"]), _0x159b8e !== void 0 && (_0x3c5f0f["polygon"]["outlineColor"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["polygon"]["outlineColor"], _0x159b8e), _0x3c5f0f["polygon"]["outlineWidth"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["polygon"]["outlineWidth"], _0x380672["width"]))));
-    if (_0x3c5f0f["polyline"] !== void 0) {
-      let _0x17607f;
-      _0x1bdf73 ? _0x17607f = _0x159b8e ?? Color["WHITE"]["withAlpha"](0) : _0x17607f = _0x380672["enabled"] ? _0x159b8e : _0x9e904e, _0x3c5f0f["polyline"]["material"] = this["updateColorMaterial"](_0x3c5f0f["polyline"]["material"], _0x17607f ?? Color["WHITE"]["withAlpha"](0)), _0x380672["enabled"] && (_0x3c5f0f["polyline"]["width"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["polyline"]["width"], _0x380672["width"]));
+  // Katmandaki noktalara varsayilan sembolu uygular; nokta yoksa undefined doner.
+  // Noktanin MEVCUT rengi (opak) korunur -- yalniz cizici ve dis hat degisir.
+  applyInitialPointSymbol(dataSource, colorHex, outline) {
+    var _a2;
+    const time = this.getCurrentTime();
+    const fallback = Color.fromCssColorString(colorHex);
+    let applied = false;
+    dataSource.entities.suspendEvents();
+    for (const entity of dataSource.entities.values) {
+      if (this.outlineGeometry.isOutlineCompanion(entity) || entity.point === void 0) continue;
+      const current = (_a2 = entity.point.color) == null ? void 0 : _a2.getValue(time);
+      this.applyPointSymbol(entity, current instanceof Color ? current : fallback, outline, DEFAULT_POINT_SYMBOL);
+      applied = true;
     }
-    _0x3c5f0f["point"] !== void 0 && (_0x3c5f0f["point"]["color"] = _0x9e904e !== void 0 ? this["updateColorProperty"](_0x3c5f0f["point"]["color"], _0x9e904e) : void 0, _0x380672["enabled"] && _0x159b8e !== void 0 && (_0x3c5f0f["point"]["outlineColor"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["point"]["outlineColor"], _0x159b8e), _0x3c5f0f["point"]["outlineWidth"] = LayerStyleEngine["updateConstantProperty"](_0x3c5f0f["point"]["outlineWidth"], _0x380672["width"]))), _0x3c5f0f["billboard"] !== void 0 && _0x9e904e !== void 0 && (_0x3c5f0f["billboard"]["color"] = this["updateColorProperty"](_0x3c5f0f["billboard"]["color"], _0x9e904e));
+    dataSource.entities.resumeEvents();
+    return applied ? DEFAULT_POINT_SYMBOL : void 0;
   }
-  ["resolveFillColor"](_0x7bf15a, _0x35022b, _0x45366b, _0x164153) {
-    switch (_0x35022b["mode"]) {
+  /** Yerel dosyadan (GeoJSON/KML/KMZ/SHP) gelen katman için rastgele, tam opak bir renk üretir (Cesium'un varsayılan sarısı yerine). */
+  randomLayerColor() {
+    return Color.fromRandom({ alpha: 1 });
+  }
+  /** Katmandaki her entity'ye bağımsız bir renk materyali atar (yükleme sonrası tek renk uygulaması). */
+  // Iki cagiran grubu var: (1) KmlDataSource kendi stilini KML dosyasindan
+  // alir, GeoJsonDataSource.load'daki fill/stroke/markerColor secenekleri
+  // burada gecerli olmadigindan entity'lere yuklendikten sonra renk uygulanir.
+  // (2) addWFS/addLocalKmlGeoJson(GEOJSON)/addShp -- GeoJsonDataSource.load
+  // GeoJSON'da per-feature simplestyle "fill" alani yoksa TUM entity'lere TEK
+  // bir PAYLASILAN materyal nesnesi atiyor; applyLayerStyle()'daki
+  // updateColorMaterial() ise flicker'i onlemek icin bu nesneyi YENIDEN
+  // OLUSTURMAK yerine yerinde mutasyona ugratiyor -- ikisi birlesince enum/
+  // gradient/bin modunda TUM poligonlar en son islenen entity'nin rengini
+  // gosteriyordu. Burada her entity'ye BASTAN bagimsiz bir materyal nesnesi
+  // vererek bu paylasimi kiriyoruz.
+  applyEntityColor(dataSource, color) {
+    dataSource.entities.suspendEvents();
+    for (const entity of dataSource.entities.values) {
+      if (entity.polygon !== void 0) {
+        entity.polygon.material = new ColorMaterialProperty(
+          new ConstantProperty(color.withAlpha(0.5))
+        );
+      }
+      if (entity.polyline !== void 0) {
+        entity.polyline.material = new ColorMaterialProperty(
+          new ConstantProperty(color)
+        );
+      }
+      if (entity.point !== void 0) {
+        entity.point.color = new ConstantProperty(color);
+      }
+      if (entity.billboard !== void 0) {
+        entity.billboard.color = new ConstantProperty(color);
+      }
+    }
+    dataSource.entities.resumeEvents();
+  }
+  /** Yükleme sonrası nokta billboard'larını (varsayılan pin) verilen renkte native nokta (daire) grafiğine çevirir; KML katmanlarında kullanılmaz. */
+  // GeoJsonDataSource.load, Point/MultiPoint geometrileri icin HER ZAMAN
+  // Cesium'in varsayilan PinBuilder billboard'ini (yer isareti/pin gorunumu)
+  // uretir -- "markerColor" gibi secenekler SADECE bu pin'in rengini/boyutunu
+  // degistirir, load-time'da "point" (daire) grafigine gecmenin bir secenegi
+  // YOKTUR. WFS/GeoJSON/SHP katmanlarindaki nokta ozellikleri, Cizim/Olcu
+  // Katmani ve CSV katmaniyla (bkz addCsv) AYNI "bilinen nokta stili"nde
+  // (renkli daire) gorunmeli -- varsayilan pin "yer isareti" gibi
+  // algilaniyordu (bkz kullanici geri bildirimi). Load SONRASI cagrilip
+  // billboard'lari native point grafigine CEVIRIR. KML'i KAPSAMAZ (bkz
+  // applyEntityColor) -- oradaki billboard KML dosyasinin KENDI ikonu,
+  // generic bir pin degil.
+  convertMarkersToPoints(dataSource, color) {
+    dataSource.entities.suspendEvents();
+    for (const entity of dataSource.entities.values) {
+      if (entity.billboard === void 0) continue;
+      const heightReference = entity.billboard.heightReference;
+      entity.point = new PointGraphics({
+        pixelSize: 8,
+        color,
+        ...heightReference !== void 0 ? { heightReference } : {}
+      });
+      entity.billboard = void 0;
+    }
+    dataSource.entities.resumeEvents();
+  }
+  /** Tek bir entity'ye dolgu rengini ve dış hat stilini uygular (yeni çizilen/ölçülen şeklin ilk stili için de kullanılır). */
+  // _addDrawnShape/_addMeasuredShape (LayerManager.ts) applyLayerStyle'dan
+  // BAGIMSIZ olarak dogrudan cagirir (yeni cizilen/olculen sekle ilk stili
+  // uygulamak icin) -- bu yuzden public.
+  applyEntityStyle(entity, color, outline, isShapeLayer, pointSymbol) {
+    const outlineColor = outline.enabled ? LayerStyleEngine.outlineColor(outline) : void 0;
+    if (pointSymbol === void 0) this.restoreStashedPoint(entity);
+    if (entity.polygon !== void 0) {
+      entity.polygon.material = this.updateColorMaterial(
+        entity.polygon.material,
+        color ?? Color.WHITE.withAlpha(0)
+      );
+      if (!this.outlineGeometry.hasOutlineCompanion(entity) && !this.outlineGeometry.hasRiskyOutline(entity)) {
+        entity.polygon.outline = LayerStyleEngine.updateConstantProperty(
+          entity.polygon.outline,
+          outline.enabled
+        );
+        if (outlineColor !== void 0) {
+          entity.polygon.outlineColor = LayerStyleEngine.updateConstantProperty(
+            entity.polygon.outlineColor,
+            outlineColor
+          );
+          entity.polygon.outlineWidth = LayerStyleEngine.updateConstantProperty(
+            entity.polygon.outlineWidth,
+            outline.width
+          );
+        }
+      }
+    }
+    if (entity.polyline !== void 0) {
+      this.applyPolylineStyle(entity.polyline, color, outline, outlineColor, isShapeLayer);
+    }
+    if (entity.point !== void 0) {
+      this.applyPointColor(entity.point, color, outline, outlineColor);
+    }
+    if (entity.point !== void 0 || this.symbolPoints.has(entity)) {
+      this.applyPointSymbol(entity, color, outline, pointSymbol);
+    }
+    if (entity.billboard !== void 0 && color !== void 0 && !this.symbolPoints.has(entity)) {
+      entity.billboard.color = this.updateColorProperty(
+        entity.billboard.color,
+        color
+      );
+    }
+  }
+  // Nokta (PointGraphics) rengi ve dis hatti (applyEntityStyle karmasikligi icin ayrildi).
+  applyPointColor(point, color, outline, outlineColor) {
+    point.color = color !== void 0 ? this.updateColorProperty(point.color, color) : void 0;
+    if (outline.enabled && outlineColor !== void 0) {
+      point.outlineColor = LayerStyleEngine.updateConstantProperty(
+        point.outlineColor,
+        outlineColor
+      );
+      point.outlineWidth = LayerStyleEngine.updateConstantProperty(
+        point.outlineWidth,
+        outline.width
+      );
+    } else if (!outline.enabled && point.outlineWidth !== void 0) {
+      point.outlineWidth = LayerStyleEngine.updateConstantProperty(point.outlineWidth, 0);
+    }
+  }
+  // Nokta sembolu: sembol verilince DAIRE DAHIL tum sekiller ayni SVG
+  // billboard hattindan cizilir. Daire ayri (Cesium PointGraphics) cizilince
+  // boyut/dis hat kalinligi/opaklik kurallari digerleriyle hicbir zaman birebir
+  // tutmuyordu (canli: biri kucuk, digerinin dis hati kalin). Sembol verilmediyse
+  // (point undefined) noktalar oldugu gibi birakilir; onceden billboard'a
+  // cevrilmis nokta varsa point'ine GERI doner (bkz applyEntityStyle basi).
+  applyPointSymbol(entity, color, outline, symbol) {
+    if (symbol === void 0) return;
+    const size = shapeBoxSize(symbol.shape, clampPointSize(symbol.size));
+    const inner = this.rasterSize(size);
+    const full = inner + 2 * TEXTURE_PADDING_PX;
+    const boxWithPadding = full / this.safePixelRatio();
+    const fill = color ?? Color.WHITE;
+    const image = pointSymbolDataUri(symbol.shape, {
+      fill: LayerStyleEngine.quantizedHex(fill),
+      // Dolgu opakligi YALNIZ dolguya yazilir, dis hat opak kalir (dairede de
+      // oyle: PointGraphics.outlineColor opaklikla carpilmaz). Boyle olmazsa
+      // sekiller daireden silik ve dis hatsiz gorunur.
+      fillOpacity: Math.round(fill.alpha * 20) / 20,
+      ...outline.enabled ? {
+        stroke: outline.color,
+        strokeWidth: this.visibleStrokeWidth(outline.width),
+        strokeOpacity: Math.round(LayerStyleEngine.outlineOpacity(outline) * 20) / 20,
+        ...outline.dash !== void 0 ? { strokeDash: outline.dash } : {}
+      } : {},
+      size,
+      renderSize: full,
+      padding: TEXTURE_PADDING_PX * 64 / inner
+    });
+    const tint = Color.WHITE;
+    let billboard = entity.billboard;
+    if (billboard === void 0 || !this.symbolPoints.has(entity)) {
+      const point = entity.point;
+      if (point === void 0) return;
+      billboard = new BillboardGraphics({
+        ...point.heightReference !== void 0 ? { heightReference: point.heightReference } : {},
+        ...point.disableDepthTestDistance !== void 0 ? { disableDepthTestDistance: point.disableDepthTestDistance } : {}
+      });
+      this.symbolPoints.set(entity, point);
+      entity.point = void 0;
+      entity.billboard = billboard;
+    }
+    billboard.image = LayerStyleEngine.updateConstantProperty(billboard.image, image);
+    billboard.width = LayerStyleEngine.updateConstantProperty(billboard.width, boxWithPadding);
+    billboard.height = LayerStyleEngine.updateConstantProperty(billboard.height, boxWithPadding);
+    billboard.color = this.updateColorProperty(billboard.color, tint);
+  }
+  // Sembol billboard'ini kaldirip kenara alinmis orijinal point'i geri takar.
+  restoreStashedPoint(entity) {
+    const point = this.symbolPoints.get(entity);
+    if (point === void 0) return;
+    entity.billboard = void 0;
+    entity.point = point;
+    this.symbolPoints.delete(entity);
+  }
+  // Billboard dokusu EKRANDA gorunecegi piksel boyutunda uretilir (Cesium
+  // billboard boyutunu scene.pixelRatio ile carpar). 64 px'lik sabit bir doku
+  // ~7 px'e mipmap'siz kucultulunce ince dis hat ve acik dolgu kayboluyordu
+  // (canli olculdu: ucgen/artı/yildiz silik ve daireden belirgin kucuk).
+  rasterSize(size) {
+    return Math.max(4, Math.round(size * this.safePixelRatio()));
+  }
+  safePixelRatio() {
+    const ratio = this.getPixelRatio();
+    return Number.isFinite(ratio) && ratio > 0 ? ratio : 1;
+  }
+  // Dis hat ekranda en az 1 piksel kalinlikta olsun (pixelRatio < 1'de 1 css px
+  // dis hat 1 ekran pikselinin altina dusup siliniyordu).
+  visibleStrokeWidth(width) {
+    return Math.max(width, 1 / this.safePixelRatio());
+  }
+  static quantizedHex(color) {
+    const channel = (value) => {
+      const stepped = Math.min(255, Math.round(value * 255 / BILLBOARD_COLOR_STEP) * BILLBOARD_COLOR_STEP);
+      return stepped.toString(16).padStart(2, "0");
+    };
+    return `#${channel(color.red)}${channel(color.green)}${channel(color.blue)}`;
+  }
+  /**
+   * Katmandaki geometri turleri (nokta/cizgi/alan). Dis hat companion
+   * polyline'lari "cizgi" SAYILMAZ (poligonun parcasi). Stil editoru hangi
+   * sembol kontrollerini gosterecegini buradan belirler.
+   */
+  getGeometryKinds(dataSource) {
+    let point = false;
+    let line2 = false;
+    let area = false;
+    let dashableArea = false;
+    for (const entity of dataSource.entities.values) {
+      if (this.outlineGeometry.isOutlineCompanion(entity)) continue;
+      if (entity.point !== void 0 || this.symbolPoints.has(entity)) point = true;
+      if (entity.polyline !== void 0) line2 = true;
+      if (entity.polygon !== void 0) {
+        area = true;
+        if (this.outlineGeometry.hasOutlineCompanion(entity)) dashableArea = true;
+      }
+      if (point && line2 && dashableArea) break;
+    }
+    return { point, line: line2, area, dashable: line2 || dashableArea };
+  }
+  /**
+   * Cizim/Olcu katmanina SONRADAN eklenen bir poligonun yeni olusturulmus
+   * companion'ina katmanin mevcut cizgi tipini uygular (toplu applyLayerStyle
+   * bu companion'i gormemisti).
+   */
+  applyCompanionDash(companion, outline) {
+    const polyline = companion.polyline;
+    if (polyline === void 0) return;
+    const color = LayerStyleEngine.outlineColor(outline);
+    polyline.material = this.updateLineMaterial(
+      polyline.material,
+      color,
+      outline.enabled ? outline.dash : void 0,
+      outline.width
+    );
+  }
+  // Cizgi geometrisi: renk/kalinlik/cizgi tipi (applyEntityStyle'dan karmasiklik
+  // sinirini asmamak icin ayrildi; davranis ayni).
+  applyPolylineStyle(polyline, color, outline, outlineColor, isShapeLayer) {
+    let lineColor;
+    if (isShapeLayer) {
+      lineColor = outlineColor ?? Color.WHITE.withAlpha(0);
+    } else {
+      lineColor = outline.enabled ? outlineColor : color;
+    }
+    polyline.material = this.updateLineMaterial(
+      polyline.material,
+      lineColor ?? Color.WHITE.withAlpha(0),
+      outline.enabled ? outline.dash : void 0,
+      outline.width
+    );
+    if (outline.enabled) {
+      polyline.width = LayerStyleEngine.updateConstantProperty(
+        polyline.width,
+        outline.width
+      );
+    }
+  }
+  resolveFillColor(entity, fill, range, time) {
+    switch (fill.mode) {
       case "off":
-        return void 0;
+        return Color.WHITE.withAlpha(0);
       case "solid":
-        return Color["fromCssColorString"](_0x35022b["color"])["withAlpha"](_0x35022b["opacity"]);
+        return Color.fromCssColorString(fill.color).withAlpha(fill.opacity);
       case "gradient": {
-        if (_0x45366b === null) return void 0;
-        const _0x285a03 = this["readNumericProperty"](_0x7bf15a, _0x35022b["column"], _0x164153);
-        if (_0x285a03 === null) return void 0;
-        if (_0x285a03 < _0x45366b["min"] || _0x285a03 > _0x45366b["max"]) return void 0;
-        const _0x44fe58 = _0x45366b["max"] === _0x45366b["min"] ? 0.5 : _0x584e42["clamp"]((_0x285a03 - _0x45366b["min"]) / (_0x45366b["max"] - _0x45366b["min"]), 0, 1);
-        return LayerStyleEngine["sampleFromPalette"](_0x35022b["palette"], _0x44fe58, _0x35022b["paletteKind"])["withAlpha"](_0x35022b["opacity"]);
+        if (range === null) return void 0;
+        const value = this.readNumericProperty(entity, fill.column, time);
+        if (value === null) return void 0;
+        if (value < range.min || value > range.max) return void 0;
+        const t = range.max === range.min ? 0.5 : Math$1.clamp((value - range.min) / (range.max - range.min), 0, 1);
+        return LayerStyleEngine.sampleFromPalette(fill.palette, t, fill.paletteKind).withAlpha(
+          fill.opacity
+        );
       }
       case "bin": {
-        if (_0x45366b === null) return void 0;
-        const _0x23e4bc = this["readNumericProperty"](_0x7bf15a, _0x35022b["column"], _0x164153);
-        if (_0x23e4bc === null) return void 0;
-        const _0x25eb2f = (_0x45366b["max"] - _0x45366b["min"]) / _0x35022b["binCount"], _0x462b60 = Array["from"]({ "length": _0x35022b["binCount"] }, (_0x40c931, _0x24356c) => _0x45366b["min"] + _0x25eb2f * (_0x24356c + 1)), _0x3897e7 = LayerStyleEngine["pickBin"](_0x23e4bc, _0x462b60), _0x59bb09 = _0x35022b["binCount"] <= 1 ? 0.5 : _0x3897e7 / (_0x35022b["binCount"] - 1);
-        return LayerStyleEngine["sampleFromPalette"](_0x35022b["palette"], _0x59bb09, _0x35022b["paletteKind"])["withAlpha"](_0x35022b["opacity"]);
+        if (range === null) return void 0;
+        const value = this.readNumericProperty(entity, fill.column, time);
+        if (value === null) return void 0;
+        const step = (range.max - range.min) / fill.binCount;
+        const boundaries = Array.from(
+          { length: fill.binCount },
+          (_, i) => range.min + step * (i + 1)
+        );
+        const index = LayerStyleEngine.pickBin(value, boundaries);
+        const t = fill.binCount <= 1 ? 0.5 : index / (fill.binCount - 1);
+        return LayerStyleEngine.sampleFromPalette(fill.palette, t, fill.paletteKind).withAlpha(
+          fill.opacity
+        );
       }
       case "enum": {
-        const _0x1c63b6 = this["readProperty"](_0x7bf15a, _0x35022b["column"], _0x164153);
-        if (_0x1c63b6 === null) return void 0;
-        const _0x3a3ff4 = _0x35022b["colors"][String(_0x1c63b6)];
-        return _0x3a3ff4 !== void 0 ? Color["fromCssColorString"](_0x3a3ff4)["withAlpha"](_0x35022b["opacity"]) : Color["LIGHTGRAY"]["withAlpha"](_0x35022b["opacity"]);
+        const value = this.readProperty(entity, fill.column, time);
+        if (value === null) return void 0;
+        const cssColor = fill.colors[String(value)];
+        return cssColor !== void 0 ? Color.fromCssColorString(cssColor).withAlpha(fill.opacity) : Color.LIGHTGRAY.withAlpha(fill.opacity);
       }
     }
   }
-  ["readProperty"](_0x21506c, _0x203b22, _0x4b1d62) {
-    const _0x221a2c = _0x21506c["properties"];
-    if (_0x221a2c === void 0 || !_0x221a2c["hasProperty"](_0x203b22)) return null;
-    const _0x43e636 = _0x221a2c["getValue"](_0x4b1d62), _0x5a570b = _0x43e636 == null ? void 0 : _0x43e636[_0x203b22];
-    if (_0x5a570b === void 0 || _0x5a570b === null) return null;
-    return typeof _0x5a570b === "number" ? _0x5a570b : String(_0x5a570b);
+  /** Entity'nin verilen kolondaki öznitelik değerini okur; sayı dışındaki değerler metne çevrilir, alan yoksa ya da boşsa `null`. */
+  // applyLayerStyle() ve okuma metodlarinin (getUniqueColumnValues/getColumnRange)
+  // paylastigi ortak property-okuma yardimcilari. entity.properties bir
+  // PropertyBag'dir; getValue(time) TUM alanlari coz(ulmus) duz bir objede
+  // dondurur (register()'daki tagEntities() ile eklenen layerId/featureId de
+  // dahil, cagiran taraf onlari filtreliyor).
+  readProperty(entity, column, time) {
+    const bag = entity.properties;
+    if (bag === void 0 || !bag.hasProperty(column)) return null;
+    const resolved = bag.getValue(time);
+    const value = resolved == null ? void 0 : resolved[column];
+    if (value === void 0 || value === null) return null;
+    return typeof value === "number" ? value : String(value);
   }
-  ["readNumericProperty"](_0x3f6bf8, _0x224fb6, _0x44da8d) {
-    const _0x29b217 = this["readProperty"](_0x3f6bf8, _0x224fb6, _0x44da8d);
-    if (_0x29b217 === null) return null;
-    const _0x13d311 = typeof _0x29b217 === "number" ? _0x29b217 : Number(_0x29b217);
-    return Number["isFinite"](_0x13d311) ? _0x13d311 : null;
+  readNumericProperty(entity, column, time) {
+    const value = this.readProperty(entity, column, time);
+    if (value === null) return null;
+    const numeric = typeof value === "number" ? value : Number(value);
+    return Number.isFinite(numeric) ? numeric : null;
   }
-  ["resolveStyleRange"](_0x3512f4, _0x2f169a, _0x2e05a3) {
-    if (_0x2e05a3["mode"] !== "gradient" && _0x2e05a3["mode"] !== "bin") return null;
-    if (_0x2e05a3["min"] !== void 0 && _0x2e05a3["max"] !== void 0) return { "min": _0x2e05a3["min"], "max": _0x2e05a3["max"] };
-    const _0x33cd86 = this["getColumnRange"](_0x3512f4, _0x2f169a, _0x2e05a3["column"]);
-    if (_0x33cd86 === null) return null;
-    return { "min": _0x2e05a3["min"] ?? _0x33cd86["min"], "max": _0x2e05a3["max"] ?? _0x33cd86["max"] };
+  // Gercek hatalar plani H7.2: gradient/bin araliginin her ucu AYRI AYRI
+  // cozulur -- verilen uc aynen kullanilir, verilmeyen uc kolonun veri
+  // araligindan alinir (GradientFillStyle/BinFillStyle sozlesmesi, bkz
+  // layer.types.ts: min ve max icin ayri ayri "verilmezse veriden otomatik
+  // hesaplanir"). Iki uc da verilmisse kolon araligi HIC hesaplanmaz
+  // (tum entity'leri dolasan getColumnRange() maliyeti eskisi gibi yok).
+  // ESKIDEN yalniz IKI UC BIRDEN verildiginde verilenler kullaniliyordu;
+  // biri eksikse VERILEN uc da atilip tum kolon araligina geciliyordu --
+  // StyleEditor'da Min girilip Max "Otomatik" birakilinca (ya da tersi)
+  // girilen sinir haritaya hic yansimiyordu (saklanan stil de tum araligi
+  // tasidigi icin lejant paneli/yazdirma da onu gosteriyordu).
+  // Karar 1-A: uclardan biri veriden gelince min > max olabilir (orn. veri
+  // 10-100 iken yalniz min: 150); buna EK bir kural uygulanmaz -- iki uc da
+  // verilmis ters aralik da bugun oldugu gibi aynen gecer. UI (StyleEditor
+  // checkGradientBound/computeMinMax) bunu zaten engeller; dogrudan API
+  // cagiran taraf sorumludur (bkz LayerManager.applyLayerStyle JSDoc'u).
+  resolveStyleRange(dataSource, time, fill) {
+    if (fill.mode !== "gradient" && fill.mode !== "bin") return null;
+    if (fill.min !== void 0 && fill.max !== void 0) return { min: fill.min, max: fill.max };
+    const data = this.getColumnRange(dataSource, time, fill.column);
+    if (data === null) return null;
+    return { min: fill.min ?? data.min, max: fill.max ?? data.max };
   }
-  ["getColumnRange"](_0x331674, _0x231566, _0x95b4be) {
-    let _0x38d6e = Infinity, _0x1bf8ec = -Infinity;
-    for (const _0x1e3128 of _0x331674["entities"]["values"]) {
-      const _0x2112d8 = this["readNumericProperty"](_0x1e3128, _0x95b4be, _0x231566);
-      if (_0x2112d8 === null) continue;
-      if (_0x2112d8 < _0x38d6e) _0x38d6e = _0x2112d8;
-      if (_0x2112d8 > _0x1bf8ec) _0x1bf8ec = _0x2112d8;
+  /** Bir kolonun sayısal min/max aralığını döndürür (gradient/bin modunda min/max'tan verilmeyen uç için otomatik kullanılır). LayerManager.getColumnRange için de tek doğru kaynak. */
+  getColumnRange(dataSource, time, column) {
+    let min = Infinity;
+    let max = -Infinity;
+    for (const entity of dataSource.entities.values) {
+      const value = this.readNumericProperty(entity, column, time);
+      if (value === null) continue;
+      if (value < min) min = value;
+      if (value > max) max = value;
     }
-    return Number["isFinite"](_0x38d6e) && Number["isFinite"](_0x1bf8ec) ? { "min": _0x38d6e, "max": _0x1bf8ec } : null;
+    return Number.isFinite(min) && Number.isFinite(max) ? { min, max } : null;
   }
-  static ["valueEquals"](_0x5b54f1, _0x43b7b6) {
-    if (_0x5b54f1 instanceof Color || _0x43b7b6 instanceof Color) return _0x5b54f1 instanceof Color && _0x43b7b6 instanceof Color && Color["equals"](_0x5b54f1, _0x43b7b6);
-    return _0x5b54f1 === _0x43b7b6;
-  }
-  static ["updateConstantProperty"](_0x3de759, _0x40ff43) {
-    if (_0x3de759 instanceof ConstantProperty) return !LayerStyleEngine["valueEquals"](_0x3de759["getValue"](), _0x40ff43) && _0x3de759["setValue"](_0x40ff43), _0x3de759;
-    return new ConstantProperty(_0x40ff43);
-  }
-  ["updateColorProperty"](_0x114739, _0x57ebe9) {
-    const _0x5ec17d = _0x114739 !== void 0 ? this["opacityController"]["getWrappedBaseColor"](_0x114739) : void 0;
-    if (_0x5ec17d !== void 0) return Color["clone"](_0x57ebe9, _0x5ec17d), _0x114739;
-    if (_0x114739 instanceof ConstantProperty) return !LayerStyleEngine["valueEquals"](_0x114739["getValue"](), _0x57ebe9) && _0x114739["setValue"](_0x57ebe9), _0x114739;
-    return new ConstantProperty(_0x57ebe9);
-  }
-  ["updateColorMaterial"](_0x174b59, _0x5b0b08) {
-    if (_0x174b59 instanceof ColorMaterialProperty) return _0x174b59["color"] = this["updateColorProperty"](_0x174b59["color"], _0x5b0b08), _0x174b59;
-    return new ColorMaterialProperty(this["updateColorProperty"](void 0, _0x5b0b08));
-  }
-  static ["sampleFromPalette"](_0x10c542, _0x23b215, _0x467268) {
-    return _0x467268 === "qualitative" ? LayerStyleEngine["sampleDiscrete"](_0x10c542, _0x23b215) : LayerStyleEngine["sampleGradient"](_0x10c542, _0x23b215);
-  }
-  static ["sampleGradient"](_0x562236, _0x26f523) {
-    if (_0x562236["length"] === 0) return Color["GRAY"];
-    if (_0x562236["length"] === 1) return Color["fromCssColorString"](_0x562236[0]);
-    const _0x45519a = _0x584e42["clamp"](_0x26f523, 0, 1) * (_0x562236["length"] - 1), _0x21134a = Math["floor"](_0x45519a), _0x2a3029 = Math["min"](_0x562236["length"] - 1, _0x21134a + 1), _0x410ee5 = _0x45519a - _0x21134a, _0x58b3cb = Color["fromCssColorString"](_0x562236[_0x21134a]), _0x3886af = Color["fromCssColorString"](_0x562236[_0x2a3029]);
-    return Color["lerp"](_0x58b3cb, _0x3886af, _0x410ee5, new Color());
-  }
-  static ["sampleDiscrete"](_0x5da9fe, _0x4f843c) {
-    if (_0x5da9fe["length"] === 0) return Color["GRAY"];
-    const _0xd8cc2e = Math["round"](_0x584e42["clamp"](_0x4f843c, 0, 1) * (_0x5da9fe["length"] - 1));
-    return Color["fromCssColorString"](_0x5da9fe[_0xd8cc2e]);
-  }
-  static ["pickBin"](_0x336b2a, _0x2dd085) {
-    for (let _0x137e8b = 0; _0x137e8b < _0x2dd085["length"]; _0x137e8b++) {
-      if (_0x336b2a <= _0x2dd085[_0x137e8b]) return _0x137e8b;
+  // StyleEditor'de HER stil guncellemesinde (Dolgu/Dis Hat farketmez, tum
+  // spec her seferinde yeniden gonderiliyor -- bkz TucbsStyleEditor
+  // _scheduleApplyStyle) entity.polygon.outline/outlineWidth,
+  // entity.polyline.width gibi GEOMETRI-ETKILEYEN Cesium graphics alanlarina
+  // HER ZAMAN YENI bir ConstantProperty atamak (degeri ayni olsa BILE)
+  // Cesium'un ilgili GeometryUpdater'ini "bu alan yapisal olarak degisti"
+  // sanip altyapi Primitive'ini YIKIP YENIDEN KURMASINA yol aciyordu --
+  // sekiller (ozellikle dis hat/"stroke") bir-iki kare kaybolup geri
+  // geliyordu. VAR OLAN property zaten bir ConstantProperty ise SADECE
+  // deger GERCEKTEN farkliysa setValue() ile YERINDE guncellenir --
+  // ConstantProperty.setValue() bile deger ayni olsa "degisti" sayip
+  // definitionChanged FIRLATABILDIGI icin (gercek kullanici geri bildirimi:
+  // renk barinda SURUKLEYEREK hizli gecis yaparken -- her frame'de renk
+  // GERCEKTEN degisirken width DEGISMEDIGI halde yine de "setValue"
+  // cagriliyordu -- flicker acikca goruluyordu, ama tek tek tiklamada
+  // GORULMUYORDU cunku tek bir gereksiz cagri COK DAHA AZ fark ediliyordu)
+  // deger DEGISMEDIYSE property'ye HIC DOKUNULMAZ. Property yoksa (ilk
+  // kurulum) yeni bir ConstantProperty olusturulup dondurulur.
+  static valueEquals(a, b) {
+    if (a instanceof Color || b instanceof Color) {
+      return a instanceof Color && b instanceof Color && Color.equals(a, b);
     }
-    return _0x2dd085["length"] - 1;
+    return a === b;
   }
-}
-function extractEpsgCode(_0x4ea8e9) {
-  if (!/EPSG/i["test"](_0x4ea8e9)) return void 0;
-  const _0x1167ce = _0x4ea8e9["trim"]();
-  let _0x55a4d9 = _0x1167ce["length"];
-  while (_0x55a4d9 > 0 && _0x1167ce["charCodeAt"](_0x55a4d9 - 1) >= 48 && _0x1167ce["charCodeAt"](_0x55a4d9 - 1) <= 57) {
-    _0x55a4d9--;
-  }
-  const _0x21977b = _0x1167ce["slice"](_0x55a4d9);
-  return _0x21977b["length"] > 0 ? _0x21977b : void 0;
-}
-const proj4DefRequests = /* @__PURE__ */ new Map();
-async function registerProj4Def(_0x4fccc2, _0x15f914) {
-  const _0x4c8fd2 = "EPSG:" + _0x15f914;
-  if (_0x4fccc2["defs"](_0x4c8fd2)) return !![];
-  let _0x117ef2 = proj4DefRequests["get"](_0x15f914);
-  !_0x117ef2 && (_0x117ef2 = (async () => {
-    try {
-      const _0x5c5c53 = await fetch("https://epsg.io/" + _0x15f914 + ".proj4");
-      if (!_0x5c5c53["ok"]) return _0x5c5c53["status"] === 404 ? "missing" : "transient-failure";
-      const _0x16c591 = (await _0x5c5c53["text"]())["trim"]();
-      if (!_0x16c591) return "missing";
-      return _0x4fccc2["defs"](_0x4c8fd2, _0x16c591), "registered";
-    } catch {
-      return "transient-failure";
+  static updateConstantProperty(current, value) {
+    if (current instanceof ConstantProperty) {
+      if (!LayerStyleEngine.valueEquals(current.getValue(), value)) {
+        current.setValue(value);
+      }
+      return current;
     }
-  })(), proj4DefRequests["set"](_0x15f914, _0x117ef2));
-  const _0x2a1d00 = await _0x117ef2;
-  return _0x2a1d00 === "transient-failure" && proj4DefRequests["get"](_0x15f914) === _0x117ef2 && proj4DefRequests["delete"](_0x15f914), _0x2a1d00 === "registered";
-}
-async function ensureProj4Def(_0x29cac3) {
-  let _0x5c5fc0;
-  try {
-    ({ default: _0x5c5fc0 } = await import("proj4"));
-  } catch {
-    return console["warn"]("[ogc/proj4Defs] EPSG:" + _0x29cac3 + ' icin koordinat donusumu atlandi -- "proj4" paketi yuklu degil (peer dependency olarak eklenmemis). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir.'), void 0;
+    return new ConstantProperty(value);
   }
-  if (!await registerProj4Def(_0x5c5fc0, _0x29cac3)) return console["warn"]("[ogc/proj4Defs] EPSG:" + _0x29cac3 + " icin proj4 tanimi epsg.io'dan alinamadi (agsizlik veya gecersiz/desteklenmeyen kod olabilir). Bu EPSG kodunu kullanan WCS katmanlari yanlis/genis bir alanda gorunebilir."), void 0;
-  return _0x5c5fc0;
-}
-const CESIUM_BUILTIN_CRS_NAMES = /* @__PURE__ */ new Set(["urn:ogc:def:crs:OGC:1.3:CRS84", "EPSG:4326", "urn:ogc:def:crs:EPSG::4326"]);
-function defaultCrsFunction(_0x1f67c5) {
-  return Cartesian3["fromDegrees"](_0x1f67c5[0], _0x1f67c5[1], _0x1f67c5[2]);
-}
-function numericCodeString(_0x51e42b) {
-  if (_0x51e42b === void 0) return void 0;
-  const _0x211e9e = String(_0x51e42b)["trim"]();
-  return /^\d+$/["test"](_0x211e9e) ? _0x211e9e : void 0;
-}
-function isSuspiciousCrsResult(_0x2a760e) {
-  return _0x2a760e !== null && _0x2a760e["kind"] !== "reprojected";
-}
-function firstCoordinatePair(_0x4dedfd) {
-  let _0x4e10f5 = _0x4dedfd;
-  while (Array["isArray"](_0x4e10f5) && _0x4e10f5["length"] > 0 && Array["isArray"](_0x4e10f5[0])) {
-    _0x4e10f5 = _0x4e10f5[0];
+  // entity.polygon/polyline.material.color, entity.point.color,
+  // entity.billboard.color gibi "dolgu" renkleri prepareDataSourceOpacity()
+  // tarafindan bir opaklik CallbackProperty'sine SARILMIS OLABILIR (bkz o
+  // metod ve dataSourceOpacityProperties). updateConstantProperty'nin
+  // ConstantProperty kontrolu bu CallbackProperty'yi TANIMADIGI icin (o bir
+  // ConstantProperty DEGIL) her stil guncellemesinde -- ozellikle renk
+  // barinda hizlica surukleyip HER FRAME'DE gercekten degisen bir renk
+  // gonderilirken -- bu alan HER SEFERINDE brand-new bir property ile
+  // DEGISTIRILIYORDU; bu da hem opaklik sarmalayicisini kaybediyor HEM DE
+  // (asil "hızlı sürüklemede net flicker" nedeni) entity'nin materyal/renk
+  // alanini GEREKSIZ yere surekli degistiriyordu. Property zaten opaklik-
+  // sarmali ise, DataSourceOpacityProperties WeakMap'inden sarmalayicinin
+  // ICINDEKI mutable baz rengi okunup DOGRUDAN guncellenir -- property
+  // NESNESI (ve dolayisiyla entity alaninin referansi) HIC DEGISMEZ,
+  // Cesium'un "yapisal degisiklik" tespit etme sansı olmaz.
+  updateColorProperty(current, color) {
+    const opacityBaseColor = current !== void 0 ? this.opacityController.getWrappedBaseColor(current) : void 0;
+    if (opacityBaseColor !== void 0) {
+      Color.clone(color, opacityBaseColor);
+      return current;
+    }
+    if (current instanceof ConstantProperty) {
+      if (!LayerStyleEngine.valueEquals(current.getValue(), color)) {
+        current.setValue(color);
+      }
+      return current;
+    }
+    return new ConstantProperty(color);
   }
-  if (Array["isArray"](_0x4e10f5) && _0x4e10f5["length"] >= 2 && typeof _0x4e10f5[0] === "number" && typeof _0x4e10f5[1] === "number") return [_0x4e10f5[0], _0x4e10f5[1]];
+  // Ayni gerekceyle (bkz updateColorProperty) -- entity.polygon.material/
+  // polyline.material gibi materyal alanlarina HER ZAMAN YENI bir
+  // ColorMaterialProperty atamak yerine, VAR OLAN materyal zaten bu yapida
+  // ise SADECE ic renk property'sini (opaklik-farkinda) guncelleriz.
+  updateColorMaterial(current, color) {
+    if (current instanceof ColorMaterialProperty) {
+      current.color = this.updateColorProperty(current.color, color);
+      return current;
+    }
+    const carried = current instanceof PolylineDashMaterialProperty ? current.color : void 0;
+    return new ColorMaterialProperty(this.updateColorProperty(carried, color));
+  }
+  // Cizgi materyali: dash verilmemis/"solid" ise duz renk, aksi halde
+  // PolylineDashMaterialProperty. Ayni turdeki materyal YERINDE guncellenir
+  // (flicker onleme, bkz updateColorMaterial); tur degisirken renk property'si
+  // (opaklik sarmali dahil) yeni materyale tasinir.
+  updateLineMaterial(current, color, dash, width) {
+    const params = dashParams(dash, width);
+    if (params === void 0) return this.updateColorMaterial(current, color);
+    if (current instanceof PolylineDashMaterialProperty) {
+      current.color = this.updateColorProperty(current.color, color);
+      current.dashLength = LayerStyleEngine.updateConstantProperty(current.dashLength, params.dashLength);
+      current.dashPattern = LayerStyleEngine.updateConstantProperty(current.dashPattern, params.dashPattern);
+      return current;
+    }
+    const carried = current instanceof ColorMaterialProperty ? current.color : void 0;
+    return new PolylineDashMaterialProperty({
+      color: this.updateColorProperty(carried, color),
+      gapColor: Color.TRANSPARENT,
+      dashLength: params.dashLength,
+      dashPattern: params.dashPattern
+    });
+  }
+  // qualitative paletler (Set2/Tableau10 vb.) AYRIK kategorik renk setleridir --
+  // karistirilirsa palette'te hic olmayan bulanik ara tonlar cikar. sequential/
+  // diverging (rampa) paletlerde ise dogrusal karisim (lerp) beklenen davranistir.
+  // paletteKind verilmezse (geriye donuk uyumluluk) sequential gibi davranilir.
+  static sampleFromPalette(palette, t, paletteKind) {
+    return paletteKind === "qualitative" ? LayerStyleEngine.sampleDiscrete(palette, t) : LayerStyleEngine.sampleGradient(palette, t);
+  }
+  // Hand-rolled lineer interpolasyon: d3-scale-chromatic gibi ek bagimlilik
+  // EKLENMEDI ("@tucbs/core Cesium-only peer dep" kurali).
+  static sampleGradient(palette, t) {
+    if (palette.length === 0) return Color.GRAY;
+    if (palette.length === 1) return Color.fromCssColorString(palette[0]);
+    const scaled = Math$1.clamp(t, 0, 1) * (palette.length - 1);
+    const lowIndex = Math.floor(scaled);
+    const highIndex = Math.min(palette.length - 1, lowIndex + 1);
+    const localT = scaled - lowIndex;
+    const low = Color.fromCssColorString(palette[lowIndex]);
+    const high = Color.fromCssColorString(palette[highIndex]);
+    return Color.lerp(low, high, localT, new Color());
+  }
+  // Karistirma yok -- en yakin palet rengine "yuvarlanir" (qualitative paletler
+  // icin, sampleGradient'in dogrusal-karisim davranisinin yerine).
+  static sampleDiscrete(palette, t) {
+    if (palette.length === 0) return Color.GRAY;
+    const index = Math.round(Math$1.clamp(t, 0, 1) * (palette.length - 1));
+    return Color.fromCssColorString(palette[index]);
+  }
+  static pickBin(value, boundaries) {
+    for (let i = 0; i < boundaries.length; i++) {
+      if (value <= boundaries[i]) return i;
+    }
+    return boundaries.length - 1;
+  }
+}
+const CESIUM_BUILTIN_CRS_NAMES = /* @__PURE__ */ new Set([
+  "urn:ogc:def:crs:OGC:1.3:CRS84",
+  "EPSG:4326",
+  "urn:ogc:def:crs:EPSG::4326"
+]);
+function defaultCrsFunction(coordinates) {
+  return Cartesian3.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+}
+function numericCodeString(code) {
+  if (code === void 0) return void 0;
+  const trimmed = String(code).trim();
+  return /^\d+$/.test(trimmed) ? trimmed : void 0;
+}
+function isSuspiciousCrsResult(result) {
+  return result !== null && result.kind !== "reprojected";
+}
+function firstCoordinatePair(value) {
+  let current = value;
+  while (Array.isArray(current) && current.length > 0 && Array.isArray(current[0])) {
+    current = current[0];
+  }
+  if (Array.isArray(current) && current.length >= 2 && typeof current[0] === "number" && typeof current[1] === "number") {
+    return [current[0], current[1]];
+  }
   return void 0;
 }
-function findFirstCoordinates(_0x53a514) {
-  if (typeof _0x53a514 !== "object" || _0x53a514 === null) return void 0;
-  const _0x15ea58 = _0x53a514;
-  if (_0x15ea58["type"] === "FeatureCollection" && Array["isArray"](_0x15ea58["features"])) {
-    for (const _0xbb5527 of _0x15ea58["features"]) {
-      const _0x4c906f = findFirstCoordinates(_0xbb5527);
-      if (_0x4c906f) return _0x4c906f;
+function findFirstCoordinates(geojson) {
+  if (typeof geojson !== "object" || geojson === null) return void 0;
+  const obj = geojson;
+  if (obj.type === "FeatureCollection" && Array.isArray(obj.features)) {
+    for (const feature of obj.features) {
+      const coords = findFirstCoordinates(feature);
+      if (coords) return coords;
     }
     return void 0;
   }
-  if (_0x15ea58["type"] === "Feature") return findFirstCoordinates(_0x15ea58["geometry"]);
-  if (_0x15ea58["type"] === "GeometryCollection" && Array["isArray"](_0x15ea58["geometries"])) {
-    for (const _0x30f18b of _0x15ea58["geometries"]) {
-      const _0x2306d7 = findFirstCoordinates(_0x30f18b);
-      if (_0x2306d7) return _0x2306d7;
+  if (obj.type === "Feature") return findFirstCoordinates(obj.geometry);
+  if (obj.type === "GeometryCollection" && Array.isArray(obj.geometries)) {
+    for (const geometry of obj.geometries) {
+      const coords = findFirstCoordinates(geometry);
+      if (coords) return coords;
     }
     return void 0;
   }
-  if ("coordinates" in _0x15ea58) return firstCoordinatePair(_0x15ea58["coordinates"]);
+  if ("coordinates" in obj) return firstCoordinatePair(obj.coordinates);
   return void 0;
 }
-function resolveOrRejectUnresolvedCrs(_0x383680, _0x2fd142, _0x45fc16) {
-  if (!_0x45fc16) throw new GeometryError("CRS_UNRESOLVED_UNSUPPORTED", "Koordinat sistemi tanınamadı ve WGS84 ile uyumlu değil.");
-  return GeoJsonDataSource["crsNames"][_0x383680] = defaultCrsFunction, { "kind": "suspicious-unresolved-crs", "crsName": _0x2fd142 };
+function resolveOrRejectUnresolvedCrs(key, crsName, looksLikeWgs84) {
+  if (!looksLikeWgs84) {
+    throw new GeometryError("CRS_UNRESOLVED_UNSUPPORTED", "Koordinat sistemi tanınamadı ve WGS84 ile uyumlu değil.");
+  }
+  GeoJsonDataSource.crsNames[key] = defaultCrsFunction;
+  return { kind: "suspicious-unresolved-crs", crsName };
 }
-function acceptClaimedWgs84(_0x7845b9, _0x244c87, _0xd40b70) {
-  if (!_0x244c87) throw new GeometryError("CRS_CLAIMED_WGS84_INVALID", "Koordinatlar WGS84 ile uyumlu değil.");
-  if (_0xd40b70) GeoJsonDataSource["crsNames"][_0x7845b9] = defaultCrsFunction;
+function acceptClaimedWgs84(key, looksLikeWgs84, shouldRegister) {
+  if (!looksLikeWgs84) {
+    throw new GeometryError("CRS_CLAIMED_WGS84_INVALID", "Koordinatlar WGS84 ile uyumlu değil.");
+  }
+  if (shouldRegister) GeoJsonDataSource.crsNames[key] = defaultCrsFunction;
   return null;
 }
-function computeLooksLikeWgs84(_0x5f5a04) {
-  const _0x523d0f = findFirstCoordinates(_0x5f5a04);
-  return !_0x523d0f || Math["abs"](_0x523d0f[0]) <= 180 && Math["abs"](_0x523d0f[1]) <= 90;
+function computeLooksLikeWgs84(geojson) {
+  const firstCoords = findFirstCoordinates(geojson);
+  return !firstCoords || Math.abs(firstCoords[0]) <= 180 && Math.abs(firstCoords[1]) <= 90;
 }
-function resolveCrsFieldOrThrow(_0xcf3d17, _0x23de1a) {
-  const _0x21ca4c = "crs" in _0xcf3d17 ? _0xcf3d17["crs"] : void 0;
-  if (!_0x21ca4c || typeof _0x21ca4c !== "object") {
-    if (!_0x23de1a) throw new GeometryError("CRS_MISSING_UNSUPPORTED", "Bu dosyada geçerli koordinat sistemi (CRS) bilgisi yok.");
+function resolveCrsFieldOrThrow(geojson, looksLikeWgs84) {
+  const crs = "crs" in geojson ? geojson.crs : void 0;
+  if (!crs || typeof crs !== "object") {
+    if (!looksLikeWgs84) {
+      throw new GeometryError(
+        "CRS_MISSING_UNSUPPORTED",
+        "Bu dosyada geçerli koordinat sistemi (CRS) bilgisi yok."
+      );
+    }
     return null;
   }
-  return _0x21ca4c;
+  return crs;
 }
-async function ensureGeoJsonCrsSupport(_0x141f03) {
+async function ensureGeoJsonCrsSupport(geojson) {
   var _a2, _b, _c;
-  if (typeof _0x141f03 !== "object" || _0x141f03 === null) return null;
-  const _0x115276 = computeLooksLikeWgs84(_0x141f03), _0x302ea4 = resolveCrsFieldOrThrow(_0x141f03, _0x115276);
-  if (!_0x302ea4) return null;
-  const _0x29d6b4 = _0x302ea4["type"] === "EPSG", _0x1806bf = _0x29d6b4 ? "EPSG:" + ((_a2 = _0x302ea4["properties"]) == null ? void 0 : _a2["code"]) : (_b = _0x302ea4["properties"]) == null ? void 0 : _b["name"];
-  if (!_0x1806bf || typeof _0x1806bf !== "string") return null;
-  if (CESIUM_BUILTIN_CRS_NAMES["has"](_0x1806bf)) return acceptClaimedWgs84(_0x1806bf, _0x115276, ![]);
-  const _0x323c53 = _0x29d6b4 ? numericCodeString((_c = _0x302ea4["properties"]) == null ? void 0 : _c["code"]) : extractEpsgCode(_0x1806bf);
-  if (!_0x323c53) return resolveOrRejectUnresolvedCrs(_0x1806bf, _0x1806bf, _0x115276);
-  if (_0x323c53 === "4326") return acceptClaimedWgs84(_0x1806bf, _0x115276, !![]);
-  const _0x96fa4d = "EPSG:" + _0x323c53;
-  let _0x4d281a;
-  try {
-    ({ default: _0x4d281a } = await import("proj4"));
-  } catch {
-    return resolveOrRejectUnresolvedCrs(_0x1806bf, _0x96fa4d, _0x115276);
+  if (typeof geojson !== "object" || geojson === null) return null;
+  const looksLikeWgs84 = computeLooksLikeWgs84(geojson);
+  const crs = resolveCrsFieldOrThrow(geojson, looksLikeWgs84);
+  if (!crs) return null;
+  const isDeprecatedEpsgType = crs.type === "EPSG";
+  const key = isDeprecatedEpsgType ? `EPSG:${(_a2 = crs.properties) == null ? void 0 : _a2.code}` : (_b = crs.properties) == null ? void 0 : _b.name;
+  if (!key || typeof key !== "string") return null;
+  if (CESIUM_BUILTIN_CRS_NAMES.has(key)) return acceptClaimedWgs84(key, looksLikeWgs84, false);
+  const epsgCode = isDeprecatedEpsgType ? numericCodeString((_c = crs.properties) == null ? void 0 : _c.code) : extractEpsgCode(key);
+  if (!epsgCode) {
+    return resolveOrRejectUnresolvedCrs(key, key, looksLikeWgs84);
   }
-  if (!await registerProj4Def(_0x4d281a, _0x323c53)) return resolveOrRejectUnresolvedCrs(_0x1806bf, _0x96fa4d, _0x115276);
-  return GeoJsonDataSource["crsNames"][_0x1806bf] = (_0x4b5b8e) => {
-    const [_0x393c18, _0x47f44b] = _0x4d281a(_0x96fa4d, "EPSG:4326", [_0x4b5b8e[0], _0x4b5b8e[1]]);
-    return Cartesian3["fromDegrees"](_0x393c18, _0x47f44b, _0x4b5b8e[2]);
-  }, { "kind": "reprojected", "fromEpsg": _0x96fa4d };
+  if (epsgCode === "4326") {
+    return acceptClaimedWgs84(key, looksLikeWgs84, true);
+  }
+  const fromEpsg = `EPSG:${epsgCode}`;
+  let proj4;
+  try {
+    ({ default: proj4 } = await import("proj4"));
+  } catch {
+    return resolveOrRejectUnresolvedCrs(key, fromEpsg, looksLikeWgs84);
+  }
+  if (!await registerProj4Def(proj4, epsgCode)) {
+    return resolveOrRejectUnresolvedCrs(key, fromEpsg, looksLikeWgs84);
+  }
+  GeoJsonDataSource.crsNames[key] = (coordinates) => {
+    const [lon, lat] = proj4(fromEpsg, "EPSG:4326", [coordinates[0], coordinates[1]]);
+    return Cartesian3.fromDegrees(lon, lat, coordinates[2]);
+  };
+  return { kind: "reprojected", fromEpsg };
+}
+function edgesOf(box) {
+  return [
+    { inside: (p) => p[0] >= box.west, t: (a, b) => (box.west - a[0]) / (b[0] - a[0]) },
+    { inside: (p) => p[0] <= box.east, t: (a, b) => (box.east - a[0]) / (b[0] - a[0]) },
+    { inside: (p) => p[1] >= box.south, t: (a, b) => (box.south - a[1]) / (b[1] - a[1]) },
+    { inside: (p) => p[1] <= box.north, t: (a, b) => (box.north - a[1]) / (b[1] - a[1]) }
+  ];
+}
+function lerp(a, b, t) {
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+}
+function clipRing(ring, box) {
+  let output = [...ring];
+  for (const edge of edgesOf(box)) {
+    const input = output;
+    output = [];
+    for (let i = 0; i < input.length; i++) {
+      const current = input[i];
+      const previous = input[(i + input.length - 1) % input.length];
+      if (edge.inside(current)) {
+        if (!edge.inside(previous)) output.push(lerp(previous, current, edge.t(previous, current)));
+        output.push(current);
+      } else if (edge.inside(previous)) {
+        output.push(lerp(previous, current, edge.t(previous, current)));
+      }
+    }
+    if (output.length === 0) return [];
+  }
+  return output.length >= 3 ? output : [];
+}
+function clipLine(line2, box) {
+  const pieces = [];
+  let current = [];
+  const flush = () => {
+    if (current.length >= 2) pieces.push(current);
+    current = [];
+  };
+  for (let i = 0; i + 1 < line2.length; i++) {
+    const segment = clipSegment(line2[i], line2[i + 1], box);
+    if (!segment) {
+      flush();
+      continue;
+    }
+    const [start, end] = segment;
+    const last = current[current.length - 1];
+    if (!last || last[0] !== start[0] || last[1] !== start[1]) {
+      flush();
+      current.push(start);
+    }
+    current.push(end);
+    if (end !== line2[i + 1]) flush();
+  }
+  flush();
+  return pieces;
+}
+function clipSegment(a, b, box) {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  let t0 = 0;
+  let t1 = 1;
+  const checks = [
+    [-dx, a[0] - box.west],
+    [dx, box.east - a[0]],
+    [-dy, a[1] - box.south],
+    [dy, box.north - a[1]]
+  ];
+  for (const [p, q] of checks) {
+    if (p === 0) {
+      if (q < 0) return void 0;
+      continue;
+    }
+    const r = q / p;
+    if (p < 0) {
+      if (r > t1) return void 0;
+      if (r > t0) t0 = r;
+    } else {
+      if (r < t0) return void 0;
+      if (r < t1) t1 = r;
+    }
+  }
+  return [t0 === 0 ? a : lerp(a, b, t0), t1 === 1 ? b : lerp(a, b, t1)];
+}
+function isInside(p, box) {
+  return p[0] >= box.west && p[0] <= box.east && p[1] >= box.south && p[1] <= box.north;
+}
+function toLonLat(position) {
+  const c = Cartographic.fromCartesian(position);
+  return [Math$1.toDegrees(c.longitude), Math$1.toDegrees(c.latitude), c.height];
+}
+function toCartesian(points) {
+  return points.map(([lon, lat, height]) => Cartesian3.fromDegrees(lon, lat, height));
+}
+function clipHierarchy(hierarchy, box) {
+  const ring = hierarchy.positions.map(toLonLat);
+  if (ring.every((point) => isInside(point, box))) return hierarchy;
+  const outer = clipRing(ring, box);
+  if (outer.length === 0) return void 0;
+  const holes = (hierarchy.holes ?? []).flatMap((hole) => {
+    const clipped = clipHierarchy(hole, box);
+    return clipped ? [clipped] : [];
+  });
+  return new PolygonHierarchy(toCartesian(outer), holes);
+}
+function clipPolygonEntity(entity, box, time) {
+  var _a2;
+  const hierarchy = (_a2 = entity.polygon.hierarchy) == null ? void 0 : _a2.getValue(time);
+  if (!hierarchy) return false;
+  const clipped = clipHierarchy(hierarchy, box);
+  if (!clipped) return false;
+  if (clipped !== hierarchy) entity.polygon.hierarchy = new ConstantProperty(clipped);
+  return true;
+}
+function clipPolylineEntity(dataSource, entity, box, time) {
+  var _a2;
+  const positions = (_a2 = entity.polyline.positions) == null ? void 0 : _a2.getValue(time);
+  if (!positions) return false;
+  const points = positions.map(toLonLat);
+  if (points.every((point) => isInside(point, box))) return true;
+  const [first, ...rest] = clipLine(points, box);
+  if (!first) return false;
+  entity.polyline.positions = new ConstantProperty(toCartesian(first));
+  rest.forEach((piece, index) => {
+    const polyline = entity.polyline.clone();
+    polyline.positions = new ConstantProperty(toCartesian(piece));
+    dataSource.entities.add({
+      id: `${entity.id}::parca-${index + 1}`,
+      ...entity.name !== void 0 && { name: entity.name },
+      ...entity.properties !== void 0 && { properties: entity.properties },
+      polyline
+    });
+  });
+  return true;
+}
+function clipDataSourceToExtent(dataSource, box) {
+  const time = JulianDate.now();
+  for (const entity of [...dataSource.entities.values]) {
+    let keep = true;
+    if (entity.polygon) {
+      keep = clipPolygonEntity(entity, box, time);
+    } else if (entity.polyline) {
+      keep = clipPolylineEntity(dataSource, entity, box, time);
+    } else if (entity.position) {
+      const position = entity.position.getValue(time);
+      keep = position !== void 0 && isInside(toLonLat(position), box);
+    }
+    if (!keep) dataSource.entities.remove(entity);
+  }
 }
 class LocalSourceLoader {
-  constructor(_0xd2fbd0, _0x67d4aa) {
-    this["viewer"] = _0xd2fbd0, this["deps"] = _0x67d4aa;
+  constructor(viewer, deps) {
+    this.viewer = viewer;
+    this.deps = deps;
   }
-  async ["addLocalKmlGeoJson"](_0x104eac, _0x3587a6) {
-    let _0x424973, _0x2bcc8b, _0x7adb4c = null;
-    const _0xcfcc1 = this["deps"]["styleEngine"]["randomLayerColor"]();
-    let _0x527b32 = _0x3587a6["clampToGround"] ?? !![];
-    if (_0x104eac === "GEOJSON") {
-      const _0x2ac1ac = _0x3587a6["data"] instanceof File ? JSON["parse"](await this["fileToText"](_0x3587a6["data"])) : _0x3587a6["data"];
-      _0x7adb4c = await ensureGeoJsonCrsSupport(_0x2ac1ac);
-      if (isSuspiciousCrsResult(_0x7adb4c)) _0x527b32 = ![];
-      _0x424973 = await GeoJsonDataSource["load"](_0x2ac1ac, { "clampToGround": _0x527b32, "fill": _0xcfcc1["withAlpha"](0.5), "stroke": _0xcfcc1, "strokeWidth": 2, "markerColor": _0xcfcc1 }), this["deps"]["styleEngine"]["applyEntityColor"](_0x424973, _0xcfcc1), this["deps"]["styleEngine"]["convertMarkersToPoints"](_0x424973, _0xcfcc1);
-      if (isSuspiciousCrsResult(_0x7adb4c)) this["deps"]["outlineGeometry"]["flattenSuspiciousGeometry"](_0x424973);
+  /** GeoJSON, KML ya da KMZ dosyasını okuyup vektör katman olarak ekler. */
+  async addLocalKmlGeoJson(layerType, options) {
+    let dataSource;
+    let blobUrl;
+    let crsInfo = null;
+    const color = this.deps.styleEngine.randomLayerColor();
+    let clampToGround = options.clampToGround ?? true;
+    if (layerType === "GEOJSON") {
+      const geojson = options.data instanceof File ? JSON.parse(await this.fileToText(options.data)) : options.data;
+      crsInfo = await ensureGeoJsonCrsSupport(geojson);
+      if (isSuspiciousCrsResult(crsInfo)) clampToGround = false;
+      dataSource = await GeoJsonDataSource.load(geojson, {
+        clampToGround,
+        fill: color.withAlpha(0.5),
+        stroke: color,
+        strokeWidth: 2,
+        markerColor: color
+      });
+      this.deps.styleEngine.applyEntityColor(dataSource, color);
+      this.deps.styleEngine.convertMarkersToPoints(dataSource, color);
+      if (isSuspiciousCrsResult(crsInfo)) this.deps.outlineGeometry.flattenSuspiciousGeometry(dataSource);
     } else {
-      let _0x12d922;
-      _0x3587a6["data"] instanceof File ? (_0x2bcc8b = this["fileToBlobUrl"](_0x3587a6["data"]), _0x12d922 = _0x2bcc8b) : _0x12d922 = _0x3587a6["data"], _0x424973 = await KmlDataSource["load"](_0x12d922, { "camera": this["viewer"]["scene"]["camera"], "canvas": this["viewer"]["scene"]["canvas"], "clampToGround": _0x527b32 }), this["deps"]["styleEngine"]["applyEntityColor"](_0x424973, _0xcfcc1);
+      let kmlSource;
+      if (options.data instanceof File) {
+        blobUrl = this.fileToBlobUrl(options.data);
+        kmlSource = blobUrl;
+      } else {
+        kmlSource = options.data;
+      }
+      dataSource = await KmlDataSource.load(kmlSource, {
+        camera: this.viewer.scene.camera,
+        canvas: this.viewer.scene.canvas,
+        clampToGround
+      });
+      this.deps.styleEngine.applyEntityColor(dataSource, color);
     }
-    this["deps"]["outlineGeometry"]["disableRiskyPolygonOutlines"](_0x424973);
-    _0x527b32 && this["deps"]["addPolygonOutlines"](_0x424973, this["deps"]["defaultOutlineColor"], 2);
-    await this["viewer"]["dataSources"]["add"](_0x424973);
-    _0x2bcc8b !== void 0 && URL["revokeObjectURL"](_0x2bcc8b);
-    const _0xe20772 = _0xcfcc1["toCssHexString"](), _0x3648e4 = this["deps"]["register"](_0x3587a6["id"], _0x3587a6["title"], _0x104eac, _0x424973, ![], _0xe20772);
-    return this["deps"]["emitCrsCheckResult"](_0x3648e4["id"], _0x7adb4c), this["deps"]["styleEngine"]["recordInitialStyle"](_0x3648e4["id"], _0xe20772, 0.5, { "enabled": !![], "color": this["deps"]["defaultOutlineColorHex"], "width": 2 }), await this["deps"]["waitForRenderSettle"](), _0x3648e4;
+    this.deps.outlineGeometry.disableRiskyPolygonOutlines(dataSource);
+    if (clampToGround) {
+      this.deps.addPolygonOutlines(dataSource, this.deps.defaultOutlineColor, 2);
+    }
+    await this.viewer.dataSources.add(dataSource);
+    if (blobUrl !== void 0) {
+      URL.revokeObjectURL(blobUrl);
+    }
+    const colorHex = color.toCssHexString();
+    const managed = this.deps.register(
+      options.id,
+      options.title,
+      layerType,
+      dataSource,
+      false,
+      colorHex
+    );
+    this.deps.emitCrsCheckResult(managed.id, crsInfo);
+    this.deps.styleEngine.recordInitialStyle(managed.id, colorHex, 0.5, {
+      enabled: true,
+      color: this.deps.defaultOutlineColorHex,
+      width: 2
+    }, dataSource);
+    await this.deps.waitForRenderSettle();
+    return managed;
   }
-  async ["addShp"](_0x425480) {
-    let _0x4d0af1;
+  // ── İç: SHP ──────────────────────────────────────────────────────────────
+  /** Shapefile verisini (dosya, adres ya da bayt dizisi) shpjs ile GeoJSON'a çevirip vektör katman olarak ekler; shpjs kurulu değilse hata fırlatır. */
+  async addShp(options) {
+    let shp;
     try {
-      ({ getShapefile: _0x4d0af1 } = await import("shpjs"));
+      ({ getShapefile: shp } = await import("shpjs"));
     } catch {
-      throw new LayerOperationError("LAYER_SHP_PACKAGE_MISSING", 'SHP katmanı için "shpjs" paketi gereklidir: shpjs kütüphanesini import etmelisiniz');
+      throw new LayerOperationError(
+        "LAYER_SHP_PACKAGE_MISSING",
+        `SHP katmanı için gereken "shpjs" paketi yüklenemedi: paket kurulu değil ya da importmap'te tanımlı değil`
+      );
     }
-    const _0x3ca1af = _0x425480["data"] instanceof File ? await this["fileToArrayBuffer"](_0x425480["data"]) : _0x425480["data"], _0x437bec = await _0x4d0af1(_0x3ca1af), _0x3368ab = Array["isArray"](_0x437bec) ? { "type": "FeatureCollection", "features": _0x437bec["flatMap"]((_0x1a1bc8) => _0x1a1bc8["features"]) } : _0x437bec;
-    return loadVectorGeoJsonLayer(this["viewer"], this["deps"], _0x3368ab, { "id": _0x425480["id"], "title": _0x425480["title"], "layerType": "SHP", "clampToGround": _0x425480["clampToGround"] ?? !![] });
+    const source = options.data instanceof File ? await this.fileToArrayBuffer(options.data) : options.data;
+    const result = await shp(source);
+    const geojson = Array.isArray(result) ? {
+      type: "FeatureCollection",
+      features: result.flatMap((collection) => collection.features)
+    } : result;
+    return loadVectorGeoJsonLayer(this.viewer, this.deps, geojson, {
+      id: options.id,
+      title: options.title,
+      layerType: "SHP",
+      clampToGround: options.clampToGround ?? true
+    });
   }
-  async ["addCsv"](_0x493f01) {
-    let _0x37dad8;
+  // ── İç: CSV ──────────────────────────────────────────────────────────────
+  /** Enlem/boylam sütunları olan CSV dosyasını papaparse ile okuyup nokta katmanı olarak ekler; papaparse kurulu değilse ya da enlem/boylam sütunu bulunamazsa hata fırlatır. */
+  async addCsv(options) {
+    let Papa;
     try {
-      ({ default: _0x37dad8 } = await import("papaparse"));
+      ({ default: Papa } = await import("papaparse"));
     } catch {
-      throw new LayerOperationError("LAYER_CSV_PACKAGE_MISSING", 'CSV katmanı için "papaparse" paketi gereklidir: papaparse kütüphanesini import etmelisiniz');
+      throw new LayerOperationError(
+        "LAYER_CSV_PACKAGE_MISSING",
+        `CSV katmanı için gereken "papaparse" paketi yüklenemedi: paket kurulu değil ya da importmap'te tanımlı değil`
+      );
     }
-    const _0x231458 = _0x493f01["data"] instanceof File ? await this["fileToText"](_0x493f01["data"]) : _0x493f01["data"], _0x4489d6 = _0x37dad8["parse"](_0x231458, { "header": !![], "dynamicTyping": !![] }), _0x449f91 = _0x4489d6["data"], _0x3a52ce = _0x449f91["find"]((_0x28f195) => _0x28f195 && Object["keys"](_0x28f195)["length"] > 0), _0x1cb2bb = _0x3a52ce && this["detectLatLonKeys"](_0x3a52ce);
-    if (!_0x1cb2bb) throw new LayerOperationError("LAYER_CSV_LATLON_NOT_FOUND", "CSV içinde lat/lon sütunlarını bulamadım (ör: lat, lon).");
-    const _0x597283 = this["deps"]["styleEngine"]["randomLayerColor"](), _0x2c5363 = new CustomDataSource(_0x493f01["title"]);
-    for (const _0x1d1607 of _0x449f91) {
-      const _0x50a6ed = Number(_0x1d1607[_0x1cb2bb["lat"]]), _0x197911 = Number(_0x1d1607[_0x1cb2bb["lon"]]);
-      Number["isFinite"](_0x50a6ed) && Number["isFinite"](_0x197911) && _0x2c5363["entities"]["add"]({ "position": Cartesian3["fromDegrees"](_0x197911, _0x50a6ed), "point": { "pixelSize": 6, "color": _0x597283 }, "properties": _0x1d1607 });
+    const text = options.data instanceof File ? await this.fileToText(options.data) : options.data;
+    const parsed = Papa.parse(text, {
+      header: true,
+      dynamicTyping: true
+    });
+    const rows = parsed.data;
+    const sample = rows.find((row) => row && Object.keys(row).length > 0);
+    const keys = sample && this.detectLatLonKeys(sample);
+    if (!keys) {
+      throw new LayerOperationError("LAYER_CSV_LATLON_NOT_FOUND", "CSV içinde lat/lon sütunlarını bulamadım (ör: lat, lon).");
     }
-    await this["viewer"]["dataSources"]["add"](_0x2c5363);
-    const _0x20e7a2 = _0x597283["toCssHexString"](), _0x2ba5b9 = this["deps"]["register"](_0x493f01["id"], _0x493f01["title"], "CSV", _0x2c5363, ![], _0x20e7a2);
-    return this["deps"]["styleEngine"]["recordInitialStyle"](_0x2ba5b9["id"], _0x20e7a2, 1, { "enabled": ![], "color": _0x20e7a2, "width": 0 }), _0x2ba5b9;
+    const color = this.deps.styleEngine.randomLayerColor();
+    const dataSource = new CustomDataSource(options.title);
+    for (const row of rows) {
+      const lat = Number(row[keys.lat]);
+      const lon = Number(row[keys.lon]);
+      if (Number.isFinite(lat) && Number.isFinite(lon)) {
+        dataSource.entities.add({
+          position: Cartesian3.fromDegrees(lon, lat),
+          point: { pixelSize: 6, color },
+          properties: row
+        });
+      }
+    }
+    await this.viewer.dataSources.add(dataSource);
+    const colorHex = color.toCssHexString();
+    const managed = this.deps.register(
+      options.id,
+      options.title,
+      "CSV",
+      dataSource,
+      false,
+      colorHex
+    );
+    this.deps.styleEngine.recordInitialStyle(managed.id, colorHex, 1, {
+      enabled: false,
+      color: colorHex,
+      width: 0
+    }, dataSource);
+    return managed;
   }
-  ["detectLatLonKeys"](_0x470516) {
-    const _0x484b9d = Object["keys"](_0x470516)["reduce"]((_0x28239f, _0x6178b6) => {
-      const _0x1147bc = _0x6178b6["toLowerCase"]();
-      if (!_0x28239f["lat"] && /^(lat|latitude|y)$/["test"](_0x1147bc)) _0x28239f["lat"] = _0x6178b6;
-      if (!_0x28239f["lon"] && /^(lon|lng|long|longitude|x)$/["test"](_0x1147bc)) _0x28239f["lon"] = _0x6178b6;
-      return _0x28239f;
-    }, { "lat": "", "lon": "" });
-    return _0x484b9d["lat"] && _0x484b9d["lon"] ? _0x484b9d : null;
+  /** CSV satırındaki enlem/boylam sütun adlarını yaygın adlandırma varyasyonlarına göre (büyük/küçük harf duyarsız) bulur; bulamazsa `null`. */
+  detectLatLonKeys(row) {
+    const keys = Object.keys(row).reduce(
+      (acc, key) => {
+        const lowerKey = key.toLowerCase();
+        if (!acc.lat && /^(lat|latitude|y)$/.test(lowerKey)) acc.lat = key;
+        if (!acc.lon && /^(lon|lng|long|longitude|x)$/.test(lowerKey))
+          acc.lon = key;
+        return acc;
+      },
+      { lat: "", lon: "" }
+    );
+    return keys.lat && keys.lon ? keys : null;
   }
-  async ["fileToText"](_0x17918b) {
-    return decodeTextBuffer(await _0x17918b["arrayBuffer"]());
+  /** Dosyayı metin olarak okur; UTF-8 değilse Windows-1254 ile çözer (bkz. `decodeTextBuffer`). */
+  async fileToText(file) {
+    return decodeTextBuffer(await file.arrayBuffer());
   }
-  ["fileToBlobUrl"](_0x3e4a06) {
-    return URL["createObjectURL"](_0x3e4a06);
+  /** Dosya için geçici bir `blob:` adresi oluşturur. */
+  fileToBlobUrl(file) {
+    return URL.createObjectURL(file);
   }
-  ["fileToArrayBuffer"](_0x1402ee) {
-    return _0x1402ee["arrayBuffer"]();
+  /** Dosyanın ham baytlarını okur. */
+  fileToArrayBuffer(file) {
+    return file.arrayBuffer();
   }
 }
-async function loadVectorGeoJsonLayer(_0x1485da, _0x3d5e55, _0x4c3746, _0x47a75b, _0x39b056) {
-  const _0x4841e3 = await ensureGeoJsonCrsSupport(_0x4c3746), _0x15f00f = _0x3d5e55["styleEngine"]["randomLayerColor"](), _0x4f0116 = isSuspiciousCrsResult(_0x4841e3) ? ![] : _0x47a75b["clampToGround"], _0x51f4cd = await GeoJsonDataSource["load"](_0x4c3746, { "clampToGround": _0x4f0116, "fill": _0x15f00f["withAlpha"](0.5), "stroke": _0x15f00f, "strokeWidth": 2, "markerColor": _0x15f00f });
-  _0x3d5e55["styleEngine"]["applyEntityColor"](_0x51f4cd, _0x15f00f), _0x3d5e55["styleEngine"]["convertMarkersToPoints"](_0x51f4cd, _0x15f00f), _0x3d5e55["outlineGeometry"]["disableRiskyPolygonOutlines"](_0x51f4cd);
-  if (isSuspiciousCrsResult(_0x4841e3)) _0x3d5e55["outlineGeometry"]["flattenSuspiciousGeometry"](_0x51f4cd);
-  _0x4f0116 && _0x3d5e55["addPolygonOutlines"](_0x51f4cd, _0x3d5e55["defaultOutlineColor"], 2);
-  await _0x1485da["dataSources"]["add"](_0x51f4cd);
-  const _0x45bb84 = _0x15f00f["toCssHexString"](), _0x3a3450 = _0x3d5e55["register"](_0x47a75b["id"], _0x47a75b["title"], _0x47a75b["layerType"], _0x51f4cd, ![], _0x45bb84);
-  return _0x3d5e55["emitCrsCheckResult"](_0x3a3450["id"], _0x4841e3), _0x39b056 == null ? void 0 : _0x39b056(_0x3a3450), _0x3d5e55["styleEngine"]["recordInitialStyle"](_0x3a3450["id"], _0x45bb84, 0.5, { "enabled": !![], "color": _0x3d5e55["defaultOutlineColorHex"], "width": 2 }), await _0x3d5e55["waitForRenderSettle"](), _0x3a3450;
+async function loadVectorGeoJsonLayer(viewer, deps, geojson, layer, afterRegister) {
+  const crsInfo = await ensureGeoJsonCrsSupport(geojson);
+  const color = deps.styleEngine.randomLayerColor();
+  const clampToGround = isSuspiciousCrsResult(crsInfo) ? false : layer.clampToGround;
+  const dataSource = await GeoJsonDataSource.load(geojson, {
+    clampToGround,
+    fill: color.withAlpha(0.5),
+    stroke: color,
+    strokeWidth: 2,
+    markerColor: color
+  });
+  if (layer.clipExtent) clipDataSourceToExtent(dataSource, layer.clipExtent);
+  deps.styleEngine.applyEntityColor(dataSource, color);
+  deps.styleEngine.convertMarkersToPoints(dataSource, color);
+  deps.outlineGeometry.disableRiskyPolygonOutlines(dataSource);
+  if (isSuspiciousCrsResult(crsInfo)) deps.outlineGeometry.flattenSuspiciousGeometry(dataSource);
+  if (clampToGround) {
+    deps.addPolygonOutlines(dataSource, deps.defaultOutlineColor, 2);
+  }
+  await viewer.dataSources.add(dataSource);
+  const colorHex = color.toCssHexString();
+  const managed = deps.register(layer.id, layer.title, layer.layerType, dataSource, false, colorHex);
+  deps.emitCrsCheckResult(managed.id, crsInfo);
+  afterRegister == null ? void 0 : afterRegister(managed);
+  deps.styleEngine.recordInitialStyle(managed.id, colorHex, 0.5, {
+    enabled: true,
+    color: deps.defaultOutlineColorHex,
+    width: 2
+  }, dataSource);
+  await deps.waitForRenderSettle();
+  return managed;
 }
-function decodeTextBuffer(_0x1d7958) {
+function decodeTextBuffer(buffer) {
   try {
-    return new TextDecoder("utf-8", { "fatal": !![] })["decode"](_0x1d7958);
+    return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
   } catch {
-    return new TextDecoder("windows-1254")["decode"](_0x1d7958);
+    return new TextDecoder("windows-1254").decode(buffer);
   }
 }
-const els = (_0x2823a7, _0x12239e) => Array["from"](_0x2823a7["getElementsByTagNameNS"]("*", _0x12239e)), el = (_0x4957b5, _0x15fdf6) => els(_0x4957b5, _0x15fdf6)[0], txt = (_0x4b8195, _0x209e2d) => {
+const els = (root, localName) => Array.from(root.getElementsByTagNameNS("*", localName));
+const el = (root, localName) => els(root, localName)[0];
+const txt = (root, localName) => {
   var _a2, _b;
-  return (_b = (_a2 = el(_0x4b8195, _0x209e2d)) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"]();
+  return (_b = (_a2 = el(root, localName)) == null ? void 0 : _a2.textContent) == null ? void 0 : _b.trim();
 };
-function buildWfsCapabilitiesUrl(_0x58963a) {
-  const _0x3405ab = new URL(_0x58963a, window["location"]["origin"]), _0x9a95f9 = new URL("" + _0x3405ab["origin"] + _0x3405ab["pathname"]);
-  for (const [_0x259125, _0x24aaa5] of _0x3405ab["searchParams"]["entries"]()) {
-    const _0x30ca9e = _0x259125["toLowerCase"]();
-    (_0x30ca9e === "url" || _0x30ca9e === "tucbsapikey") && _0x9a95f9["searchParams"]["set"](_0x259125, _0x24aaa5);
+function buildWfsCapabilitiesUrl(raw) {
+  const u = new URL(raw, window.location.origin);
+  const capsUrl = new URL(`${u.origin}${u.pathname}`);
+  for (const [key, value] of u.searchParams.entries()) {
+    const k = key.toLowerCase();
+    if (k === "url" || k === "tucbsapikey") {
+      capsUrl.searchParams.set(key, value);
+    }
   }
-  return _0x9a95f9["searchParams"]["set"]("service", "WFS"), _0x9a95f9["searchParams"]["set"]("request", "GetCapabilities"), _0x9a95f9["searchParams"]["set"]("acceptVersions", "2.0.0,1.1.0,1.0.0"), _0x9a95f9["toString"]();
+  capsUrl.searchParams.set("service", "WFS");
+  capsUrl.searchParams.set("request", "GetCapabilities");
+  capsUrl.searchParams.set("acceptVersions", "2.0.0,1.1.0,1.0.0");
+  return capsUrl.toString();
 }
-function isOgcExceptionXml(_0x2498c1) {
-  const _0x2563a6 = _0x2498c1["trimStart"]();
-  return _0x2563a6["startsWith"]("<") && (_0x2563a6["includes"]("ExceptionReport") || _0x2563a6["includes"]("ServiceExceptionReport"));
+function isOgcExceptionXml(text) {
+  const t = text.trimStart();
+  return t.startsWith("<") && (t.includes("ExceptionReport") || t.includes("ServiceExceptionReport"));
 }
-function repairBareAmpersands(_0x1c7416) {
-  return _0x1c7416["replace"](/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[\da-fA-F]+);)/gi, "&amp;");
+function repairBareAmpersands(xml) {
+  return xml.replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[\da-fA-F]+);)/gi, "&amp;");
 }
-async function fetchWfsCapabilities(_0x5d9d3e, _0x5800b1 = {}) {
-  const _0x2ff6c4 = await fetch(buildWfsCapabilitiesUrl(_0x5d9d3e), _0x5800b1);
-  if (!_0x2ff6c4["ok"]) throw new OgcRequestError("OGC_CAPABILITIES_REQUEST_FAILED", "WFS GetCapabilities başarısız: " + _0x2ff6c4["status"] + " " + _0x2ff6c4["statusText"]);
-  const _0x56f7f9 = await _0x2ff6c4["text"]();
-  if (isOgcExceptionXml(_0x56f7f9)) throw new OgcRequestError("OGC_CAPABILITIES_EXCEPTION", "WFS GetCapabilities OGC Exception döndü.");
-  const _0x167b8c = repairBareAmpersands(_0x56f7f9), _0x3d4c9e = new DOMParser()["parseFromString"](_0x167b8c, "application/xml");
-  if (_0x3d4c9e["querySelector"]("parsererror")) throw new OgcRequestError("OGC_CAPABILITIES_PARSE_FAILED", "WFS GetCapabilities XML parse edilemedi.");
-  const _0x4048b7 = _0x3d4c9e["documentElement"]["getAttribute"]("version") || "2.0.0", _0x5296d5 = [];
-  for (const _0xa029ad of els(_0x3d4c9e, "FeatureType")) {
-    const _0x37f2a8 = txt(_0xa029ad, "Name") || "";
-    if (!_0x37f2a8) continue;
-    const _0x4e174b = els(_0xa029ad, "OutputFormats")["flatMap"]((_0x9db2f9) => els(_0x9db2f9, "Format")["map"]((_0x520c32) => {
-      var _a2;
-      return ((_a2 = _0x520c32["textContent"]) == null ? void 0 : _a2["trim"]()) || "";
-    })["filter"](Boolean)), _0x1e0658 = txt(_0xa029ad, "Title"), _0x378c35 = txt(_0xa029ad, "DefaultCRS"), _0x47a585 = txt(_0xa029ad, "DefaultSRS");
-    _0x5296d5["push"]({ "name": _0x37f2a8, ..._0x1e0658 ? { "title": _0x1e0658 } : {}, ..._0x378c35 ? { "defaultCRS": _0x378c35 } : {}, ..._0x47a585 ? { "defaultSRS": _0x47a585 } : {}, ..._0x4e174b["length"] ? { "outputFormats": _0x4e174b } : {} });
+async function fetchWfsCapabilities(url, fetchOptions = {}) {
+  const response = await fetch(buildWfsCapabilitiesUrl(url), fetchOptions);
+  if (!response.ok) {
+    throw new OgcRequestError(
+      "OGC_CAPABILITIES_REQUEST_FAILED",
+      `WFS GetCapabilities başarısız: ${response.status} ${response.statusText}`
+    );
   }
-  const _0x1f5b84 = el(_0x3d4c9e, "OperationsMetadata");
-  let _0x5729e0 = [];
-  if (_0x1f5b84) {
-    const _0x41ff6a = els(_0x1f5b84, "Operation")["find"]((_0x112fdc) => (_0x112fdc["getAttribute"]("name") || "") === "GetFeature"), _0x41f1ae = els(_0x41ff6a ?? _0x1f5b84, "Parameter")["find"]((_0xce4df5) => (_0xce4df5["getAttribute"]("name") || "")["toLowerCase"]() === "outputformat");
-    _0x41f1ae && (_0x5729e0 = els(_0x41f1ae, "Value")["map"]((_0x182061) => {
-      var _a2;
-      return ((_a2 = _0x182061["textContent"]) == null ? void 0 : _a2["trim"]()) || "";
-    })["filter"](Boolean));
+  const xml = await response.text();
+  if (isOgcExceptionXml(xml)) {
+    throw new OgcRequestError("OGC_CAPABILITIES_EXCEPTION", "WFS GetCapabilities OGC Exception döndü.");
   }
-  if (!_0x5729e0["length"]) {
-    const _0x9cf9e1 = /* @__PURE__ */ new Set();
-    _0x5729e0 = _0x5296d5["flatMap"]((_0x3d6808) => _0x3d6808["outputFormats"] || [])["filter"]((_0x41f60d) => !_0x9cf9e1["has"](_0x41f60d) && _0x9cf9e1["add"](_0x41f60d));
+  const safeXml = repairBareAmpersands(xml);
+  const doc = new DOMParser().parseFromString(safeXml, "application/xml");
+  if (doc.querySelector("parsererror")) {
+    throw new OgcRequestError("OGC_CAPABILITIES_PARSE_FAILED", "WFS GetCapabilities XML parse edilemedi.");
   }
-  return { "version": _0x4048b7, "featureTypes": _0x5296d5, "outputFormats": _0x5729e0 };
-}
-function normName(_0x5e8df7) {
-  return _0x5e8df7["trim"]()["toLowerCase"]();
-}
-function localTypeName(_0x31f009) {
-  const _0x59f906 = _0x31f009["lastIndexOf"](":");
-  return _0x59f906 >= 0 ? _0x31f009["slice"](_0x59f906 + 1) : _0x31f009;
-}
-function resolveWfsFeatureType(_0x5848e1, _0x751ce4) {
-  if (!_0x751ce4["length"]) throw new OgcRequestError("OGC_FEATURE_TYPE_NOT_FOUND", "WFS FeatureType bulunamadı.");
-  const _0x1f1930 = _0x5848e1 == null ? void 0 : _0x5848e1["trim"]();
-  if (_0x1f1930) {
-    const _0x3dc986 = _0x751ce4["find"]((_0x1b018d) => normName(_0x1b018d["name"]) === normName(_0x1f1930));
-    if (_0x3dc986) return _0x3dc986;
-    const _0x4864ba = normName(localTypeName(_0x1f1930)), _0xb0efa1 = _0x751ce4["find"]((_0x4e7042) => normName(localTypeName(_0x4e7042["name"])) === _0x4864ba);
-    if (_0xb0efa1) return _0xb0efa1;
+  const version = doc.documentElement.getAttribute("version") || "2.0.0";
+  const featureTypes = [];
+  for (const node of els(doc, "FeatureType")) {
+    const name = txt(node, "Name") || "";
+    if (!name) continue;
+    const outputFormats2 = els(node, "OutputFormats").flatMap(
+      (of) => els(of, "Format").map((f) => {
+        var _a2;
+        return ((_a2 = f.textContent) == null ? void 0 : _a2.trim()) || "";
+      }).filter(Boolean)
+    );
+    const title = txt(node, "Title");
+    const defaultCRS = txt(node, "DefaultCRS");
+    const defaultSRS = txt(node, "DefaultSRS");
+    const srs = txt(node, "SRS");
+    featureTypes.push({
+      name,
+      ...title ? { title } : {},
+      ...defaultCRS ? { defaultCRS } : {},
+      ...defaultSRS ? { defaultSRS } : {},
+      ...srs ? { srs } : {},
+      ...outputFormats2.length ? { outputFormats: outputFormats2 } : {}
+    });
   }
-  return _0x751ce4[0];
+  const opMeta = el(doc, "OperationsMetadata");
+  let outputFormats = [];
+  if (opMeta) {
+    const getFeatureOp = els(opMeta, "Operation").find(
+      (op) => (op.getAttribute("name") || "") === "GetFeature"
+    );
+    const ofParam = els(getFeatureOp ?? opMeta, "Parameter").find(
+      (p) => (p.getAttribute("name") || "").toLowerCase() === "outputformat"
+    );
+    if (ofParam) {
+      outputFormats = els(ofParam, "Value").map((v) => {
+        var _a2;
+        return ((_a2 = v.textContent) == null ? void 0 : _a2.trim()) || "";
+      }).filter(Boolean);
+    }
+  }
+  if (!outputFormats.length) {
+    const seen = /* @__PURE__ */ new Set();
+    outputFormats = featureTypes.flatMap((ft) => ft.outputFormats || []).filter((f) => !seen.has(f) && seen.add(f));
+  }
+  return { version, featureTypes, outputFormats };
 }
-function pickJsonOutput(_0x4d5708) {
-  const _0x6881d2 = ["application/geo+json", "application/json;subtype=geojson", "application/json", "geojson", "json", "esrigeojson", "geojson+gzip", "geojson+zip"], _0x183ffc = _0x4d5708["map"]((_0x22d8dc) => _0x22d8dc["toLowerCase"]()["replace"](/\s+/g, ""));
-  for (const _0x2dd2a5 of _0x6881d2) {
-    const _0xf21e7a = _0x183ffc["findIndex"]((_0x45e1d0) => _0x45e1d0 === _0x2dd2a5 || _0x45e1d0["includes"](_0x2dd2a5));
-    if (_0xf21e7a >= 0) return _0x4d5708[_0xf21e7a] ?? null;
+function normName(name) {
+  return name.trim().toLowerCase();
+}
+function localTypeName(name) {
+  const idx = name.lastIndexOf(":");
+  return idx >= 0 ? name.slice(idx + 1) : name;
+}
+function resolveWfsFeatureType(hint, featureTypes) {
+  if (!featureTypes.length) {
+    throw new OgcRequestError("OGC_FEATURE_TYPE_NOT_FOUND", "WFS FeatureType bulunamadı.");
+  }
+  const h = hint == null ? void 0 : hint.trim();
+  if (h) {
+    const exact = featureTypes.find((ft) => normName(ft.name) === normName(h));
+    if (exact) return exact;
+    const local = normName(localTypeName(h));
+    const byLocal = featureTypes.find(
+      (ft) => normName(localTypeName(ft.name)) === local
+    );
+    if (byLocal) return byLocal;
+  }
+  return featureTypes[0];
+}
+function pickJsonOutput(formats) {
+  const prefs = [
+    "application/geo+json",
+    "application/json;subtype=geojson",
+    "application/json",
+    "geojson",
+    "json",
+    "esrigeojson",
+    "geojson+gzip",
+    "geojson+zip"
+  ];
+  const norm = formats.map((f) => f.toLowerCase().replace(/\s+/g, ""));
+  for (const p of prefs) {
+    const i = norm.findIndex((f) => f === p || f.includes(p));
+    if (i >= 0) return formats[i] ?? null;
   }
   return null;
 }
-function buildWfsGetFeaturePlan(_0x75d94d) {
-  const _0x3f03ae = resolveWfsFeatureType(_0x75d94d["typeNameHint"], _0x75d94d["caps"]["featureTypes"]), _0x4f21ee = _0x75d94d["version"] || _0x75d94d["caps"]["version"] || "2.0.0", _0x1fd155 = _0x75d94d["srsName"] || _0x3f03ae["defaultCRS"] || _0x3f03ae["defaultSRS"] || "EPSG:4326", _0x3865a7 = _0x75d94d["outputFormat"] || pickJsonOutput(_0x3f03ae["outputFormats"] || []) || pickJsonOutput(_0x75d94d["caps"]["outputFormats"]), _0x17eccd = _0x75d94d["maxFeatures"] ?? 5e3;
-  return { "version": _0x4f21ee, "typeName": _0x3f03ae["name"], "srsName": _0x1fd155, "jsonOutputFormat": _0x3865a7, "maxFeatures": _0x17eccd };
+function buildWfsGetFeaturePlan(args) {
+  const ft = resolveWfsFeatureType(args.typeNameHint, args.caps.featureTypes);
+  const version = args.version || args.caps.version || "2.0.0";
+  const srsName = args.srsName || ft.defaultCRS || ft.defaultSRS || "EPSG:4326";
+  const jsonOutputFormat = args.outputFormat || pickJsonOutput(ft.outputFormats || []) || pickJsonOutput(args.caps.outputFormats);
+  const maxFeatures = args.maxFeatures ?? 5e3;
+  const nativeSrs = ft.defaultCRS || ft.defaultSRS || ft.srs;
+  return {
+    version,
+    typeName: ft.name,
+    srsName,
+    jsonOutputFormat,
+    maxFeatures,
+    ...nativeSrs && { nativeSrs }
+  };
 }
-function appendWfsGetFeatureParams(_0x165980, _0x19baa5, _0x131842) {
-  _0x165980["set"]("service", "WFS"), _0x165980["set"]("request", "GetFeature"), _0x165980["set"]("version", _0x19baa5["version"]);
-  const _0x3acd6f = _0x19baa5["version"]["startsWith"]("2.");
-  _0x165980["set"](_0x3acd6f ? "typeNames" : "typeName", _0x19baa5["typeName"]), _0x165980["set"]("srsName", _0x19baa5["srsName"]);
-  _0x131842 && _0x165980["set"]("outputFormat", _0x131842);
-  const _0x43bbec = _0x3acd6f ? "count" : "maxFeatures";
-  _0x165980["set"](_0x43bbec, String(_0x19baa5["maxFeatures"]));
-}
-async function getCapabilities(_0x18bdf3, _0x31639f, _0x3cd985) {
-  const _0x4f7de8 = _0x3cd985 == null ? void 0 : _0x3cd985["mergeApiKeyHeader"](_0x3cd985["buildAuthHeaders"](_0x31639f), _0x18bdf3), _0x3d9ee6 = await fetch(_0x18bdf3, _0x4f7de8 ? { "headers": _0x4f7de8 } : void 0);
-  if (!_0x3d9ee6["ok"]) throw new OgcRequestError("OGC_CAPABILITIES_REQUEST_FAILED", "GetCapabilities isteği başarısız: " + _0x3d9ee6["status"] + " " + _0x3d9ee6["statusText"]);
-  const _0x3f99b0 = await _0x3d9ee6["text"](), _0x30455a = new DOMParser()["parseFromString"](_0x3f99b0, "application/xml");
-  if (_0x30455a["getElementsByTagName"]("parsererror")["length"] > 0) throw new OgcRequestError("OGC_SERVICE_DISCOVERY_PARSE_FAILED", "GetCapabilities yanıtı XML olarak ayrıştırılamadı.");
-  return _0x30455a;
-}
-function parseWmsStyles(_0x235def, _0x53a3ff) {
-  var _a2, _b, _c, _d;
-  const _0x35ac23 = elementsByLocalName(_0x235def, "Layer")["find"]((_0x26b6ca) => {
-    var _a3, _b2;
-    return ((_b2 = (_a3 = childByLocalName(_0x26b6ca, "Name")) == null ? void 0 : _a3["textContent"]) == null ? void 0 : _b2["trim"]()) === _0x53a3ff;
-  });
-  if (!_0x35ac23) return [];
-  const _0x90e048 = [];
-  for (const _0xb5ec68 of Array["from"](_0x35ac23["children"])) {
-    if (_0xb5ec68["localName"] !== "Style") continue;
-    const _0x38f957 = (_b = (_a2 = childByLocalName(_0xb5ec68, "Name")) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"]();
-    if (!_0x38f957) continue;
-    const _0x59c43e = ((_d = (_c = childByLocalName(_0xb5ec68, "Title")) == null ? void 0 : _c["textContent"]) == null ? void 0 : _d["trim"]()) ?? _0x38f957;
-    _0x90e048["push"]({ "name": _0x38f957, "title": _0x59c43e });
+function appendWfsGetFeatureParams(params, plan, outputFormat) {
+  params.set("service", "WFS");
+  params.set("request", "GetFeature");
+  params.set("version", plan.version);
+  const isV2 = plan.version.startsWith("2.");
+  params.set(isV2 ? "typeNames" : "typeName", plan.typeName);
+  params.set("srsName", plan.srsName);
+  if (outputFormat) {
+    params.set("outputFormat", outputFormat);
   }
-  return _0x90e048;
+  const limitParam = isV2 ? "count" : "maxFeatures";
+  params.set(limitParam, String(plan.maxFeatures));
+  if (plan.bbox) {
+    params.set("bbox", plan.bbox);
+  }
 }
-function parseWmtsStyles(_0x385a4c, _0x529b6a) {
+async function getCapabilities(url, authToken, authContext) {
+  const headers = authContext == null ? void 0 : authContext.mergeApiKeyHeader(authContext.buildAuthHeaders(authToken), url);
+  const response = await fetch(url, headers ? { headers } : void 0);
+  if (!response.ok) {
+    throw new OgcRequestError("OGC_CAPABILITIES_REQUEST_FAILED", `GetCapabilities isteği başarısız: ${response.status} ${response.statusText}`);
+  }
+  const text = await response.text();
+  const doc = new DOMParser().parseFromString(text, "application/xml");
+  if (doc.getElementsByTagName("parsererror").length > 0) {
+    throw new OgcRequestError("OGC_SERVICE_DISCOVERY_PARSE_FAILED", "GetCapabilities yanıtı XML olarak ayrıştırılamadı.");
+  }
+  return doc;
+}
+function parseWmsStyles(xml, layerName) {
+  var _a2, _b, _c, _d;
+  const layerEl = elementsByLocalName(xml, "Layer").find(
+    (layer) => {
+      var _a3, _b2;
+      return ((_b2 = (_a3 = childByLocalName(layer, "Name")) == null ? void 0 : _a3.textContent) == null ? void 0 : _b2.trim()) === layerName;
+    }
+  );
+  if (!layerEl) return [];
+  const styles = [];
+  for (const styleEl of Array.from(layerEl.children)) {
+    if (styleEl.localName !== "Style") continue;
+    const name = (_b = (_a2 = childByLocalName(styleEl, "Name")) == null ? void 0 : _a2.textContent) == null ? void 0 : _b.trim();
+    if (!name) continue;
+    const title = ((_d = (_c = childByLocalName(styleEl, "Title")) == null ? void 0 : _c.textContent) == null ? void 0 : _d.trim()) ?? name;
+    styles.push({ name, title });
+  }
+  return styles;
+}
+function parseWmtsStyles(xml, layerName) {
   var _a2, _b, _c, _d, _e;
-  const _0xbbab3c = elementsByLocalName(_0x385a4c, "Layer")["find"]((_0x220023) => {
-    var _a3, _b2;
-    return ((_b2 = (_a3 = childByLocalName(_0x220023, "Identifier")) == null ? void 0 : _a3["textContent"]) == null ? void 0 : _b2["trim"]()) === _0x529b6a;
-  });
-  if (!_0xbbab3c) return [];
-  const _0x19d8d8 = [];
-  for (const _0x5db4ab of Array["from"](_0xbbab3c["children"])) {
-    if (_0x5db4ab["localName"] !== "Style") continue;
-    const _0x2461ec = (_b = (_a2 = childByLocalName(_0x5db4ab, "Identifier")) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"]();
-    if (!_0x2461ec) continue;
-    const _0x2656b7 = ((_d = (_c = childByLocalName(_0x5db4ab, "Title")) == null ? void 0 : _c["textContent"]) == null ? void 0 : _d["trim"]()) ?? _0x2461ec, _0x57f2e0 = ((_e = childByLocalName(_0x5db4ab, "LegendURL")) == null ? void 0 : _e["getAttribute"]("xlink:href")) ?? "", _0x3ebaef = _0x5db4ab["getAttribute"]("isDefault") === "true";
-    _0x19d8d8["push"]({ "name": _0x2461ec, "title": _0x2656b7, "legendUrl": _0x57f2e0, "isDefault": _0x3ebaef });
+  const layerEl = elementsByLocalName(xml, "Layer").find(
+    (layer) => {
+      var _a3, _b2;
+      return ((_b2 = (_a3 = childByLocalName(layer, "Identifier")) == null ? void 0 : _a3.textContent) == null ? void 0 : _b2.trim()) === layerName;
+    }
+  );
+  if (!layerEl) return [];
+  const styles = [];
+  for (const styleEl of Array.from(layerEl.children)) {
+    if (styleEl.localName !== "Style") continue;
+    const name = (_b = (_a2 = childByLocalName(styleEl, "Identifier")) == null ? void 0 : _a2.textContent) == null ? void 0 : _b.trim();
+    if (!name) continue;
+    const title = ((_d = (_c = childByLocalName(styleEl, "Title")) == null ? void 0 : _c.textContent) == null ? void 0 : _d.trim()) ?? name;
+    const legendUrl = ((_e = childByLocalName(styleEl, "LegendURL")) == null ? void 0 : _e.getAttribute("xlink:href")) ?? "";
+    const isDefault = styleEl.getAttribute("isDefault") === "true";
+    styles.push({ name, title, legendUrl, isDefault });
   }
-  return _0x19d8d8["sort"]((_0x3eb91e, _0x115cc3) => Number(_0x115cc3["isDefault"]) - Number(_0x3eb91e["isDefault"])), _0x19d8d8["map"]((_0x4c55af) => ({ "name": _0x4c55af["name"], "title": _0x4c55af["title"], "legendUrl": _0x4c55af["legendUrl"] }));
+  styles.sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
+  return styles.map((style) => ({ name: style.name, title: style.title, legendUrl: style.legendUrl }));
 }
-function buildCapabilitiesUrl(_0x3679be, _0x434a94, _0xd52488) {
-  const _0x58a604 = new URL(_0x3679be);
-  return _0x58a604["searchParams"]["set"]("SERVICE", _0x434a94), _0x58a604["searchParams"]["set"]("REQUEST", "GetCapabilities"), _0x58a604["searchParams"]["set"]("VERSION", _0xd52488), _0x58a604["toString"]();
+function buildCapabilitiesUrl(baseUrl, serviceType, version) {
+  const url = new URL(baseUrl);
+  url.searchParams.set("SERVICE", serviceType);
+  url.searchParams.set("REQUEST", "GetCapabilities");
+  url.searchParams.set("VERSION", version);
+  return url.toString();
 }
-function elementsByLocalName(_0x372652, _0x3b5fa7) {
-  return Array["from"](_0x372652["getElementsByTagNameNS"]("*", _0x3b5fa7));
+function elementsByLocalName(root, tagName) {
+  return Array.from(root.getElementsByTagNameNS("*", tagName));
 }
-function childByLocalName(_0x1852c6, _0x2ad1ad) {
-  return Array["from"](_0x1852c6["children"])["find"]((_0x37628e) => _0x37628e["localName"] === _0x2ad1ad);
+function childByLocalName(element, tagName) {
+  return Array.from(element.children).find(
+    (child) => child.localName === tagName
+  );
 }
-function parseWmsGeographicBoundingBox(_0x4ed7a1) {
+function lonLatBox(lowerText, upperText) {
+  const lower = (lowerText == null ? void 0 : lowerText.trim().split(/\s+/).map(Number)) ?? [];
+  const upper = (upperText == null ? void 0 : upperText.trim().split(/\s+/).map(Number)) ?? [];
+  if (lower.length < 2 || upper.length < 2) return void 0;
+  const box = { west: lower[0], south: lower[1], east: upper[0], north: upper[1] };
+  return Object.values(box).every(Number.isFinite) ? box : void 0;
+}
+function parseWcsSummaryBoundingBox(summary) {
+  var _a2, _b;
+  const bbox = childByLocalName(summary, "WGS84BoundingBox");
+  if (!bbox) return void 0;
+  return lonLatBox(
+    (_a2 = childByLocalName(bbox, "LowerCorner")) == null ? void 0 : _a2.textContent,
+    (_b = childByLocalName(bbox, "UpperCorner")) == null ? void 0 : _b.textContent
+  );
+}
+function parseWcs10LonLatEnvelope(brief) {
+  const envelope = childByLocalName(brief, "lonLatEnvelope");
+  if (!envelope) return void 0;
+  const [lower, upper] = Array.from(envelope.children).filter((child) => child.localName === "pos");
+  return lonLatBox(lower == null ? void 0 : lower.textContent, upper == null ? void 0 : upper.textContent);
+}
+function parseWmsGeographicBoundingBox(layer) {
   var _a2, _b, _c, _d;
-  const _0x242e6b = childByLocalName(_0x4ed7a1, "EX_GeographicBoundingBox");
-  if (_0x242e6b) {
-    const _0x42fa65 = (_a2 = childByLocalName(_0x242e6b, "westBoundLongitude")) == null ? void 0 : _a2["textContent"], _0x35fa9a = (_b = childByLocalName(_0x242e6b, "eastBoundLongitude")) == null ? void 0 : _b["textContent"], _0x4d7524 = (_c = childByLocalName(_0x242e6b, "southBoundLatitude")) == null ? void 0 : _c["textContent"], _0x3bb97c = (_d = childByLocalName(_0x242e6b, "northBoundLatitude")) == null ? void 0 : _d["textContent"];
-    if (_0x42fa65 && _0x35fa9a && _0x4d7524 && _0x3bb97c) {
-      const _0x23de78 = { "west": Number(_0x42fa65), "south": Number(_0x4d7524), "east": Number(_0x35fa9a), "north": Number(_0x3bb97c) };
-      if (Object["values"](_0x23de78)["every"](Number["isFinite"])) return _0x23de78;
+  const exBbox = childByLocalName(layer, "EX_GeographicBoundingBox");
+  if (exBbox) {
+    const west = (_a2 = childByLocalName(exBbox, "westBoundLongitude")) == null ? void 0 : _a2.textContent;
+    const east = (_b = childByLocalName(exBbox, "eastBoundLongitude")) == null ? void 0 : _b.textContent;
+    const south = (_c = childByLocalName(exBbox, "southBoundLatitude")) == null ? void 0 : _c.textContent;
+    const north = (_d = childByLocalName(exBbox, "northBoundLatitude")) == null ? void 0 : _d.textContent;
+    if (west && east && south && north) {
+      const box = {
+        west: Number(west),
+        south: Number(south),
+        east: Number(east),
+        north: Number(north)
+      };
+      if (Object.values(box).every(Number.isFinite)) return box;
     }
   }
-  const _0x433c66 = childByLocalName(_0x4ed7a1, "LatLonBoundingBox");
-  if (_0x433c66) {
-    const _0x2b1c78 = { "west": Number(_0x433c66["getAttribute"]("minx")), "south": Number(_0x433c66["getAttribute"]("miny")), "east": Number(_0x433c66["getAttribute"]("maxx")), "north": Number(_0x433c66["getAttribute"]("maxy")) };
-    if (Object["values"](_0x2b1c78)["every"](Number["isFinite"])) return _0x2b1c78;
+  const llBbox = childByLocalName(layer, "LatLonBoundingBox");
+  if (llBbox) {
+    const box = {
+      west: Number(llBbox.getAttribute("minx")),
+      south: Number(llBbox.getAttribute("miny")),
+      east: Number(llBbox.getAttribute("maxx")),
+      north: Number(llBbox.getAttribute("maxy"))
+    };
+    if (Object.values(box).every(Number.isFinite)) return box;
   }
   return void 0;
 }
-function parseWmsCapabilities(_0x2dc05e) {
+function parseWmsCapabilities(doc) {
   var _a2;
-  const _0xc1e653 = [];
-  for (const _0x3fed9b of elementsByLocalName(_0x2dc05e, "Layer")) {
-    const _0x2378e0 = childByLocalName(_0x3fed9b, "Name");
-    if (!(_0x2378e0 == null ? void 0 : _0x2378e0["textContent"])) continue;
-    const _0x3facf4 = childByLocalName(_0x3fed9b, "Title"), _0x41c002 = parseWmsGeographicBoundingBox(_0x3fed9b);
-    _0xc1e653["push"]({ "identifier": _0x2378e0["textContent"]["trim"](), "title": ((_a2 = _0x3facf4 == null ? void 0 : _0x3facf4["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x2378e0["textContent"]["trim"](), ..._0x41c002 && { "geographicBoundingBox": _0x41c002 } });
+  const items = [];
+  for (const layer of elementsByLocalName(doc, "Layer")) {
+    const nameEl = childByLocalName(layer, "Name");
+    if (!(nameEl == null ? void 0 : nameEl.textContent)) continue;
+    const titleEl = childByLocalName(layer, "Title");
+    const geographicBoundingBox = parseWmsGeographicBoundingBox(layer);
+    items.push({
+      identifier: nameEl.textContent.trim(),
+      title: ((_a2 = titleEl == null ? void 0 : titleEl.textContent) == null ? void 0 : _a2.trim()) || nameEl.textContent.trim(),
+      ...geographicBoundingBox && { geographicBoundingBox }
+    });
   }
-  return _0xc1e653;
+  return items;
 }
-function parseWmsTiffFormat(_0x463bd4) {
-  const _0x3db08e = elementsByLocalName(_0x463bd4, "GetMap")[0];
-  if (!_0x3db08e) return void 0;
-  const _0x39de17 = new Set(elementsByLocalName(_0x3db08e, "Format")["map"]((_0x15c45d) => {
-    var _a2;
-    return (_a2 = _0x15c45d["textContent"]) == null ? void 0 : _a2["trim"]()["toLowerCase"]();
-  })["filter"]((_0x15d974) => !!_0x15d974));
-  if (_0x39de17["has"]("image/geotiff")) return "image/geotiff";
-  if (_0x39de17["has"]("image/tiff")) return "image/tiff";
+function parseWmsTiffFormat(doc) {
+  const getMapEl = elementsByLocalName(doc, "GetMap")[0];
+  if (!getMapEl) return void 0;
+  const formats = new Set(
+    elementsByLocalName(getMapEl, "Format").map((el2) => {
+      var _a2;
+      return (_a2 = el2.textContent) == null ? void 0 : _a2.trim().toLowerCase();
+    }).filter((value) => !!value)
+  );
+  if (formats.has("image/geotiff")) return "image/geotiff";
+  if (formats.has("image/tiff")) return "image/tiff";
   return void 0;
 }
-function parseWcsTiffFormat(_0xf7a12a) {
-  const _0x4fbe1e = new Set(elementsByLocalName(_0xf7a12a, "formatSupported")["map"]((_0x4c9e7c) => {
-    var _a2;
-    return (_a2 = _0x4c9e7c["textContent"]) == null ? void 0 : _a2["trim"]()["toLowerCase"]();
-  })["filter"]((_0x5a3e99) => !!_0x5a3e99));
-  if (_0x4fbe1e["has"]("image/geotiff")) return "image/geotiff";
-  if (_0x4fbe1e["has"]("image/tiff")) return "image/tiff";
+function parseWcsTiffFormat(doc) {
+  const formats = new Set(
+    elementsByLocalName(doc, "formatSupported").map((el2) => {
+      var _a2;
+      return (_a2 = el2.textContent) == null ? void 0 : _a2.trim().toLowerCase();
+    }).filter((value) => !!value)
+  );
+  if (formats.has("image/geotiff")) return "image/geotiff";
+  if (formats.has("image/tiff")) return "image/tiff";
   return void 0;
 }
-function parseWmtsCapabilities(_0x5d0952) {
+function parseWmtsCapabilities(doc) {
   var _a2;
-  const _0x4614e6 = [];
-  for (const _0x1795f1 of elementsByLocalName(_0x5d0952, "Layer")) {
-    const _0x436eba = childByLocalName(_0x1795f1, "Identifier");
-    if (!(_0x436eba == null ? void 0 : _0x436eba["textContent"])) continue;
-    const _0x17c636 = childByLocalName(_0x1795f1, "Title"), _0x4fdb64 = childByLocalName(_0x1795f1, "TileMatrixSetLink"), _0x52706f = _0x4fdb64 ? childByLocalName(_0x4fdb64, "TileMatrixSet") : void 0;
-    _0x4614e6["push"]({ "identifier": _0x436eba["textContent"]["trim"](), "title": ((_a2 = _0x17c636 == null ? void 0 : _0x17c636["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x436eba["textContent"]["trim"](), ...(_0x52706f == null ? void 0 : _0x52706f["textContent"]) && { "tileMatrixSetID": _0x52706f["textContent"]["trim"]() } });
+  const items = [];
+  for (const layer of elementsByLocalName(doc, "Layer")) {
+    const idEl = childByLocalName(layer, "Identifier");
+    if (!(idEl == null ? void 0 : idEl.textContent)) continue;
+    const titleEl = childByLocalName(layer, "Title");
+    const tmsLinkEl = childByLocalName(layer, "TileMatrixSetLink");
+    const tmsEl = tmsLinkEl ? childByLocalName(tmsLinkEl, "TileMatrixSet") : void 0;
+    items.push({
+      identifier: idEl.textContent.trim(),
+      title: ((_a2 = titleEl == null ? void 0 : titleEl.textContent) == null ? void 0 : _a2.trim()) || idEl.textContent.trim(),
+      ...(tmsEl == null ? void 0 : tmsEl.textContent) && { tileMatrixSetID: tmsEl.textContent.trim() }
+    });
   }
-  return _0x4614e6;
+  return items;
 }
-function parseWfsCapabilities(_0x5b8dc8) {
+function parseWfsCapabilities(doc) {
   var _a2;
-  const _0x6595ae = [];
-  for (const _0xef8b64 of elementsByLocalName(_0x5b8dc8, "FeatureType")) {
-    const _0x5160f7 = childByLocalName(_0xef8b64, "Name");
-    if (!(_0x5160f7 == null ? void 0 : _0x5160f7["textContent"])) continue;
-    const _0x37d64a = childByLocalName(_0xef8b64, "Title");
-    _0x6595ae["push"]({ "identifier": _0x5160f7["textContent"]["trim"](), "title": ((_a2 = _0x37d64a == null ? void 0 : _0x37d64a["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x5160f7["textContent"]["trim"]() });
+  const items = [];
+  for (const featureType of elementsByLocalName(doc, "FeatureType")) {
+    const nameEl = childByLocalName(featureType, "Name");
+    if (!(nameEl == null ? void 0 : nameEl.textContent)) continue;
+    const titleEl = childByLocalName(featureType, "Title");
+    items.push({
+      identifier: nameEl.textContent.trim(),
+      title: ((_a2 = titleEl == null ? void 0 : titleEl.textContent) == null ? void 0 : _a2.trim()) || nameEl.textContent.trim()
+    });
   }
-  return _0x6595ae;
+  return items;
 }
-function parseWcsCapabilities(_0x2d4209) {
+function parseWcsCapabilities(doc) {
   var _a2, _b;
-  const _0x5836ce = [];
-  for (const _0x5f5390 of elementsByLocalName(_0x2d4209, "CoverageSummary")) {
-    const _0x359f08 = childByLocalName(_0x5f5390, "CoverageId") ?? childByLocalName(_0x5f5390, "Identifier");
-    if (!(_0x359f08 == null ? void 0 : _0x359f08["textContent"])) continue;
-    const _0xd49685 = childByLocalName(_0x5f5390, "Title");
-    _0x5836ce["push"]({ "identifier": _0x359f08["textContent"]["trim"](), "title": ((_a2 = _0xd49685 == null ? void 0 : _0xd49685["textContent"]) == null ? void 0 : _a2["trim"]()) || _0x359f08["textContent"]["trim"]() });
+  const items = [];
+  for (const summary of elementsByLocalName(doc, "CoverageSummary")) {
+    const idEl = childByLocalName(summary, "CoverageId") ?? childByLocalName(summary, "Identifier");
+    if (!(idEl == null ? void 0 : idEl.textContent)) continue;
+    const titleEl = childByLocalName(summary, "Title");
+    const geographicBoundingBox = parseWcsSummaryBoundingBox(summary);
+    items.push({
+      identifier: idEl.textContent.trim(),
+      title: ((_a2 = titleEl == null ? void 0 : titleEl.textContent) == null ? void 0 : _a2.trim()) || idEl.textContent.trim(),
+      ...geographicBoundingBox && { geographicBoundingBox }
+    });
   }
-  if (_0x5836ce["length"] > 0) return _0x5836ce;
-  for (const _0x25a109 of elementsByLocalName(_0x2d4209, "CoverageOfferingBrief")) {
-    const _0x195755 = childByLocalName(_0x25a109, "name");
-    if (!(_0x195755 == null ? void 0 : _0x195755["textContent"])) continue;
-    const _0x6dad07 = childByLocalName(_0x25a109, "label");
-    _0x5836ce["push"]({ "identifier": _0x195755["textContent"]["trim"](), "title": ((_b = _0x6dad07 == null ? void 0 : _0x6dad07["textContent"]) == null ? void 0 : _b["trim"]()) || _0x195755["textContent"]["trim"]() });
+  if (items.length > 0) return items;
+  for (const brief of elementsByLocalName(doc, "CoverageOfferingBrief")) {
+    const nameEl = childByLocalName(brief, "name");
+    if (!(nameEl == null ? void 0 : nameEl.textContent)) continue;
+    const labelEl = childByLocalName(brief, "label");
+    const geographicBoundingBox = parseWcs10LonLatEnvelope(brief);
+    items.push({
+      identifier: nameEl.textContent.trim(),
+      title: ((_b = labelEl == null ? void 0 : labelEl.textContent) == null ? void 0 : _b.trim()) || nameEl.textContent.trim(),
+      ...geographicBoundingBox && { geographicBoundingBox }
+    });
   }
-  return _0x5836ce;
+  return items;
 }
-async function parseWcsCoverageEnvelope(_0x434705) {
+async function parseWcsCoverageEnvelope(descriptionEl) {
   var _a2, _b, _c, _d;
-  const _0x58c7e1 = childByLocalName(_0x434705, "boundedBy"), _0xc74d92 = _0x58c7e1 ? childByLocalName(_0x58c7e1, "Envelope") : void 0;
-  if (!_0xc74d92) return void 0;
-  const _0x2ec96f = (_b = (_a2 = childByLocalName(_0xc74d92, "lowerCorner")) == null ? void 0 : _a2["textContent"]) == null ? void 0 : _b["trim"](), _0x3183e4 = (_d = (_c = childByLocalName(_0xc74d92, "upperCorner")) == null ? void 0 : _c["textContent"]) == null ? void 0 : _d["trim"]();
-  if (!_0x2ec96f || !_0x3183e4) return void 0;
-  const _0x38f1b0 = _0x2ec96f["split"](/\s+/)["map"](Number), _0x5cf0c4 = _0x3183e4["split"](/\s+/)["map"](Number);
-  if (_0x38f1b0["length"] < 2 || _0x5cf0c4["length"] < 2) return void 0;
-  if (![..._0x38f1b0, ..._0x5cf0c4]["every"](Number["isFinite"])) return void 0;
-  const _0x3098b0 = (_0xc74d92["getAttribute"]("axisLabels") ?? "")["trim"]()["toLowerCase"](), _0x1bd7a0 = (_0xc74d92["getAttribute"]("uomLabels") ?? "")["toLowerCase"]();
-  if (_0x1bd7a0["includes"]("deg")) {
-    const _0x373dd6 = _0x3098b0["startsWith"]("lat");
-    return _0x373dd6 ? { "south": _0x38f1b0[0], "west": _0x38f1b0[1], "north": _0x5cf0c4[0], "east": _0x5cf0c4[1] } : { "west": _0x38f1b0[0], "south": _0x38f1b0[1], "east": _0x5cf0c4[0], "north": _0x5cf0c4[1] };
+  const boundedByEl = childByLocalName(descriptionEl, "boundedBy");
+  const envelopeEl = boundedByEl ? childByLocalName(boundedByEl, "Envelope") : void 0;
+  if (!envelopeEl) return void 0;
+  const lowerText = (_b = (_a2 = childByLocalName(envelopeEl, "lowerCorner")) == null ? void 0 : _a2.textContent) == null ? void 0 : _b.trim();
+  const upperText = (_d = (_c = childByLocalName(envelopeEl, "upperCorner")) == null ? void 0 : _c.textContent) == null ? void 0 : _d.trim();
+  if (!lowerText || !upperText) return void 0;
+  const lowerTokens = lowerText.split(/\s+/);
+  const upperTokens = upperText.split(/\s+/);
+  const axes = (envelopeEl.getAttribute("axisLabels") ?? "").trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const uomLabels = (envelopeEl.getAttribute("uomLabels") ?? "").toLowerCase();
+  const isGeographic = uomLabels.includes("deg");
+  const xIndex = axes.findIndex((a) => isGeographic ? a.startsWith("lon") : a === "x" || a.startsWith("e"));
+  const yIndex = axes.findIndex((a) => isGeographic ? a.startsWith("lat") : a === "y" || a.startsWith("n"));
+  const yFirst = axes[0] !== void 0 && /^(lat|y|n)/.test(axes[0]);
+  const [xi, yi] = xIndex >= 0 && yIndex >= 0 ? [xIndex, yIndex] : yFirst ? [1, 0] : [0, 1];
+  const lower = [Number(lowerTokens[xi]), Number(lowerTokens[yi])];
+  const upper = [Number(upperTokens[xi]), Number(upperTokens[yi])];
+  if (![...lower, ...upper].every(Number.isFinite)) return void 0;
+  if (isGeographic) {
+    return { west: lower[0], south: lower[1], east: upper[0], north: upper[1] };
   }
-  const _0xa42aa7 = _0xc74d92["getAttribute"]("srsName") ?? "";
-  return resolveProjectedEnvelope(_0xa42aa7, _0x3098b0, _0x38f1b0, _0x5cf0c4);
+  const srsName = envelopeEl.getAttribute("srsName") ?? "";
+  return resolveProjectedEnvelope(srsName, lower, upper);
 }
-async function resolveProjectedEnvelope(_0x4ef421, _0x1086ee, _0x4910b2, _0x3cd9f) {
-  const _0x39101e = extractEpsgCode(_0x4ef421);
-  if (!_0x39101e) return void 0;
-  const _0x437aeb = await ensureProj4Def(_0x39101e);
-  if (!_0x437aeb) return void 0;
+async function resolveProjectedEnvelope(srsName, lower, upper) {
+  const epsgCode = extractEpsgCode(srsName);
+  if (!epsgCode) return void 0;
+  const proj4 = await ensureProj4Def(epsgCode);
+  if (!proj4) return void 0;
   try {
-    const _0x50228b = _0x1086ee["startsWith"]("y") || _0x1086ee["startsWith"]("n"), _0x19c1cc = (_0x2c4c24) => _0x50228b ? [_0x2c4c24[1], _0x2c4c24[0]] : [_0x2c4c24[0], _0x2c4c24[1]], [_0x5bdae6, _0x34711b] = _0x19c1cc(_0x4910b2), [_0x17c681, _0x149f8e] = _0x19c1cc(_0x3cd9f), _0x1de042 = [[_0x5bdae6, _0x34711b], [_0x17c681, _0x149f8e], [_0x5bdae6, _0x149f8e], [_0x17c681, _0x34711b]], _0x1dc79d = "EPSG:" + _0x39101e, _0xa5b69b = _0x1de042["map"]((_0x1ffc85) => _0x437aeb(_0x1dc79d, "EPSG:4326", _0x1ffc85)), _0x1c881e = _0xa5b69b["map"]((_0x23c23a) => _0x23c23a[0]), _0x48ad57 = _0xa5b69b["map"]((_0x1040d3) => _0x1040d3[1]), _0x798909 = { "west": Math["min"](..._0x1c881e), "east": Math["max"](..._0x1c881e), "south": Math["min"](..._0x48ad57), "north": Math["max"](..._0x48ad57) };
-    if (!Object["values"](_0x798909)["every"](Number["isFinite"])) return void 0;
-    return _0x798909;
+    const [lx, ly] = [lower[0], lower[1]];
+    const [ux, uy] = [upper[0], upper[1]];
+    const corners = [
+      [lx, ly],
+      [ux, uy],
+      [lx, uy],
+      [ux, ly]
+    ];
+    const from = `EPSG:${epsgCode}`;
+    const projected = corners.map((xy2) => proj4(from, "EPSG:4326", xy2));
+    const lons = projected.map((p) => p[0]);
+    const lats = projected.map((p) => p[1]);
+    const box = {
+      west: Math.min(...lons),
+      east: Math.max(...lons),
+      south: Math.min(...lats),
+      north: Math.max(...lats)
+    };
+    if (!Object.values(box).every(Number.isFinite)) return void 0;
+    return box;
   } catch {
     return void 0;
   }
 }
-async function fetchWcsCoverageExtents(_0x3f45b4, _0x3d9fae, _0x5bdf8c, _0x28320a) {
+async function fetchWcsCoverageExtents(rawUrl, coverageIds, authToken, authContext) {
+  return (await fetchWcsCoverageDescriptions(rawUrl, coverageIds, coverageIds, authToken, authContext)).extents;
+}
+async function fetchWcsCoverageDescriptions(rawUrl, coverageIds, unlocatedIds, authToken, authContext) {
   var _a2;
-  const _0x358d71 = /* @__PURE__ */ new Map();
-  if (_0x3d9fae["length"] === 0) return _0x358d71;
+  const extents = /* @__PURE__ */ new Map();
+  const elevationIds = /* @__PURE__ */ new Set();
+  if (coverageIds.length === 0) return { extents, elevationIds };
+  const batches = await Promise.all(
+    chunkCoverageIds(coverageIds).map((chunk) => describeCoverages(rawUrl, chunk, authToken, authContext))
+  );
+  const requestedByKey = new Map(coverageIds.map((id) => [coverageIdKey(id), id]));
+  for (const descEl of batches.flat()) {
+    const idEl = childByLocalName(descEl, "CoverageId");
+    const returnedId = (_a2 = idEl == null ? void 0 : idEl.textContent) == null ? void 0 : _a2.trim();
+    if (!returnedId) continue;
+    const id = requestedByKey.get(coverageIdKey(returnedId)) ?? returnedId;
+    if (isWcsElevationCoverage(id, descEl)) elevationIds.add(id);
+    const box = await parseWcsCoverageEnvelope(descEl);
+    if (box) extents.set(id, box);
+  }
+  const missing = unlocatedIds.filter((id) => !extents.has(id));
+  if (missing.length > 0) {
+    await fillFromWcs10LonLatEnvelopes(rawUrl, missing, extents, authToken, authContext);
+  }
+  return { extents, elevationIds };
+}
+const DESCRIBE_COVERAGE_IDS_MAX_LENGTH = 1500;
+function chunkCoverageIds(coverageIds) {
+  const chunks = [];
+  let current = [];
+  let length = 0;
+  for (const id of coverageIds) {
+    const added = encodeURIComponent(id).length + 3;
+    if (current.length > 0 && length + added > DESCRIBE_COVERAGE_IDS_MAX_LENGTH) {
+      chunks.push(current);
+      current = [];
+      length = 0;
+    }
+    current.push(id);
+    length += added;
+  }
+  if (current.length > 0) chunks.push(current);
+  return chunks;
+}
+function coverageIdKey(id) {
+  return id.replace(/[^a-z0-9]/gi, "").toLowerCase();
+}
+async function describeCoverages(rawUrl, coverageIds, authToken, authContext) {
   try {
-    const _0x268c70 = new URL(_0x3f45b4);
-    _0x268c70["searchParams"]["set"]("SERVICE", "WCS"), _0x268c70["searchParams"]["set"]("VERSION", "2.0.1"), _0x268c70["searchParams"]["set"]("REQUEST", "DescribeCoverage"), _0x268c70["searchParams"]["set"]("COVERAGEID", _0x3d9fae["join"](","));
-    const _0x1dabf6 = await getCapabilities(_0x268c70["toString"](), _0x5bdf8c, _0x28320a);
-    for (const _0x418a76 of elementsByLocalName(_0x1dabf6, "CoverageDescription")) {
-      const _0x2863ee = childByLocalName(_0x418a76, "CoverageId"), _0x59150d = (_a2 = _0x2863ee == null ? void 0 : _0x2863ee["textContent"]) == null ? void 0 : _a2["trim"]();
-      if (!_0x59150d) continue;
-      const _0x4795f0 = await parseWcsCoverageEnvelope(_0x418a76);
-      if (_0x4795f0) _0x358d71["set"](_0x59150d, _0x4795f0);
+    const url = new URL(rawUrl);
+    url.searchParams.set("SERVICE", "WCS");
+    url.searchParams.set("VERSION", "2.0.1");
+    url.searchParams.set("REQUEST", "DescribeCoverage");
+    url.searchParams.set("COVERAGEID", coverageIds.join(","));
+    const doc = await getCapabilities(url.toString(), authToken, authContext);
+    return elementsByLocalName(doc, "CoverageDescription");
+  } catch {
+    return [];
+  }
+}
+const ELEVATION_KEYWORD = /elev|altitud|bathym|terrain|srtm|(^|[^a-z])(g?dem|dtm|dsm)([^a-z]|$)/i;
+const ELEVATION_BAND_KEYWORD = /height/i;
+function isWcsElevationCoverage(coverageId, descEl) {
+  const rangeTypeEl = childByLocalName(descEl, "rangeType");
+  if (!rangeTypeEl) return false;
+  const fields = elementsByLocalName(rangeTypeEl, "field");
+  if (fields.length !== 1) return false;
+  const bandName = fields[0].getAttribute("name") ?? "";
+  return ELEVATION_KEYWORD.test(coverageId) || ELEVATION_KEYWORD.test(bandName) || ELEVATION_BAND_KEYWORD.test(bandName);
+}
+async function fillFromWcs10LonLatEnvelopes(rawUrl, coverageIds, result, authToken, authContext) {
+  var _a2, _b;
+  try {
+    const url = new URL(rawUrl);
+    url.searchParams.set("SERVICE", "WCS");
+    url.searchParams.set("VERSION", "1.0.0");
+    url.searchParams.set("REQUEST", "GetCapabilities");
+    const doc = await getCapabilities(url.toString(), authToken, authContext);
+    const missing = new Set(coverageIds);
+    for (const brief of elementsByLocalName(doc, "CoverageOfferingBrief")) {
+      const id = (_b = (_a2 = childByLocalName(brief, "name")) == null ? void 0 : _a2.textContent) == null ? void 0 : _b.trim();
+      if (!id || !missing.has(id)) continue;
+      const box = parseWcs10LonLatEnvelope(brief);
+      if (box) result.set(id, box);
     }
   } catch {
   }
-  return _0x358d71;
 }
-function wcsRectangleFor(_0x2f6683) {
-  const _0x4514f7 = _0x2f6683["geographicBoundingBox"];
-  if (!_0x4514f7) return void 0;
-  return Rectangle["fromDegrees"](_0x4514f7["west"], _0x4514f7["south"], _0x4514f7["east"], _0x4514f7["north"]);
+function wcsRectangleFor(item) {
+  const box = item.geographicBoundingBox;
+  if (!box) return void 0;
+  return Rectangle.fromDegrees(box.west, box.south, box.east, box.north);
 }
-function parseCapabilities(_0x32043d, _0x561094) {
-  switch (_0x32043d) {
+function parseCapabilities(serviceType, doc) {
+  switch (serviceType) {
     case "WMS":
-      return parseWmsCapabilities(_0x561094);
+      return parseWmsCapabilities(doc);
     case "WMTS":
-      return parseWmtsCapabilities(_0x561094);
+      return parseWmtsCapabilities(doc);
     case "WFS":
-      return parseWfsCapabilities(_0x561094);
+      return parseWfsCapabilities(doc);
     case "WCS":
-      return parseWcsCapabilities(_0x561094);
+      return parseWcsCapabilities(doc);
     default:
       return [];
   }
 }
-function detectServiceType(_0x2644d2) {
-  const _0x177f94 = _0x2644d2["documentElement"], _0x9fdf31 = _0x177f94["localName"], _0x909835 = _0x177f94["namespaceURI"] ?? "";
-  if (_0x9fdf31 === "WMS_Capabilities" || _0x9fdf31 === "WMT_MS_Capabilities" || _0x909835["includes"]("/wms")) return "WMS";
-  if (_0x9fdf31 === "WFS_Capabilities" || _0x909835["includes"]("/wfs")) return "WFS";
-  if (_0x909835["includes"]("/wmts")) return "WMTS";
-  if (_0x909835["includes"]("/wcs") || _0x9fdf31 === "WCS_Capabilities") return "WCS";
+function detectServiceType(doc) {
+  const root = doc.documentElement;
+  const rootLocalName = root.localName;
+  const namespaceUri = root.namespaceURI ?? "";
+  if (rootLocalName === "WMS_Capabilities" || rootLocalName === "WMT_MS_Capabilities" || namespaceUri.includes("/wms")) {
+    return "WMS";
+  }
+  if (rootLocalName === "WFS_Capabilities" || namespaceUri.includes("/wfs")) {
+    return "WFS";
+  }
+  if (namespaceUri.includes("/wmts")) return "WMTS";
+  if (namespaceUri.includes("/wcs") || rootLocalName === "WCS_Capabilities")
+    return "WCS";
   return void 0;
 }
 const _OgcLayerFactory = class _OgcLayerFactory {
-  constructor(_0x21b385, _0x6b262c) {
-    this["viewer"] = _0x21b385, this["deps"] = _0x6b262c, this["serviceLayerOptions"] = /* @__PURE__ */ new Map();
+  constructor(viewer, deps) {
+    this.viewer = viewer;
+    this.deps = deps;
+    this.serviceLayerOptions = /* @__PURE__ */ new Map();
   }
-  ["getServiceOptions"](_0x1ce934) {
-    return this["serviceLayerOptions"]["get"](_0x1ce934);
+  /** Katmanın eklenirken verilen WMS/WMTS/WCS seçeneklerini döndürür; kayıtlı değilse `undefined`. */
+  getServiceOptions(id) {
+    return this.serviceLayerOptions.get(id);
   }
-  ["deleteServiceOptions"](_0x5eabf6) {
-    this["serviceLayerOptions"]["delete"](_0x5eabf6);
+  /** Katmanın saklanan servis seçeneklerini siler (katman kaldırılınca çağrılır). */
+  deleteServiceOptions(id) {
+    this.serviceLayerOptions.delete(id);
   }
-  ["buildWmsProvider"](_0x2107f8) {
+  // ── İç: WMS ──────────────────────────────────────────────────────────────
+  buildWmsProvider(options) {
     var _a2, _b;
-    const _0x596b1f = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wms", _0x2107f8["url"]), _0x393b28 = (_a2 = _0x2107f8["layers"]) == null ? void 0 : _a2["trim"]();
-    if (!_0x393b28) throw new LayerOperationError("LAYER_WMS_LAYERS_EMPTY", "WMS katmani eklenemedi: layers (ogcLayerName) bos — id=" + _0x2107f8["id"]);
-    const _0x4cd2e8 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](this["deps"]["apiKeyPolicy"]["buildAuthHeaders"](_0x2107f8["authToken"]), _0x596b1f), _0x113b1b = _0x2107f8["version"] ?? "1.3.0", _0x20e014 = new WebMapServiceImageryProvider({ "url": _0x4cd2e8 ? new Resource({ "url": _0x596b1f, "headers": _0x4cd2e8 }) : _0x596b1f, "layers": _0x393b28, "parameters": { "service": "WMS", "version": _0x113b1b, "request": "GetMap", "transparent": "true", "format": "image/png", ..._0x2107f8["parameters"] }, "getFeatureInfoParameters": { "version": _0x113b1b, "styles": ((_b = _0x2107f8["parameters"]) == null ? void 0 : _b["styles"]) ?? "" }, "getFeatureInfoFormats": [new GetFeatureInfoFormat("json"), new GetFeatureInfoFormat("xml", "application/vnd.ogc.gml"), new GetFeatureInfoFormat("xml", "text/xml"), new GetFeatureInfoFormat("html")], ..._0x2107f8["rectangle"] !== void 0 && { "rectangle": _0x2107f8["rectangle"] }, ..._0x2107f8["minimumLevel"] !== void 0 && { "minimumLevel": _0x2107f8["minimumLevel"] }, ..._0x2107f8["maximumLevel"] !== void 0 && { "maximumLevel": _0x2107f8["maximumLevel"] }, ..._0x2107f8["tileWidth"] !== void 0 && { "tileWidth": _0x2107f8["tileWidth"] }, ..._0x2107f8["tileHeight"] !== void 0 && { "tileHeight": _0x2107f8["tileHeight"] } });
-    return _0x20e014;
-  }
-  ["addWMS"](_0x4f7f2d) {
-    const _0x4d1931 = this["buildWmsProvider"](_0x4f7f2d), _0xdbf677 = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x4d1931), _0x25c1dd = this["deps"]["register"](_0x4f7f2d["id"], _0x4f7f2d["title"], "WMS", _0xdbf677, ![]);
-    return this["serviceLayerOptions"]["set"](_0x4f7f2d["id"], _0x4f7f2d), Promise["resolve"](_0x25c1dd);
-  }
-  ["buildWmtsProvider"](_0x544eda) {
-    const _0x265227 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wmts", _0x544eda["url"]), _0x69cae7 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](this["deps"]["apiKeyPolicy"]["buildAuthHeaders"](_0x544eda["authToken"]), _0x265227);
-    return new WebMapTileServiceImageryProvider({ "url": _0x69cae7 ? new Resource({ "url": _0x265227, "headers": _0x69cae7 }) : _0x265227, "layer": _0x544eda["layer"], "style": _0x544eda["style"] ?? "default", "tileMatrixSetID": _0x544eda["tileMatrixSetID"], "format": _0x544eda["format"] ?? "image/png", "tilingScheme": new WebMercatorTilingScheme(), ..._0x544eda["tileWidth"] !== void 0 && { "tileWidth": _0x544eda["tileWidth"] }, ..._0x544eda["tileHeight"] !== void 0 && { "tileHeight": _0x544eda["tileHeight"] }, ..._0x544eda["minimumLevel"] !== void 0 && { "minimumLevel": _0x544eda["minimumLevel"] }, ..._0x544eda["maximumLevel"] !== void 0 && { "maximumLevel": _0x544eda["maximumLevel"] }, ..._0x544eda["rectangle"] !== void 0 && { "rectangle": _0x544eda["rectangle"] } });
-  }
-  ["addWMTS"](_0x2393b7) {
-    const _0x3a708b = this["buildWmtsProvider"](_0x2393b7), _0x3a7edc = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x3a708b), _0x240a8d = this["deps"]["register"](_0x2393b7["id"], _0x2393b7["title"], "WMTS", _0x3a7edc, ![]);
-    return this["serviceLayerOptions"]["set"](_0x2393b7["id"], _0x2393b7), Promise["resolve"](_0x240a8d);
-  }
-  async ["getWmsAvailableStyles"](_0x23d398) {
-    const _0x9854e6 = this["requireServiceOptions"](_0x23d398, "WMS"), _0xe698e = _0x9854e6["version"] ?? "1.3.0", _0x13846b = await this["getCapabilitiesDocument"](_0x9854e6["url"], "WMS", _0xe698e, _0x9854e6["authToken"]);
-    return parseWmsStyles(_0x13846b, _0x9854e6["layers"])["map"]((_0x186a4f) => ({ ..._0x186a4f, "legendUrl": this["getWmsLegendGraphicUrl"](_0x23d398, _0x186a4f["name"]) }));
-  }
-  async ["setWmsStyle"](_0x34d085, _0x100aa5) {
-    const _0x454d69 = this["requireServiceOptions"](_0x34d085, "WMS"), _0x472399 = { ..._0x454d69, "parameters": { ..._0x454d69["parameters"], "STYLES": _0x100aa5 } };
-    await this["rebuildImageryLayer"](_0x34d085, () => this["buildWmsProvider"](_0x472399)), this["serviceLayerOptions"]["set"](_0x34d085, _0x472399);
-  }
-  ["getWmsLegendGraphicUrl"](_0x503760, _0x3e9c85) {
-    const _0x1388b0 = this["requireServiceOptions"](_0x503760, "WMS"), _0x5ea5e0 = new URLSearchParams({ "service": "WMS", "version": _0x1388b0["version"] ?? "1.3.0", "request": "GetLegendGraphic", "format": "image/png", "layer": _0x1388b0["layers"], "sld_version": "1.1.0", ..._0x3e9c85 !== void 0 && _0x3e9c85 !== "" ? { "style": _0x3e9c85 } : {} }), _0x1460b6 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wms", _0x1388b0["url"]);
-    return this["deps"]["apiKeyPolicy"]["attachApiKeyToUrl"]("" + _0x1460b6 + (_0x1460b6["includes"]("?") ? "&" : "?") + _0x5ea5e0["toString"]());
-  }
-  async ["getWmtsAvailableStyles"](_0x382bc1) {
-    const _0x32e7b0 = this["requireServiceOptions"](_0x382bc1, "WMTS"), _0x5165e9 = await this["getCapabilitiesDocument"](_0x32e7b0["url"], "WMTS", "1.0.0", _0x32e7b0["authToken"]), _0x41d5ad = parseWmtsStyles(_0x5165e9, _0x32e7b0["layer"]);
-    return _0x41d5ad["map"]((_0x53a2e5) => ({ ..._0x53a2e5, "legendUrl": this["deps"]["apiKeyPolicy"]["attachApiKeyToUrl"](_0x53a2e5["legendUrl"]) }));
-  }
-  async ["setWmtsStyle"](_0xd051cc, _0x3070df) {
-    const _0x14453b = this["requireServiceOptions"](_0xd051cc, "WMTS"), _0x481c9b = { ..._0x14453b, "style": _0x3070df };
-    await this["rebuildImageryLayer"](_0xd051cc, () => this["buildWmtsProvider"](_0x481c9b)), this["serviceLayerOptions"]["set"](_0xd051cc, _0x481c9b);
-  }
-  async ["addWFS"](_0x7fc2de) {
-    const _0x4d719f = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wfs", _0x7fc2de["url"]), _0x5070a1 = {};
-    _0x7fc2de["authToken"] !== void 0 && (_0x5070a1["headers"] = { "Authorization": "Bearer " + _0x7fc2de["authToken"] });
-    const _0x326515 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](_0x5070a1["headers"], _0x4d719f);
-    if (_0x326515 !== void 0) _0x5070a1["headers"] = _0x326515;
-    const _0x4a0d3e = { ..._0x7fc2de, "url": _0x4d719f }, _0x1bbcdb = await fetchWfsCapabilities(_0x4d719f, _0x5070a1), _0x581ea4 = { "typeNameHint": _0x7fc2de["typeName"], "caps": _0x1bbcdb };
-    if (_0x7fc2de["version"] !== void 0) _0x581ea4["version"] = _0x7fc2de["version"];
-    if (_0x7fc2de["srsName"] !== void 0) _0x581ea4["srsName"] = _0x7fc2de["srsName"];
-    _0x7fc2de["outputFormat"] !== void 0 && (_0x581ea4["outputFormat"] = _0x7fc2de["outputFormat"]);
-    _0x7fc2de["maxFeatures"] !== void 0 ? _0x581ea4["maxFeatures"] = _0x7fc2de["maxFeatures"] : _0x581ea4["maxFeatures"] = _OgcLayerFactory["TEMP_WFS_UNLIMITED_MAX_FEATURES"];
-    const _0x3cd83e = buildWfsGetFeaturePlan(_0x581ea4);
-    let _0xcd1fb4;
-    try {
-      _0xcd1fb4 = await this["fetchWfsGeoJson"](_0x4a0d3e, _0x5070a1, _0x3cd83e);
-    } catch (_0x54e6e8) {
-      try {
-        _0xcd1fb4 = await this["fetchWfsGml"](_0x4a0d3e, _0x5070a1, _0x3cd83e);
-      } catch (_0x26edd8) {
-        _0x26edd8 instanceof Error && (_0x26edd8["cause"] = _0x54e6e8);
-        throw _0x26edd8;
-      }
+    const url = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wms", options.url);
+    const layers = (_a2 = options.layers) == null ? void 0 : _a2.trim();
+    if (!layers) {
+      throw new LayerOperationError(
+        "LAYER_WMS_LAYERS_EMPTY",
+        `WMS katmani eklenemedi: layers (ogcLayerName) bos — id=${options.id}`
+      );
     }
-    const _0x24c320 = _0xcd1fb4 !== null && typeof _0xcd1fb4 === "object" ? _0xcd1fb4["features"] : void 0;
-    return Array["isArray"](_0x24c320) ? _0x24c320["length"] : _0x3cd83e["maxFeatures"], loadVectorGeoJsonLayer(this["viewer"], this["deps"], _0xcd1fb4, { "id": _0x7fc2de["id"], "title": _0x7fc2de["title"], "layerType": "WFS", "clampToGround": _0x7fc2de["clampToGround"] ?? ![] }, (_0x3d2fea) => {
+    const headers = this.deps.apiKeyPolicy.mergeApiKeyHeader(
+      this.deps.apiKeyPolicy.buildAuthHeaders(options.authToken),
+      url
+    );
+    const version = options.version ?? "1.3.0";
+    const provider = new WebMapServiceImageryProvider({
+      url: headers ? new Resource({ url, headers }) : url,
+      layers,
+      parameters: {
+        service: "WMS",
+        version,
+        request: "GetMap",
+        transparent: "true",
+        format: "image/png",
+        ...options.parameters
+      },
+      // Cesium'un GetFeatureInfo varsayilani ("version:1.1.1", styles YOK)
+      // GetMap tarafindaki (yukaridaki) parametrelerden TAMAMEN bagimsizdir --
+      // GetMap'te version 1.3.0 kullanilirken GetFeatureInfo'nun sessizce
+      // 1.1.1'e sabit kalmasi crs/srs parametre adi uyusmazligina yol aciyor,
+      // ayrica STYLES parametresini zorunlu tutan (WMS spec'e gore GetMap ile
+      // ayni parametreleri bekleyen) sunucularda (orn. MapServer varsayilan
+      // yapilandirmasi) "Missing required parameter STYLES/SRS" hatasiyla
+      // GetFeatureInfo tamamen basarisiz oluyordu -- InteractionManager'in
+      // WMS/WMTS identify akisinin gercek dunyada calismasi icin bu ikisini
+      // GetMap ile tutarli tutuyoruz.
+      getFeatureInfoParameters: {
+        version,
+        styles: ((_b = options.parameters) == null ? void 0 : _b.styles) ?? ""
+      },
+      // Cesium'un VARSAYILAN format zinciri (json -> text/xml -> text/html)
+      // GERCEK dunyada COK sunucuda (orn. MapServer'in varsayilan/demo
+      // kurulumu -- bkz kullanici geri bildirimi: "WMS sorgusu yapinca
+      // Sorgulanıyor... loading dönüyor, sonuç yok") sessizce basarisiz
+      // oluyordu: sunucu "text/xml" INFO_FORMAT'ini DESTEKLEMEDIGINI bir
+      // ServiceExceptionReport (yine de GECERLI bir XML govdesi!) ile
+      // bildiriyor -- Cesium bunu "basarili ama BOS" bir XML yaniti sanip
+      // zincire DEVAM ETMIYOR, gercekten calisan "text/html" adimina hic
+      // ulasilmiyordu. Ayrica coklu WMS sunucusu (MapServer/GeoServer)
+      // gercek GML feature verisini "text/xml" yerine klasik
+      // "application/vnd.ogc.gml" MIME'i altinda sunuyor -- bu, ayni
+      // Cesium xmlToFeatureInfo parser'iyla (type:"xml") calisir, sadece
+      // FARKLI bir INFO_FORMAT sorgu degeri ister. Bu yuzden zincire hem bu
+      // klasik GML varyanti hem de HER ZAMAN calisan bir "html" son care
+      // fallback'i eklenir -- "json" hala ILK denenen (destekleyen modern
+      // sunucularda en zengin/yapisal sonucu verir).
+      getFeatureInfoFormats: [
+        new GetFeatureInfoFormat("json"),
+        new GetFeatureInfoFormat("xml", "application/vnd.ogc.gml"),
+        new GetFeatureInfoFormat("xml", "text/xml"),
+        new GetFeatureInfoFormat("html")
+      ],
+      rectangle: this.serviceRectangle(options.id, options.rectangle),
+      ...options.minimumLevel !== void 0 && {
+        minimumLevel: options.minimumLevel
+      },
+      ...options.maximumLevel !== void 0 && {
+        maximumLevel: options.maximumLevel
+      },
+      ...options.tileWidth !== void 0 && { tileWidth: options.tileWidth },
+      ...options.tileHeight !== void 0 && {
+        tileHeight: options.tileHeight
+      }
+    });
+    return provider;
+  }
+  /** WMS katmanını imagery katmanı olarak haritaya ekler ve kaydeder. */
+  addWMS(options) {
+    const provider = this.buildWmsProvider(options);
+    const imageryLayer = this.viewer.imageryLayers.addImageryProvider(provider);
+    const managed = this.deps.register(options.id, options.title, "WMS", imageryLayer, false);
+    this.serviceLayerOptions.set(options.id, options);
+    return Promise.resolve(managed);
+  }
+  // ── İç: WMTS ─────────────────────────────────────────────────────────────
+  buildWmtsProvider(options) {
+    const url = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wmts", options.url);
+    const headers = this.deps.apiKeyPolicy.mergeApiKeyHeader(
+      this.deps.apiKeyPolicy.buildAuthHeaders(options.authToken),
+      url
+    );
+    return new WebMapTileServiceImageryProvider({
+      url: headers ? new Resource({ url, headers }) : url,
+      layer: options.layer,
+      style: options.style ?? "default",
+      tileMatrixSetID: options.tileMatrixSetID,
+      format: options.format ?? "image/png",
+      tilingScheme: new WebMercatorTilingScheme(),
+      ...options.tileWidth !== void 0 && { tileWidth: options.tileWidth },
+      ...options.tileHeight !== void 0 && {
+        tileHeight: options.tileHeight
+      },
+      ...options.minimumLevel !== void 0 && {
+        minimumLevel: options.minimumLevel
+      },
+      ...options.maximumLevel !== void 0 && {
+        maximumLevel: options.maximumLevel
+      },
+      rectangle: this.serviceRectangle(options.id, options.rectangle)
     });
   }
-  async ["fetchWfsHitsCount"](_0x372d6a, _0x5d9e1c, _0x45ac1e) {
-    if (!_0x45ac1e["version"]["startsWith"]("2.") && !_0x45ac1e["version"]["startsWith"]("1.1")) return void 0;
-    const _0xf00b88 = new URLSearchParams();
-    appendWfsGetFeatureParams(_0xf00b88, _0x45ac1e), _0xf00b88["delete"]("count"), _0xf00b88["delete"]("maxFeatures"), _0xf00b88["set"]("resultType", "hits");
-    let _0x4a359a;
-    try {
-      _0x4a359a = await fetch("" + _0x372d6a["url"] + (_0x372d6a["url"]["includes"]("?") ? "&" : "?") + _0xf00b88["toString"](), _0x5d9e1c);
-    } catch {
-      return void 0;
-    }
-    if (!_0x4a359a["ok"]) return void 0;
-    const _0x1fa70c = decodeTextBuffer(await _0x4a359a["arrayBuffer"]());
-    if (isOgcExceptionXml(_0x1fa70c)) return void 0;
-    const _0x2f3b40 = _0x1fa70c["trimStart"]();
-    if (_0x2f3b40["startsWith"]("{")) try {
-      const _0x4253ce = JSON["parse"](_0x2f3b40), _0x1ac2ae = _0x4253ce["numberMatched"] ?? _0x4253ce["totalFeatures"];
-      return typeof _0x1ac2ae === "number" ? _0x1ac2ae : void 0;
-    } catch {
-      return void 0;
-    }
-    try {
-      const _0x4b7029 = new DOMParser()["parseFromString"](_0x1fa70c, "application/xml")["documentElement"], _0x407f4d = _0x4b7029["getAttribute"]("numberMatched") ?? _0x4b7029["getAttribute"]("numberOfFeatures") ?? _0x4b7029["getAttribute"]("numberReturned");
-      if (!_0x407f4d) return void 0;
-      const _0x25cb1f = Number(_0x407f4d);
-      return Number["isFinite"](_0x25cb1f) ? _0x25cb1f : void 0;
-    } catch {
-      return void 0;
-    }
+  /** WMTS katmanını imagery katmanı olarak haritaya ekler ve kaydeder. */
+  addWMTS(options) {
+    const provider = this.buildWmtsProvider(options);
+    const imageryLayer = this.viewer.imageryLayers.addImageryProvider(provider);
+    const managed = this.deps.register(options.id, options.title, "WMTS", imageryLayer, false);
+    this.serviceLayerOptions.set(options.id, options);
+    return Promise.resolve(managed);
   }
-  async ["fetchWfsGeoJson"](_0x25a18c, _0x59df54, _0x2336ae) {
-    const _0x247295 = _0x2336ae["jsonOutputFormat"];
-    if (!_0x247295) throw new OgcRequestError("OGC_WFS_JSON_FORMAT_UNSUPPORTED", "WFS sunucusu JSON çıktı formatı ilan etmiyor.");
-    const _0x1a1d69 = new URLSearchParams();
-    appendWfsGetFeatureParams(_0x1a1d69, _0x2336ae, _0x247295);
-    const _0x1f1bf4 = await fetch("" + _0x25a18c["url"] + (_0x25a18c["url"]["includes"]("?") ? "&" : "?") + _0x1a1d69["toString"](), _0x59df54), _0x3f55c4 = decodeTextBuffer(await _0x1f1bf4["arrayBuffer"]());
-    if (!_0x1f1bf4["ok"] || isOgcExceptionXml(_0x3f55c4) || !_0x3f55c4["trimStart"]()["startsWith"]("{")) throw new OgcRequestError("OGC_WFS_GEOJSON_REQUEST_FAILED", "WFS GeoJSON isteği başarısız: " + _0x1f1bf4["status"] + " " + _0x1f1bf4["statusText"]);
-    return JSON["parse"](_0x3f55c4);
+  // ── Katman stili: WMS/WMTS (B1 — sunucu-tanımlı stil seçimi) ────────────────
+  // Vektör stil motorunun (applyLayerStyle) aksine burada renk client-side
+  // HESAPLANMIYOR — sunucunun GetCapabilities'te tanımladığı hazır "Style"lar
+  // arasından seçim yapılıp ImageryLayer, seçilen STYLES parametresiyle
+  // YENİDEN kuruluyor (Cesium'da provider parametreleri construct-sonrası
+  // immutable). Lejant, WMS'te ayrı bir GetLegendGraphic isteğiyle, WMTS'te
+  // ise mümkünse doğrudan capabilities içindeki <LegendURL>'den alınır
+  // (istemci tarafı SLD kapsam dışı).
+  /** Bir WMS katmanının sunucu-tanımlı (GetCapabilities'ten) stil seçeneklerini, lejant URL'leriyle birlikte döndürür. */
+  async getWmsAvailableStyles(id) {
+    const options = this.requireServiceOptions(id, "WMS");
+    const version = options.version ?? "1.3.0";
+    const xml = await this.getCapabilitiesDocument(options.url, "WMS", version, options.authToken);
+    return parseWmsStyles(xml, options.layers).map((style) => ({
+      ...style,
+      legendUrl: this.getWmsLegendGraphicUrl(id, style.name)
+    }));
   }
-  async ["fetchWfsGml"](_0x204f73, _0x2d6169, _0x5edcdf) {
-    const _0x74c73a = new URLSearchParams();
-    appendWfsGetFeatureParams(_0x74c73a, _0x5edcdf);
-    const _0x1fd215 = await fetch("" + _0x204f73["url"] + (_0x204f73["url"]["includes"]("?") ? "&" : "?") + _0x74c73a["toString"](), _0x2d6169);
-    if (!_0x1fd215["ok"]) throw new OgcRequestError("OGC_WFS_REQUEST_FAILED", "WFS isteği başarısız: " + _0x1fd215["status"] + " " + _0x1fd215["statusText"]);
-    const _0x17c9bc = decodeTextBuffer(await _0x1fd215["arrayBuffer"]());
-    if (isOgcExceptionXml(_0x17c9bc)) throw new OgcRequestError("OGC_WFS_EXCEPTION", "WFS GetFeature OGC Exception döndü.");
-    let _0x865b47, _0x38b834;
-    try {
-      ({ default: _0x865b47 } = await import("ol/format/WFS.js")), { default: _0x38b834 } = await import("ol/format/GeoJSON.js");
-    } catch {
-      throw new OgcRequestError("OGC_WFS_OL_PACKAGE_MISSING", 'WFS sunucusu GeoJSON çıktısı desteklemiyor; GML yanıtını okumak için "ol" paketi gereklidir: pnpm add ol');
+  /** WMS katmanını seçilen sunucu-tanımlı stille (STYLES parametresiyle) yeniden kurar. */
+  async setWmsStyle(id, styleName) {
+    const options = this.requireServiceOptions(id, "WMS");
+    const updated = {
+      ...options,
+      parameters: { ...options.parameters, STYLES: styleName }
+    };
+    await this.rebuildImageryLayer(id, () => this.buildWmsProvider(updated));
+    this.serviceLayerOptions.set(id, updated);
+  }
+  /** WMS GetLegendGraphic URL'ini (apiKey varsa query parametresiyle) oluşturur. */
+  getWmsLegendGraphicUrl(id, styleName) {
+    const options = this.requireServiceOptions(id, "WMS");
+    const params = new URLSearchParams({
+      service: "WMS",
+      version: options.version ?? "1.3.0",
+      request: "GetLegendGraphic",
+      format: "image/png",
+      layer: options.layers,
+      // MapServer GetLegendGraphic'i SLD_VERSION olmadan
+      // "MissingParameterValue" hatasiyla reddediyor (gercek demo.mapserver.org
+      // istegiyle dogrulandi); GeoServer bu parametreyi zaten yok sayiyor
+      // (regresyon yok).
+      sld_version: "1.1.0",
+      ...styleName !== void 0 && styleName !== "" ? { style: styleName } : {}
+    });
+    const proxyBase = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wms", options.url);
+    return this.deps.apiKeyPolicy.attachApiKeyToUrl(
+      `${proxyBase}${proxyBase.includes("?") ? "&" : "?"}${params.toString()}`
+    );
+  }
+  /** Bir WMTS katmanının sunucu-tanımlı (GetCapabilities'ten) stil seçeneklerini, lejant URL'leriyle birlikte döndürür. */
+  async getWmtsAvailableStyles(id) {
+    const options = this.requireServiceOptions(id, "WMTS");
+    const xml = await this.getCapabilitiesDocument(options.url, "WMTS", "1.0.0", options.authToken);
+    const styles = parseWmtsStyles(xml, options.layer);
+    return styles.map((style) => ({
+      ...style,
+      legendUrl: this.deps.apiKeyPolicy.attachApiKeyToUrl(style.legendUrl)
+    }));
+  }
+  /** WMTS katmanını seçilen sunucu-tanımlı stille yeniden kurar. */
+  async setWmtsStyle(id, styleName) {
+    const options = this.requireServiceOptions(id, "WMTS");
+    const updated = { ...options, style: styleName };
+    await this.rebuildImageryLayer(id, () => this.buildWmtsProvider(updated));
+    this.serviceLayerOptions.set(id, updated);
+  }
+  // ── İç: WFS ──────────────────────────────────────────────────────────────
+  /** WFS katmanının özelliklerini (GeoJSON, gerekirse GML) proxy üzerinden indirip vektör katman olarak ekler ve rastgele ilk rengini atar. */
+  async addWFS(options) {
+    const proxyUrl = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wfs", options.url);
+    const fetchOptions = {};
+    if (options.authToken !== void 0) {
+      fetchOptions.headers = { Authorization: `Bearer ${options.authToken}` };
     }
-    const _0x32446a = new _0x865b47({ "version": _0x5edcdf["version"] })["readFeatures"](_0x17c9bc);
-    return new _0x38b834()["writeFeaturesObject"](_0x32446a, { "featureProjection": "EPSG:4326" });
-  }
-  async ["addWCS"](_0x15bc92) {
-    const _0x4f7fba = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wcs", _0x15bc92["url"]), _0x14959d = { "service": "WCS", "version": _0x15bc92["version"] ?? "2.0.1", "request": "GetCoverage", "coverageId": _0x15bc92["coverageId"], "format": _0x15bc92["format"] ?? "image/png" }, _0x4a2c04 = this["deps"]["apiKeyPolicy"]["mergeApiKeyHeader"](this["deps"]["apiKeyPolicy"]["buildAuthHeaders"](_0x15bc92["authToken"]), _0x4f7fba), _0x152223 = _0x15bc92["rectangle"] ?? Rectangle["fromDegrees"](-180, -90, 180, 90), _0x2f4039 = async (_0x16e039) => {
-      const _0x30a058 = { ..._0x14959d };
-      if (_0x16e039 !== void 0) _0x30a058["SCALESIZE"] = _0x16e039;
-      const _0x4d2fcc = _0x4f7fba + "?" + new URLSearchParams(_0x30a058)["toString"](), _0xdd2508 = await this["resolveWcsImageUrl"](_0x4d2fcc, _0x4a2c04);
+    const headersWithApiKey = this.deps.apiKeyPolicy.mergeApiKeyHeader(
+      fetchOptions.headers,
+      proxyUrl
+    );
+    if (headersWithApiKey !== void 0) fetchOptions.headers = headersWithApiKey;
+    const proxied = { ...options, url: proxyUrl };
+    const caps = await fetchWfsCapabilities(proxyUrl, fetchOptions);
+    const planArgs = {
+      typeNameHint: options.typeName,
+      caps
+    };
+    if (options.version !== void 0) planArgs.version = options.version;
+    if (options.srsName !== void 0) planArgs.srsName = options.srsName;
+    if (options.outputFormat !== void 0) {
+      planArgs.outputFormat = options.outputFormat;
+    }
+    if (options.maxFeatures !== void 0) {
+      planArgs.maxFeatures = options.maxFeatures;
+    } else {
+      planArgs.maxFeatures = _OgcLayerFactory.TEMP_WFS_UNLIMITED_MAX_FEATURES;
+    }
+    const basePlan = buildWfsGetFeaturePlan(planArgs);
+    const bbox = await wfsBboxParam(basePlan.version, basePlan.nativeSrs, SERVICE_REQUEST_EXTENT);
+    const plan = bbox ? { ...basePlan, bbox } : basePlan;
+    let geojson;
+    try {
+      geojson = await this.fetchWfsGeoJson(proxied, fetchOptions, plan);
+    } catch (geoJsonError) {
       try {
-        return await SingleTileImageryProvider["fromUrl"](_0xdd2508, { "rectangle": _0x152223 });
-      } finally {
-        if (_0xdd2508["startsWith"]("blob:")) URL["revokeObjectURL"](_0xdd2508);
+        geojson = await this.fetchWfsGml(proxied, fetchOptions, plan);
+      } catch (gmlError) {
+        if (gmlError instanceof Error) {
+          gmlError.cause = geoJsonError;
+        }
+        throw gmlError;
       }
-    }, _0xe09d2e = _0x15bc92["maxSize"] ?? 2048, _0x4f26c4 = _0x14959d["version"]["startsWith"]("2.") && Number["isFinite"](_0xe09d2e);
-    let _0x4b223a;
-    if (!_0x4f26c4) _0x4b223a = await _0x2f4039();
-    else {
-      const _0x56a922 = "http://www.opengis.net/def/axis/OGC/1/i(" + _0xe09d2e + "),http://www.opengis.net/def/axis/OGC/1/j(" + _0xe09d2e + ")";
+    }
+    const loadedFeatures = geojson !== null && typeof geojson === "object" ? geojson.features : void 0;
+    Array.isArray(loadedFeatures) ? loadedFeatures.length : plan.maxFeatures;
+    return loadVectorGeoJsonLayer(
+      this.viewer,
+      this.deps,
+      geojson,
+      {
+        id: options.id,
+        title: options.title,
+        layerType: "WFS",
+        clampToGround: options.clampToGround ?? false,
+        // BBOX kutuyla KESISEN feature'lari tam geometrisiyle doner (ör.
+        // Turkiye'ye degen Rusya poligonu) -- Turkiye disi kisimlar kirpilir.
+        clipExtent: SERVICE_REQUEST_EXTENT
+      },
+      (managed) => {
+      }
+    );
+  }
+  // WFS 2.0/1.1'in "resultType=hits" ozelligiyle (WFS core spec'inin
+  // ZORUNLU bir parcasi) geometri hic cekilmeden SADECE toplam eslesen
+  // kayit sayisini sorar -- kucuk/hizli bir istek. Amac: "count"/"maxFeatures"
+  // limitini asan devasa katmanlarda (bkz kullanici bildirimi: 27458 kayitlik
+  // bir WFS demo katmani sessizce 5000'de kesilip kullaniciya YANLIŞLIKLA
+  // TAMAMMIŞ gibi eksik/tutarsiz gorunuyordu) veriyi hic INDIRMEDEN once
+  // limitin asilip asilmadigini ogrenip ACIK bir hatayla REDDETMEK.
+  // Sunucu hits'i desteklemiyorsa/beklenmedik bir yanit donerse (WFS 1.0'da
+  // resultType hic yok, bazi sunucular XML yerine kendi formatinda yanit
+  // verebilir) sessizce undefined doner -- cagiran taraf bu durumda
+  // (fetchWfsGeoJson/fetchWfsGml'in GERCEK yanitindaki "numberMatched"
+  // alanina bakan) SON CARE kontrolune guvenir.
+  async fetchWfsHitsCount(options, fetchOptions, plan) {
+    if (!plan.version.startsWith("2.") && !plan.version.startsWith("1.1")) {
+      return void 0;
+    }
+    const params = new URLSearchParams();
+    appendWfsGetFeatureParams(params, plan);
+    params.delete("count");
+    params.delete("maxFeatures");
+    params.set("resultType", "hits");
+    let response;
+    try {
+      response = await fetch(
+        `${options.url}${options.url.includes("?") ? "&" : "?"}${params.toString()}`,
+        fetchOptions
+      );
+    } catch {
+      return void 0;
+    }
+    if (!response.ok) return void 0;
+    const text = decodeTextBuffer(await response.arrayBuffer());
+    if (isOgcExceptionXml(text)) return void 0;
+    const trimmed = text.trimStart();
+    if (trimmed.startsWith("{")) {
       try {
-        _0x4b223a = await _0x2f4039(_0x56a922);
+        const json = JSON.parse(trimmed);
+        const count = json.numberMatched ?? json.totalFeatures;
+        return typeof count === "number" ? count : void 0;
       } catch {
-        _0x4b223a = await _0x2f4039("x(" + _0xe09d2e + "),y(" + _0xe09d2e + ")");
+        return void 0;
       }
     }
-    const _0x5793e3 = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x4b223a);
-    return this["serviceLayerOptions"]["set"](_0x15bc92["id"], _0x15bc92), this["deps"]["register"](_0x15bc92["id"], _0x15bc92["title"], "WCS", _0x5793e3, ![]);
+    try {
+      const root = new DOMParser().parseFromString(text, "application/xml").documentElement;
+      const raw = root.getAttribute("numberMatched") ?? root.getAttribute("numberOfFeatures") ?? root.getAttribute("numberReturned");
+      if (!raw) return void 0;
+      const count = Number(raw);
+      return Number.isFinite(count) ? count : void 0;
+    } catch {
+      return void 0;
+    }
   }
-  async ["resolveWcsImageUrl"](_0xf54f8c, _0x14ae12) {
-    const _0x3fb500 = await fetch(_0xf54f8c, _0x14ae12 ? { "headers": _0x14ae12 } : void 0);
-    if (!_0x3fb500["ok"]) throw new OgcRequestError("OGC_WCS_REQUEST_FAILED", "WCS isteği başarısız: " + _0x3fb500["status"] + " " + _0x3fb500["statusText"]);
-    const _0x26d146 = _0x3fb500["headers"]["get"]("content-type") ?? "", _0x4572a9 = await _0x3fb500["arrayBuffer"](), _0x2c0d63 = /boundary="?([^";]+)"?/i["exec"](_0x26d146);
-    if (!_0x26d146["includes"]("multipart/") || !_0x2c0d63) return URL["createObjectURL"](new Blob([_0x4572a9], { "type": _0x26d146 || "image/png" }));
-    const _0x1529df = extractMultipartImage(new Uint8Array(_0x4572a9), _0x2c0d63[1]), _0x4e1f06 = _0x1529df["bytes"]["buffer"]["slice"](_0x1529df["bytes"]["byteOffset"], _0x1529df["bytes"]["byteOffset"] + _0x1529df["bytes"]["byteLength"]);
-    return URL["createObjectURL"](new Blob([_0x4e1f06], { "type": _0x1529df["mimeType"] }));
+  async fetchWfsGeoJson(options, fetchOptions, plan) {
+    const outputFormat = plan.jsonOutputFormat;
+    if (!outputFormat) {
+      throw new OgcRequestError("OGC_WFS_JSON_FORMAT_UNSUPPORTED", "WFS sunucusu JSON çıktı formatı ilan etmiyor.");
+    }
+    const params = new URLSearchParams();
+    appendWfsGetFeatureParams(params, plan, outputFormat);
+    const response = await fetch(
+      `${options.url}${options.url.includes("?") ? "&" : "?"}${params.toString()}`,
+      fetchOptions
+    );
+    const text = decodeTextBuffer(await response.arrayBuffer());
+    if (!response.ok || isOgcExceptionXml(text) || !text.trimStart().startsWith("{")) {
+      throw new OgcRequestError(
+        "OGC_WFS_GEOJSON_REQUEST_FAILED",
+        `WFS GeoJSON isteği başarısız: ${response.status} ${response.statusText}`
+      );
+    }
+    return JSON.parse(text);
   }
-  ["addGeoTiff"](_0x4467e3) {
-    throw new LayerOperationError("LAYER_GEOTIFF_UNSUPPORTED", "GeoTIFF katmanı bu Cesium sürümünde (≥1.143) henüz desteklenmiyor. GeoTiffImageryProvider mevcut değil. geotiff.js ile özel provider gereklidir.");
+  // outputFormat parametresi verilmez; sunucu boylece kendi varsayilan
+  // (genelde GML) cikisini doner. "ol" bu GML yanitini (WFS 1.0/1.1/2.0,
+  // GML2/3/3.2) parse edip GeoJSON'a cevirir.
+  async fetchWfsGml(options, fetchOptions, plan) {
+    const params = new URLSearchParams();
+    appendWfsGetFeatureParams(params, plan);
+    const response = await fetch(
+      `${options.url}${options.url.includes("?") ? "&" : "?"}${params.toString()}`,
+      fetchOptions
+    );
+    if (!response.ok) {
+      throw new OgcRequestError(
+        "OGC_WFS_REQUEST_FAILED",
+        `WFS isteği başarısız: ${response.status} ${response.statusText}`
+      );
+    }
+    const gml = decodeTextBuffer(await response.arrayBuffer());
+    if (isOgcExceptionXml(gml)) {
+      throw new OgcRequestError("OGC_WFS_EXCEPTION", "WFS GetFeature OGC Exception döndü.");
+    }
+    let WFSFormat;
+    let GeoJSONFormat;
+    try {
+      ({ default: WFSFormat } = await import("ol/format/WFS.js"));
+      ({ default: GeoJSONFormat } = await import("ol/format/GeoJSON.js"));
+    } catch {
+      throw new OgcRequestError(
+        "OGC_WFS_OL_PACKAGE_MISSING",
+        `WFS sunucusu GeoJSON çıktısı desteklemiyor; GML yanıtını okumak için gereken "ol" paketi yüklenemedi: paket kurulu değil ya da importmap'te tanımlı değil`
+      );
+    }
+    const features = new WFSFormat({
+      version: plan.version
+    }).readFeatures(gml);
+    return new GeoJSONFormat().writeFeaturesObject(features, {
+      featureProjection: "EPSG:4326"
+    });
   }
-  ["requireServiceOptions"](_0x35d994, _0x4ffef6) {
-    const _0x4c1482 = this["deps"]["requireLayer"](_0x35d994);
-    if (_0x4c1482["layerType"] !== _0x4ffef6) throw new LayerOperationError("LAYER_TYPE_MISMATCH", "Katman " + _0x4ffef6 + ' değil: "' + _0x35d994 + '" (' + _0x4c1482["layerType"] + ")");
-    const _0x4d13c2 = this["serviceLayerOptions"]["get"](_0x35d994);
-    if (_0x4d13c2 === void 0) throw new LayerOperationError("LAYER_SERVICE_OPTIONS_NOT_FOUND", 'Katman için orijinal servis seçenekleri bulunamadı: "' + _0x35d994 + '"');
-    return _0x4d13c2;
+  // ── İç: WCS ──────────────────────────────────────────────────────────────
+  /** WCS kapsamını (coverage) proxy üzerinden görsel olarak indirip tek görüntülü imagery katmanı olarak ekler. */
+  async addWCS(options) {
+    const proxyUrl = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wcs", options.url);
+    const baseParams = {
+      service: "WCS",
+      version: options.version ?? "2.0.1",
+      request: "GetCoverage",
+      coverageId: options.coverageId,
+      // format belirtilmezse sunucu genelde GeoTIFF gibi tarayicinin <img> ile
+      // decode edemedigi bir format doner (SingleTileImageryProvider gorseli
+      // dogrudan bir <img> olarak yukler); bu yuzden varsayilani PNG'ye sabitliyoruz.
+      format: options.format ?? "image/png"
+    };
+    const headers = this.deps.apiKeyPolicy.mergeApiKeyHeader(
+      this.deps.apiKeyPolicy.buildAuthHeaders(options.authToken),
+      proxyUrl
+    );
+    const rect = options.rectangle ?? Rectangle.fromDegrees(-180, -90, 180, 90);
+    const visibleRect = this.serviceRectangle(options.id, options.rectangle);
+    const loadProvider = async (scaleSize) => {
+      const params = { ...baseParams };
+      if (scaleSize !== void 0) params["SCALESIZE"] = scaleSize;
+      const url = `${proxyUrl}?${new URLSearchParams(params).toString()}`;
+      const imageUrl = await this.resolveWcsImageUrl(url, headers);
+      try {
+        return await SingleTileImageryProvider.fromUrl(imageUrl, { rectangle: rect });
+      } finally {
+        if (imageUrl.startsWith("blob:")) URL.revokeObjectURL(imageUrl);
+      }
+    };
+    const maxSize = options.maxSize ?? 2048;
+    const canScale = baseParams["version"].startsWith("2.") && Number.isFinite(maxSize);
+    let provider;
+    if (!canScale) {
+      provider = await loadProvider();
+    } else {
+      const axisVariants = [
+        `http://www.opengis.net/def/axis/OGC/1/i(${maxSize}),http://www.opengis.net/def/axis/OGC/1/j(${maxSize})`,
+        `x(${maxSize}),y(${maxSize})`,
+        `Lon(${maxSize}),Lat(${maxSize})`,
+        `Long(${maxSize}),Lat(${maxSize})`
+      ];
+      let loaded;
+      let lastError;
+      for (const scaleSize of axisVariants) {
+        try {
+          loaded = await loadProvider(scaleSize);
+          break;
+        } catch (error) {
+          lastError = error;
+        }
+      }
+      if (!loaded) throw lastError;
+      provider = loaded;
+    }
+    const imageryLayer = new ImageryLayer(provider, { rectangle: visibleRect });
+    this.viewer.imageryLayers.add(imageryLayer);
+    this.serviceLayerOptions.set(options.id, options);
+    return this.deps.register(options.id, options.title, "WCS", imageryLayer, false);
   }
-  async ["rebuildImageryLayer"](_0x50cf43, _0xaa076e) {
-    const _0x2dc99f = this["deps"]["requireLayer"](_0x50cf43);
-    if (!(_0x2dc99f["cesiumObject"] instanceof ImageryLayer)) throw new LayerOperationError("LAYER_NOT_RASTER", 'Katman raster (ImageryLayer) değil: "' + _0x50cf43 + '"');
-    const _0x513db6 = _0x2dc99f["cesiumObject"], _0xfd00fd = this["viewer"]["imageryLayers"]["indexOf"](_0x513db6), { show: _0x588c45, alpha: _0x38e93a } = _0x513db6, _0xcb4d74 = _0xaa076e(), _0x48d75b = new ImageryLayer(_0xcb4d74, { "show": _0x588c45, "alpha": _0x38e93a });
-    this["viewer"]["imageryLayers"]["remove"](_0x513db6, !![]), this["viewer"]["imageryLayers"]["add"](_0x48d75b, _0xfd00fd), this["deps"]["setItem"](_0x50cf43, Object["freeze"]({ ..._0x2dc99f, "cesiumObject": _0x48d75b }));
+  // ArcGIS ImageServer gibi bazi WCS sunuculari GetCoverage yanitini duz bir
+  // goruntu olarak degil, multipart/related MIME zarfi icinde (GML metadata
+  // parcasi + goruntu parcasi bir arada) donuyor. Tarayici bu zarfi
+  // dogrudan bir goruntu olarak decode edemez; burada zarfi kendimiz
+  // aciyor, icindeki goruntu baytlarini ayiklayip bir blob URL'e
+  // ceviriyoruz. Multipart olmayan (cogunluk) yanitlarda da baytlar zaten
+  // elimizde oldugu icin ayni sekilde blob URL'e ceviriyoruz.
+  async resolveWcsImageUrl(url, headers) {
+    const response = await fetch(url, headers ? { headers } : void 0);
+    if (!response.ok) {
+      throw new OgcRequestError(
+        "OGC_WCS_REQUEST_FAILED",
+        `WCS isteği başarısız: ${response.status} ${response.statusText}`
+      );
+    }
+    const contentType = response.headers.get("content-type") ?? "";
+    const buffer = await response.arrayBuffer();
+    const boundaryMatch = /boundary="?([^";]+)"?/i.exec(contentType);
+    if (!contentType.includes("multipart/") || !boundaryMatch) {
+      if (/xml|html|text\/|json/i.test(contentType)) {
+        throw new OgcRequestError(
+          "OGC_WCS_REQUEST_FAILED",
+          `WCS isteği görüntü yerine "${contentType}" döndürdü (sunucu hatası).`
+        );
+      }
+      return URL.createObjectURL(
+        new Blob([buffer], { type: contentType || "image/png" })
+      );
+    }
+    const imageBytes = extractMultipartImage(
+      new Uint8Array(buffer),
+      boundaryMatch[1]
+    );
+    const imageBuffer = imageBytes.bytes.buffer.slice(
+      imageBytes.bytes.byteOffset,
+      imageBytes.bytes.byteOffset + imageBytes.bytes.byteLength
+    );
+    return URL.createObjectURL(
+      new Blob([imageBuffer], { type: imageBytes.mimeType })
+    );
   }
-  async ["getCapabilitiesDocument"](_0x55fd95, _0xc4488d, _0x17f6e8, _0x314a80) {
-    const _0x546813 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"](_0xc4488d["toLowerCase"](), _0x55fd95), _0x10cea2 = buildCapabilitiesUrl(_0x546813, _0xc4488d, _0x17f6e8);
-    return getCapabilities(_0x10cea2, _0x314a80, this["deps"]["apiKeyPolicy"]);
+  // ── İç: GeoTIFF ──────────────────────────────────────────────────────────
+  /** Desteklenmiyor: her zaman `LayerOperationError` (`LAYER_GEOTIFF_UNSUPPORTED`) fırlatır. */
+  addGeoTiff(_options) {
+    throw new LayerOperationError(
+      "LAYER_GEOTIFF_UNSUPPORTED",
+      "GeoTIFF katmanı bu Cesium sürümünde (≥1.143) henüz desteklenmiyor. GeoTiffImageryProvider mevcut değil. geotiff.js ile özel provider gereklidir."
+    );
   }
-  async ["getWcsCoverageExtents"](_0x35e6ca, _0x1574f2, _0x314a02) {
-    const _0x113dc2 = this["deps"]["apiKeyPolicy"]["resolveOgcProxyUrl"]("wcs", _0x35e6ca);
-    return fetchWcsCoverageExtents(_0x113dc2, _0x1574f2, _0x314a02, this["deps"]["apiKeyPolicy"]);
+  // ── Yardımcılar ──────────────────────────────────────────────────────────
+  // Servis istekleri yalnizca Turkiye extent'iyle sinirli (TUCBS1-1403):
+  // katmanin kendi kapsama alani verildiyse onunla kesisimi alinir.
+  // Kesisim yoksa katman Turkiye'de hic veri gostermeyecegi icin eklenmez.
+  serviceRectangle(id, rectangle) {
+    const clipped = clipRectangleToServiceExtent(rectangle);
+    if (!clipped) {
+      throw new LayerOperationError(
+        "LAYER_OUTSIDE_SERVICE_EXTENT",
+        `Katmanın kapsama alanı Türkiye sınırları dışında — id=${id}`
+      );
+    }
+    return clipped;
+  }
+  requireServiceOptions(id, expected) {
+    const managed = this.deps.requireLayer(id);
+    if (managed.layerType !== expected) {
+      throw new LayerOperationError("LAYER_TYPE_MISMATCH", `Katman ${expected} değil: "${id}" (${managed.layerType})`);
+    }
+    const options = this.serviceLayerOptions.get(id);
+    if (options === void 0) {
+      throw new LayerOperationError("LAYER_SERVICE_OPTIONS_NOT_FOUND", `Katman için orijinal servis seçenekleri bulunamadı: "${id}"`);
+    }
+    return options;
+  }
+  // Cesium'da ImageryProvider parametreleri construct-sonrası immutable;
+  // stil değişince (setWmsStyle/setWmtsStyle) eski ImageryLayer kaldırılıp
+  // aynı z-sıra indeksinde, aynı show/alpha ile yenisi kurulur. ManagedLayer
+  // referansı (items Map'i) da güncellenir ki getLayers()/getLayerById() her
+  // zaman canlı Cesium nesnesini döndürsün.
+  async rebuildImageryLayer(id, buildProvider) {
+    const managed = this.deps.requireLayer(id);
+    if (!(managed.cesiumObject instanceof ImageryLayer)) {
+      throw new LayerOperationError("LAYER_NOT_RASTER", `Katman raster (ImageryLayer) değil: "${id}"`);
+    }
+    const oldLayer = managed.cesiumObject;
+    const index = this.viewer.imageryLayers.indexOf(oldLayer);
+    const { show, alpha } = oldLayer;
+    const provider = buildProvider();
+    const newLayer = new ImageryLayer(provider, { show, alpha });
+    this.viewer.imageryLayers.remove(oldLayer, true);
+    this.viewer.imageryLayers.add(newLayer, index);
+    this.deps.setItem(
+      id,
+      Object.freeze({ ...managed, cesiumObject: newLayer })
+    );
+  }
+  /**
+   * ML-12 düzeltmesi: OGC GetCapabilities'i apiKey header + proxy KURALLARIYLA
+   * çeker. `TucbsServiceUpload` (GC-05) gibi ayrı bir `LayerManager`
+   * referansına sahip tüketiciler de servis keşfi için bunu kullanır --
+   * eskiden bu tüketiciler proxy/apiKey'den TAMAMEN habersiz çıplak `fetch`
+   * kullanıyordu (ML-12).
+   */
+  async getCapabilitiesDocument(baseUrl, serviceType, version, authToken) {
+    const proxiedUrl = this.deps.apiKeyPolicy.resolveOgcProxyUrl(
+      serviceType.toLowerCase(),
+      baseUrl
+    );
+    const url = buildCapabilitiesUrl(proxiedUrl, serviceType, version);
+    return getCapabilities(url, authToken, this.deps.apiKeyPolicy);
+  }
+  /**
+   * Faz 5b (ML-12'nin DescribeCoverage boşluğu): WCS coverage'larının gerçek
+   * coğrafi kapsama alanlarını `getCapabilitiesDocument` ile AYNI apiKey/proxy
+   * politikasından geçirerek çeker -- eskiden bu istek proxy'siz gittiği için
+   * CORS-korumalı sunucularda sessizce başarısız olup katmanlar global
+   * (-180,-90,180,90) dikdörtgene düşüyordu.
+   */
+  async getWcsCoverageExtents(rawUrl, coverageIds, authToken) {
+    const proxiedUrl = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wcs", rawUrl);
+    return fetchWcsCoverageExtents(proxiedUrl, coverageIds, authToken, this.deps.apiKeyPolicy);
+  }
+  /**
+   * TUCBS1-1441: `getWcsCoverageExtents` ile AYNI apiKey/proxy politikasıyla
+   * coverage'ların zarfını VE yükseklik (Elevation) sınıflamasını tek
+   * DescribeCoverage isteğiyle çeker (bkz `fetchWcsCoverageDescriptions`).
+   */
+  async getWcsCoverageDescriptions(rawUrl, coverageIds, unlocatedIds, authToken) {
+    const proxiedUrl = this.deps.apiKeyPolicy.resolveOgcProxyUrl("wcs", rawUrl);
+    return fetchWcsCoverageDescriptions(
+      proxiedUrl,
+      coverageIds,
+      unlocatedIds,
+      authToken,
+      this.deps.apiKeyPolicy
+    );
   }
 };
-_OgcLayerFactory["TEMP_WFS_UNLIMITED_MAX_FEATURES"] = 1e6;
+_OgcLayerFactory.TEMP_WFS_UNLIMITED_MAX_FEATURES = 1e6;
 let OgcLayerFactory = _OgcLayerFactory;
+function drawnFillColor(style) {
+  if ((style == null ? void 0 : style.fill.mode) === "solid") {
+    return Color.fromCssColorString(style.fill.color).withAlpha(style.fill.opacity);
+  }
+  if ((style == null ? void 0 : style.fill.mode) === "off") return Color.WHITE.withAlpha(0);
+  return Color.CYAN.withAlpha(0.4);
+}
 class ShapeLayerBridge {
-  constructor(_0x5bd5dc, _0x4a9e93) {
-    this["viewer"] = _0x5bd5dc, this["deps"] = _0x4a9e93, this["drawnShapeCounters"] = /* @__PURE__ */ new Map();
+  /**
+   * @param viewer Şekillerin taşınacağı Cesium görüntüleyicisi.
+   * @param deps `LayerManager`'dan gelen kayıt, stil ve dış hat işlemleri.
+   */
+  constructor(viewer, deps) {
+    this.viewer = viewer;
+    this.deps = deps;
+    this.drawnShapeCounters = /* @__PURE__ */ new Map();
   }
-  ["deleteCounter"](_0x10cf72) {
-    this["drawnShapeCounters"]["delete"](_0x10cf72);
+  /** Katmanın sıralı "id" sayacını siler; katman yeniden oluşursa sayaç 1'den başlar. */
+  deleteCounter(id) {
+    this.drawnShapeCounters.delete(id);
   }
-  async ["addDrawnShape"](_0x311592, _0x550236, _0x536b29) {
-    const _0xb001f6 = _0x536b29["entity"];
-    this["viewer"]["entities"]["remove"](_0xb001f6);
-    const _0x2bc959 = (this["drawnShapeCounters"]["get"](_0x311592) ?? 0) + 1;
-    this["drawnShapeCounters"]["set"](_0x311592, _0x2bc959), _0xb001f6["properties"] = buildDrawnShapeProperties(_0x536b29, _0x2bc959);
-    const _0x433882 = this["deps"]["getItem"](_0x311592), _0x7de85a = _0x433882 && "entities" in _0x433882["cesiumObject"] ? _0x433882["cesiumObject"] : new CustomDataSource(_0x550236), _0x48d0d8 = _0x433882 ? this["deps"]["getStyle"](_0x311592) : void 0, _0x3fc6ea = (_0x48d0d8 == null ? void 0 : _0x48d0d8["fill"]["mode"]) === "solid" ? Color["fromCssColorString"](_0x48d0d8["fill"]["color"])["withAlpha"](_0x48d0d8["fill"]["opacity"]) : Color["CYAN"]["withAlpha"](0.4), _0x323fab = (_0x48d0d8 == null ? void 0 : _0x48d0d8["outline"]) ?? { "enabled": !![], "color": this["deps"]["defaultOutlineColorHex"], "width": 1 };
-    this["deps"]["applyEntityStyle"](_0xb001f6, _0x3fc6ea, _0x323fab, !![]), _0x7de85a["entities"]["add"](_0xb001f6);
-    _0xb001f6["polygon"] !== void 0 && this["deps"]["addPolygonOutlineCompanion"](_0x7de85a, _0xb001f6, Color["fromCssColorString"](_0x323fab["color"]), _0x323fab["width"], ![]);
-    if (_0x433882) return this["deps"]["tagEntities"](_0x7de85a, _0x311592), _0x433882;
-    await this["viewer"]["dataSources"]["add"](_0x7de85a);
-    const _0x296f0a = Color["CYAN"]["toCssHexString"](), _0x98fb28 = this["deps"]["register"](_0x311592, _0x550236, "DRAWING", _0x7de85a, ![], _0x296f0a);
-    return this["deps"]["recordInitialStyle"](_0x98fb28["id"], _0x296f0a, 0.4, _0x323fab), _0x98fb28;
+  /**
+   * Hedef katman diyalogu acikken sekil, katmana eklendikten SONRAKI gorunumuyle
+   * (dis hat dahil) gorunsun diye alan sekillerine gecici bir dis hat cizgisi
+   * ekler; donen fonksiyon bu cizgiyi kaldirir. Katmana eklerken
+   * (addDrawnShape) gercek companion dis hat olusturuldugundan diyalog
+   * kapanirken mutlaka cagrilmalidir. Alan olmayan sekillerde no-op'tur.
+   */
+  previewDrawnShape(shape) {
+    var _a2, _b;
+    const hierarchy = (_b = (_a2 = shape.entity.polygon) == null ? void 0 : _a2.hierarchy) == null ? void 0 : _b.getValue(this.viewer.clock.currentTime);
+    const positions = hierarchy == null ? void 0 : hierarchy.positions;
+    const first = positions == null ? void 0 : positions[0];
+    if (positions === void 0 || first === void 0 || positions.length < 2) return () => void 0;
+    const outline = this.viewer.entities.add({
+      polyline: {
+        positions: [...positions, first],
+        width: 1,
+        material: Color.fromCssColorString(this.deps.defaultOutlineColorHex)
+      }
+    });
+    return () => {
+      this.viewer.entities.remove(outline);
+    };
   }
-  async ["addMeasuredShape"](_0x47bdb1, _0x32821e, _0x2839e9) {
-    const _0x4c475a = _0x2839e9["entity"];
-    this["viewer"]["entities"]["remove"](_0x4c475a);
-    const _0x378d69 = (this["drawnShapeCounters"]["get"](_0x47bdb1) ?? 0) + 1;
-    this["drawnShapeCounters"]["set"](_0x47bdb1, _0x378d69), _0x4c475a["properties"] = buildMeasuredShapeProperties(_0x2839e9, _0x378d69);
-    const _0x4569db = this["deps"]["getItem"](_0x47bdb1), _0x5d73e2 = _0x4569db && "entities" in _0x4569db["cesiumObject"] ? _0x4569db["cesiumObject"] : new CustomDataSource(_0x32821e), _0x1492f6 = _0x4569db ? this["deps"]["getStyle"](_0x47bdb1) : void 0, _0x39827f = (_0x1492f6 == null ? void 0 : _0x1492f6["fill"]["mode"]) === "solid" ? Color["fromCssColorString"](_0x1492f6["fill"]["color"])["withAlpha"](_0x1492f6["fill"]["opacity"]) : Color["CYAN"]["withAlpha"](0.4), _0x38c4a3 = (_0x1492f6 == null ? void 0 : _0x1492f6["outline"]) ?? { "enabled": !![], "color": this["deps"]["defaultOutlineColorHex"], "width": 1 };
-    this["deps"]["applyEntityStyle"](_0x4c475a, _0x39827f, _0x38c4a3, !![]), _0x5d73e2["entities"]["add"](_0x4c475a);
-    _0x4c475a["polygon"] !== void 0 && this["deps"]["addPolygonOutlineCompanion"](_0x5d73e2, _0x4c475a, Color["fromCssColorString"](_0x38c4a3["color"]), _0x38c4a3["width"], ![]);
-    if (_0x4569db) return this["deps"]["tagEntities"](_0x5d73e2, _0x47bdb1), _0x4569db;
-    await this["viewer"]["dataSources"]["add"](_0x5d73e2);
-    const _0x52f87c = Color["CYAN"]["toCssHexString"](), _0x52ed41 = this["deps"]["register"](_0x47bdb1, _0x32821e, "MEASURE", _0x5d73e2, ![], _0x52f87c);
-    return this["deps"]["recordInitialStyle"](_0x52ed41["id"], _0x52f87c, 0.4, _0x38c4a3), _0x52ed41;
+  /**
+   * DrawingManager'in tamamladığı bir şekli verilen kimlikteki "Çizim Katmanı"na
+   * ekler (Map, hedef katmanı `DrawingLayerRegistry` ile belirledikten sonra
+   * çağırır). Katman ilk çağrıda (henüz yoksa) boş bir CustomDataSource olarak
+   * oluşturulur; sonraki her çağrı AYNI katmana yeni bir entity ekler -- id her seferinde assertUniqueId'ye
+   * takılmadan register() edilebilsin diye bu, public add() ÜZERİNDEN DEĞİL
+   * doğrudan register() ile yapılır.
+   *
+   * `shape.entity`, DrawingManager tarafından zaten viewer.entities'e eklenmiş
+   * durumdadır (kendi cizim stiliyle -- ayrica GeoJSON'a cevrilip yeniden
+   * cizilmiyor, boylece TucbsDrawTool'un cizdigi gorunum BIREBIR korunur).
+   * Bu yuzden ilk viewer.entities'ten cikarilip hedef DataSource'a tasinir.
+   */
+  async addDrawnShape(id, title, shape) {
+    const entity = shape.entity;
+    this.viewer.entities.remove(entity);
+    const sequentialId = (this.drawnShapeCounters.get(id) ?? 0) + 1;
+    this.drawnShapeCounters.set(id, sequentialId);
+    entity.properties = buildDrawnShapeProperties(shape, sequentialId);
+    const existing = this.deps.getItem(id);
+    const dataSource = existing && "entities" in existing.cesiumObject ? existing.cesiumObject : new CustomDataSource(title);
+    const currentStyle = existing ? this.deps.getStyle(id) : void 0;
+    const fillColor = drawnFillColor(currentStyle);
+    const initialOutline = (currentStyle == null ? void 0 : currentStyle.outline) ?? {
+      enabled: true,
+      color: this.deps.defaultOutlineColorHex,
+      // Diger vektor katman turlerinin varsayilani (2) ile AYNI DEGIL --
+      // Cizim Katmani'nin dis hat genisligi kullanici istegiyle 1 (bkz.
+      // TucbsStyleEditor.ts'teki FIXED_SOLID_LAYER_OUTLINE_WIDTH, "Sifirla"
+      // islevi de bu degere doner).
+      width: 1
+    };
+    this.deps.applyEntityStyle(entity, fillColor, initialOutline, true, currentStyle == null ? void 0 : currentStyle.point);
+    dataSource.entities.add(entity);
+    if (entity.polygon !== void 0) {
+      this.deps.addPolygonOutlineCompanion(
+        dataSource,
+        entity,
+        Color.fromCssColorString(initialOutline.color),
+        initialOutline.width,
+        false
+      );
+      const companion = dataSource.entities.getById(`${entity.id}::outline`);
+      if (companion !== void 0) this.deps.applyCompanionDash(companion, initialOutline);
+    }
+    if (existing) {
+      this.deps.tagEntities(dataSource, id);
+      return existing;
+    }
+    await this.viewer.dataSources.add(dataSource);
+    const colorHex = Color.CYAN.toCssHexString();
+    const managed = this.deps.register(id, title, "DRAWING", dataSource, false, colorHex);
+    this.deps.recordInitialStyle(managed.id, colorHex, 0.4, initialOutline, dataSource);
+    return managed;
   }
-  ["removeDrawnShape"](_0x59f437, _0x34ef10) {
-    const _0x55d3ad = this["deps"]["getItem"](_0x59f437);
-    if (!_0x55d3ad || !("entities" in _0x55d3ad["cesiumObject"])) return;
-    _0x55d3ad["cesiumObject"]["entities"]["removeById"](_0x34ef10["id"] + "::outline"), _0x55d3ad["cesiumObject"]["entities"]["remove"](_0x34ef10), _0x55d3ad["cesiumObject"]["entities"]["values"]["length"] === 0 && this["deps"]["removeLayer"](_0x59f437);
+  /**
+   * DrawingManager'in tamamladığı bir ÖLÇÜM şeklini (source==="measure")
+   * tek, kalıcı "Ölçü Katmanı"na ekler (Map, draw:complete dinleyicisinde
+   * çağırır) -- addDrawnShape ile BİREBİR AYNI mimari/gerekçe (bkz o
+   * metodun yorumları); yalnız katman türü ("MEASURE") ve öznitelik alanları
+   * (buildMeasuredShapeProperties, "sekil" yerine "olcum_turu") farklıdır.
+   */
+  async addMeasuredShape(id, title, shape) {
+    const entity = shape.entity;
+    this.viewer.entities.remove(entity);
+    const sequentialId = (this.drawnShapeCounters.get(id) ?? 0) + 1;
+    this.drawnShapeCounters.set(id, sequentialId);
+    entity.properties = buildMeasuredShapeProperties(shape, sequentialId);
+    const existing = this.deps.getItem(id);
+    const dataSource = existing && "entities" in existing.cesiumObject ? existing.cesiumObject : new CustomDataSource(title);
+    const currentStyle = existing ? this.deps.getStyle(id) : void 0;
+    const fillColor = drawnFillColor(currentStyle);
+    const initialOutline = (currentStyle == null ? void 0 : currentStyle.outline) ?? {
+      enabled: true,
+      color: this.deps.defaultOutlineColorHex,
+      width: 1
+    };
+    this.deps.applyEntityStyle(entity, fillColor, initialOutline, true, currentStyle == null ? void 0 : currentStyle.point);
+    dataSource.entities.add(entity);
+    if (entity.polygon !== void 0) {
+      this.deps.addPolygonOutlineCompanion(
+        dataSource,
+        entity,
+        Color.fromCssColorString(initialOutline.color),
+        initialOutline.width,
+        false
+      );
+      const companion = dataSource.entities.getById(`${entity.id}::outline`);
+      if (companion !== void 0) this.deps.applyCompanionDash(companion, initialOutline);
+    }
+    if (existing) {
+      this.deps.tagEntities(dataSource, id);
+      return existing;
+    }
+    await this.viewer.dataSources.add(dataSource);
+    const colorHex = Color.CYAN.toCssHexString();
+    const managed = this.deps.register(id, title, "MEASURE", dataSource, false, colorHex);
+    this.deps.recordInitialStyle(managed.id, colorHex, 0.4, initialOutline, dataSource);
+    return managed;
+  }
+  /**
+   * Şekli (ve varsa dış hat eşlikçisini) katmandan siler; katmanın son şekli
+   * de silinince katman tamamen kaldırılır ("haritada çizim yoksa katman da
+   * olmamalı" kuralı).
+   *
+   * TucbsDeleteTool -> DrawingManager.clearAll()/removeShape(), şekli KENDİ
+   * viewer.entities'inden silmeye çalışır (artık taşındığı için bu çağrı
+   * sessizce no-op olur); gerçek silme Map'in draw:remove dinleyicisi
+   * üzerinden burada yapılır. Yalnız katman kimliğine göre çalıştığından Map,
+   * hem Çizim hem Ölçü Katmanı için AYNI metodu (farklı id ile) çağırır.
+   */
+  removeDrawnShape(id, entity) {
+    const existing = this.deps.getItem(id);
+    if (!existing || !("entities" in existing.cesiumObject)) return;
+    existing.cesiumObject.entities.removeById(`${entity.id}::outline`);
+    existing.cesiumObject.entities.remove(entity);
+    if (existing.cesiumObject.entities.values.length === 0) {
+      this.deps.removeLayer(id);
+    }
   }
 }
-const DRAWN_SHAPE_LABELS = { "point": "Nokta", "polyline": "Çizgi", "polygon": "Alan", "rectangle": "Dikdörtgen", "circle": "Daire", "freehand": "Serbest Çizim" };
-function roundMeters(_0x41ce72) {
-  return Math["round"](_0x41ce72 * 100) / 100;
+const DRAWN_SHAPE_LABELS = {
+  point: "Nokta",
+  polyline: "Çizgi",
+  polygon: "Alan",
+  rectangle: "Dikdörtgen",
+  circle: "Daire",
+  freehand: "Serbest Çizim"
+};
+function roundMeters(value) {
+  return Math.round(value * 100) / 100;
 }
-function roundCoordinate(_0x350c5c) {
-  return Math["round"](_0x350c5c * 1e6) / 1e6;
+function roundCoordinate(value) {
+  return Math.round(value * 1e6) / 1e6;
 }
-function wktCoordinatePair(_0x138f9a) {
-  return roundCoordinate(_0x138f9a[0]) + " " + roundCoordinate(_0x138f9a[1]);
+function wktCoordinatePair(coordinate) {
+  return `${roundCoordinate(coordinate[0])} ${roundCoordinate(coordinate[1])}`;
 }
-function geometryToWkt(_0xb49cbf) {
-  switch (_0xb49cbf["type"]) {
+function geometryToWkt(geometry) {
+  switch (geometry.type) {
     case "Point": {
-      const _0x2925e1 = _0xb49cbf["coordinates"];
-      return "POINT (" + wktCoordinatePair(_0x2925e1) + ")";
+      const coordinate = geometry.coordinates;
+      return `POINT (${wktCoordinatePair(coordinate)})`;
     }
     case "LineString": {
-      const _0x50dbdb = _0xb49cbf["coordinates"];
-      return "LINESTRING (" + _0x50dbdb["map"]((_0x55e3b5) => wktCoordinatePair(_0x55e3b5))["join"](", ") + ")";
+      const coordinates = geometry.coordinates;
+      return `LINESTRING (${coordinates.map((c) => wktCoordinatePair(c)).join(", ")})`;
     }
     case "Polygon": {
-      const _0x11cc4f = _0xb49cbf["coordinates"], _0x3fdfcb = _0x11cc4f["map"]((_0x36b60d) => "(" + _0x36b60d["map"]((_0x1c6094) => wktCoordinatePair(_0x1c6094))["join"](", ") + ")")["join"](", ");
-      return "POLYGON (" + _0x3fdfcb + ")";
+      const rings = geometry.coordinates;
+      const ringsWkt = rings.map((ring) => `(${ring.map((c) => wktCoordinatePair(c)).join(", ")})`).join(", ");
+      return `POLYGON (${ringsWkt})`;
     }
     default:
       return "";
   }
 }
-function buildDrawnShapeProperties(_0x250b91, _0x44f72f) {
-  const _0x406566 = { "id": _0x44f72f, "sekil": DRAWN_SHAPE_LABELS[_0x250b91["tool"]] };
-  if (_0x250b91["length"] !== void 0) _0x406566["uzunluk_m"] = roundMeters(_0x250b91["length"]);
-  if (_0x250b91["area"] !== void 0) _0x406566["alan_m2"] = roundMeters(_0x250b91["area"]);
-  if (_0x250b91["perimeter"] !== void 0) _0x406566["cevre_m"] = roundMeters(_0x250b91["perimeter"]);
-  if (_0x250b91["radius"] !== void 0) _0x406566["yaricap_m"] = roundMeters(_0x250b91["radius"]);
-  return _0x406566["olusturma_tarihi"] = new Date(_0x250b91["createdAt"])["toLocaleString"]("tr-TR"), _0x406566["geomwkt"] = geometryToWkt(_0x250b91["geometry"]), new PropertyBag(_0x406566);
+function buildDrawnShapeProperties(shape, sequentialId) {
+  const properties = {
+    id: sequentialId,
+    sekil: DRAWN_SHAPE_LABELS[shape.tool]
+  };
+  if (shape.length !== void 0) properties.uzunluk_m = roundMeters(shape.length);
+  if (shape.area !== void 0) properties.alan_m2 = roundMeters(shape.area);
+  if (shape.perimeter !== void 0) properties.cevre_m = roundMeters(shape.perimeter);
+  if (shape.radius !== void 0) properties.yaricap_m = roundMeters(shape.radius);
+  properties.olusturma_tarihi = new Date(shape.createdAt).toLocaleString("tr-TR");
+  properties.geomwkt = geometryToWkt(shape.geometry);
+  return new PropertyBag(properties);
 }
-const MEASURED_SHAPE_LABELS = { "point": "Nokta", "polyline": "Mesafe", "polygon": "Alan", "rectangle": "Dikdörtgen", "circle": "Daire", "freehand": "Serbest Çizim" };
-function buildMeasuredShapeProperties(_0x2d663f, _0x3689ef) {
-  const _0x2a563a = { "id": _0x3689ef, "olcum_turu": MEASURED_SHAPE_LABELS[_0x2d663f["tool"]] };
-  if (_0x2d663f["length"] !== void 0) _0x2a563a["uzunluk_m"] = roundMeters(_0x2d663f["length"]);
-  if (_0x2d663f["area"] !== void 0) _0x2a563a["alan_m2"] = roundMeters(_0x2d663f["area"]);
-  if (_0x2d663f["perimeter"] !== void 0) _0x2a563a["cevre_m"] = roundMeters(_0x2d663f["perimeter"]);
-  return _0x2a563a["olusturma_tarihi"] = new Date(_0x2d663f["createdAt"])["toLocaleString"]("tr-TR"), _0x2a563a["geomwkt"] = geometryToWkt(_0x2d663f["geometry"]), new PropertyBag(_0x2a563a);
+const MEASURED_SHAPE_LABELS = {
+  point: "Nokta",
+  polyline: "Mesafe",
+  polygon: "Alan",
+  rectangle: "Dikdörtgen",
+  circle: "Daire",
+  freehand: "Serbest Çizim"
+};
+function buildMeasuredShapeProperties(shape, sequentialId) {
+  const properties = {
+    id: sequentialId,
+    olcum_turu: MEASURED_SHAPE_LABELS[shape.tool]
+  };
+  if (shape.length !== void 0) properties.uzunluk_m = roundMeters(shape.length);
+  if (shape.area !== void 0) properties.alan_m2 = roundMeters(shape.area);
+  if (shape.perimeter !== void 0) properties.cevre_m = roundMeters(shape.perimeter);
+  properties.olusturma_tarihi = new Date(shape.createdAt).toLocaleString("tr-TR");
+  properties.geomwkt = geometryToWkt(shape.geometry);
+  return new PropertyBag(properties);
 }
 const _LayerManager = class _LayerManager extends EventEmitter {
-  constructor(_0x1ed722) {
-    super(), this["items"] = /* @__PURE__ */ new Map(), this["analysisResultIds"] = /* @__PURE__ */ new Set(), this["viewer"] = _0x1ed722, this["apiKeyPolicy"] = new ApiKeyPolicy({ "apiBase": () => getUcbpApiBase() }), this["outlineGeometry"] = new OutlineGeometry({ "getCurrentTime": () => this["viewer"]["clock"]["currentTime"] }), this["opacityController"] = new OpacityController({ "requestRender": () => this["viewer"]["scene"]["requestRender"]() }), this["styleEngine"] = new LayerStyleEngine({ "outlineGeometry": this["outlineGeometry"], "opacityController": this["opacityController"], "getCurrentTime": () => this["viewer"]["clock"]["currentTime"], "requestRender": () => this["viewer"]["scene"]["requestRender"](), "emitStyle": (_0x2aea58, _0x3c2563) => this["emit"]("layer:style", { "id": _0x2aea58, "style": _0x3c2563 }), "waitForRenderSettle": () => this["waitForRenderSettle"]() }), this["localSourceLoader"] = new LocalSourceLoader(_0x1ed722, { "styleEngine": this["styleEngine"], "outlineGeometry": this["outlineGeometry"], "addPolygonOutlines": (_0x5db740, _0x5ae596, _0x35c51d) => this["addPolygonOutlines"](_0x5db740, _0x5ae596, _0x35c51d), "register": (_0x1fde1b, _0x20efb0, _0x5cffe0, _0x4fe51a, _0x5f596c, _0x29b494) => this["register"](_0x1fde1b, _0x20efb0, _0x5cffe0, _0x4fe51a, _0x5f596c, _0x29b494), "emitCrsCheckResult": (_0x55ca57, _0x291b62) => this["emitCrsCheckResult"](_0x55ca57, _0x291b62), "waitForRenderSettle": () => this["waitForRenderSettle"](), "defaultOutlineColor": _LayerManager["DEFAULT_OUTLINE_COLOR"], "defaultOutlineColorHex": _LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] }), this["shapeLayerBridge"] = new ShapeLayerBridge(_0x1ed722, { "getItem": (_0x4fe472) => this["items"]["get"](_0x4fe472), "getStyle": (_0x21364b) => this["styleEngine"]["getStyle"](_0x21364b), "applyEntityStyle": (_0x4e577b, _0x2cf965, _0x2788a1, _0x5746ca) => this["applyEntityStyle"](_0x4e577b, _0x2cf965, _0x2788a1, _0x5746ca), "addPolygonOutlineCompanion": (_0x23a293, _0x49c046, _0x5f3098, _0x5b1c76, _0x33d1f0) => this["addPolygonOutlineCompanion"](_0x23a293, _0x49c046, _0x5f3098, _0x5b1c76, _0x33d1f0), "tagEntities": (_0x5d7ee9, _0x5e7e51) => this["tagEntities"](_0x5d7ee9, _0x5e7e51), "register": (_0x1defe8, _0x4a1a99, _0x10a5cc, _0x404e4d, _0x3d8361, _0x4efb70) => this["register"](_0x1defe8, _0x4a1a99, _0x10a5cc, _0x404e4d, _0x3d8361, _0x4efb70), "recordInitialStyle": (_0x5c5dc3, _0x546a60, _0x3d2d79, _0x403339) => this["styleEngine"]["recordInitialStyle"](_0x5c5dc3, _0x546a60, _0x3d2d79, _0x403339), "removeLayer": (_0x3eba50) => this["removeLayer"](_0x3eba50), "defaultOutlineColorHex": _LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] }), this["ogcLayerFactory"] = new OgcLayerFactory(_0x1ed722, { "apiKeyPolicy": this["apiKeyPolicy"], "styleEngine": this["styleEngine"], "outlineGeometry": this["outlineGeometry"], "requireLayer": (_0x3a0618) => this["requireLayer"](_0x3a0618), "setItem": (_0x25913f, _0x35fcda) => this["items"]["set"](_0x25913f, _0x35fcda), "register": (_0x5dc67f, _0x589a84, _0x598133, _0x246c92, _0x248950, _0x34b544) => this["register"](_0x5dc67f, _0x589a84, _0x598133, _0x246c92, _0x248950, _0x34b544), "addPolygonOutlines": (_0x198404, _0x528b77, _0x4e248f) => this["addPolygonOutlines"](_0x198404, _0x528b77, _0x4e248f), "emitCrsCheckResult": (_0x441af5, _0x5b93fd) => this["emitCrsCheckResult"](_0x441af5, _0x5b93fd), "emitFeaturesTruncated": (_0xa3ce68, _0x1253fb, _0xe05387) => this["emit"]("layer:features-truncated", { "id": _0xa3ce68, "totalCount": _0x1253fb, "loadedCount": _0xe05387 }), "waitForRenderSettle": () => this["waitForRenderSettle"](), "defaultOutlineColor": _LayerManager["DEFAULT_OUTLINE_COLOR"], "defaultOutlineColorHex": _LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] }), this["cameraHighlight"] = new CameraHighlight(_0x1ed722, { "requireLayer": (_0x1cf3bd) => this["requireLayer"](_0x1cf3bd), "getLayerStyle": (_0x1b547d) => this["getLayerStyle"](_0x1b547d) });
+  /** @param viewer - Katmanların yönetileceği Cesium `Viewer`. */
+  constructor(viewer) {
+    var _a2;
+    super();
+    this.items = /* @__PURE__ */ new Map();
+    this.analysisResultIds = /* @__PURE__ */ new Set();
+    this.viewer = viewer;
+    this.apiKeyPolicy = new ApiKeyPolicy({ apiBase: () => getUcbpApiBase() });
+    this.outlineGeometry = new OutlineGeometry({
+      getCurrentTime: () => this.viewer.clock.currentTime
+    });
+    this.opacityController = new OpacityController({
+      requestRender: () => this.viewer.scene.requestRender()
+    });
+    this.styleEngine = new LayerStyleEngine({
+      outlineGeometry: this.outlineGeometry,
+      opacityController: this.opacityController,
+      getCurrentTime: () => this.viewer.clock.currentTime,
+      requestRender: () => this.viewer.scene.requestRender(),
+      emitStyle: (id, style) => this.emit("layer:style", { id, style }),
+      waitForRenderSettle: () => this.waitForRenderSettle(),
+      // scene.pixelRatio Cesium'un public tip tanimlarinda yok (runtime'da var: devicePixelRatio * resolutionScale).
+      getPixelRatio: () => this.viewer.scene.pixelRatio ?? 1
+    });
+    this.localSourceLoader = new LocalSourceLoader(viewer, {
+      styleEngine: this.styleEngine,
+      outlineGeometry: this.outlineGeometry,
+      addPolygonOutlines: (dataSource, color, width) => this.addPolygonOutlines(dataSource, color, width),
+      register: (id, title, layerType, cesiumObject, isBasemap, initialFillColor) => this.register(id, title, layerType, cesiumObject, isBasemap, initialFillColor),
+      emitCrsCheckResult: (id, result) => this.emitCrsCheckResult(id, result),
+      waitForRenderSettle: () => this.waitForRenderSettle(),
+      defaultOutlineColor: _LayerManager.DEFAULT_OUTLINE_COLOR,
+      defaultOutlineColorHex: _LayerManager.DEFAULT_OUTLINE_COLOR_HEX
+    });
+    this.shapeLayerBridge = new ShapeLayerBridge(viewer, {
+      getItem: (id) => this.items.get(id),
+      getStyle: (id) => this.styleEngine.getStyle(id),
+      applyEntityStyle: (entity, color, outline, isShapeLayer, pointSymbol) => this.applyEntityStyle(entity, color, outline, isShapeLayer, pointSymbol),
+      applyCompanionDash: (companion, outline) => this.styleEngine.applyCompanionDash(companion, outline),
+      addPolygonOutlineCompanion: (dataSource, entity, color, width, clampToGround) => this.addPolygonOutlineCompanion(dataSource, entity, color, width, clampToGround),
+      tagEntities: (dataSource, layerId) => this.tagEntities(dataSource, layerId),
+      register: (id, title, layerType, cesiumObject, isBasemap, initialFillColor) => this.register(id, title, layerType, cesiumObject, isBasemap, initialFillColor),
+      recordInitialStyle: (id, colorHex, fillOpacity, outline, dataSource) => this.styleEngine.recordInitialStyle(id, colorHex, fillOpacity, outline, dataSource),
+      removeLayer: (id) => this.removeLayer(id),
+      defaultOutlineColorHex: _LayerManager.DEFAULT_OUTLINE_COLOR_HEX
+    });
+    this.ogcLayerFactory = new OgcLayerFactory(viewer, {
+      apiKeyPolicy: this.apiKeyPolicy,
+      styleEngine: this.styleEngine,
+      outlineGeometry: this.outlineGeometry,
+      requireLayer: (id) => this.requireLayer(id),
+      setItem: (id, managed) => this.items.set(id, managed),
+      register: (id, title, layerType, cesiumObject, isBasemap, initialFillColor) => this.register(id, title, layerType, cesiumObject, isBasemap, initialFillColor),
+      addPolygonOutlines: (dataSource, color, width) => this.addPolygonOutlines(dataSource, color, width),
+      emitCrsCheckResult: (id, result) => this.emitCrsCheckResult(id, result),
+      emitFeaturesTruncated: (id, totalCount, loadedCount) => this.emit("layer:features-truncated", { id, totalCount, loadedCount }),
+      waitForRenderSettle: () => this.waitForRenderSettle(),
+      defaultOutlineColor: _LayerManager.DEFAULT_OUTLINE_COLOR,
+      defaultOutlineColorHex: _LayerManager.DEFAULT_OUTLINE_COLOR_HEX
+    });
+    this.cameraHighlight = new CameraHighlight(viewer, {
+      requireLayer: (id) => this.requireLayer(id),
+      getLayerStyle: (id) => this.getLayerStyle(id)
+    });
+    this.removeMorphListener = (_a2 = viewer.scene.morphComplete) == null ? void 0 : _a2.addEventListener(() => {
+      const sources = viewer.dataSources;
+      this.syncPointHeightReferences(Array.from({ length: sources.length }, (_, index) => sources.get(index)));
+    });
   }
-  ["configure"](_0x1a627a) {
-    this["apiKeyPolicy"]["configure"](_0x1a627a), _0x1a627a["apiKey"] !== void 0 && this["emit"]("apiKey:change", { "hasApiKey": !![] });
+  /**
+   * apiKey ile ilgili ayarlari (Map.ts constructor'indan) gec-yapilandirir.
+   * Sadece verilen alanlar guncellenir, digerleri oldugu gibi kalir --
+   * boylece Map.ts, MapOptions'ta apiKey verilmemisse bu metodu hic
+   * cagirmayabilir ya da kismi bir nesne geciebilir.
+   */
+  configure(options) {
+    this.apiKeyPolicy.configure(options);
+    if (options.apiKey !== void 0) {
+      this.emit("apiKey:change", { hasApiKey: true });
+    }
   }
-  get ["hasApiKey"]() {
-    return this["apiKeyPolicy"]["hasApiKey"];
+  /** apiKey configure() ile atanmis mi -- SADECE varligi, degerin kendisi
+   * degil (gercek deger ApiKeyPolicy icinde #apiKey olarak kapali kalir). */
+  get hasApiKey() {
+    return this.apiKeyPolicy.hasApiKey;
   }
-  async ["getAuthorizedLayers"]() {
-    return this["apiKeyPolicy"]["getAuthorizedLayers"]();
+  /**
+   * apiKey’e göre yetkili WMS/WFS/WMTS listesi — `GET /layers` + `X-API-Key`.
+   * Checklist: getLayerList eşdeğeri.
+   *
+   * @example
+   * ```ts
+   * const authorizedLayers = await map.layerManager.getAuthorizedLayers();
+   * console.log(`${authorizedLayers.length} yetkili katman bulundu.`);
+   * ```
+   */
+  async getAuthorizedLayers() {
+    return this.apiKeyPolicy.getAuthorizedLayers();
   }
-  async ["getLayerList"]() {
-    return this["apiKeyPolicy"]["getLayerList"]();
+  /** {@link getAuthorizedLayers} alias (checklist getLayerList). */
+  async getLayerList() {
+    return this.apiKeyPolicy.getLayerList();
   }
-  ["canAddAuthorizedLayer"](_0x10a912) {
-    return this["apiKeyPolicy"]["canAddAuthorizedLayer"](_0x10a912);
+  /**
+   * Bir {@link AuthorizedLayerInfo}'nun {@link addAuthorizedLayer} ile
+   * eklenebilir olup olmadigini bildirir (servisUrl + cozumlenmis katman
+   * adi + WMTS ise wmtsTileMatrixSet sarti). Gercek mantik
+   * `auth/ApiKeyPolicy.ts`'te (bkz. GC-03 Adim 3 — hem Lit bilesen hem
+   * baska bir UI katmani AYNI kaynagi kullanabilsin diye).
+   *
+   * @example
+   * ```ts
+   * const addable = authorizedLayers.filter((info) => map.layerManager.canAddAuthorizedLayer(info));
+   * ```
+   */
+  canAddAuthorizedLayer(info) {
+    return this.apiKeyPolicy.canAddAuthorizedLayer(info);
   }
-  async ["addAuthorizedLayer"](_0x28334a) {
-    const _0x112a5f = this["apiKeyPolicy"]["resolveAddOptions"](_0x28334a);
-    if (_0x112a5f["layerType"] === "WMS") return this["add"]("WMS", _0x112a5f["options"]);
-    if (_0x112a5f["layerType"] === "WFS") return this["add"]("WFS", _0x112a5f["options"]);
-    return this["add"]("WMTS", _0x112a5f["options"]);
+  /**
+   * {@link getAuthorizedLayers}'tan donen bir {@link AuthorizedLayerInfo}'yu
+   * haritaya ekler — servis turune gore WMS/WFS/WMTS olarak {@link add}'a
+   * yonlendirir. {@link canAddAuthorizedLayer} false donuyorsa
+   * `LayerOperationError` firlatir.
+   *
+   * @example
+   * ```ts
+   * const authorizedLayers = await map.layerManager.getAuthorizedLayers();
+   * await map.layerManager.addAuthorizedLayer(authorizedLayers[0]);
+   * ```
+   */
+  async addAuthorizedLayer(info) {
+    const resolved = this.apiKeyPolicy.resolveAddOptions(info);
+    if (resolved.layerType === "WMS") return this.add("WMS", resolved.options);
+    if (resolved.layerType === "WFS") return this.add("WFS", resolved.options);
+    return this.add("WMTS", resolved.options);
   }
-  ["layerRequiresApiKey"](_0x2e1a11) {
-    return this["apiKeyPolicy"]["layerRequiresApiKey"](_0x2e1a11);
+  // ── apiKey ic yardimcilari (auth/ApiKeyPolicy.ts'e delege) ────────────────
+  /**
+   * URL'in apiKey gerektiren bir servis deseni (ucbp-api OGC proxy veya
+   * configure edilmis trustedApiKeyHosts) tasiyip tasimadigini, apiKey'in
+   * o an var olup olmadigindan BAGIMSIZ olarak bildirir. Tuketiciler
+   * (ör. TucbsMapPreview) bunu, apiKey yok/gecersizken bir katmanin
+   * gercekten acik olup olmadigina karar vermek icin kullanir.
+   */
+  layerRequiresApiKey(url) {
+    return this.apiKeyPolicy.layerRequiresApiKey(url);
   }
-  ["getLayers"]() {
-    return Array["from"](this["items"]["values"]());
+  // ── Sorgulama ────────────────────────────────────────────────────────────
+  /** Yönetilen tüm katmanları (basemap dahil) döndürür. */
+  getLayers() {
+    return Array.from(this.items.values());
   }
-  ["getLayerById"](_0xf21b22) {
-    return this["items"]["get"](_0xf21b22);
+  /** Kimliği verilen katmanı döndürür, yoksa `undefined`. */
+  getLayerById(id) {
+    return this.items.get(id);
   }
-  ["getEntityPropertyNames"](_0x23111e) {
-    const _0x35b647 = this["requireLayer"](_0x23111e);
-    if (!("entities" in _0x35b647["cesiumObject"])) return [];
-    const _0x2dbd84 = /* @__PURE__ */ new Set();
-    for (const _0x53c262 of _0x35b647["cesiumObject"]["entities"]["values"]) {
-      const _0x4b6b5a = _0x53c262["properties"];
-      if (_0x4b6b5a === void 0) continue;
-      for (const _0xf8a567 of _0x4b6b5a["propertyNames"]) {
-        if (_0xf8a567 === "layerId" || _0xf8a567 === "featureId") continue;
-        _0x2dbd84["add"](_0xf8a567);
+  // ── Katman stili: vektör (WFS + LOCAL) ─────────────────────────────────────
+  // Sadece Entity-tabanlı (GeoJsonDataSource/KmlDataSource/CustomDataSource)
+  // katmanlarda geçerli. WMS/WMTS için bkz. "Katman stili: WMS/WMTS" bölümü.
+  /** Katmanın entity'lerindeki gerçek veri kolonlarını (layerId/featureId hariç) döndürür. */
+  getEntityPropertyNames(id) {
+    const managed = this.requireLayer(id);
+    if (!("entities" in managed.cesiumObject)) return [];
+    const names = /* @__PURE__ */ new Set();
+    for (const entity of managed.cesiumObject.entities.values) {
+      const bag = entity.properties;
+      if (bag === void 0) continue;
+      for (const name of bag.propertyNames) {
+        if (name === "layerId" || name === "featureId") continue;
+        names.add(name);
       }
     }
-    return Array["from"](_0x2dbd84);
+    return Array.from(names);
   }
-  ["getUniqueColumnValues"](_0x5f5901, _0xbc3716) {
-    const _0x3f03af = this["requireLayer"](_0x5f5901);
-    if (!("entities" in _0x3f03af["cesiumObject"])) return [];
-    const _0xd0f3a8 = this["viewer"]["clock"]["currentTime"], _0x4e49e2 = /* @__PURE__ */ new Set();
-    for (const _0x4c1b94 of _0x3f03af["cesiumObject"]["entities"]["values"]) {
-      const _0x31e55e = this["readProperty"](_0x4c1b94, _0xbc3716, _0xd0f3a8);
-      if (_0x31e55e !== null) _0x4e49e2["add"](_0x31e55e);
+  /** Bir kolonun tüm benzersiz değerlerini (kategorik/enum stil için) döndürür. */
+  getUniqueColumnValues(id, column) {
+    const managed = this.requireLayer(id);
+    if (!("entities" in managed.cesiumObject)) return [];
+    const time = this.viewer.clock.currentTime;
+    const values = /* @__PURE__ */ new Set();
+    for (const entity of managed.cesiumObject.entities.values) {
+      const value = this.readProperty(entity, column, time);
+      if (value !== null) values.add(value);
     }
-    return Array["from"](_0x4e49e2);
+    return Array.from(values);
   }
-  ["getFeatureCount"](_0x667aaf) {
-    const _0xa23b05 = this["requireLayer"](_0x667aaf);
-    if (!("entities" in _0xa23b05["cesiumObject"])) return void 0;
-    let _0x190e2b = 0;
-    for (const _0x1990db of _0xa23b05["cesiumObject"]["entities"]["values"]) {
-      if (!this["isOutlineCompanion"](_0x1990db)) _0x190e2b++;
+  /** Bir katmanin (entity-tabanli) GERCEK ozellik/sekil sayisini dondurur --
+   * addPolygonOutlineCompanion ile eklenen ic companion polyline'lar (bkz
+   * outlineCompanionEntities) HARIC tutulur (bkz getLayerGeoJSON'daki ayni
+   * filtre). Entity-tabanli olmayan (ImageryLayer) katmanlarda undefined
+   * doner. TucbsStyleEditor gibi tuketiciler bunu, cok BUYUK katmanlarda
+   * (bkz kullanici bildirimi: 27458 ozellikli bir WFS katmaninda "Dış Hat
+   * Genişliği" degisikligi -- Cesium geometriyi HER entity icin yeniden
+   * insa etmesi gerektigi icin -- gorunur bir etki olmadan surekli
+   * "yükleniyor" gosterip bitiyordu) pahali/geometri-etkileyen stil
+   * kontrollerini devre disi birakmak icin kullanir. */
+  getFeatureCount(id) {
+    const managed = this.requireLayer(id);
+    if (!("entities" in managed.cesiumObject)) return void 0;
+    let count = 0;
+    for (const entity of managed.cesiumObject.entities.values) {
+      if (!this.isOutlineCompanion(entity)) count++;
     }
-    return _0x190e2b;
+    return count;
   }
-  ["getLayerGeoJSON"](_0x257d82) {
-    return getLayerGeoJSON(this["requireLayer"](_0x257d82), this["viewer"]["clock"]["currentTime"], (_0x107b22) => this["isOutlineCompanion"](_0x107b22));
+  /** Bir katmanın (entity-tabanli herhangi bir katman -- TucbsLayerList
+   * SADECE Cizim Katmani/DRAWING icin bu aksiyonu menuye ekler, bkz
+   * TucbsLayerList._openMenuPortal) tum sekillerini GeoJSON FeatureCollection
+   * olarak dondurur (TucbsLayerExport'un indirme aksiyonu icin).
+   * Entity-tabanli olmayan (ImageryLayer) katmanlarda undefined doner.
+   * addPolygonOutlineCompanion ile eklenen ic companion polyline'lar (bkz
+   * outlineCompanionEntities) HARIC tutulur -- bunlar poligonun dis hattini
+   * gostermek icin eklenmis gorsel bir workaround, sekli TEKRAR eden sahte
+   * bir LineString feature olarak disa aktarilmamali. */
+  getLayerGeoJSON(id) {
+    return getLayerGeoJSON(
+      this.requireLayer(id),
+      this.viewer.clock.currentTime,
+      (entity) => this.isOutlineCompanion(entity)
+    );
   }
-  ["exportLayerGeoJSON"](_0x477b0b, _0x103833 = "katman") {
-    exportLayerGeoJSON(this["getLayerGeoJSON"](_0x477b0b), _0x103833);
+  /** getLayerGeoJSON()'i bir ".geojson" dosyasi olarak indirir -- TucbsLayerExport
+   * bu ince tetikleyici cagriyi yapar (bkz TucbsMapExport/exportJPEG ile AYNI
+   * "yakalama/indirme mantigi @tucbs/core'da" kurali). Entity-tabanli olmayan
+   * bir katman icin (getLayerGeoJSON undefined donerse) sessizce hicbir sey
+   * yapmaz.
+   *
+   * @example
+   * ```ts
+   * map.layerManager.exportLayerGeoJSON("katman-id", "katmanim");
+   * ```
+   */
+  exportLayerGeoJSON(id, filename = "katman") {
+    exportLayerGeoJSON(this.getLayerGeoJSON(id), filename);
   }
-  ["exportLayerKml"](_0x4fb0ba, _0x2f9108 = "katman") {
-    exportLayerKml(this["getLayerGeoJSON"](_0x4fb0ba), _0x2f9108);
+  /** Analiz sonucu katmanı KML indirir. Geometri GeoJSON indirmesiyle aynıdır. */
+  exportLayerKml(id, filename = "katman") {
+    exportLayerKml(this.getLayerGeoJSON(id), filename);
   }
-  ["exportLayerShapefile"](_0x463912, _0x3a7458 = "katman") {
-    exportLayerShapefile(this["getLayerGeoJSON"](_0x463912), _0x3a7458);
+  /** Analiz sonucu katmanı Shapefile zip indirir. Geometri GeoJSON indirmesiyle aynıdır. */
+  exportLayerShapefile(id, filename = "katman") {
+    exportLayerShapefile(this.getLayerGeoJSON(id), filename);
   }
-  ["markAnalysisResult"](_0x18b8fd) {
-    this["analysisResultIds"]["add"](_0x18b8fd);
+  /** Tampon veya kesişim katmanını işaretler. Üç nokta menüsü Dışa Aktar'ı buna bakar. */
+  markAnalysisResult(id) {
+    this.analysisResultIds.add(id);
   }
-  ["isAnalysisResult"](_0x2b205d) {
-    return this["analysisResultIds"]["has"](_0x2b205d);
+  /** Katman tampon/kesişim sonucu mu. Yüklenen GEOJSON bu kümede değildir. */
+  isAnalysisResult(id) {
+    return this.analysisResultIds.has(id);
   }
-  ["isGeoTiffExportAvailable"](_0x349a7d) {
-    return isGeoTiffExportAvailable(this["items"]["get"](_0x349a7d), this["ogcLayerFactory"]["getServiceOptions"](_0x349a7d));
+  /** id'li katman WMS/WCS ise VE kesif sirasinda sunucunun GeoTIFF-uyumlu
+   * bir formati (tiffFormat) desteklediği tespit edildiyse true doner --
+   * TucbsLayerList "GeoTIFF Olarak Dışa Aktar" menu ogesini SADECE bu true
+   * ise gosterir (bkz TucbsServiceUpload capabilities format kesfi). */
+  isGeoTiffExportAvailable(id) {
+    return isGeoTiffExportAvailable(this.items.get(id), this.ogcLayerFactory.getServiceOptions(id));
   }
-  async ["exportLayerAsGeoTiff"](_0x5e1fee, _0x5c6c41 = "katman") {
-    const _0x3f9d5e = this["requireLayer"](_0x5e1fee);
-    await exportLayerAsGeoTiff(_0x3f9d5e, this["ogcLayerFactory"]["getServiceOptions"](_0x5e1fee), _0x5c6c41, (_0x85dbbf, _0x892476) => this["apiKeyPolicy"]["resolveOgcProxyUrl"](_0x85dbbf, _0x892476), { "mergeApiKeyHeader": (_0x34cc87, _0x3b2733) => this["apiKeyPolicy"]["mergeApiKeyHeader"](_0x34cc87, _0x3b2733), "buildAuthHeaders": (_0x3a501f) => this["apiKeyPolicy"]["buildAuthHeaders"](_0x3a501f) });
+  /** WMS GetMap / WCS GetCoverage'i sunucunun desteklediği GeoTIFF-uyumlu
+   * formatla (bkz isGeoTiffExportAvailable) yeniden istekleyip ".tif" olarak
+   * indirir. Cesium/canvas'a HIC dokunmaz -- WCS'in resolveWcsImageUrl'i ile
+   * AYNI "ham HTTP indirme" deseninde (bkz o metod), tek fark burada format
+   * PNG'ye SABITLENMIYOR, sunucunun kendi GeoTIFF ciktisi ISTENIYOR.
+   * Desteklenmiyorsa (isGeoTiffExportAvailable false) hata firlatir --
+   * cagiran taraf (TucbsLayerExport) bunu yakalar.
+   *
+   * @example
+   * ```ts
+   * await map.layerManager.exportLayerAsGeoTiff("katman-id", "katmanim");
+   * ```
+   */
+  async exportLayerAsGeoTiff(id, filename = "katman") {
+    const managed = this.requireLayer(id);
+    await exportLayerAsGeoTiff(
+      managed,
+      this.ogcLayerFactory.getServiceOptions(id),
+      filename,
+      (serviceType, url) => this.apiKeyPolicy.resolveOgcProxyUrl(serviceType, url),
+      {
+        mergeApiKeyHeader: (headers, url) => this.apiKeyPolicy.mergeApiKeyHeader(headers, url),
+        buildAuthHeaders: (authToken) => this.apiKeyPolicy.buildAuthHeaders(authToken)
+      }
+    );
   }
-  ["getColumnRange"](_0x43330a, _0x1ce88d) {
-    const _0x5baba0 = this["requireLayer"](_0x43330a);
-    if (!("entities" in _0x5baba0["cesiumObject"])) return null;
-    return this["styleEngine"]["getColumnRange"](_0x5baba0["cesiumObject"], this["viewer"]["clock"]["currentTime"], _0x1ce88d);
+  /** Bir kolonun sayısal min/max aralığını döndürür (gradient/bin modunda min/max verilmezse otomatik kullanılır). */
+  getColumnRange(id, column) {
+    const managed = this.requireLayer(id);
+    if (!("entities" in managed.cesiumObject)) return null;
+    return this.styleEngine.getColumnRange(
+      managed.cesiumObject,
+      this.viewer.clock.currentTime,
+      column
+    );
   }
-  async ["applyLayerStyle"](_0xad3bfc, _0xccb493) {
-    const _0x29752a = this["requireLayer"](_0xad3bfc);
-    if (!("entities" in _0x29752a["cesiumObject"])) throw new LayerOperationError("LAYER_STYLE_NOT_VECTOR", 'applyLayerStyle sadece vektör (Entity tabanlı) katmanlarda kullanılabilir: "' + _0xad3bfc + '"');
-    await this["styleEngine"]["applyLayerStyle"](_0xad3bfc, _0x29752a["cesiumObject"], _0x29752a["layerType"] === "DRAWING" || _0x29752a["layerType"] === "MEASURE", _0xccb493);
+  /**
+   * Katmanın dolgu/dış-hat stilini uygular. Sadece Entity tabanlı (WFS/LOCAL)
+   * katmanlarda çalışır. Gradient/bin modunda `min`/`max`'tan verilmeyen uç
+   * getColumnRange() ile veri aralığından otomatik hesaplanır; verilen uç
+   * aynen kullanılır (tucbs-react'teki "min===max===v her zaman" bug'ı burada
+   * YOK). Ters aralık
+   * (`min` > `max`, uçlardan biri veriden gelince de oluşabilir) düzeltilmez;
+   * geçerli bir aralık vermek çağıranın sorumluluğundadır.
+   *
+   * Semboloji alanları isteğe bağlıdır: `outline.dash` çizgi tipini (çizgiler
+   * ve kenarı ayrı çizilen alanlar), `outline.opacity` dış hat opaklığını
+   * (0-1), `point` nokta şeklini ve boyutunu belirler. `point` verilmezse
+   * noktalar mevcut görünümünde kalır; `dash` verilmezse çizgi düzdür.
+   *
+   * @example
+   * ```ts
+   * await map.layerManager.applyLayerStyle("katman-id", {
+   *   fill: { mode: "solid", color: "#3388ff", opacity: 0.6 },
+   *   outline: { enabled: true, color: "#1d4e89", width: 2 },
+   * });
+   *
+   * // Nokta katmanı: yıldız sembol, kesikli ve yarı saydam dış hat
+   * await map.layerManager.applyLayerStyle("nokta-katmani", {
+   *   fill: { mode: "solid", color: "#e4572e", opacity: 1 },
+   *   outline: { enabled: true, color: "#161616", width: 2, dash: "dashed", opacity: 0.5 },
+   *   point: { shape: "star", size: 20 },
+   * });
+   * ```
+   */
+  // Donen Promise, GENISLIK gercekten degistiyse (bkz asagidaki widthChanged)
+  // waitForRenderSettle() ile cozulur -- cagiran taraf (TucbsStyleEditor)
+  // bu Promise'i "Uygulanıyor…" gostergesini ne kadar sure tutacagini
+  // bilmek icin kullanabilir. Renk/opaklik gibi geometriye dokunmayan
+  // degisikliklerde HEMEN cozulur (yapay bir bekleme EKLENMEZ).
+  async applyLayerStyle(id, spec) {
+    const managed = this.requireLayer(id);
+    if (!("entities" in managed.cesiumObject)) {
+      throw new LayerOperationError(
+        "LAYER_STYLE_NOT_VECTOR",
+        `applyLayerStyle sadece vektör (Entity tabanlı) katmanlarda kullanılabilir: "${id}"`
+      );
+    }
+    const settled = this.styleEngine.applyLayerStyle(
+      id,
+      managed.cesiumObject,
+      managed.layerType === "DRAWING" || managed.layerType === "MEASURE",
+      spec
+    );
+    this.syncPointHeightReferences([managed.cesiumObject]);
+    await settled;
   }
-  ["getLayerStyle"](_0x4a0cd0) {
-    return this["styleEngine"]["getStyle"](_0x4a0cd0);
+  /**
+   * Bir vektör katmandaki geometri türlerini (nokta/çizgi/alan) döndürür;
+   * stil editörü sembol kontrollerini buna göre gösterir. Entity tabanlı
+   * olmayan (ImageryLayer) katmanlarda `undefined` döner.
+   *
+   * @example
+   * ```ts
+   * const kinds = map.layerManager.getGeometryKinds("katman-id");
+   * if (kinds?.point) { /* nokta sembolü seçilebilir *\/ }
+   * ```
+   */
+  getGeometryKinds(id) {
+    const managed = this.requireLayer(id);
+    if (!("entities" in managed.cesiumObject)) return void 0;
+    return this.styleEngine.getGeometryKinds(managed.cesiumObject);
   }
-  ["getInitialFillColor"](_0x56abae) {
+  /**
+   * Bir vektör katmana en son uygulanan stili döndürür (Stil Editörü, Lejant
+   * Paneli ve Katman Listesi bunu okur). Stilde nokta sembolü (`point`)
+   * hiç belirlenmemişse ve katmanda nokta varsa, noktaların haritadaki
+   * gerçek görünümü (daire ve boyutu) `point` alanı olarak eklenir.
+   * Henüz stil kaydı olmayan katmanda `undefined` döner.
+   */
+  getLayerStyle(id) {
     var _a2;
-    return (_a2 = this["items"]["get"](_0x56abae)) == null ? void 0 : _a2["initialFillColor"];
+    const style = this.styleEngine.getStyle(id);
+    if (style === void 0 || style.point !== void 0) return style;
+    const cesiumObject = (_a2 = this.items.get(id)) == null ? void 0 : _a2.cesiumObject;
+    const point = cesiumObject !== void 0 && "entities" in cesiumObject ? this.styleEngine.inferPointSymbol(cesiumObject) : void 0;
+    return point === void 0 ? style : { ...style, point };
   }
-  ["getImageryLayers"]() {
-    return Array["from"](this["items"]["values"]())["filter"]((_0x556c68) => !_0x556c68["isBasemap"] && _0x556c68["cesiumObject"] instanceof ImageryLayer)["map"]((_0x156f64) => _0x156f64["cesiumObject"]);
+  /** Katmana eklenirken atanan ilk (random) rengi döndürür — sonraki stil
+   * değişikliklerinden etkilenmez. TucbsStyleEditor'ün "Sıfırla" işlevi
+   * için kullanılır. */
+  getInitialFillColor(id) {
+    var _a2;
+    return (_a2 = this.items.get(id)) == null ? void 0 : _a2.initialFillColor;
   }
-  ["getBasemapLayers"]() {
-    return Array["from"](this["items"]["values"]())["filter"]((_0x9d059b) => _0x9d059b["isBasemap"] && _0x9d059b["cesiumObject"] instanceof ImageryLayer)["map"]((_0xaa179e) => _0xaa179e["cesiumObject"]);
+  /** Basemap HARİÇ tüm imagery (WMS/WMTS/WCS/GEOTIFF) katmanlarının Cesium `ImageryLayer`'larını döndürür. */
+  getImageryLayers() {
+    return Array.from(this.items.values()).filter(
+      (m) => !m.isBasemap && m.cesiumObject instanceof ImageryLayer
+    ).map((m) => m.cesiumObject);
   }
-  ["getDataSourceLayers"]() {
-    return this["viewer"]["dataSources"];
+  /** SADECE basemap olarak işaretli imagery katmanlarının Cesium `ImageryLayer`'larını döndürür. */
+  getBasemapLayers() {
+    return Array.from(this.items.values()).filter(
+      (m) => m.isBasemap && m.cesiumObject instanceof ImageryLayer
+    ).map((m) => m.cesiumObject);
   }
-  ["getLayerByType"](_0x4dfb9b) {
-    return Array["from"](this["items"]["values"]())["filter"]((_0x2c80e6) => _0x2c80e6["layerType"] === _0x4dfb9b);
+  /** Cesium `Viewer`'ın `dataSources` koleksiyonunu doğrudan döndürür. */
+  getDataSourceLayers() {
+    return this.viewer.dataSources;
   }
-  async ["zoomToLayer"](_0x1175f1) {
-    return this["cameraHighlight"]["zoomToLayer"](_0x1175f1);
+  /** Belirli bir katman türündeki (`WMS`/`WFS`/... ) tüm yönetilen katmanları döndürür. */
+  getLayerByType(layerType) {
+    return Array.from(this.items.values()).filter(
+      (m) => m.layerType === layerType
+    );
   }
-  async ["zoomToEntity"](_0x30205f, _0x273bbb) {
-    return this["cameraHighlight"]["zoomToEntity"](_0x30205f, _0x273bbb);
+  // ── Kamera ───────────────────────────────────────────────────────────────
+  /**
+   * Kamerayı, katmanın tüm görünür alanına (extent) düz tepeden bakışla yakınlaştırır.
+   *
+   * @example
+   * ```ts
+   * await map.layerManager.zoomToLayer("katman-id");
+   * ```
+   */
+  async zoomToLayer(id) {
+    return this.cameraHighlight.zoomToLayer(id);
   }
-  ["highlightEntity"](_0x1f6e61) {
-    this["cameraHighlight"]["highlightEntity"](_0x1f6e61);
+  /** Kamerayı, tek bir entity'nin çerçevesine düz tepeden bakışla yakınlaştırır. */
+  async zoomToEntity(entity, options) {
+    return this.cameraHighlight.zoomToEntity(entity, options);
   }
-  ["clearHighlight"]() {
-    this["cameraHighlight"]["clearHighlight"]();
+  /** Bir entity'yi, kendi stiline dokunmadan sabit renkli bir "outline" ile geçici olarak vurgular. */
+  highlightEntity(entity) {
+    this.cameraHighlight.highlightEntity(entity);
   }
-  async ["add"](_0x351180, _0x43d46f) {
-    this["assertUniqueId"](_0x43d46f["id"]);
-    switch (_0x351180) {
+  /** {@link highlightEntity} ile eklenen geçici vurguyu kaldırır (aktif vurgu yoksa no-op). */
+  clearHighlight() {
+    this.cameraHighlight.clearHighlight();
+  }
+  async add(layerType, options) {
+    this.assertUniqueId(options.id);
+    switch (layerType) {
       case "WMS":
-        return this["addWMS"](_0x43d46f);
+        return this.addWMS(options);
       case "WMTS":
-        return this["addWMTS"](_0x43d46f);
+        return this.addWMTS(options);
       case "WFS":
-        return this["addWFS"](_0x43d46f);
+        return this.addWFS(options);
       case "WCS":
-        return this["addWCS"](_0x43d46f);
+        return this.addWCS(options);
       case "GEOTIFF":
-        return this["addGeoTiff"](_0x43d46f);
+        return this.addGeoTiff(options);
       case "GEOJSON":
       case "KML":
       case "KMZ":
-        return this["addLocalKmlGeoJson"](_0x351180, _0x43d46f);
+        return this.addLocalKmlGeoJson(layerType, options);
       case "SHP":
-        return this["addShp"](_0x43d46f);
+        return this.addShp(options);
       case "CSV":
-        return this["addCsv"](_0x43d46f);
+        return this.addCsv(options);
       case "XYZ":
-        throw new LayerOperationError("LAYER_TYPE_UNSUPPORTED_XYZ", "XYZ katmanı add() ile desteklenmiyor. Map.setBasemap() kullanın.");
+        throw new LayerOperationError(
+          "LAYER_TYPE_UNSUPPORTED_XYZ",
+          "XYZ katmanı add() ile desteklenmiyor. Map.setBasemap() kullanın."
+        );
       case "DRAWING":
-        throw new LayerOperationError("LAYER_TYPE_UNSUPPORTED_DRAWING", '"DRAWING" katmanı add() ile desteklenmiyor -- DrawingManager draw:complete olayı üzerinden Map tarafından otomatik eklenir.');
+        throw new LayerOperationError(
+          "LAYER_TYPE_UNSUPPORTED_DRAWING",
+          '"DRAWING" katmanı add() ile desteklenmiyor -- DrawingManager draw:complete olayı üzerinden Map tarafından otomatik eklenir.'
+        );
       case "MEASURE":
-        throw new LayerOperationError("LAYER_TYPE_UNSUPPORTED_MEASURE", '"MEASURE" katmanı add() ile desteklenmiyor -- DrawingManager draw:complete olayı üzerinden Map tarafından otomatik eklenir.');
+        throw new LayerOperationError(
+          "LAYER_TYPE_UNSUPPORTED_MEASURE",
+          '"MEASURE" katmanı add() ile desteklenmiyor -- DrawingManager draw:complete olayı üzerinden Map tarafından otomatik eklenir.'
+        );
     }
   }
-  ["setVisible"](_0x1101a5, _0x23b03a) {
-    const _0x1dc68f = this["requireLayer"](_0x1101a5);
-    _0x1dc68f["cesiumObject"]["show"] = _0x23b03a, this["emit"]("layer:visibility", { "id": _0x1101a5, "visible": _0x23b03a });
+  // ── Görünürlük & Opaklık ─────────────────────────────────────────────────
+  /**
+   * Bir katmanın görünürlüğünü ayarlar.
+   *
+   * @example
+   * ```ts
+   * map.layerManager.setVisible("katman-id", false);
+   * ```
+   */
+  setVisible(id, visible) {
+    const managed = this.requireLayer(id);
+    managed.cesiumObject.show = visible;
+    this.emit("layer:visibility", { id, visible });
   }
-  ["setOpacity"](_0x41b50d, _0x160d79) {
-    const _0x41caf2 = Math["max"](0, Math["min"](1, _0x160d79)), _0x3c000f = this["requireLayer"](_0x41b50d);
-    _0x3c000f["cesiumObject"] instanceof ImageryLayer ? _0x3c000f["cesiumObject"]["alpha"] = _0x41caf2 : this["setDataSourceOpacity"](_0x3c000f["cesiumObject"], _0x41caf2), this["emit"]("layer:opacity", { "id": _0x41b50d, "opacity": _0x41caf2 });
-  }
-  ["_move"](_0x378913, _0x577d4c) {
-    const _0x17a6bd = this["requireLayer"](_0x378913), _0x49c6fb = _0x17a6bd["cesiumObject"] instanceof ImageryLayer ? this["viewer"]["imageryLayers"] : this["viewer"]["dataSources"], _0x7915c7 = _0x49c6fb["indexOf"](_0x17a6bd["cesiumObject"]);
-    _0x49c6fb[_0x577d4c](_0x17a6bd["cesiumObject"]);
-    const _0x1a90e7 = _0x49c6fb["indexOf"](_0x17a6bd["cesiumObject"]);
-    this["reindexLayerOrder"](), this["emit"]("layer:reorder", { "id": _0x378913, "oldIndex": _0x7915c7, "newIndex": _0x1a90e7, "layer": _0x17a6bd });
-  }
-  ["raise"](_0x3270d7) {
-    this["_move"](_0x3270d7, "raise");
-  }
-  ["lower"](_0x2acbd8) {
-    this["_move"](_0x2acbd8, "lower");
-  }
-  ["raiseToTop"](_0x165628) {
-    this["_move"](_0x165628, "raiseToTop");
-  }
-  ["lowerToBottom"](_0x3978fa) {
-    this["_move"](_0x3978fa, "lowerToBottom");
-  }
-  ["reorder"](_0x40bcc7) {
-    const _0x89e8bb = _0x40bcc7[0], _0x525ab2 = _0x89e8bb !== void 0 ? this["items"]["get"](_0x89e8bb) : void 0, _0x1de237 = (_0x525ab2 == null ? void 0 : _0x525ab2["cesiumObject"]) instanceof ImageryLayer, _0x352910 = _0x525ab2 ? _0x1de237 ? this["viewer"]["imageryLayers"]["indexOf"](_0x525ab2["cesiumObject"]) : this["viewer"]["dataSources"]["indexOf"](_0x525ab2["cesiumObject"]) : -1, _0xeef61 = [], _0x355c09 = [];
-    for (const _0x34ac84 of _0x40bcc7) {
-      const _0x2083f5 = this["items"]["get"](_0x34ac84);
-      if (_0x2083f5 === void 0) continue;
-      _0x2083f5["cesiumObject"] instanceof ImageryLayer ? _0xeef61["push"](_0x34ac84) : _0x355c09["push"](_0x34ac84);
+  /**
+   * Bir katmanın opaklığını (0-1 arası, sınırlanır) ayarlar.
+   *
+   * @example
+   * ```ts
+   * map.layerManager.setOpacity("katman-id", 0.5);
+   * ```
+   */
+  setOpacity(id, opacity) {
+    const clamped = Math.max(0, Math.min(1, opacity));
+    const managed = this.requireLayer(id);
+    if (managed.cesiumObject instanceof ImageryLayer) {
+      managed.cesiumObject.alpha = clamped;
+    } else {
+      this.setDataSourceOpacity(managed.cesiumObject, clamped);
     }
-    for (let _0x45e12c = _0xeef61["length"] - 1; _0x45e12c >= 0; _0x45e12c--) {
-      const _0x1bcb33 = this["items"]["get"](_0xeef61[_0x45e12c]);
-      (_0x1bcb33 == null ? void 0 : _0x1bcb33["cesiumObject"]) instanceof ImageryLayer && this["viewer"]["imageryLayers"]["raiseToTop"](_0x1bcb33["cesiumObject"]);
+    this.emit("layer:opacity", { id, opacity: clamped });
+  }
+  // ── Z-sıra ───────────────────────────────────────────────────────────────
+  // raise/lower/raiseToTop/lowerToBottom birbirinin harfi harfine kopyasiydi
+  // (tek fark cagrilan Cesium koleksiyon metodunun adiydi) -- Adim 9
+  // (Temizlik) kapsaminda tek bir ozel yardimciya indirildi. imageryLayers/dataSources ayni metod isimlerini (raise/
+  // lower/raiseToTop/lowerToBottom/indexOf) FARKLI parametre tipleriyle
+  // (ImageryLayer vs DataSource) bildirdigi icin TS statik olarak union
+  // uzerinden guvenli cagrimayi dogrulayamiyor -- "as never" cast'i burada
+  // BILEREK kullaniliyor (runtime'da managed.cesiumObject ile collection
+  // instanceof kontrolune gore ZATEN eslesiyor).
+  _move(id, op) {
+    const managed = this.requireLayer(id);
+    const collection = managed.cesiumObject instanceof ImageryLayer ? this.viewer.imageryLayers : this.viewer.dataSources;
+    const oldIndex = collection.indexOf(managed.cesiumObject);
+    collection[op](managed.cesiumObject);
+    const newIndex = collection.indexOf(managed.cesiumObject);
+    this.reindexLayerOrder();
+    this.emit("layer:reorder", { id, oldIndex, newIndex, layer: managed });
+  }
+  /** Katmanı kendi koleksiyonu (imagery veya dataSource) içinde bir sıra yukarı taşır. */
+  raise(id) {
+    this._move(id, "raise");
+  }
+  /** Katmanı kendi koleksiyonu (imagery veya dataSource) içinde bir sıra aşağı taşır. */
+  lower(id) {
+    this._move(id, "lower");
+  }
+  /** Katmanı kendi koleksiyonu (imagery veya dataSource) içinde en üste taşır. */
+  raiseToTop(id) {
+    this._move(id, "raiseToTop");
+  }
+  /** Katmanı kendi koleksiyonu (imagery veya dataSource) içinde en alta taşır. */
+  lowerToBottom(id) {
+    this._move(id, "lowerToBottom");
+  }
+  /** TucbsLayerList sürükle-bırak yeniden sıralaması için: basemap hariç tüm katmanların yeni z-sırasını tek çağrıda uygular. */
+  // TucbsLayerList'teki surukle-birak yeniden siralama icin: basemap HARIC
+  // TUM katmanlarin YENI z-sirasini (en usttekinden en alttakine, yani
+  // raiseToTop()'un "index 0" varsayimiyla TUTARLI) TEK cagride uygular.
+  // WHY (BUNUN YERINE tek-adimlik raise()/lower() cagrilarinin bir
+  // DONGUDE, KARISIK liste indeks farki kadar tekrarlanmasi NEDEN YANLIS):
+  // Cesium'da imagery (WMS/WMTS/WCS) ve dataSource (GEOJSON/KML/WFS/...)
+  // katmanlari AYRI koleksiyonlardir (viewer.imageryLayers / viewer.
+  // dataSources); TucbsLayerList'in gosterdigi liste ise IKI turu de
+  // KARISIK sirada tutar. Suruklenen bir imagery katmani, listede araya
+  // giren dataSource katmanlari kadar "fazladan" raise()/lower() adimi
+  // alirdi -- ama bu adimlar SADECE imagery koleksiyonu icinde uygulanir,
+  // ve imageryLayers[0] HER ZAMAN basemap'e ayrilmistir (bkz Map.
+  // setBasemap). Fazladan bir lower() cagrisi, katman zaten basemap'in
+  // hemen ustundeyken (index 1) onu basemap'le (index 0) YER
+  // DEGISTIRIRDI -- katman artik basemap'in ALTINDA kalip haritada
+  // GORSEL OLARAK TAMAMEN KAYBOLURDU (basemap tum globe'u kapladigi
+  // icin), listede ise HALA GORUNMEYE devam ederdi (bkz kullanici
+  // bildirimi: "sadece TucbsServiceUpload/WMS-WMTS-WCS katmanlarinda,
+  // TucbsFileUpload/dataSource katmanlarinda degil" -- bu asimetri tam
+  // olarak bu kok nedenle ortusuyor). Bu metod bunun yerine her katmani
+  // KENDI koleksiyonu icinde, KENDI turdeslerine gore dogru sirada
+  // raiseToTop() ile (alttan basa dogru islenerek) yeniden konumlandirir
+  // -- basemap'e ASLA dokunmaz (o zaten `orderedIds` icinde YER ALMAZ,
+  // bkz TucbsLayerList._syncFromLayerManager'in isBasemap filtresi).
+  reorder(orderedIds) {
+    const primaryId = orderedIds[0];
+    const primaryManaged = primaryId !== void 0 ? this.items.get(primaryId) : void 0;
+    const primaryIsImagery = (primaryManaged == null ? void 0 : primaryManaged.cesiumObject) instanceof ImageryLayer;
+    const primaryOldIndex = primaryManaged ? primaryIsImagery ? this.viewer.imageryLayers.indexOf(primaryManaged.cesiumObject) : this.viewer.dataSources.indexOf(primaryManaged.cesiumObject) : -1;
+    const imageryIds = [];
+    const dataSourceIds = [];
+    for (const id of orderedIds) {
+      const managed = this.items.get(id);
+      if (managed === void 0) continue;
+      if (managed.cesiumObject instanceof ImageryLayer) {
+        imageryIds.push(id);
+      } else {
+        dataSourceIds.push(id);
+      }
     }
-    for (let _0x54f44f = _0x355c09["length"] - 1; _0x54f44f >= 0; _0x54f44f--) {
-      const _0x1edf3f = this["items"]["get"](_0x355c09[_0x54f44f]);
-      _0x1edf3f !== void 0 && !(_0x1edf3f["cesiumObject"] instanceof ImageryLayer) && this["viewer"]["dataSources"]["raiseToTop"](_0x1edf3f["cesiumObject"]);
+    for (let i = imageryIds.length - 1; i >= 0; i--) {
+      const managed = this.items.get(imageryIds[i]);
+      if ((managed == null ? void 0 : managed.cesiumObject) instanceof ImageryLayer) {
+        this.viewer.imageryLayers.raiseToTop(managed.cesiumObject);
+      }
     }
-    this["reindexLayerOrder"]();
-    if (_0x525ab2 !== void 0 && _0x89e8bb !== void 0) {
-      const _0x52f8bd = _0x1de237 ? this["viewer"]["imageryLayers"]["indexOf"](_0x525ab2["cesiumObject"]) : this["viewer"]["dataSources"]["indexOf"](_0x525ab2["cesiumObject"]);
-      this["emit"]("layer:reorder", { "id": _0x89e8bb, "oldIndex": _0x352910, "newIndex": _0x52f8bd, "layer": _0x525ab2 });
+    for (let i = dataSourceIds.length - 1; i >= 0; i--) {
+      const managed = this.items.get(dataSourceIds[i]);
+      if (managed !== void 0 && !(managed.cesiumObject instanceof ImageryLayer)) {
+        this.viewer.dataSources.raiseToTop(managed.cesiumObject);
+      }
     }
-  }
-  ["removeLayer"](_0x32cb3f) {
-    const _0x41dd82 = this["requireLayer"](_0x32cb3f);
-    _0x41dd82["cesiumObject"] instanceof ImageryLayer ? this["viewer"]["imageryLayers"]["remove"](_0x41dd82["cesiumObject"], !![]) : void this["viewer"]["dataSources"]["remove"](_0x41dd82["cesiumObject"], !![]), this["items"]["delete"](_0x32cb3f), this["analysisResultIds"]["delete"](_0x32cb3f), this["ogcLayerFactory"]["deleteServiceOptions"](_0x32cb3f), this["styleEngine"]["deleteStyle"](_0x32cb3f), this["shapeLayerBridge"]["deleteCounter"](_0x32cb3f), this["emit"]("layer:remove", { "layer": _0x41dd82 });
-  }
-  ["addWMS"](_0x5ceb4c) {
-    return this["ogcLayerFactory"]["addWMS"](_0x5ceb4c);
-  }
-  ["addWMTS"](_0x132878) {
-    return this["ogcLayerFactory"]["addWMTS"](_0x132878);
-  }
-  async ["getWmsAvailableStyles"](_0x96c678) {
-    return this["ogcLayerFactory"]["getWmsAvailableStyles"](_0x96c678);
-  }
-  async ["setWmsStyle"](_0x39dc92, _0xb6a536) {
-    return this["ogcLayerFactory"]["setWmsStyle"](_0x39dc92, _0xb6a536);
-  }
-  ["getWmsLegendGraphicUrl"](_0x1969f9, _0x2b7c15) {
-    return this["ogcLayerFactory"]["getWmsLegendGraphicUrl"](_0x1969f9, _0x2b7c15);
-  }
-  async ["getWmtsAvailableStyles"](_0x2602b3) {
-    return this["ogcLayerFactory"]["getWmtsAvailableStyles"](_0x2602b3);
-  }
-  async ["setWmtsStyle"](_0x3ffc93, _0x199758) {
-    return this["ogcLayerFactory"]["setWmtsStyle"](_0x3ffc93, _0x199758);
-  }
-  ["addWFS"](_0x1ae7a3) {
-    return this["ogcLayerFactory"]["addWFS"]({ ..._0x1ae7a3, "clampToGround": _0x1ae7a3["clampToGround"] ?? !![] });
-  }
-  ["addWCS"](_0x1c6019) {
-    return this["ogcLayerFactory"]["addWCS"](_0x1c6019);
-  }
-  ["addGeoTiff"](_0x56d145) {
-    return this["ogcLayerFactory"]["addGeoTiff"](_0x56d145);
-  }
-  ["addLocalKmlGeoJson"](_0x1bba96, _0x158cd0) {
-    return this["localSourceLoader"]["addLocalKmlGeoJson"](_0x1bba96, _0x158cd0);
-  }
-  ["addShp"](_0x3dd524) {
-    return this["localSourceLoader"]["addShp"](_0x3dd524);
-  }
-  ["addCsv"](_0x3ff91e) {
-    return this["localSourceLoader"]["addCsv"](_0x3ff91e);
-  }
-  ["_addBasemapImageryLayer"](_0x52fe7f, _0xca559d, _0x383565) {
-    return this["register"](_0x52fe7f, _0xca559d, "XYZ", _0x383565, !![]);
-  }
-  ["_removeBasemapLayers"]() {
-    for (const _0x3a339c of this["items"]["values"]()) {
-      _0x3a339c["isBasemap"] && _0x3a339c["cesiumObject"] instanceof ImageryLayer && (this["viewer"]["imageryLayers"]["remove"](_0x3a339c["cesiumObject"], !![]), this["items"]["delete"](_0x3a339c["id"]));
+    this.reindexLayerOrder();
+    if (primaryManaged !== void 0 && primaryId !== void 0) {
+      const primaryNewIndex = primaryIsImagery ? this.viewer.imageryLayers.indexOf(primaryManaged.cesiumObject) : this.viewer.dataSources.indexOf(primaryManaged.cesiumObject);
+      this.emit("layer:reorder", {
+        id: primaryId,
+        oldIndex: primaryOldIndex,
+        newIndex: primaryNewIndex,
+        layer: primaryManaged
+      });
     }
   }
-  ["_addDrawnShape"](_0x27feeb, _0x3c304a, _0x51ad11) {
-    return this["shapeLayerBridge"]["addDrawnShape"](_0x27feeb, _0x3c304a, _0x51ad11);
-  }
-  ["_addMeasuredShape"](_0x1812cf, _0x316064, _0x5adac2) {
-    return this["shapeLayerBridge"]["addMeasuredShape"](_0x1812cf, _0x316064, _0x5adac2);
-  }
-  ["_removeDrawnShape"](_0x24b63b, _0xcab927) {
-    this["shapeLayerBridge"]["removeDrawnShape"](_0x24b63b, _0xcab927);
-  }
-  ["register"](_0x3dbdf8, _0x5ce46f, _0x21b0e6, _0x3db5c3, _0x2273e0, _0x558948) {
-    "entities" in _0x3db5c3 && this["tagEntities"](_0x3db5c3, _0x3dbdf8);
-    const _0x84aac1 = Object["freeze"]({ "id": _0x3dbdf8, "title": _0x5ce46f, "layerType": _0x21b0e6, "cesiumObject": _0x3db5c3, "isBasemap": _0x2273e0, ..._0x558948 !== void 0 ? { "initialFillColor": _0x558948 } : {} });
-    return this["items"]["set"](_0x3dbdf8, _0x84aac1), this["emit"]("layer:add", { "layer": _0x84aac1 }), _0x84aac1;
-  }
-  ["emitCrsCheckResult"](_0x50c543, _0x364ba6) {
-    if (!_0x364ba6) return;
-    switch (_0x364ba6["kind"]) {
-      case "reprojected":
-        this["emit"]("layer:crs-reprojected", { "id": _0x50c543, "fromEpsg": _0x364ba6["fromEpsg"], "toEpsg": "EPSG:4326" });
-        break;
-      case "suspicious-unresolved-crs":
-        this["emit"]("layer:crs-unresolved", { "id": _0x50c543, "crsName": _0x364ba6["crsName"] });
-        break;
+  // ── Kaldırma ─────────────────────────────────────────────────────────────
+  /**
+   * Katmanı haritadan ve tüm iç bookkeeping (stil/apiKey/sayaç kayıtları) yapılarından kaldırır.
+   *
+   * @example
+   * ```ts
+   * map.layerManager.removeLayer("katman-id");
+   * ```
+   */
+  removeLayer(id) {
+    const managed = this.requireLayer(id);
+    if (managed.cesiumObject instanceof ImageryLayer) {
+      this.viewer.imageryLayers.remove(managed.cesiumObject, true);
+    } else {
+      void this.viewer.dataSources.remove(managed.cesiumObject, true);
     }
+    this.items.delete(id);
+    this.analysisResultIds.delete(id);
+    this.ogcLayerFactory.deleteServiceOptions(id);
+    this.styleEngine.deleteStyle(id);
+    this.shapeLayerBridge.deleteCounter(id);
+    this.emit("layer:remove", { layer: managed });
   }
-  ["tagEntities"](_0x12155e, _0x18fa92) {
-    _0x12155e["entities"]["suspendEvents"]();
-    for (const _0x5bb165 of _0x12155e["entities"]["values"]) {
-      _0x5bb165["properties"] === void 0 && (_0x5bb165["properties"] = new PropertyBag()), !_0x5bb165["properties"]["hasProperty"]("layerId") && _0x5bb165["properties"]["addProperty"]("layerId", _0x18fa92), !_0x5bb165["properties"]["hasProperty"]("featureId") && _0x5bb165["properties"]["addProperty"]("featureId", _0x5bb165["id"]);
-    }
-    _0x12155e["entities"]["resumeEvents"]();
+  // ── İç: WMS/WMTS/WFS/WCS/GeoTIFF ────────────────────────────────────────
+  // Orkestrasyon layers/ogc/OgcLayerFactory.ts'e tasindi (bkz Adim 8/Faz 2) --
+  // asagidaki delegeler ISIM/IMZA/JSDoc AYNEN korunur: 5 tanesi (addWMS/
+  // addWMTS/addWFS/addWCS/addGeoTiff) add() dispatcher'i tarafindan
+  // DOGRUDAN cagrilir, digerleri (setWmsStyle vb.) public API yuzeyidir
+  // (bkz kural 3 -- yuzey sabit).
+  addWMS(options) {
+    return this.ogcLayerFactory.addWMS(options);
   }
-  ["reindexLayerOrder"]() {
-    const _0x1b0f28 = /* @__PURE__ */ new Map();
-    for (let _0x1b918a = 0; _0x1b918a < this["viewer"]["imageryLayers"]["length"]; _0x1b918a++) {
-      _0x1b0f28["set"](this["viewer"]["imageryLayers"]["get"](_0x1b918a), _0x1b918a);
-    }
-    const _0xfb97b0 = /* @__PURE__ */ new Map();
-    for (let _0x7756b5 = 0; _0x7756b5 < this["viewer"]["dataSources"]["length"]; _0x7756b5++) {
-      _0xfb97b0["set"](this["viewer"]["dataSources"]["get"](_0x7756b5), _0x7756b5);
-    }
-    const _0x53ae10 = (_0x26bf15) => (_0x26bf15["cesiumObject"] instanceof ImageryLayer ? _0x1b0f28["get"](_0x26bf15["cesiumObject"]) : _0xfb97b0["get"](_0x26bf15["cesiumObject"])) ?? Number["POSITIVE_INFINITY"], _0x3b54ac = Array["from"](this["items"]["entries"]()), _0x1cb1ff = _0x3b54ac["filter"](([, _0x2087d9]) => _0x2087d9["cesiumObject"] instanceof ImageryLayer)["sort"](([, _0x36af24], [, _0x21b19c]) => _0x53ae10(_0x36af24) - _0x53ae10(_0x21b19c)), _0xbf5020 = _0x3b54ac["filter"](([, _0xea5831]) => !(_0xea5831["cesiumObject"] instanceof ImageryLayer))["sort"](([, _0x53ed8c], [, _0x1278d8]) => _0x53ae10(_0x53ed8c) - _0x53ae10(_0x1278d8));
-    let _0x5efab5 = 0, _0x239a11 = 0;
-    const _0x12aa4e = _0x3b54ac["map"](([, _0x3919e8]) => _0x3919e8["cesiumObject"] instanceof ImageryLayer ? _0x1cb1ff[_0x5efab5++] : _0xbf5020[_0x239a11++]);
-    this["items"]["clear"]();
-    for (const [_0x175337, _0x361271] of _0x12aa4e) this["items"]["set"](_0x175337, _0x361271);
+  addWMTS(options) {
+    return this.ogcLayerFactory.addWMTS(options);
   }
-  ["requireLayer"](_0x1a2d98) {
-    const _0x2ad98c = this["items"]["get"](_0x1a2d98);
-    if (_0x2ad98c === void 0) throw new LayerOperationError("LAYER_NOT_FOUND", 'Katman bulunamadı: "' + _0x1a2d98 + '"');
-    return _0x2ad98c;
+  /** Bir WMS katmanının sunucu-tanımlı (GetCapabilities'ten) stil seçeneklerini, lejant URL'leriyle birlikte döndürür. */
+  async getWmsAvailableStyles(id) {
+    return this.ogcLayerFactory.getWmsAvailableStyles(id);
   }
-  ["assertUniqueId"](_0x561b94) {
-    if (this["items"]["has"](_0x561b94)) throw new LayerOperationError("LAYER_ID_ALREADY_EXISTS", '"' + _0x561b94 + `" id'li katman zaten eklenmiş.`);
+  /** WMS katmanını seçilen sunucu-tanımlı stille (STYLES parametresiyle) yeniden kurar. */
+  async setWmsStyle(id, styleName) {
+    return this.ogcLayerFactory.setWmsStyle(id, styleName);
   }
-  async ["getCapabilitiesDocument"](_0x5ec75f, _0x3b9ee2, _0x842984, _0x329456) {
-    return this["ogcLayerFactory"]["getCapabilitiesDocument"](_0x5ec75f, _0x3b9ee2, _0x842984, _0x329456);
+  /** WMS GetLegendGraphic URL'ini (apiKey varsa query parametresiyle) oluşturur. */
+  getWmsLegendGraphicUrl(id, styleName) {
+    return this.ogcLayerFactory.getWmsLegendGraphicUrl(id, styleName);
   }
-  async ["getWcsCoverageExtents"](_0x52b32e, _0x51b5c4, _0x54c29c) {
-    return this["ogcLayerFactory"]["getWcsCoverageExtents"](_0x52b32e, _0x51b5c4, _0x54c29c);
+  /** Bir WMTS katmanının sunucu-tanımlı (GetCapabilities'ten) stil seçeneklerini, lejant URL'leriyle birlikte döndürür. */
+  async getWmtsAvailableStyles(id) {
+    return this.ogcLayerFactory.getWmtsAvailableStyles(id);
   }
-  ["waitForRenderSettle"](_0x29a243 = 60) {
-    return new Promise((_0x599178) => {
-      let _0x44c530 = _0x29a243;
-      const _0x2678ac = () => {
-        _0x44c530 -= 1, _0x44c530 <= 0 && (this["viewer"]["scene"]["postRender"]["removeEventListener"](_0x2678ac), _0x599178());
-      };
-      this["viewer"]["scene"]["postRender"]["addEventListener"](_0x2678ac);
+  /** WMTS katmanını seçilen sunucu-tanımlı stille yeniden kurar. */
+  async setWmtsStyle(id, styleName) {
+    return this.ogcLayerFactory.setWmtsStyle(id, styleName);
+  }
+  // WFS de lokal vektor katmanlari gibi varsayilan olarak zemine oturtulur.
+  // Cesium, zemine oturan (GroundPrimitive) poligonlari oturmayanlardan
+  // AYRI bir geciste ve her zaman onlarin altinda cizer; iki tur karisinca
+  // Katman Yonetimi'ndeki sira haritaya yansimiyordu (WFS hep ustte
+  // kaliyordu). Zemine oturan katmanlar ise kendi aralarinda
+  // viewer.dataSources sirasiyla cizilir (her dataSource'un
+  // OrderedGroundPrimitiveCollection'i raiseToTop ile birlikte tasinir), bu
+  // yuzden reorder() ek bir islem gerektirmez. Kutup/antimeridyen poligonlari
+  // OutlineGeometry.disableRiskyPolygonOutlines zeminden ayirir.
+  addWFS(options) {
+    return this.ogcLayerFactory.addWFS({
+      ...options,
+      clampToGround: options.clampToGround ?? true
     });
   }
-  ["isOutlineCompanion"](_0x27175a) {
-    return this["outlineGeometry"]["isOutlineCompanion"](_0x27175a);
+  addWCS(options) {
+    return this.ogcLayerFactory.addWCS(options);
   }
-  ["hasOutlineCompanion"](_0xcb6229) {
-    return this["outlineGeometry"]["hasOutlineCompanion"](_0xcb6229);
+  addGeoTiff(options) {
+    return this.ogcLayerFactory.addGeoTiff(options);
   }
-  ["hasRiskyOutline"](_0x417ee4) {
-    return this["outlineGeometry"]["hasRiskyOutline"](_0x417ee4);
+  // ── İç: GeoJSON / KML / KMZ ──────────────────────────────────────────────
+  addLocalKmlGeoJson(layerType, options) {
+    return this.localSourceLoader.addLocalKmlGeoJson(layerType, options);
   }
-  ["addPolygonOutlines"](_0x4fb3eb, _0x94fbe0, _0x25f103) {
-    this["outlineGeometry"]["addPolygonOutlines"](_0x4fb3eb, _0x94fbe0, _0x25f103);
-    for (const _0xd61431 of _0x4fb3eb["entities"]["values"]) {
-      this["outlineGeometry"]["hasOutlineCompanion"](_0xd61431) && this["opacityController"]["ensureDynamicFillColor"](_0x4fb3eb, _0xd61431);
+  // ── İç: SHP ──────────────────────────────────────────────────────────────
+  addShp(options) {
+    return this.localSourceLoader.addShp(options);
+  }
+  // ── İç: CSV ──────────────────────────────────────────────────────────────
+  addCsv(options) {
+    return this.localSourceLoader.addCsv(options);
+  }
+  // ── İç: Basemap (Map sınıfı tarafından kullanılır) ───────────────────────
+  /** @internal */
+  _addBasemapImageryLayer(id, title, imageryLayer) {
+    return this.register(id, title, "XYZ", imageryLayer, true);
+  }
+  /** @internal */
+  _removeBasemapLayers() {
+    for (const managed of this.items.values()) {
+      if (managed.isBasemap && managed.cesiumObject instanceof ImageryLayer) {
+        this.viewer.imageryLayers.remove(managed.cesiumObject, true);
+        this.items.delete(managed.id);
+      }
     }
   }
-  ["addPolygonOutlineCompanion"](_0x491411, _0x315eec, _0x47bde2, _0x55be3c, _0x65a4b0) {
-    this["outlineGeometry"]["addPolygonOutlineCompanion"](_0x491411, _0x315eec, _0x47bde2, _0x55be3c, _0x65a4b0), this["outlineGeometry"]["hasOutlineCompanion"](_0x315eec) && this["opacityController"]["ensureDynamicFillColor"](_0x491411, _0x315eec);
+  // ── İç: Çizim Katmanı (Map'in DrawingManager köprüsü) ────────────────────
+  // Orkestrasyon layers/sources/ShapeLayerBridge.ts'e tasindi (bkz Adim 7/Faz 3) --
+  // asagidaki 3 metod SADECE ince delege; isim/imza AYNEN korunur cunku
+  // Map.ts (draw:complete/draw:remove dinleyicileri) bunlari DOGRUDAN
+  // cagirir (bkz kural 3 -- public/internal yuzey sabit).
+  /** @internal */
+  _addDrawnShape(id, title, shape) {
+    return this.shapeLayerBridge.addDrawnShape(id, title, shape);
   }
-  ["readProperty"](_0x40858f, _0x1143ee, _0x3db85f) {
-    return this["styleEngine"]["readProperty"](_0x40858f, _0x1143ee, _0x3db85f);
+  /** @internal */
+  _previewDrawnShape(shape) {
+    return this.shapeLayerBridge.previewDrawnShape(shape);
   }
-  ["applyEntityStyle"](_0x56c8e5, _0x5124a2, _0x8d639e, _0x1569ab) {
-    this["styleEngine"]["applyEntityStyle"](_0x56c8e5, _0x5124a2, _0x8d639e, _0x1569ab);
+  /** @internal */
+  _addMeasuredShape(id, title, shape) {
+    return this.shapeLayerBridge.addMeasuredShape(id, title, shape);
   }
-  ["setDataSourceOpacity"](_0x4c0044, _0x2c94de) {
-    this["opacityController"]["setDataSourceOpacity"](_0x4c0044, _0x2c94de);
+  /** @internal */
+  _removeDrawnShape(id, entity) {
+    this.shapeLayerBridge.removeDrawnShape(id, entity);
   }
-  ["destroy"]() {
-    this["removeAllListeners"](), this["items"]["clear"]();
+  // ── Yardımcılar ──────────────────────────────────────────────────────────
+  register(id, title, layerType, cesiumObject, isBasemap, initialFillColor) {
+    if ("entities" in cesiumObject) {
+      this.tagEntities(cesiumObject, id);
+    }
+    const managed = Object.freeze({
+      id,
+      title,
+      layerType,
+      cesiumObject,
+      isBasemap,
+      ...initialFillColor !== void 0 ? { initialFillColor } : {}
+    });
+    this.items.set(id, managed);
+    if ("entities" in cesiumObject) this.syncPointHeightReferences([cesiumObject]);
+    this.emit("layer:add", { layer: managed });
+    return managed;
+  }
+  // Verilen DataSource'lardaki noktalari sahnenin guncel moduna uyarlar
+  // (2B'de yere yapistirma kaldirilir, 3B'de geri gelir; bkz B24).
+  syncPointHeightReferences(sources) {
+    const mode = this.viewer.scene.mode;
+    if (mode === void 0) return;
+    let changed = false;
+    for (const source of sources) {
+      if (syncPointHeightReferences(source.entities.values, mode, this.viewer.clock.currentTime)) changed = true;
+    }
+    if (changed) this.viewer.scene.requestRender();
+  }
+  // addWFS/addLocalKmlGeoJson/addShp -- UCUNUN de ensureGeoJsonCrsSupport()
+  // sonucunu register()'dan hemen sonra AYNI sekilde event'e cevirmesi
+  // gerektigi icin (bkz layers/sources/geojsonCrs.ts CrsCheckResult), tekrari
+  // onlemek amaciyla buraya alindi.
+  emitCrsCheckResult(id, result) {
+    if (!result) return;
+    switch (result.kind) {
+      case "reprojected":
+        this.emit("layer:crs-reprojected", { id, fromEpsg: result.fromEpsg, toEpsg: "EPSG:4326" });
+        break;
+      case "suspicious-unresolved-crs":
+        this.emit("layer:crs-unresolved", { id, crsName: result.crsName });
+        break;
+    }
+  }
+  // InteractionManager'in entity:click payload'indaki layerId/featureId alanlarini
+  // doldurabilmesi icin her DataSource-tabanli katmanin entity'lerini etiketler
+  // (bkz claude-code-interactionmanager-drawingmanager-mimarisi-v1.md §3.4).
+  tagEntities(dataSource, layerId) {
+    dataSource.entities.suspendEvents();
+    for (const entity of dataSource.entities.values) {
+      if (entity.properties === void 0) {
+        entity.properties = new PropertyBag();
+      }
+      if (!entity.properties.hasProperty("layerId")) {
+        entity.properties.addProperty("layerId", layerId);
+      }
+      if (!entity.properties.hasProperty("featureId")) {
+        entity.properties.addProperty("featureId", entity.id);
+      }
+    }
+    dataSource.entities.resumeEvents();
+  }
+  // raise/lower Cesium koleksiyonlarinin (imageryLayers / dataSources) sirasini
+  // degistirir ama "items" Map'inin ekleme sirasini degistirmez; getLayers()
+  // gercek z-sirasini donsun diye ImageryLayer'lari kendi koleksiyonundaki,
+  // DataSource'lari da kendi koleksiyonundaki guncel sıraya gore yeniden
+  // siralar (iki tur birbirine karisik oldugunda goreli sira korunur).
+  reindexLayerOrder() {
+    const imageryIndex = /* @__PURE__ */ new Map();
+    for (let i = 0; i < this.viewer.imageryLayers.length; i++) {
+      imageryIndex.set(this.viewer.imageryLayers.get(i), i);
+    }
+    const dataSourceIndex = /* @__PURE__ */ new Map();
+    for (let i = 0; i < this.viewer.dataSources.length; i++) {
+      dataSourceIndex.set(this.viewer.dataSources.get(i), i);
+    }
+    const orderOf = (managed) => (managed.cesiumObject instanceof ImageryLayer ? imageryIndex.get(managed.cesiumObject) : dataSourceIndex.get(managed.cesiumObject)) ?? Number.POSITIVE_INFINITY;
+    const entries = Array.from(this.items.entries());
+    const imageryEntries = entries.filter(([, m]) => m.cesiumObject instanceof ImageryLayer).sort(([, a], [, b]) => orderOf(a) - orderOf(b));
+    const dataSourceEntries = entries.filter(([, m]) => !(m.cesiumObject instanceof ImageryLayer)).sort(([, a], [, b]) => orderOf(a) - orderOf(b));
+    let imageryCursor = 0;
+    let dataSourceCursor = 0;
+    const merged = entries.map(
+      ([, managed]) => managed.cesiumObject instanceof ImageryLayer ? imageryEntries[imageryCursor++] : dataSourceEntries[dataSourceCursor++]
+    );
+    this.items.clear();
+    for (const [id, managed] of merged) this.items.set(id, managed);
+  }
+  requireLayer(id) {
+    const managed = this.items.get(id);
+    if (managed === void 0) {
+      throw new LayerOperationError("LAYER_NOT_FOUND", `Katman bulunamadı: "${id}"`);
+    }
+    return managed;
+  }
+  assertUniqueId(id) {
+    if (this.items.has(id)) {
+      throw new LayerOperationError("LAYER_ID_ALREADY_EXISTS", `"${id}" id'li katman zaten eklenmiş.`);
+    }
+  }
+  /**
+   * ML-12 düzeltmesi: OGC GetCapabilities'i apiKey header + proxy KURALLARIYLA
+   * çeker. `TucbsServiceUpload` (GC-05) gibi ayrı bir `LayerManager`
+   * referansına sahip tüketiciler de servis keşfi için bunu kullanır --
+   * eskiden bu tüketiciler proxy/apiKey'den TAMAMEN habersiz çıplak `fetch`
+   * kullanıyordu (ML-12).
+   * layers/ogc/OgcLayerFactory.ts'e delege (bkz Adim 8/Faz 2).
+   */
+  async getCapabilitiesDocument(baseUrl, serviceType, version, authToken) {
+    return this.ogcLayerFactory.getCapabilitiesDocument(baseUrl, serviceType, version, authToken);
+  }
+  // Faz 5b (ML-12'nin DescribeCoverage boslugu): eskiden bu istek proxy'siz
+  // gittigi icin CORS-korumali sunucularda sessizce basarisiz olup katmanlar
+  // global (-180,-90,180,90) dikdortgene dusuyordu.
+  // layers/ogc/OgcLayerFactory.ts'e delege (bkz Adim 8/Faz 2).
+  /**
+   * WCS kapsamalarının gerçek coğrafi kutularını, `getCapabilitiesDocument`
+   * ile aynı apiKey/proxy politikasından geçirerek getirir. İstek başarısız
+   * olursa hata fırlatmaz, boş sonuç döner.
+   *
+   * @param rawUrl WCS servisinin adresi.
+   * @param coverageIds Kutusu istenen kapsama kimlikleri.
+   * @param authToken İsteğe eklenecek yetki belirteci (isteğe bağlı).
+   * @returns Kapsama kimliğinden WGS84 kutusuna eşleme; kutusu okunamayanlar yer almaz.
+   */
+  async getWcsCoverageExtents(rawUrl, coverageIds, authToken) {
+    return this.ogcLayerFactory.getWcsCoverageExtents(rawUrl, coverageIds, authToken);
+  }
+  // TUCBS1-1441: servis kesfi (TucbsServiceUpload) yalnizca GeoTIFF
+  // coverage'larini listeler. layers/ogc/OgcLayerFactory.ts'e delege.
+  /**
+   * WCS kapsamalarının coğrafi kutularını ve hangilerinin yükseklik modeli
+   * olduğunu, `getCapabilitiesDocument` ile aynı apiKey/proxy politikasından
+   * geçirerek getirir (bkz. `fetchWcsCoverageDescriptions`). İstek başarısız
+   * olursa hata fırlatmaz.
+   *
+   * @param rawUrl WCS servisinin adresi.
+   * @param coverageIds Sınıflandırılacak kapsama kimlikleri.
+   * @param unlocatedIds Kutusu henüz bilinmeyen (GetCapabilities'te kutusu olmayan) kapsama kimlikleri.
+   * @param authToken İsteğe eklenecek yetki belirteci (isteğe bağlı).
+   * @returns Kapsama kutuları ve yükseklik modeli sayılan kapsama kimlikleri.
+   */
+  async getWcsCoverageDescriptions(rawUrl, coverageIds, unlocatedIds, authToken) {
+    return this.ogcLayerFactory.getWcsCoverageDescriptions(rawUrl, coverageIds, unlocatedIds, authToken);
+  }
+  // Katman EKLENDIKTEN ya da genislik gibi GEOMETRI gerektiren bir stil
+  // degisikligi UYGULANDIKTAN SONRA, Cesium GeometryVisualizer/
+  // ClassificationPrimitive gibi entity'leri genellikle ASENKRON (worker'lar
+  // uzerinden, birden fazla render karesi suren) olarak GORSEL primitive'lere
+  // cevirir. Cesium'un Entity/DataSource API'sinde "primitive artik ekranda
+  // hazir" diyen PUBLIC bir sinyal YOK (bkz kullanici bildirimi: buyuk
+  // katmanlarda -- 68-86MB'lik Ulkeler_Polygon gibi -- hem ilk yuklemede hem
+  // de Dis Hat Genislik degisikliginde ekran BIR SURE eski/bos haliyle
+  // kaliyordu). add()/applyLayerStyle()'in dondurdugu Promise, cagiran
+  // tarafin (ör. TucbsFileUpload/TucbsStyleEditor) bu sure boyunca bir
+  // "Yukleniyor…" gostergesi tutabilmesi icin BU bekleme penceresini de
+  // kapsayacak sekilde genisletilir. requestAnimationFrame yerine BILEREK
+  // scene.postRender kullanilir -- bu, Cesium'un KENDI render dongusune
+  // (surekli render modu varsayilaninda HER karede calisir) bagli oldugu
+  // icin bagimsiz bir zamanlayicidan daha guvenilirdir. Kesin bir tamamlanma
+  // sinyali OLMADIGINDAN bu SADECE bir TAHMIN -- cok buyuk veri kumelerinde
+  // gercek gorsel tamamlanma bu pencereden biraz daha uzun surebilir, ama
+  // "hic beklemeden hemen kapatmak"tan cok daha dogru bir yaklasim.
+  waitForRenderSettle(frames = 60) {
+    return new Promise((resolve) => {
+      let remaining = frames;
+      const listener = () => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          this.viewer.scene.postRender.removeEventListener(listener);
+          resolve();
+        }
+      };
+      this.viewer.scene.postRender.addEventListener(listener);
+    });
+  }
+  /** Bu entity'nin KENDİSİ bir outline companion'i mi (ayri bir polyline
+   * olarak eklenmis, poligonun gercek bir ozelligi degil)? */
+  isOutlineCompanion(entity) {
+    return this.outlineGeometry.isOutlineCompanion(entity);
+  }
+  /** Bu (poligon) entity'nin bir outline companion'i VAR mi -- varsa native
+   * polygon.outline/outlineColor/outlineWidth alanlarina DOKUNULMAMALI. */
+  hasOutlineCompanion(entity) {
+    return this.outlineGeometry.hasOutlineCompanion(entity);
+  }
+  /** Bu (poligon) entity antimeridyen/kutup crash riski tasidigi icin native
+   * outline'i BILEREK kapatilmis mi -- tekrar acilmamali. */
+  hasRiskyOutline(entity) {
+    return this.outlineGeometry.hasRiskyOutline(entity);
+  }
+  // Cesium, clampToGround (zemine oturan/GroundPrimitive) poligonlarda
+  // outline'i framework seviyesinde sessizce kapatir (bkz.
+  // @cesium/engine/Source/DataSources/GeometryUpdater.js: "outlineEnabled &&
+  // onTerrain" kontrolu) -- WebGL kisitlamasi, bizim kodumuzdaki bir hata
+  // degil. clampToGround:false durumda da outlineWidth>1 coğu GPU/tarayicida
+  // GL_LINE_WIDTH sinirlamasi yuzunden PRATIKTE gorunmuyor (gercek headless
+  // testle Cizim Katmani icin dogrulandi) -- ayni companion-polyline
+  // teknigi HER IKI durumda da kullanilir (bkz addPolygonOutlineCompanion),
+  // companion'in KENDI clampToGround'u ilgili poligonla ayni tutulur.
+  addPolygonOutlines(dataSource, color, width) {
+    this.outlineGeometry.addPolygonOutlines(dataSource, color, width);
+    for (const entity of dataSource.entities.values) {
+      if (this.outlineGeometry.hasOutlineCompanion(entity)) {
+        this.opacityController.ensureDynamicFillColor(dataSource, entity);
+      }
+    }
+  }
+  // Bir poligon entity'sinin kose koordinatlarindan AYRI bir polyline
+  // "outline" entity'si ekler (bkz yukaridaki addPolygonOutlines yorumu) --
+  // hem TOPLU ilk yukleme (addPolygonOutlines) HEM DE Cizim Katmani'na TEK
+  // TEK eklenen poligonlar (_addDrawnShape, clampToGround:false) bu ORTAK
+  // helper'i kullanir. Companion, applyLayerStyle()'daki mevcut
+  // outlineCompanionEntities dongusu tarafindan otomatik olarak
+  // renk/genislik guncellemesi alir.
+  addPolygonOutlineCompanion(dataSource, entity, color, width, clampToGround) {
+    this.outlineGeometry.addPolygonOutlineCompanion(
+      dataSource,
+      entity,
+      color,
+      width,
+      clampToGround
+    );
+    if (this.outlineGeometry.hasOutlineCompanion(entity)) {
+      this.opacityController.ensureDynamicFillColor(dataSource, entity);
+    }
+  }
+  // layers/style/LayerStyleEngine.ts'e delege (public -- getUniqueColumnValues de kullanir).
+  readProperty(entity, column, time) {
+    return this.styleEngine.readProperty(entity, column, time);
+  }
+  // layers/style/LayerStyleEngine.ts'e delege (public -- _addDrawnShape/
+  // _addMeasuredShape applyLayerStyle'dan BAGIMSIZ dogrudan cagirir).
+  applyEntityStyle(entity, color, outline, isShapeLayer, pointSymbol) {
+    this.styleEngine.applyEntityStyle(entity, color, outline, isShapeLayer, pointSymbol);
+  }
+  // layers/style/OpacityController.ts'e delege.
+  setDataSourceOpacity(dataSource, opacity) {
+    this.opacityController.setDataSourceOpacity(dataSource, opacity);
+  }
+  // ── Kaynak temizleme ─────────────────────────────────────────────────────
+  /** Tüm event dinleyicilerini ve iç katman kaydını temizler (Cesium katmanlarının kendisini kaldırmaz). */
+  destroy() {
+    var _a2;
+    (_a2 = this.removeMorphListener) == null ? void 0 : _a2.call(this);
+    this.removeAllListeners();
+    this.items.clear();
   }
 };
-_LayerManager["DEFAULT_OUTLINE_COLOR_HEX"] = "#1a73e8";
-_LayerManager["DEFAULT_OUTLINE_COLOR"] = Color["fromCssColorString"](_LayerManager["DEFAULT_OUTLINE_COLOR_HEX"]);
+_LayerManager.DEFAULT_OUTLINE_COLOR_HEX = "#1a73e8";
+_LayerManager.DEFAULT_OUTLINE_COLOR = Color.fromCssColorString(
+  _LayerManager.DEFAULT_OUTLINE_COLOR_HEX
+);
 let LayerManager = _LayerManager;
 const FLAG = "__tucbsSelectionHighlight";
-function isSelectionHighlightEntity(_0x2d00d2) {
-  return _0x2d00d2[FLAG] === !![];
+function isSelectionHighlightEntity(entity) {
+  return entity[FLAG] === true;
 }
 class SelectionHighlight {
-  constructor(_0x31131c) {
-    this["viewer"] = _0x31131c, this["source"] = null, this["generation"] = 0;
+  constructor(viewer) {
+    this.viewer = viewer;
+    this.source = null;
+    this.generation = 0;
   }
-  ["show"](_0x798da3) {
-    const _0x25456c = ++this["generation"];
-    if (_0x798da3["length"] === 0) {
-      this["removeSource"]();
+  /** Verilen feature'ları vurgular ve önceki vurguyu değiştirir; boş dizi vurguyu kaldırır. */
+  show(features) {
+    const generation = ++this.generation;
+    if (features.length === 0) {
+      this.removeSource();
       return;
     }
-    void this["load"](_0x798da3, _0x25456c);
+    void this.load(features, generation);
   }
-  ["clear"]() {
-    this["generation"]++, this["removeSource"]();
+  /** Vurguyu kaldırır ve hâlâ yüklenmekte olan bir vurgunun eklenmesini engeller. */
+  clear() {
+    this.generation++;
+    this.removeSource();
   }
-  async ["load"](_0x17f608, _0x50ef95) {
-    const _0x5880c9 = Color["fromCssColorString"]("#dc2626")["withAlpha"](0.25), _0x47637a = Color["fromCssColorString"]("#dc2626"), _0x504733 = { "type": "FeatureCollection", "features": [..._0x17f608] }, _0x37d890 = await GeoJsonDataSource["load"](_0x504733, { "clampToGround": !![], "fill": _0x5880c9, "stroke": _0x47637a, "strokeWidth": 3, "markerColor": _0x47637a, "markerSize": 16 });
-    if (_0x50ef95 !== this["generation"]) return;
-    this["removeSource"](), this["paint"](_0x37d890, _0x5880c9, _0x47637a), this["viewer"]["dataSources"]["add"](_0x37d890), this["source"] = _0x37d890;
+  async load(features, generation) {
+    const fill = Color.fromCssColorString("#dc2626").withAlpha(0.25);
+    const stroke = Color.fromCssColorString("#dc2626");
+    const data = { type: "FeatureCollection", features: [...features] };
+    const source = await GeoJsonDataSource.load(data, {
+      clampToGround: true,
+      fill,
+      stroke,
+      strokeWidth: 3,
+      markerColor: stroke,
+      markerSize: 16
+    });
+    if (generation !== this.generation) return;
+    this.removeSource();
+    this.paint(source, fill, stroke);
+    syncPointHeightReferences(source.entities.values, this.viewer.scene.mode, JulianDate.now());
+    this.viewer.dataSources.add(source);
+    this.source = source;
   }
-  ["paint"](_0x3c9bbc, _0x2cebca, _0x170f4a) {
+  paint(source, fill, stroke) {
     var _a2;
-    for (const _0xa7135d of [..._0x3c9bbc["entities"]["values"]]) {
-      this["tag"](_0xa7135d);
-      _0xa7135d["billboard"] && (_0xa7135d["billboard"] = void 0, _0xa7135d["point"] = new PointGraphics({ "pixelSize": 16, "color": _0x170f4a, "outlineColor": Color["WHITE"], "outlineWidth": 2, "heightReference": HeightReference["CLAMP_TO_GROUND"], "disableDepthTestDistance": Number["POSITIVE_INFINITY"] }));
-      const _0x5f3f46 = _0xa7135d["polygon"];
-      if (!_0x5f3f46) continue;
-      _0x5f3f46["material"] = new ColorMaterialProperty(_0x2cebca), _0x5f3f46["outline"] = new ConstantProperty(![]);
-      const _0x54c17e = (_a2 = _0x5f3f46["hierarchy"]) == null ? void 0 : _a2["getValue"](JulianDate["now"]());
-      this["addRings"](_0x3c9bbc, _0x54c17e, _0x170f4a);
+    for (const entity of [...source.entities.values]) {
+      this.tag(entity);
+      if (entity.billboard) {
+        entity.billboard = void 0;
+        entity.point = new PointGraphics({
+          pixelSize: 16,
+          color: stroke,
+          outlineColor: Color.WHITE,
+          outlineWidth: 2,
+          heightReference: HeightReference.CLAMP_TO_GROUND,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY
+        });
+      }
+      const polygon = entity.polygon;
+      if (!polygon) continue;
+      polygon.material = new ColorMaterialProperty(fill);
+      polygon.outline = new ConstantProperty(false);
+      const hierarchy = (_a2 = polygon.hierarchy) == null ? void 0 : _a2.getValue(JulianDate.now());
+      this.addRings(source, hierarchy, stroke);
     }
   }
-  ["addRings"](_0x33328f, _0x500452, _0x99aba8) {
+  addRings(source, hierarchy, stroke) {
     var _a2;
-    if (!((_a2 = _0x500452 == null ? void 0 : _0x500452["positions"]) == null ? void 0 : _a2["length"])) return;
-    this["addRing"](_0x33328f, _0x500452["positions"], _0x99aba8);
-    for (const _0x42e3fe of _0x500452["holes"] ?? []) this["addRings"](_0x33328f, _0x42e3fe, _0x99aba8);
+    if (!((_a2 = hierarchy == null ? void 0 : hierarchy.positions) == null ? void 0 : _a2.length)) return;
+    this.addRing(source, hierarchy.positions, stroke);
+    for (const hole of hierarchy.holes ?? []) this.addRings(source, hole, stroke);
   }
-  ["addRing"](_0x5eac41, _0x251438, _0x5a3aa7) {
-    const _0x37e070 = _0x5eac41["entities"]["add"]({ "polyline": { "positions": _0x251438, "width": 3, "material": new ColorMaterialProperty(_0x5a3aa7), "clampToGround": !![] } });
-    this["tag"](_0x37e070);
+  addRing(source, positions, stroke) {
+    const line2 = source.entities.add({
+      polyline: {
+        positions,
+        width: 3,
+        material: new ColorMaterialProperty(stroke),
+        clampToGround: true
+      }
+    });
+    this.tag(line2);
   }
-  ["tag"](_0x22aa94) {
-    _0x22aa94[FLAG] = !![];
+  tag(entity) {
+    entity[FLAG] = true;
   }
-  ["removeSource"]() {
-    if (!this["source"]) return;
-    this["viewer"]["dataSources"]["remove"](this["source"], !![]), this["source"] = null;
+  removeSource() {
+    if (!this.source) return;
+    this.viewer.dataSources.remove(this.source, true);
+    this.source = null;
   }
 }
 const DRILL_PICK_LIMIT = 32;
-function boundingBoxFromPoints(_0x553b5a) {
-  if (_0x553b5a["length"] === 0) return void 0;
-  let _0x1d9614 = Infinity, _0x5418a9 = Infinity, _0x3ff2ad = -Infinity, _0x1f70f2 = -Infinity;
-  for (const [_0x1a6b8d, _0x1786f9] of _0x553b5a) {
-    if (_0x1a6b8d < _0x1d9614) _0x1d9614 = _0x1a6b8d;
-    if (_0x1a6b8d > _0x3ff2ad) _0x3ff2ad = _0x1a6b8d;
-    if (_0x1786f9 < _0x5418a9) _0x5418a9 = _0x1786f9;
-    if (_0x1786f9 > _0x1f70f2) _0x1f70f2 = _0x1786f9;
+function boundingBoxFromPoints(points) {
+  if (points.length === 0) return void 0;
+  let west = Infinity;
+  let south = Infinity;
+  let east = -Infinity;
+  let north = -Infinity;
+  for (const [lon, lat] of points) {
+    if (lon < west) west = lon;
+    if (lon > east) east = lon;
+    if (lat < south) south = lat;
+    if (lat > north) north = lat;
   }
-  if (_0x1d9614 === _0x3ff2ad && _0x5418a9 === _0x1f70f2) return { "kind": "point", "longitude": _0x1d9614, "latitude": _0x5418a9 };
-  return { "kind": "extent", "west": _0x1d9614, "south": _0x5418a9, "east": _0x3ff2ad, "north": _0x1f70f2 };
+  if (west === east && south === north) return { kind: "point", longitude: west, latitude: south };
+  return { kind: "extent", west, south, east, north };
 }
-function flattenGeoJsonCoordinates(_0x2350b8, _0x347268) {
-  if (!Array["isArray"](_0x2350b8) || _0x2350b8["length"] === 0) return;
-  if (typeof _0x2350b8[0] === "number") {
-    const [_0x590b2b, _0x29f0fc] = _0x2350b8;
-    if (typeof _0x590b2b === "number" && typeof _0x29f0fc === "number") _0x347268["push"]([_0x590b2b, _0x29f0fc]);
+function flattenGeoJsonCoordinates(coords, out) {
+  if (!Array.isArray(coords) || coords.length === 0) return;
+  if (typeof coords[0] === "number") {
+    const [lon, lat] = coords;
+    if (typeof lon === "number" && typeof lat === "number") out.push([lon, lat]);
     return;
   }
-  for (const _0x76154a of _0x2350b8) flattenGeoJsonCoordinates(_0x76154a, _0x347268);
+  for (const child of coords) flattenGeoJsonCoordinates(child, out);
 }
-function extractGeoJsonExtent(_0x293c6f) {
-  if (_0x293c6f === null || typeof _0x293c6f !== "object") return void 0;
-  const _0x22dcbd = _0x293c6f, _0x328b52 = _0x22dcbd["type"] === "FeatureCollection" && Array["isArray"](_0x22dcbd["features"]) ? _0x22dcbd["features"]["map"]((_0x1f9246) => _0x1f9246 == null ? void 0 : _0x1f9246["geometry"])["filter"]((_0x173882) => _0x173882 !== void 0 && _0x173882 !== null) : _0x22dcbd["geometry"] ? [_0x22dcbd["geometry"]] : [];
-  if (_0x328b52["length"] === 0) return void 0;
-  const _0x164dee = [];
-  for (const _0x7d05d9 of _0x328b52) {
-    const _0x1f94d3 = _0x7d05d9;
-    if (_0x1f94d3["type"] === "GeometryCollection" && Array["isArray"](_0x1f94d3["geometries"])) for (const _0x354954 of _0x1f94d3["geometries"]) {
-      flattenGeoJsonCoordinates(_0x354954 == null ? void 0 : _0x354954["coordinates"], _0x164dee);
+function extractGeoJsonExtent(data) {
+  if (data === null || typeof data !== "object") return void 0;
+  const feature = data;
+  const geometries = feature.type === "FeatureCollection" && Array.isArray(feature.features) ? feature.features.map((f) => f == null ? void 0 : f.geometry).filter((g) => g !== void 0 && g !== null) : feature.geometry ? [feature.geometry] : [];
+  if (geometries.length === 0) return void 0;
+  const points = [];
+  for (const geometry of geometries) {
+    const g = geometry;
+    if (g.type === "GeometryCollection" && Array.isArray(g.geometries)) {
+      for (const sub of g.geometries) {
+        flattenGeoJsonCoordinates(sub == null ? void 0 : sub.coordinates, points);
+      }
+    } else {
+      flattenGeoJsonCoordinates(g.coordinates, points);
     }
-    else flattenGeoJsonCoordinates(_0x1f94d3["coordinates"], _0x164dee);
   }
-  return boundingBoxFromPoints(_0x164dee);
+  return boundingBoxFromPoints(points);
 }
-function collectGmlCoordinates(_0x19fff3, _0x4d8c66) {
+function collectGmlCoordinates(node, out) {
   var _a2, _b;
-  for (const _0x1f4721 of Array["from"](_0x19fff3["getElementsByTagNameNS"]("*", "coordinates"))) {
-    const _0x416a50 = (_a2 = _0x1f4721["textContent"]) == null ? void 0 : _a2["trim"]();
-    if (!_0x416a50) continue;
-    for (const _0x8e6b82 of _0x416a50["split"](/\s+/)) {
-      const [_0x1094b7, _0x26fed2] = _0x8e6b82["split"](","), _0x5a53c6 = Number(_0x1094b7), _0x1145f6 = Number(_0x26fed2);
-      if (Number["isFinite"](_0x5a53c6) && Number["isFinite"](_0x1145f6)) _0x4d8c66["push"]([_0x5a53c6, _0x1145f6]);
+  for (const el2 of Array.from(node.getElementsByTagNameNS("*", "coordinates"))) {
+    const text = (_a2 = el2.textContent) == null ? void 0 : _a2.trim();
+    if (!text) continue;
+    for (const pair of text.split(/\s+/)) {
+      const [lonStr, latStr] = pair.split(",");
+      const lon = Number(lonStr);
+      const lat = Number(latStr);
+      if (Number.isFinite(lon) && Number.isFinite(lat)) out.push([lon, lat]);
     }
   }
-  for (const _0x8e8618 of ["pos", "posList"]) {
-    for (const _0x4d4a54 of Array["from"](_0x19fff3["getElementsByTagNameNS"]("*", _0x8e8618))) {
-      const _0x44b506 = (((_b = _0x4d4a54["textContent"]) == null ? void 0 : _b["trim"]()) ?? "")["split"](/\s+/)["map"](Number);
-      for (let _0x12c873 = 0; _0x12c873 + 1 < _0x44b506["length"]; _0x12c873 += 2) {
-        const _0x55cf74 = _0x44b506[_0x12c873], _0xe70eee = _0x44b506[_0x12c873 + 1];
-        if (Number["isFinite"](_0x55cf74) && Number["isFinite"](_0xe70eee)) _0x4d8c66["push"]([_0x55cf74, _0xe70eee]);
+  for (const tag of ["pos", "posList"]) {
+    for (const el2 of Array.from(node.getElementsByTagNameNS("*", tag))) {
+      const numbers = (((_b = el2.textContent) == null ? void 0 : _b.trim()) ?? "").split(/\s+/).map(Number);
+      for (let i = 0; i + 1 < numbers.length; i += 2) {
+        const lon = numbers[i];
+        const lat = numbers[i + 1];
+        if (Number.isFinite(lon) && Number.isFinite(lat)) out.push([lon, lat]);
       }
     }
   }
 }
-function extractGmlExtent(_0x3b7cb3) {
-  if (!(_0x3b7cb3 instanceof Element)) return void 0;
-  const _0x283ede = [];
-  return collectGmlCoordinates(_0x3b7cb3, _0x283ede), boundingBoxFromPoints(_0x283ede);
+function extractGmlExtent(data) {
+  if (!(data instanceof Element)) return void 0;
+  const points = [];
+  collectGmlCoordinates(data, points);
+  return boundingBoxFromPoints(points);
 }
-function extractImageryGeometry(_0x32cf1d) {
-  return extractGeoJsonExtent(_0x32cf1d) ?? extractGmlExtent(_0x32cf1d);
+function extractImageryGeometry(data) {
+  return extractGeoJsonExtent(data) ?? extractGmlExtent(data);
 }
 class InteractionManager extends EventEmitter {
-  constructor(_0x4d3635) {
-    super(), this["unsubscribers"] = [], this["suspended"] = ![], this["identifySuspended"] = ![], this["hoverEnabled"] = ![], this["pickGeneration"] = 0, this["viewer"] = _0x4d3635, this["handler"] = new ScreenSpaceEventHandler(_0x4d3635["scene"]["canvas"]), this["bindMouseEvents"](), this["bindCameraEvents"](), this["bindSceneEvents"]();
+  /** @param viewer - Etkileşimlerin dinleneceği Cesium `Viewer`. */
+  constructor(viewer) {
+    super();
+    this.unsubscribers = [];
+    this.suspended = false;
+    this.identifySuspended = false;
+    this.hoverEnabled = false;
+    this.pickGeneration = 0;
+    this.viewer = viewer;
+    this.handler = new ScreenSpaceEventHandler(viewer.scene.canvas);
+    this.bindMouseEvents();
+    this.bindCameraEvents();
+    this.bindSceneEvents();
   }
-  get ["scene"]() {
-    return this["viewer"]["scene"];
+  /** Cesium `Scene` nesnesi (`viewer.scene`). */
+  get scene() {
+    return this.viewer.scene;
   }
-  get ["camera"]() {
-    return this["viewer"]["camera"];
+  /** Cesium `Camera` nesnesi (`viewer.camera`). */
+  get camera() {
+    return this.viewer.camera;
   }
-  ["suspend"]() {
-    if (this["suspended"]) return;
-    this["suspended"] = !![], this["emit"]("interaction:suspend", {});
+  /** Tıklama/pick event grubunu (`entity:*`/`map:*`/`imagery:*`) geçici olarak durdurur (bkz `DrawingManager`). */
+  suspend() {
+    if (this.suspended) return;
+    this.suspended = true;
+    this.emit("interaction:suspend", {});
   }
-  ["resume"]() {
-    this["suspended"] = ![];
+  /** `suspend()` ile durdurulan tıklama/pick event grubunu devam ettirir. */
+  resume() {
+    this.suspended = false;
   }
-  ["isSuspended"]() {
-    return this["suspended"];
+  /** Tıklama/pick event grubunun şu an durdurulmuş olup olmadığı. */
+  isSuspended() {
+    return this.suspended;
   }
-  ["suspendIdentify"]() {
-    this["identifySuspended"] = !![];
+  /** `TucbsIdentifyPanel`'in kendi tepkisini (öznitelik tablosu/koordinat kartı) geçici olarak durdurur, event yayınını ETKİLEMEZ (bkz `identifySuspended` alanı). */
+  suspendIdentify() {
+    this.identifySuspended = true;
   }
-  ["resumeIdentify"]() {
-    this["identifySuspended"] = ![];
+  /** `suspendIdentify()` ile durdurulan identify tepkisini devam ettirir. */
+  resumeIdentify() {
+    this.identifySuspended = false;
   }
-  ["isIdentifySuspended"]() {
-    return this["identifySuspended"];
+  /** Identify tepkisinin şu an durdurulmuş olup olmadığı. */
+  isIdentifySuspended() {
+    return this.identifySuspended;
   }
-  ["enableHover"](_0xa759a8) {
-    this["hoverEnabled"] = _0xa759a8, !_0xa759a8 && (this["hoveredEntity"] = void 0);
-  }
-  ["isHoverEnabled"]() {
-    return this["hoverEnabled"];
-  }
-  ["flyToPosition"](_0xa0cc7f, _0x157ae4, _0x48b509) {
-    const _0x57623b = (_0x48b509 == null ? void 0 : _0x48b509["height"]) ?? 1e3;
-    this["viewer"]["camera"]["flyTo"]({ "destination": Cartesian3["fromDegrees"](_0xa0cc7f, _0x157ae4, _0x57623b), "orientation": { "pitch": _0x584e42["toRadians"](-90) }, ...(_0x48b509 == null ? void 0 : _0x48b509["duration"]) !== void 0 ? { "duration": _0x48b509["duration"] } : {} });
-  }
-  ["flyToExtent"](_0x21412e, _0x17f797, _0x4b1624, _0x486bf4, _0x5bf84b) {
-    this["viewer"]["camera"]["flyTo"]({ "destination": Rectangle["fromDegrees"](_0x21412e, _0x17f797, _0x4b1624, _0x486bf4), "orientation": { "pitch": _0x584e42["toRadians"](-90) }, ...(_0x5bf84b == null ? void 0 : _0x5bf84b["duration"]) !== void 0 ? { "duration": _0x5bf84b["duration"] } : {} });
-  }
-  ["destroy"]() {
-    !this["handler"]["isDestroyed"]() && this["handler"]["destroy"]();
-    for (const _0x492e13 of this["unsubscribers"]) {
-      _0x492e13();
+  /** `entity:mouseenter`/`entity:mouseleave` hover event'lerinin açık olup olmadığını ayarlar; kapatılırken mevcut hover durumu sıfırlanır. */
+  enableHover(enabled) {
+    this.hoverEnabled = enabled;
+    if (!enabled) {
+      this.hoveredEntity = void 0;
     }
-    this["unsubscribers"]["length"] = 0, this["removeAllListeners"]();
   }
-  ["bindMouseEvents"]() {
-    this["handler"]["setInputAction"]((_0xac70aa) => this["dispatchPick"](_0xac70aa["position"], "entity:click", "map:click", "imagery:click"), ScreenSpaceEventType["LEFT_CLICK"]), this["handler"]["setInputAction"]((_0x256a43) => this["dispatchPick"](_0x256a43["position"], "entity:dblclick", "map:dblclick", "imagery:dblclick"), ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]), this["handler"]["setInputAction"]((_0x2c62e3) => this["dispatchPick"](_0x2c62e3["position"], "entity:rightclick", "map:rightclick", "imagery:rightclick"), ScreenSpaceEventType["RIGHT_CLICK"]), this["handler"]["setInputAction"]((_0x3c1957) => this["dispatchEntityOnly"](_0x3c1957["position"], "entity:mousedown"), ScreenSpaceEventType["LEFT_DOWN"]), this["handler"]["setInputAction"]((_0x54e7e5) => this["dispatchEntityOnly"](_0x54e7e5["position"], "entity:mouseup"), ScreenSpaceEventType["LEFT_UP"]), this["handler"]["setInputAction"]((_0x135c53) => this["handleMouseMove"](_0x135c53["endPosition"]), ScreenSpaceEventType["MOUSE_MOVE"]), this["handler"]["setInputAction"]((_0xfa6808) => this["emit"]("map:wheel", { "delta": _0xfa6808 }), ScreenSpaceEventType["WHEEL"]), this["handler"]["setInputAction"]((_0xab4601) => this["emit"]("map:pinchstart", this["buildMapDetail"](_0xab4601["position1"])), ScreenSpaceEventType["PINCH_START"]), this["handler"]["setInputAction"](() => this["emit"]("map:pinchend", {}), ScreenSpaceEventType["PINCH_END"]), this["handler"]["setInputAction"]((_0x2b8f1b) => {
-      const _0x1084c5 = Math["atan2"](_0x2b8f1b["position2"]["y"] - _0x2b8f1b["position1"]["y"], _0x2b8f1b["position2"]["x"] - _0x2b8f1b["position1"]["x"]);
-      this["emit"]("map:pinchmove", { ...this["buildMapDetail"](_0x2b8f1b["position1"]), "angle": _0x1084c5 });
-    }, ScreenSpaceEventType["PINCH_MOVE"]);
+  /** Hover event'lerinin şu an açık olup olmadığı. */
+  isHoverEnabled() {
+    return this.hoverEnabled;
   }
-  ["handleMouseMove"](_0x5bf784) {
-    this["emit"]("map:mousemove", this["buildMapDetail"](_0x5bf784));
-    if (!this["hoverEnabled"] || this["suspended"]) return;
-    const _0x1275e8 = this["pickSelectableEntity"](_0x5bf784);
-    if (_0x1275e8 === this["hoveredEntity"]) return;
-    this["hoveredEntity"] !== void 0 && this["emit"]("entity:mouseleave", this["buildEntityDetail"](this["hoveredEntity"], _0x5bf784)), this["hoveredEntity"] = _0x1275e8, _0x1275e8 !== void 0 && this["emit"]("entity:mouseenter", this["buildEntityDetail"](_0x1275e8, _0x5bf784));
+  /**
+   * Kamerayı verilen coğrafi konuma top-down (`pitch=-90`) uçurur.
+   * @param longitude - Boylam (derece).
+   * @param latitude - Enlem (derece).
+   * @param options.height - Uçuş sonrası yükseklik (metre). @default 1000
+   * @param options.duration - Uçuş süresi (saniye); verilmezse Cesium'un mesafeye göre otomatik hesapladığı süre kullanılır.
+   *
+   * @example
+   * ```ts
+   * map.interactionManager.flyToPosition(32.85, 39.93, { height: 5000 });
+   * ```
+   */
+  // Map.flyTo ile AYNI top-down varsayilan (pitch=-90) -- TucbsIdentifyPanel'in
+  // "Yakınlaş" butonu, entity'si olmayan (WMS/WMTS GetFeatureInfo) raster
+  // sonuclar icin bunu kullanir: bu sonuclarin client-side bir geometrisi
+  // yoktur, yakinlasabilecegimiz tek sey tiklanan noktadir (entity'si olan
+  // vektor sonuclar LayerManager.zoomToEntity ile feature'in GERCEK
+  // cercevesine yakinlasir, bu daha hassastir).
+  flyToPosition(longitude, latitude, options) {
+    const height = (options == null ? void 0 : options.height) ?? 1e3;
+    this.viewer.camera.flyTo({
+      destination: Cartesian3.fromDegrees(longitude, latitude, height),
+      orientation: { pitch: Math$1.toRadians(-90) },
+      ...(options == null ? void 0 : options.duration) !== void 0 ? { duration: options.duration } : {}
+    });
   }
-  ["dispatchPick"](_0x385c95, _0x259131, _0x4b684f, _0x200356) {
-    if (this["suspended"]) return;
-    this["pickGeneration"]++;
-    const _0x4c2c1b = this["pickSelectableEntity"](_0x385c95);
-    _0x4c2c1b ? this["emit"](_0x259131, this["buildEntityDetail"](_0x4c2c1b, _0x385c95)) : this["emit"](_0x4b684f, this["buildMapDetail"](_0x385c95)), this["pickImageryFeatures"](_0x385c95, _0x200356);
+  /**
+   * Kamerayı verilen coğrafi dikdörtgene (derece) top-down uçurur.
+   *
+   * @param west - Batı sınırı (boylam, derece).
+   * @param south - Güney sınırı (enlem, derece).
+   * @param east - Doğu sınırı (boylam, derece).
+   * @param north - Kuzey sınırı (enlem, derece).
+   * @param options - Uçuş seçenekleri (isteğe bağlı).
+   * @param options.duration - Uçuş süresi (saniye); verilmezse Cesium'un mesafeye göre otomatik hesapladığı süre kullanılır.
+   *
+   * @example
+   * ```ts
+   * map.interactionManager.flyToExtent(26, 36, 45, 42);
+   * ```
+   */
+  // TucbsIdentifyPanel'in "Yakınlaş" butonu, WMS GetFeatureInfo yaniti GERCEK
+  // geometri (GeoJSON) icerdiginde (bkz ImageryFeatureInfo.extent yorumu,
+  // InteractionManager.extractGeoJsonExtent) tiklanan NOKTAYA sabit yukseklikte
+  // ucmak (flyToPosition) veya katmanin TAMAMINA zoom yapmak (LayerManager.
+  // zoomToLayer) yerine bunu kullanir -- entity'si olmayan raster sonuclarda
+  // da (varsa) feature'in GERCEK sinirlarina hassas bir yakinlasma saglar.
+  flyToExtent(west, south, east, north, options) {
+    this.viewer.camera.flyTo({
+      destination: Rectangle.fromDegrees(west, south, east, north),
+      orientation: { pitch: Math$1.toRadians(-90) },
+      ...(options == null ? void 0 : options.duration) !== void 0 ? { duration: options.duration } : {}
+    });
   }
-  ["pickSelectableEntity"](_0x189b78) {
-    const _0x4b5b08 = this["scene"]["drillPick"](_0x189b78, DRILL_PICK_LIMIT);
-    for (const _0x3e008f of _0x4b5b08) {
-      const _0x18550b = _0x3e008f == null ? void 0 : _0x3e008f["id"];
-      if (!(_0x18550b instanceof Entity)) continue;
-      if (isSelectionHighlightEntity(_0x18550b)) continue;
-      return _0x18550b;
+  /** `ScreenSpaceEventHandler`'ı ve tüm camera/scene aboneliklerini yok eder, kayıtlı event dinleyicilerini temizler. */
+  destroy() {
+    if (!this.handler.isDestroyed()) {
+      this.handler.destroy();
+    }
+    for (const unsubscribe of this.unsubscribers) {
+      unsubscribe();
+    }
+    this.unsubscribers.length = 0;
+    this.removeAllListeners();
+  }
+  // ── Mouse event'leri (entity grubu + map grubu) ────────────────────────────
+  bindMouseEvents() {
+    this.handler.setInputAction(
+      (event) => this.dispatchPick(
+        event.position,
+        "entity:click",
+        "map:click",
+        "imagery:click"
+      ),
+      ScreenSpaceEventType.LEFT_CLICK
+    );
+    this.handler.setInputAction(
+      (event) => this.dispatchPick(
+        event.position,
+        "entity:dblclick",
+        "map:dblclick",
+        "imagery:dblclick"
+      ),
+      ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+    );
+    this.handler.setInputAction(
+      (event) => this.dispatchPick(
+        event.position,
+        "entity:rightclick",
+        "map:rightclick",
+        "imagery:rightclick"
+      ),
+      ScreenSpaceEventType.RIGHT_CLICK
+    );
+    this.handler.setInputAction(
+      (event) => this.dispatchEntityOnly(event.position, "entity:mousedown"),
+      ScreenSpaceEventType.LEFT_DOWN
+    );
+    this.handler.setInputAction(
+      (event) => this.dispatchEntityOnly(event.position, "entity:mouseup"),
+      ScreenSpaceEventType.LEFT_UP
+    );
+    this.handler.setInputAction(
+      (event) => this.handleMouseMove(event.endPosition),
+      ScreenSpaceEventType.MOUSE_MOVE
+    );
+    this.handler.setInputAction(
+      (delta) => this.emit("map:wheel", { delta }),
+      ScreenSpaceEventType.WHEEL
+    );
+    this.handler.setInputAction(
+      (event) => this.emit("map:pinchstart", this.buildMapDetail(event.position1)),
+      ScreenSpaceEventType.PINCH_START
+    );
+    this.handler.setInputAction(
+      () => this.emit("map:pinchend", {}),
+      ScreenSpaceEventType.PINCH_END
+    );
+    this.handler.setInputAction(
+      (event) => {
+        const angle = Math.atan2(
+          event.position2.y - event.position1.y,
+          event.position2.x - event.position1.x
+        );
+        this.emit("map:pinchmove", {
+          ...this.buildMapDetail(event.position1),
+          angle
+        });
+      },
+      ScreenSpaceEventType.PINCH_MOVE
+    );
+  }
+  handleMouseMove(screenPos) {
+    this.emit("map:mousemove", this.buildMapDetail(screenPos));
+    if (!this.hoverEnabled || this.suspended) return;
+    const entity = this.pickSelectableEntity(screenPos);
+    if (entity === this.hoveredEntity) return;
+    if (this.hoveredEntity !== void 0) {
+      this.emit(
+        "entity:mouseleave",
+        this.buildEntityDetail(this.hoveredEntity, screenPos)
+      );
+    }
+    this.hoveredEntity = entity;
+    if (entity !== void 0) {
+      this.emit("entity:mouseenter", this.buildEntityDetail(entity, screenPos));
+    }
+  }
+  // suspended iken pick/tiklama grubu (entity:* VE map:*) tamamen susar --
+  // DrawingManager aktifken TucbsIdentifyPanel'in (map:click -> koordinat
+  // karti, entity:click -> oznitelik tablosu) araya girmemesi icin. Bos
+  // zemine tiklamak onceden suspended iken bile map:click yayardi (sadece
+  // entity dalinda kontrol vardi) -- bu, cizim sirasinda identify koordinat
+  // kartinin gorunmesine yol aciyordu (gercek kullanimda bulundu).
+  dispatchPick(screenPos, entityEvent, mapEvent, imageryEvent) {
+    if (this.suspended) return;
+    this.pickGeneration++;
+    const entity = this.pickSelectableEntity(screenPos);
+    if (entity) {
+      this.emit(entityEvent, this.buildEntityDetail(entity, screenPos));
+    } else {
+      this.emit(mapEvent, this.buildMapDetail(screenPos));
+    }
+    this.pickImageryFeatures(screenPos, imageryEvent);
+  }
+  /** Vurgu katmanını atlar; alttaki asıl objeyi seçer. */
+  pickSelectableEntity(screenPos) {
+    const picks = this.scene.drillPick(screenPos, DRILL_PICK_LIMIT);
+    for (const pick of picks) {
+      const entity = pick == null ? void 0 : pick.id;
+      if (!(entity instanceof Entity)) continue;
+      if (isSelectionHighlightEntity(entity)) continue;
+      return entity;
     }
     return void 0;
   }
-  ["pickImageryFeatures"](_0x3ec959, _0x216ddb) {
-    const _0x4557f7 = this["pickGeneration"], _0x309b11 = this["camera"]["getPickRay"](_0x3ec959);
-    if (!_0x309b11) return;
-    const _0x2edd25 = this["viewer"]["imageryLayers"]["pickImageryLayerFeatures"](_0x309b11, this["scene"]);
-    if (!_0x2edd25) return;
-    this["emit"]("imagery:querying", this["buildMapDetail"](_0x3ec959));
-    const _0x3b85c7 = (_0xddcbb1) => {
-      if (this["suspended"] || _0x4557f7 !== this["pickGeneration"]) return;
-      this["emit"](_0x216ddb, this["buildImageryDetail"](_0xddcbb1, _0x3ec959));
+  // scene.pick hicbir Entity bulamadiginda cagrilir. Cesium'un
+  // ImageryLayerCollection.pickImageryLayerFeatures'i o an ekranda render
+  // edilen TUM gorunur raster katmanlar icin GetFeatureInfo'yu paralel
+  // sorgular (bkz Cesium kaynagi) -- WMS/WMTS ayrimini burada elle yapmaya
+  // gerek yok, sadece pickFeatures'i destekleyen/gorunur katmanlar sonuca
+  // dahil olur. Hicbir katman pickable degilse (orn. sadece basemap
+  // gorunuyorsa) `undefined` doner.
+  pickImageryFeatures(screenPos, imageryEvent) {
+    const generation = this.pickGeneration;
+    const ray = this.camera.getPickRay(screenPos);
+    if (!ray) return;
+    const promise = this.viewer.imageryLayers.pickImageryLayerFeatures(
+      ray,
+      this.scene
+    );
+    if (!promise) return;
+    this.emit("imagery:querying", this.buildMapDetail(screenPos));
+    const finish = (infos) => {
+      if (this.suspended || generation !== this.pickGeneration) return;
+      this.emit(imageryEvent, this.buildImageryDetail(infos, screenPos));
     };
-    _0x2edd25["then"](_0x3b85c7)["catch"](() => {
-      _0x3b85c7([]);
+    promise.then(finish).catch(() => {
+      finish([]);
     });
   }
-  ["buildImageryDetail"](_0x5d78fe, _0x309341) {
-    const _0x4bcf85 = _0x5d78fe["map"]((_0x48cd6f) => ({ "imageryLayer": _0x48cd6f["imageryLayer"], "name": _0x48cd6f["name"] ?? null, "properties": _0x48cd6f["properties"] ?? {}, "description": _0x48cd6f["description"] ?? null, "geometryHint": extractImageryGeometry(_0x48cd6f["data"]) }));
-    return { "position": this["toLonLat"](_0x309341), "screenPos": { "x": _0x309341["x"], "y": _0x309341["y"] }, "features": _0x4bcf85 };
+  buildImageryDetail(infos, screenPos) {
+    const features = infos.map((info) => ({
+      imageryLayer: info.imageryLayer,
+      name: info.name ?? null,
+      properties: info.properties ?? {},
+      description: info.description ?? null,
+      geometryHint: extractImageryGeometry(info.data)
+    }));
+    return {
+      position: this.toLonLat(screenPos),
+      screenPos: { x: screenPos.x, y: screenPos.y },
+      features
+    };
   }
-  ["dispatchEntityOnly"](_0x47569e, _0x1adfaa) {
-    if (this["suspended"]) return;
-    const _0x2499f3 = this["scene"]["pick"](_0x47569e);
-    (_0x2499f3 == null ? void 0 : _0x2499f3["id"]) instanceof Entity && this["emit"](_0x1adfaa, this["buildEntityDetail"](_0x2499f3["id"], _0x47569e));
+  // LEFT_DOWN/LEFT_UP icin map:* karsiligi katalogda yok (bkz v1 §3.3) — pick
+  // bos donerse hicbir event yayilmaz.
+  dispatchEntityOnly(screenPos, entityEvent) {
+    if (this.suspended) return;
+    const picked = this.scene.pick(screenPos);
+    if ((picked == null ? void 0 : picked.id) instanceof Entity) {
+      this.emit(entityEvent, this.buildEntityDetail(picked.id, screenPos));
+    }
   }
-  ["bindCameraEvents"]() {
-    this["unsubscribers"]["push"](this["camera"]["moveStart"]["addEventListener"](() => this["emit"]("camera:moveStart", {})), this["camera"]["moveEnd"]["addEventListener"](() => this["emit"]("camera:moveEnd", {})), this["camera"]["changed"]["addEventListener"]((_0x3ca910) => this["emit"]("camera:changed", { "percentage": _0x3ca910 })));
+  // ── Camera / Scene relay ────────────────────────────────────────────────
+  bindCameraEvents() {
+    this.unsubscribers.push(
+      this.camera.moveStart.addEventListener(
+        () => this.emit("camera:moveStart", {})
+      ),
+      this.camera.moveEnd.addEventListener(
+        () => this.emit("camera:moveEnd", {})
+      ),
+      this.camera.changed.addEventListener(
+        (percentage) => this.emit("camera:changed", { percentage })
+      )
+    );
   }
-  ["bindSceneEvents"]() {
-    this["unsubscribers"]["push"](this["scene"]["preRender"]["addEventListener"]((_0x413281, _0x2eb9dd) => this["emit"]("scene:preRender", { "time": _0x2eb9dd })), this["scene"]["postRender"]["addEventListener"]((_0x254d22, _0x44c8d4) => this["emit"]("scene:postRender", { "time": _0x44c8d4 })), this["scene"]["morphStart"]["addEventListener"](() => this["emit"]("scene:morphStart", {})), this["scene"]["morphComplete"]["addEventListener"](() => this["emit"]("scene:morphComplete", {})));
+  bindSceneEvents() {
+    this.unsubscribers.push(
+      this.scene.preRender.addEventListener(
+        (_scene, time) => this.emit("scene:preRender", { time })
+      ),
+      this.scene.postRender.addEventListener(
+        (_scene, time) => this.emit("scene:postRender", { time })
+      ),
+      this.scene.morphStart.addEventListener(
+        () => this.emit("scene:morphStart", {})
+      ),
+      this.scene.morphComplete.addEventListener(
+        () => this.emit("scene:morphComplete", {})
+      )
+    );
   }
-  ["buildMapDetail"](_0xa20792) {
-    return { "position": this["toLonLat"](_0xa20792), "screenPos": { "x": _0xa20792["x"], "y": _0xa20792["y"] } };
+  // ── Yardimcilar ──────────────────────────────────────────────────────────
+  buildMapDetail(screenPos) {
+    return {
+      position: this.toLonLat(screenPos),
+      screenPos: { x: screenPos.x, y: screenPos.y }
+    };
   }
-  ["buildEntityDetail"](_0x54d966, _0x321e79) {
-    return { ...this["resolveFeature"](_0x54d966), "position": this["toLonLat"](_0x321e79), "screenPos": { "x": _0x321e79["x"], "y": _0x321e79["y"] }, "features": this["pickAllFeatures"](_0x321e79, _0x54d966) };
+  buildEntityDetail(entity, screenPos) {
+    return {
+      ...this.resolveFeature(entity),
+      position: this.toLonLat(screenPos),
+      screenPos: { x: screenPos.x, y: screenPos.y },
+      features: this.pickAllFeatures(screenPos, entity)
+    };
   }
-  ["resolveFeature"](_0xcf3c7f) {
+  // LayerManager.addPolygonOutlineCompanion, clampToGround poligonlarda
+  // (Cesium'un native outline'i calismadigi icin) her poligona AYRI, gorsel
+  // amacli sentetik bir dis-hat (polyline) entity ekler -- bu companion'in
+  // GeoJSON'dan gelen GERCEK bir feature'i yok, "__tucbsOutlineOf" ile
+  // sadece asil (dolgu) entity'nin id'sini tasir (bkz o metodun yorumu).
+  resolveFeature(entity) {
     var _a2, _b;
-    const _0x564f5a = JulianDate["now"](), _0x290bdb = ((_a2 = _0xcf3c7f["properties"]) == null ? void 0 : _a2["getValue"](_0x564f5a)) ?? {}, _0x3f9e91 = _0x290bdb["__tucbsOutlineOf"];
-    if (typeof _0x3f9e91 === "string") {
-      const _0x3048ac = (_b = _0xcf3c7f["entityCollection"]) == null ? void 0 : _b["getById"](_0x3f9e91);
-      if (_0x3048ac && _0x3048ac !== _0xcf3c7f) return this["resolveFeature"](_0x3048ac);
+    const currentTime = JulianDate.now();
+    const resolved = ((_a2 = entity.properties) == null ? void 0 : _a2.getValue(currentTime)) ?? {};
+    const outlineOf = resolved.__tucbsOutlineOf;
+    if (typeof outlineOf === "string") {
+      const original = (_b = entity.entityCollection) == null ? void 0 : _b.getById(outlineOf);
+      if (original && original !== entity) return this.resolveFeature(original);
     }
-    const _0x241f5a = typeof _0x290bdb["layerId"] === "string" ? _0x290bdb["layerId"] : null, _0x3dad5c = typeof _0x290bdb["featureId"] === "string" ? _0x290bdb["featureId"] : null;
-    if ("__tucbsOutlineOf" in _0x290bdb) {
-      const { __tucbsOutlineOf: _0x2e5000, ..._0x2e0eff } = _0x290bdb;
-      return { "entity": _0xcf3c7f, "layerId": _0x241f5a, "featureId": _0x3dad5c, "properties": _0x2e0eff };
+    const layerId = typeof resolved.layerId === "string" ? resolved.layerId : null;
+    const featureId = typeof resolved.featureId === "string" ? resolved.featureId : null;
+    if ("__tucbsOutlineOf" in resolved) {
+      const { __tucbsOutlineOf: _drop, ...rest } = resolved;
+      return { entity, layerId, featureId, properties: rest };
     }
-    return { "entity": _0xcf3c7f, "layerId": _0x241f5a, "featureId": _0x3dad5c, "properties": _0x290bdb };
+    return { entity, layerId, featureId, properties: resolved };
   }
-  ["pickAllFeatures"](_0x490241, _0x1331c0) {
-    const _0x46c69e = this["resolveFeature"](_0x1331c0), _0x5d83ca = [_0x46c69e], _0x479974 = /* @__PURE__ */ new Set([_0x46c69e["entity"]]), _0x381872 = this["scene"]["drillPick"](_0x490241, DRILL_PICK_LIMIT);
-    for (const _0x305978 of _0x381872) {
-      const _0x237875 = _0x305978 == null ? void 0 : _0x305978["id"];
-      if (!(_0x237875 instanceof Entity)) continue;
-      const _0x571862 = this["resolveFeature"](_0x237875);
-      if (_0x479974["has"](_0x571862["entity"])) continue;
-      _0x479974["add"](_0x571862["entity"]), _0x5d83ca["push"](_0x571862);
+  // scene.pick sadece en ustteki entity'yi dondurur -- ayni ekran noktasinda
+  // ust uste binen farkli vektor katmanlardaki feature'lar drillPick olmadan
+  // hic identify'e girmiyordu. "entity" (en ustteki, scene.pick'in bulduğu)
+  // her zaman listenin basinda yer alir.
+  //
+  // Dedup, PICKLENEN entity yerine resolveFeature'in DONDURDUGU (companion
+  // ise asil'a substitute edilmis) entity uzerinden yapilir -- aksi halde
+  // ayni poligonun hem dolgusu hem dis-hat companion'i AYRI iki "hit" olarak
+  // sayilip listede iki kez gorunurdu (bkz resolveFeature'daki WHY yorumu).
+  pickAllFeatures(screenPos, primary) {
+    const primaryDetail = this.resolveFeature(primary);
+    const features = [primaryDetail];
+    const seen = /* @__PURE__ */ new Set([primaryDetail.entity]);
+    const picks = this.scene.drillPick(screenPos, DRILL_PICK_LIMIT);
+    for (const pick of picks) {
+      const entity = pick == null ? void 0 : pick.id;
+      if (!(entity instanceof Entity)) continue;
+      const detail = this.resolveFeature(entity);
+      if (seen.has(detail.entity)) continue;
+      seen.add(detail.entity);
+      features.push(detail);
     }
-    return _0x5d83ca;
+    return features;
   }
-  ["toLonLat"](_0x12aba8) {
-    const _0x2b054e = this["camera"]["pickEllipsoid"](_0x12aba8, this["scene"]["globe"]["ellipsoid"]);
-    if (_0x2b054e === void 0) return [0, 0];
-    const _0x31e93c = Cartographic["fromCartesian"](_0x2b054e);
-    return [_0x584e42["toDegrees"](_0x31e93c["longitude"]), _0x584e42["toDegrees"](_0x31e93c["latitude"])];
+  // Ellipsoid uzerinde yaklasik dunya konumu — terrain yuklu olmasa da calisir.
+  toLonLat(screenPos) {
+    const cartesian = this.camera.pickEllipsoid(
+      screenPos,
+      this.scene.globe.ellipsoid
+    );
+    if (cartesian === void 0) return [0, 0];
+    const cartographic = Cartographic.fromCartesian(cartesian);
+    return [
+      Math$1.toDegrees(cartographic.longitude),
+      Math$1.toDegrees(cartographic.latitude)
+    ];
   }
 }
-const EARTH_RADIUS_METERS = 6378137, CIRCLE_SEGMENTS = 48;
-function dedupePositions(_0x483e72) {
-  return _0x483e72["filter"]((_0x474bb5, _0x4a7029) => _0x4a7029 === 0 || !Cartesian3["equalsEpsilon"](_0x474bb5, _0x483e72[_0x4a7029 - 1], _0x584e42["EPSILON7"]));
+const EARTH_RADIUS_METERS = 6378137;
+const CIRCLE_SEGMENTS = 48;
+function dedupePositions(positions) {
+  return positions.filter(
+    (p, i) => i === 0 || !Cartesian3.equalsEpsilon(p, positions[i - 1], Math$1.EPSILON7)
+  );
 }
 class DrawingManager extends EventEmitter {
-  constructor(_0x40a446, _0x3e96a2) {
-    super(), this["shapes"] = /* @__PURE__ */ new Map(), this["positions"] = [], this["tempVertexEntities"] = [], this["freehandDragging"] = ![], this["onEscapeKey"] = (_0xc080b2) => {
-      if (_0xc080b2["key"] !== "Escape") return;
-      this["abortCurrentShape"]();
-    }, this["viewer"] = _0x40a446, this["interactionManager"] = _0x3e96a2, this["handler"] = new ScreenSpaceEventHandler(_0x40a446["scene"]["canvas"]);
+  /**
+   * @param viewer - Çizimin yapılacağı Cesium `Viewer`.
+   * @param interactionManager - `activate()` sırasında `suspend()`/`resume()` çağrılacak `InteractionManager`.
+   */
+  constructor(viewer, interactionManager) {
+    super();
+    this.shapes = /* @__PURE__ */ new Map();
+    this.positions = [];
+    this.tempVertexEntities = [];
+    this.freehandDragging = false;
+    this.onEscapeKey = (event) => {
+      if (event.key !== "Escape") return;
+      this.abortCurrentShape();
+    };
+    this.viewer = viewer;
+    this.interactionManager = interactionManager;
+    this.handler = new ScreenSpaceEventHandler(viewer.scene.canvas);
   }
-  get ["scene"]() {
-    return this["viewer"]["scene"];
+  /** Cesium `Scene` nesnesi (`viewer.scene`). */
+  get scene() {
+    return this.viewer.scene;
   }
-  ["activate"](_0x325986, _0xa3d86) {
-    if (this["activeTool"]) this["deactivate"]();
-    this["activeTool"] = _0x325986, this["activeSource"] = _0xa3d86, this["positions"] = [], this["previewPosition"] = void 0, this["interactionManager"]["suspend"](), this["resetTrackedEntity"](), this["suspendBuiltInDoubleClick"]();
-    if (_0x325986 === "freehand") this["lockCamera"]();
-    this["setCursor"]("crosshair"), this["bindToolHandlers"](_0x325986), this["emit"]("draw:start", _0xa3d86 === void 0 ? { "tool": _0x325986 } : { "tool": _0x325986, "source": _0xa3d86 });
+  /**
+   * Verilen çizim aracını etkinleştirir (aktif bir araç varsa önce `deactivate()` ile kapatılır).
+   * @param tool - Etkinleştirilecek çizim aracı.
+   * @param source - Aktivasyonun hangi bileşen türünden geldiğini belirtir (ör. `TucbsMeasureTool` vs `TucbsDrawTool` aynı `tool` değerini farklı amaçla paylaştığında); `DrawingManager` davranışını etkilemez, sadece emit edilen event payload'ında iletilir.
+   *
+   * @example
+   * ```ts
+   * map.drawingManager.activate("rectangle");
+   * ```
+   */
+  activate(tool, source) {
+    if (this.activeTool) this.deactivate();
+    this.activeTool = tool;
+    this.activeSource = source;
+    this.positions = [];
+    this.previewPosition = void 0;
+    this.interactionManager.suspend();
+    this.resetTrackedEntity();
+    this.suspendBuiltInDoubleClick();
+    if (tool === "freehand") this.lockCamera();
+    this.setCursor("crosshair");
+    this.bindToolHandlers(tool);
+    this.emit("draw:start", source === void 0 ? { tool } : { tool, source });
   }
-  ["deactivate"]() {
-    if (!this["activeTool"]) return;
-    const _0x44a6f3 = this["activeTool"], _0xe48110 = this["activeSource"];
-    this["finishSession"](), this["emit"]("draw:cancel", _0xe48110 === void 0 ? { "tool": _0x44a6f3 } : { "tool": _0x44a6f3, "source": _0xe48110 });
+  /**
+   * Aktif çizim aracını kapatır; yarım kalan çizim varsa iptal edilir (tamamlanmaz).
+   *
+   * @example
+   * ```ts
+   * map.drawingManager.deactivate();
+   * ```
+   */
+  deactivate() {
+    if (!this.activeTool) return;
+    const tool = this.activeTool;
+    const source = this.activeSource;
+    this.finishSession();
+    this.emit("draw:cancel", source === void 0 ? { tool } : { tool, source });
   }
-  ["getActiveTool"]() {
-    return this["activeTool"];
+  /** Şu an etkin olan çizim aracı (yoksa `undefined`). */
+  getActiveTool() {
+    return this.activeTool;
   }
-  ["isActive"]() {
-    return this["activeTool"] !== void 0;
+  /** Herhangi bir çizim aracının etkin olup olmadığı. */
+  isActive() {
+    return this.activeTool !== void 0;
   }
-  ["getShapes"]() {
-    return [...this["shapes"]["values"]()];
+  /**
+   * Tamamlanmış tüm şekillerin listesi.
+   *
+   * @example
+   * ```ts
+   * const shapes = map.drawingManager.getShapes();
+   * console.log(shapes.length);
+   * ```
+   */
+  getShapes() {
+    return [...this.shapes.values()];
   }
-  ["getShapeById"](_0x279f92) {
-    return this["shapes"]["get"](_0x279f92);
+  /** Verilen id'ye sahip tamamlanmış şekli döndürür (yoksa `undefined`). */
+  getShapeById(id) {
+    return this.shapes.get(id);
   }
-  ["removeShape"](_0x525174) {
-    const _0x164d4c = this["shapes"]["get"](_0x525174);
-    if (!_0x164d4c) return;
-    this["viewer"]["entities"]["remove"](_0x164d4c["entity"]), this["shapes"]["delete"](_0x525174), this["emit"]("draw:remove", { "id": _0x525174, "shape": _0x164d4c });
+  /** Verilen id'ye sahip şekli haritadan ve kayıtlardan kaldırır. */
+  removeShape(id) {
+    const shape = this.shapes.get(id);
+    if (!shape) return;
+    this.viewer.entities.remove(shape.entity);
+    this.shapes.delete(id);
+    this.emit("draw:remove", { id, shape });
   }
-  ["clearAll"]() {
-    for (const _0x577a35 of [...this["shapes"]["keys"]()]) this["removeShape"](_0x577a35);
+  /** Tamamlanmış tüm şekilleri haritadan ve kayıtlardan kaldırır. */
+  clearAll() {
+    for (const id of [...this.shapes.keys()]) this.removeShape(id);
   }
-  ["undo"]() {
-    if (this["positions"]["length"] === 0) return;
-    this["positions"]["pop"]();
-    const _0x56c13f = this["tempVertexEntities"]["pop"]();
-    if (_0x56c13f) this["viewer"]["entities"]["remove"](_0x56c13f);
+  /** Devam eden çizimde son eklenen vertex'i geri alır. */
+  undo() {
+    if (this.positions.length === 0) return;
+    this.positions.pop();
+    const marker = this.tempVertexEntities.pop();
+    if (marker) this.viewer.entities.remove(marker);
   }
-  ["toGeoJSON"]() {
-    return { "type": "FeatureCollection", "features": this["getShapes"]()["map"]((_0x5847d5) => ({ "type": "Feature", "properties": { "id": _0x5847d5["id"], "tool": _0x5847d5["tool"] }, "geometry": _0x5847d5["geometry"] })) };
+  /**
+   * Tamamlanmış tüm şekilleri tek bir GeoJSON `FeatureCollection`'a dönüştürür.
+   *
+   * @example
+   * ```ts
+   * const featureCollection = map.drawingManager.toGeoJSON();
+   * ```
+   */
+  toGeoJSON() {
+    return {
+      type: "FeatureCollection",
+      features: this.getShapes().map((shape) => ({
+        type: "Feature",
+        properties: { id: shape.id, tool: shape.tool },
+        geometry: shape.geometry
+      }))
+    };
   }
-  ["destroy"]() {
-    this["deactivate"](), this["handler"]["destroy"](), this["removeAllListeners"]();
+  /** Aktif çizimi kapatır, `ScreenSpaceEventHandler`'ı yok eder ve kayıtlı event dinleyicilerini temizler. */
+  destroy() {
+    this.deactivate();
+    this.handler.destroy();
+    this.removeAllListeners();
   }
-  ["bindToolHandlers"](_0x2a093d) {
-    this["handler"]["setInputAction"](() => this["deactivate"](), ScreenSpaceEventType["RIGHT_CLICK"]), document["addEventListener"]("keydown", this["onEscapeKey"]);
-    if (_0x2a093d === "freehand") {
-      this["handler"]["setInputAction"]((_0x58bb1c) => this["onFreehandDown"](_0x58bb1c["position"]), ScreenSpaceEventType["LEFT_DOWN"]), this["handler"]["setInputAction"](() => this["onFreehandUp"](), ScreenSpaceEventType["LEFT_UP"]), this["handler"]["setInputAction"]((_0x202ca6) => this["onFreehandMove"](_0x202ca6["endPosition"]), ScreenSpaceEventType["MOUSE_MOVE"]);
+  // ── Arac baglama ─────────────────────────────────────────────────────────
+  bindToolHandlers(tool) {
+    this.handler.setInputAction(() => this.deactivate(), ScreenSpaceEventType.RIGHT_CLICK);
+    document.addEventListener("keydown", this.onEscapeKey);
+    if (tool === "freehand") {
+      this.handler.setInputAction(
+        (e) => this.onFreehandDown(e.position),
+        ScreenSpaceEventType.LEFT_DOWN
+      );
+      this.handler.setInputAction(
+        () => this.onFreehandUp(),
+        ScreenSpaceEventType.LEFT_UP
+      );
+      this.handler.setInputAction(
+        (e) => this.onFreehandMove(e.endPosition),
+        ScreenSpaceEventType.MOUSE_MOVE
+      );
       return;
     }
-    this["handler"]["setInputAction"]((_0x1aa44e) => this["onVertexClick"](_0x1aa44e["position"]), ScreenSpaceEventType["LEFT_CLICK"]), this["handler"]["setInputAction"]((_0x5c71ba) => this["onPreviewMove"](_0x5c71ba["endPosition"]), ScreenSpaceEventType["MOUSE_MOVE"]), (_0x2a093d === "polyline" || _0x2a093d === "polygon") && this["handler"]["setInputAction"](() => this["finishMultiVertexViaDoubleClick"](), ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]);
+    this.handler.setInputAction(
+      (e) => this.onVertexClick(e.position),
+      ScreenSpaceEventType.LEFT_CLICK
+    );
+    this.handler.setInputAction(
+      (e) => this.onPreviewMove(e.endPosition),
+      ScreenSpaceEventType.MOUSE_MOVE
+    );
+    if (tool === "polyline" || tool === "polygon") {
+      this.handler.setInputAction(
+        () => this.finishMultiVertexViaDoubleClick(),
+        ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+      );
+    }
   }
-  ["unbindToolHandlers"]() {
-    this["handler"]["removeInputAction"](ScreenSpaceEventType["LEFT_CLICK"]), this["handler"]["removeInputAction"](ScreenSpaceEventType["LEFT_DOWN"]), this["handler"]["removeInputAction"](ScreenSpaceEventType["LEFT_UP"]), this["handler"]["removeInputAction"](ScreenSpaceEventType["MOUSE_MOVE"]), this["handler"]["removeInputAction"](ScreenSpaceEventType["RIGHT_CLICK"]), this["handler"]["removeInputAction"](ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]), document["removeEventListener"]("keydown", this["onEscapeKey"]);
+  unbindToolHandlers() {
+    this.handler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+    this.handler.removeInputAction(ScreenSpaceEventType.LEFT_DOWN);
+    this.handler.removeInputAction(ScreenSpaceEventType.LEFT_UP);
+    this.handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+    this.handler.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
+    this.handler.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+    document.removeEventListener("keydown", this.onEscapeKey);
   }
-  ["abortCurrentShape"]() {
-    if (this["activeTool"] === void 0 || this["positions"]["length"] === 0) return;
-    const _0x419624 = this["activeTool"], _0x62e169 = this["activeSource"];
-    this["clearTempEntity"](), this["resetSessionForContinuousDrawing"](), this["resetTrackedEntity"](), this["emit"]("draw:abort", _0x62e169 === void 0 ? { "tool": _0x419624 } : { "tool": _0x419624, "source": _0x62e169 });
+  // Devam eden (en az 1 vertex'i konmus) cizimi atar; tamamlanmis sekillere ve
+  // araç durumuna (handler'lar, kamera/interaction suspend) dokunmaz -- araç
+  // hemen yeni bir cizime hazir kalir. Cizim yoksa no-op (Esc aracı kapatmaz).
+  abortCurrentShape() {
+    if (this.activeTool === void 0 || this.positions.length === 0) return;
+    const tool = this.activeTool;
+    const source = this.activeSource;
+    this.clearTempEntity();
+    this.resetSessionForContinuousDrawing();
+    this.resetTrackedEntity();
+    this.emit("draw:abort", source === void 0 ? { tool } : { tool, source });
   }
-  ["onVertexClick"](_0x422e6d) {
-    const _0x240748 = this["toCartesian"](_0x422e6d);
-    if (_0x240748 === void 0 || this["activeTool"] === void 0) return;
-    this["positions"]["push"](_0x240748), this["emitVertex"](_0x422e6d), this["ensureTempEntity"]();
-    (this["activeTool"] === "polygon" || this["activeTool"] === "polyline") && this["addVertexMarker"](_0x240748);
-    if (this["activeTool"] === "point") {
-      this["completeShape"]();
+  // ── Vertex-tabanli araclar (point/polyline/polygon/rectangle/circle) ──────
+  onVertexClick(screenPos) {
+    const cartesian = this.toCartesian(screenPos);
+    if (cartesian === void 0 || this.activeTool === void 0) return;
+    this.positions.push(cartesian);
+    this.emitVertex(screenPos);
+    this.ensureTempEntity();
+    if (this.activeTool === "polygon" || this.activeTool === "polyline") {
+      this.addVertexMarker(cartesian);
+    }
+    if (this.activeTool === "point") {
+      this.completeShape();
       return;
     }
-    (this["activeTool"] === "rectangle" || this["activeTool"] === "circle") && this["positions"]["length"] >= 2 && this["completeShape"]();
-  }
-  ["onPreviewMove"](_0x893035) {
-    if (this["positions"]["length"] === 0 || this["activeTool"] === void 0) return;
-    const _0x3d86aa = this["toCartesian"](_0x893035);
-    if (_0x3d86aa === void 0) return;
-    this["previewPosition"] = _0x3d86aa, this["emit"]("draw:move", { "tool": this["activeTool"], "coordinates": this["toLonLat"](_0x3d86aa), "screenPos": { "x": _0x893035["x"], "y": _0x893035["y"] } });
-  }
-  ["finishMultiVertex"]() {
-    const _0x20ae7e = this["activeTool"] === "polygon" ? 3 : 2;
-    if (this["positions"]["length"] < _0x20ae7e) return;
-    this["completeShape"]();
-  }
-  ["finishMultiVertexViaDoubleClick"]() {
-    this["positions"]["length"] >= 2 && this["positions"]["pop"](), this["finishMultiVertex"](), this["resetTrackedEntity"]();
-  }
-  ["onFreehandDown"](_0x167aa7) {
-    this["freehandDragging"] = !![], this["positions"] = [];
-    const _0xd4f1f7 = this["toCartesian"](_0x167aa7);
-    if (_0xd4f1f7 === void 0) return;
-    this["positions"]["push"](_0xd4f1f7), this["emitVertex"](_0x167aa7), this["ensureTempEntity"]();
-  }
-  ["onFreehandMove"](_0x17b829) {
-    if (!this["freehandDragging"] || this["activeTool"] === void 0) return;
-    const _0x110e27 = this["toCartesian"](_0x17b829);
-    if (_0x110e27 === void 0) return;
-    this["positions"]["push"](_0x110e27), this["previewPosition"] = _0x110e27, this["emit"]("draw:move", { "tool": this["activeTool"], "coordinates": this["toLonLat"](_0x110e27), "screenPos": { "x": _0x17b829["x"], "y": _0x17b829["y"] } });
-  }
-  ["onFreehandUp"]() {
-    this["freehandDragging"] = ![];
-    if (this["positions"]["length"] >= 2) this["completeShape"]();
-  }
-  ["emitVertex"](_0x16b7ed) {
-    if (this["activeTool"] === void 0) return;
-    const _0x619ae2 = this["requireIndex"](this["positions"], this["positions"]["length"] - 1);
-    this["emit"]("draw:vertex", { "tool": this["activeTool"], "index": this["positions"]["length"] - 1, "coordinates": this["toLonLat"](_0x619ae2), "screenPos": { "x": _0x16b7ed["x"], "y": _0x16b7ed["y"] } });
-  }
-  ["completeShape"]() {
-    if (this["activeTool"] === void 0 || this["positions"]["length"] === 0) return;
-    const _0x38b7a2 = this["buildShape"](this["activeTool"], this["positions"]), _0x11a575 = this["activeSource"] === void 0 ? _0x38b7a2 : { ..._0x38b7a2, "source": this["activeSource"] };
-    this["shapes"]["set"](_0x11a575["id"], _0x11a575), this["clearTempEntity"](), this["resetSessionForContinuousDrawing"](), this["emit"]("draw:complete", { "shape": _0x11a575 });
-  }
-  ["resetSessionForContinuousDrawing"]() {
-    this["positions"] = [], this["previewPosition"] = void 0, this["freehandDragging"] = ![];
-  }
-  ["finishSession"]() {
-    this["unbindToolHandlers"](), this["clearTempEntity"](), this["resetSessionForContinuousDrawing"](), this["activeTool"] = void 0, this["activeSource"] = void 0, this["unlockCamera"](), this["setCursor"]("default"), this["resetTrackedEntity"](), this["restoreBuiltInDoubleClick"](), this["interactionManager"]["resume"]();
-  }
-  ["ensureTempEntity"]() {
-    if (this["activeTool"] === void 0) return;
-    if (this["tempEntity"] === void 0) {
-      if (this["activeTool"] === "point") this["tempEntity"] = this["viewer"]["entities"]["add"]({ "position": this["requireIndex"](this["positions"], 0), "point": { "pixelSize": 8, "color": Color["YELLOW"] } });
-      else this["activeTool"] !== "rectangle" && this["activeTool"] !== "circle" && (this["tempEntity"] = this["viewer"]["entities"]["add"]({ "polyline": { "positions": this["buildPositionsCallback"](2), "width": 2, "material": Color["YELLOW"] } }));
+    if ((this.activeTool === "rectangle" || this.activeTool === "circle") && this.positions.length >= 2) {
+      this.completeShape();
     }
-    if (this["tempFillEntity"] === void 0) {
-      if (this["activeTool"] === "polygon") this["tempFillEntity"] = this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": new CallbackProperty(() => {
-        const _0x17d158 = [...this["positions"], ...this["previewPosition"] ? [this["previewPosition"]] : []], _0x32dade = dedupePositions(_0x17d158);
-        return _0x32dade["length"] >= 3 ? new PolygonHierarchy(_0x32dade) : void 0;
-      }, ![]), "material": Color["CYAN"]["withAlpha"](0.35) } });
-      else {
-        if (this["activeTool"] === "rectangle") this["tempFillEntity"] = this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": new CallbackProperty(() => {
-          const _0xa2f704 = this["positions"][0], _0x53a875 = this["previewPosition"];
-          if (_0xa2f704 === void 0 || _0x53a875 === void 0) return void 0;
-          const _0x1253fa = this["computeRectangleCoordinates"](_0xa2f704, _0x53a875);
-          return new PolygonHierarchy(_0x1253fa["map"]((_0x547c90) => this["toCartesianFromLonLat"](_0x547c90)));
-        }, ![]), "material": Color["CYAN"]["withAlpha"](0.35) } });
-        else this["activeTool"] === "circle" && (this["tempFillEntity"] = this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": new CallbackProperty(() => {
-          const _0x5b88f3 = this["positions"][0], _0x47609a = this["previewPosition"];
-          if (_0x5b88f3 === void 0 || _0x47609a === void 0) return void 0;
-          const _0x5e8cb5 = this["computeCircleRing"](_0x5b88f3, _0x47609a);
-          return new PolygonHierarchy(_0x5e8cb5["map"]((_0x33325a) => this["toCartesianFromLonLat"](_0x33325a)));
-        }, ![]), "material": Color["CYAN"]["withAlpha"](0.35) } }));
+  }
+  onPreviewMove(screenPos) {
+    if (this.positions.length === 0 || this.activeTool === void 0) return;
+    const cartesian = this.toCartesian(screenPos);
+    if (cartesian === void 0) return;
+    this.previewPosition = cartesian;
+    this.emit("draw:move", {
+      tool: this.activeTool,
+      coordinates: this.toLonLat(cartesian),
+      screenPos: { x: screenPos.x, y: screenPos.y }
+    });
+  }
+  finishMultiVertex() {
+    const minVertices = this.activeTool === "polygon" ? 3 : 2;
+    if (this.positions.length < minVertices) return;
+    this.completeShape();
+  }
+  // Tarayici, cift tiklamada ayni ekran konumunda IKI ayri LEFT_CLICK (+bir
+  // LEFT_DOUBLE_CLICK) uretir; onVertexClick() bu yuzden son noktayi iki kez
+  // ekler. Bitirmeden once tekrarlanan son vertex'i (double-click'in ikinci
+  // click bileseni) dusuruyoruz — aksi halde DrawnShape.coordinates'te
+  // yinelenen bir kose olusur (gercek headless testle bulundu/dogrulandi).
+  finishMultiVertexViaDoubleClick() {
+    if (this.positions.length >= 2) {
+      this.positions.pop();
+    }
+    this.finishMultiVertex();
+    this.resetTrackedEntity();
+  }
+  // ── Freehand ─────────────────────────────────────────────────────────────
+  onFreehandDown(screenPos) {
+    this.freehandDragging = true;
+    this.positions = [];
+    const cartesian = this.toCartesian(screenPos);
+    if (cartesian === void 0) return;
+    this.positions.push(cartesian);
+    this.emitVertex(screenPos);
+    this.ensureTempEntity();
+  }
+  onFreehandMove(screenPos) {
+    if (!this.freehandDragging || this.activeTool === void 0) return;
+    const cartesian = this.toCartesian(screenPos);
+    if (cartesian === void 0) return;
+    this.positions.push(cartesian);
+    this.previewPosition = cartesian;
+    this.emit("draw:move", {
+      tool: this.activeTool,
+      coordinates: this.toLonLat(cartesian),
+      screenPos: { x: screenPos.x, y: screenPos.y }
+    });
+  }
+  onFreehandUp() {
+    this.freehandDragging = false;
+    if (this.positions.length >= 2) this.completeShape();
+  }
+  // ── Tamamlama ────────────────────────────────────────────────────────────
+  emitVertex(screenPos) {
+    if (this.activeTool === void 0) return;
+    const last = this.requireIndex(this.positions, this.positions.length - 1);
+    this.emit("draw:vertex", {
+      tool: this.activeTool,
+      index: this.positions.length - 1,
+      coordinates: this.toLonLat(last),
+      screenPos: { x: screenPos.x, y: screenPos.y }
+    });
+  }
+  // Bir sekil tamamlaninca arac KAPANMAZ -- surekli cizim modu: kullanici
+  // farkli bir arac secmedikce (activate() eskisini otomatik kapatir) ya da
+  // acikca deactivate() cagirmadikca (ör. TucbsDrawTool'da aktif araca
+  // tekrar tiklamak) ayni arac hemen yeni bir sekil cizmeye hazir kalir.
+  completeShape() {
+    if (this.activeTool === void 0 || this.positions.length === 0) return;
+    const built = this.buildShape(this.activeTool, this.positions);
+    const shape = this.activeSource === void 0 ? built : { ...built, source: this.activeSource };
+    this.shapes.set(shape.id, shape);
+    this.clearTempEntity();
+    this.resetSessionForContinuousDrawing();
+    this.emit("draw:complete", { shape });
+  }
+  // Sadece devam eden cizim OTURUMUNUN durumunu sifirlar -- handler'lar
+  // bagli kalir, kamera kilidi/interactionManager suspend durumu KORUNUR
+  // (hala cizim modundayiz). Tam kapanis icin bkz. finishSession()/deactivate().
+  resetSessionForContinuousDrawing() {
+    this.positions = [];
+    this.previewPosition = void 0;
+    this.freehandDragging = false;
+  }
+  finishSession() {
+    this.unbindToolHandlers();
+    this.clearTempEntity();
+    this.resetSessionForContinuousDrawing();
+    this.activeTool = void 0;
+    this.activeSource = void 0;
+    this.unlockCamera();
+    this.setCursor("default");
+    this.resetTrackedEntity();
+    this.restoreBuiltInDoubleClick();
+    this.interactionManager.resume();
+  }
+  // ── Gecici onizleme entity'si ────────────────────────────────────────────
+  ensureTempEntity() {
+    if (this.activeTool === void 0) return;
+    if (this.tempEntity === void 0) {
+      if (this.activeTool === "point") {
+        this.tempEntity = this.viewer.entities.add({
+          position: this.requireIndex(this.positions, 0),
+          point: { pixelSize: 8, color: Color.YELLOW }
+        });
+      } else if (this.activeTool !== "rectangle" && this.activeTool !== "circle") {
+        this.tempEntity = this.viewer.entities.add({
+          polyline: { positions: this.buildPositionsCallback(2), width: 2, material: Color.YELLOW }
+        });
+      }
+    }
+    if (this.tempFillEntity === void 0) {
+      if (this.activeTool === "polygon") {
+        this.tempFillEntity = this.viewer.entities.add({
+          polygon: {
+            hierarchy: new CallbackProperty(() => {
+              const raw = [
+                ...this.positions,
+                ...this.previewPosition ? [this.previewPosition] : []
+              ];
+              const deduped = dedupePositions(raw);
+              return deduped.length >= 3 ? new PolygonHierarchy(deduped) : void 0;
+            }, false),
+            material: Color.CYAN.withAlpha(0.35)
+          }
+        });
+      } else if (this.activeTool === "rectangle") {
+        this.tempFillEntity = this.viewer.entities.add({
+          polygon: {
+            hierarchy: new CallbackProperty(() => {
+              const first = this.positions[0];
+              const second = this.previewPosition;
+              if (first === void 0 || second === void 0) return void 0;
+              const coordinates = this.computeRectangleCoordinates(first, second);
+              return new PolygonHierarchy(coordinates.map((c) => this.toCartesianFromLonLat(c)));
+            }, false),
+            material: Color.CYAN.withAlpha(0.35)
+          }
+        });
+      } else if (this.activeTool === "circle") {
+        this.tempFillEntity = this.viewer.entities.add({
+          polygon: {
+            hierarchy: new CallbackProperty(() => {
+              const center = this.positions[0];
+              const edge = this.previewPosition;
+              if (center === void 0 || edge === void 0) return void 0;
+              const ring = this.computeCircleRing(center, edge);
+              return new PolygonHierarchy(ring.map((c) => this.toCartesianFromLonLat(c)));
+            }, false),
+            material: Color.CYAN.withAlpha(0.35)
+          }
+        });
       }
     }
   }
-  ["addVertexMarker"](_0x5426dc) {
-    this["tempVertexEntities"]["push"](this["viewer"]["entities"]["add"]({ "position": _0x5426dc, "point": { "pixelSize": 6, "color": Color["YELLOW"], "outlineColor": Color["BLACK"], "outlineWidth": 1 } }));
+  // Alan/cizgi cizerken her onaylanan vertex'te kucuk bir nokta isaretcisi
+  // ekler -- sadece anahat/dolgu onizlemesiyle "sekil olusturdugum" arasindaki
+  // gorsel farki netlestirmek icin (kullanici geri bildirimi, sonradan cizgiye
+  // de genisletildi).
+  addVertexMarker(position) {
+    this.tempVertexEntities.push(
+      this.viewer.entities.add({
+        position,
+        point: { pixelSize: 6, color: Color.YELLOW, outlineColor: Color.BLACK, outlineWidth: 1 }
+      })
+    );
   }
-  ["buildPositionsCallback"](_0x5c5399) {
+  buildPositionsCallback(minPoints) {
     return new CallbackProperty(() => {
-      const _0x22e81d = [...this["positions"], ...this["previewPosition"] ? [this["previewPosition"]] : []], _0x30248c = dedupePositions(_0x22e81d);
-      return _0x30248c["length"] >= _0x5c5399 ? _0x30248c : void 0;
-    }, ![]);
+      const raw = [
+        ...this.positions,
+        ...this.previewPosition ? [this.previewPosition] : []
+      ];
+      const deduped = dedupePositions(raw);
+      return deduped.length >= minPoints ? deduped : void 0;
+    }, false);
   }
-  ["clearTempEntity"]() {
-    this["tempEntity"] !== void 0 && (this["viewer"]["entities"]["remove"](this["tempEntity"]), this["tempEntity"] = void 0);
-    this["tempFillEntity"] !== void 0 && (this["viewer"]["entities"]["remove"](this["tempFillEntity"]), this["tempFillEntity"] = void 0);
-    for (const _0xcf35da of this["tempVertexEntities"]) {
-      this["viewer"]["entities"]["remove"](_0xcf35da);
+  clearTempEntity() {
+    if (this.tempEntity !== void 0) {
+      this.viewer.entities.remove(this.tempEntity);
+      this.tempEntity = void 0;
     }
-    this["tempVertexEntities"] = [];
-  }
-  ["resetTrackedEntity"]() {
-    this["viewer"]["trackedEntity"] !== void 0 && (this["viewer"]["trackedEntity"] = void 0);
-  }
-  ["suspendBuiltInDoubleClick"]() {
-    if (this["builtInDoubleClickAction"] !== void 0) return;
-    const _0x4c78de = this["viewer"]["screenSpaceEventHandler"], _0x27b998 = _0x4c78de["getInputAction"](ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]);
-    if (_0x27b998 === void 0) return;
-    this["builtInDoubleClickAction"] = _0x27b998, _0x4c78de["removeInputAction"](ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]);
-  }
-  ["restoreBuiltInDoubleClick"]() {
-    if (this["builtInDoubleClickAction"] === void 0) return;
-    this["viewer"]["screenSpaceEventHandler"]["setInputAction"](this["builtInDoubleClickAction"], ScreenSpaceEventType["LEFT_DOUBLE_CLICK"]), this["builtInDoubleClickAction"] = void 0;
-  }
-  ["setCursor"](_0x72cd83) {
-    this["viewer"]["scene"]["canvas"]["style"]["cursor"] = _0x72cd83;
-  }
-  ["lockCamera"]() {
-    this["viewer"]["scene"]["screenSpaceCameraController"]["enableRotate"] = ![], this["viewer"]["scene"]["screenSpaceCameraController"]["enableTilt"] = ![];
-  }
-  ["unlockCamera"]() {
-    this["viewer"]["scene"]["screenSpaceCameraController"]["enableRotate"] = !![], this["viewer"]["scene"]["screenSpaceCameraController"]["enableTilt"] = !![];
-  }
-  ["buildShape"](_0x4fcb74, _0x30945e) {
-    const _0x42d42c = crypto["randomUUID"](), _0x6cc4d = Date["now"]();
-    if (_0x4fcb74 === "point") {
-      const _0x170390 = this["requireIndex"](_0x30945e, 0), _0x585d66 = this["toLonLat"](_0x170390);
-      return { "id": _0x42d42c, "tool": _0x4fcb74, "entity": this["viewer"]["entities"]["add"]({ "position": _0x170390, "point": { "pixelSize": 8, "color": Color["CYAN"] } }), "positions": _0x30945e, "coordinates": [_0x585d66], "geometry": { "type": "Point", "coordinates": _0x585d66 }, "createdAt": _0x6cc4d };
+    if (this.tempFillEntity !== void 0) {
+      this.viewer.entities.remove(this.tempFillEntity);
+      this.tempFillEntity = void 0;
     }
-    if (_0x4fcb74 === "circle") return this["buildCircleShape"](_0x42d42c, _0x30945e, _0x6cc4d);
-    if (_0x4fcb74 === "rectangle") return this["buildRectangleShape"](_0x42d42c, _0x30945e, _0x6cc4d);
-    if (_0x4fcb74 === "polygon") return this["buildPolygonShape"](_0x42d42c, _0x30945e, _0x6cc4d);
-    return this["buildLineShape"](_0x42d42c, _0x4fcb74, _0x30945e, _0x6cc4d);
-  }
-  ["buildLineShape"](_0x198040, _0x2197d8, _0x5b2098, _0x103575) {
-    const _0x55cd08 = _0x5b2098["map"]((_0x15285b) => this["toLonLat"](_0x15285b));
-    return { "id": _0x198040, "tool": _0x2197d8, "entity": this["viewer"]["entities"]["add"]({ "polyline": { "positions": _0x5b2098, "width": 3, "material": Color["CYAN"] } }), "positions": _0x5b2098, "coordinates": _0x55cd08, "geometry": { "type": "LineString", "coordinates": _0x55cd08 }, "length": this["computeLength"](_0x5b2098), "createdAt": _0x103575 };
-  }
-  ["buildPolygonShape"](_0x2f0e75, _0x54156f, _0x2b75d4) {
-    const _0x148df8 = _0x54156f["map"]((_0x24f972) => this["toLonLat"](_0x24f972)), _0x5d6471 = this["requireIndex"](_0x148df8, 0), _0x5e5483 = this["requireIndex"](_0x54156f, 0), _0x5ad59c = [..._0x148df8, _0x5d6471];
-    return { "id": _0x2f0e75, "tool": "polygon", "entity": this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": _0x54156f, "material": Color["CYAN"]["withAlpha"](0.4) } }), "positions": _0x54156f, "coordinates": _0x148df8, "geometry": { "type": "Polygon", "coordinates": [_0x5ad59c] }, "area": this["computeArea"](_0x148df8), "perimeter": this["computeLength"]([..._0x54156f, _0x5e5483]), "createdAt": _0x2b75d4 };
-  }
-  ["buildRectangleShape"](_0x433435, _0x22cc5f, _0x2847bf) {
-    const _0x55dfa5 = this["requireIndex"](_0x22cc5f, 0), _0x331368 = this["requireIndex"](_0x22cc5f, 1), _0x2350e9 = this["computeRectangleCoordinates"](_0x55dfa5, _0x331368), _0x3cef7d = _0x2350e9["map"]((_0x4d8848) => this["toCartesianFromLonLat"](_0x4d8848)), _0xccaa2 = this["requireIndex"](_0x3cef7d, 0);
-    return { "id": _0x433435, "tool": "rectangle", "entity": this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": _0x3cef7d, "material": Color["CYAN"]["withAlpha"](0.4) } }), "positions": _0x3cef7d, "coordinates": _0x2350e9, "geometry": { "type": "Polygon", "coordinates": [[..._0x2350e9, this["requireIndex"](_0x2350e9, 0)]] }, "area": this["computeArea"](_0x2350e9), "perimeter": this["computeLength"]([..._0x3cef7d, _0xccaa2]), "createdAt": _0x2847bf };
-  }
-  ["buildCircleShape"](_0x80f1a1, _0xc6f709, _0x2be829) {
-    const _0x2faaa0 = this["requireIndex"](_0xc6f709, 0), _0x52385c = this["requireIndex"](_0xc6f709, 1), _0xd06824 = Cartesian3["distance"](_0x2faaa0, _0x52385c), _0x580cee = this["computeCircleRing"](_0x2faaa0, _0x52385c), _0x895321 = _0x580cee["map"]((_0x5d8acb) => this["toCartesianFromLonLat"](_0x5d8acb)), _0x3e2f6c = this["requireIndex"](_0x580cee, 0);
-    return { "id": _0x80f1a1, "tool": "circle", "entity": this["viewer"]["entities"]["add"]({ "polygon": { "hierarchy": _0x895321, "material": Color["CYAN"]["withAlpha"](0.4) } }), "positions": [_0x2faaa0, _0x52385c], "coordinates": [this["toLonLat"](_0x2faaa0)], "geometry": { "type": "Polygon", "coordinates": [[..._0x580cee, _0x3e2f6c]] }, "area": Math["PI"] * _0xd06824 * _0xd06824, "perimeter": 2 * Math["PI"] * _0xd06824, "radius": _0xd06824, "createdAt": _0x2be829 };
-  }
-  ["sampleCircleRing"](_0x433178, _0x5b87a5) {
-    const _0x57267d = [];
-    for (let _0x49d842 = 0; _0x49d842 < CIRCLE_SEGMENTS; _0x49d842++) {
-      const _0x30d61e = 2 * Math["PI"] * _0x49d842 / CIRCLE_SEGMENTS, _0x1c8aaf = _0x5b87a5 * Math["cos"](_0x30d61e), _0x3b1acf = _0x5b87a5 * Math["sin"](_0x30d61e);
-      _0x57267d["push"](this["offsetMetersToLonLat"](_0x433178, _0x1c8aaf, _0x3b1acf));
+    for (const marker of this.tempVertexEntities) {
+      this.viewer.entities.remove(marker);
     }
-    return _0x57267d;
+    this.tempVertexEntities = [];
   }
-  ["computeRectangleCoordinates"](_0x542e50, _0x60b3a5) {
-    const _0x4c74d1 = this["toLonLat"](_0x542e50), _0x380363 = this["toLonLat"](_0x60b3a5), _0x3c9635 = Math["min"](_0x4c74d1[0], _0x380363[0]), _0x35ccbc = Math["max"](_0x4c74d1[0], _0x380363[0]), _0x283521 = Math["min"](_0x4c74d1[1], _0x380363[1]), _0x474f7e = Math["max"](_0x4c74d1[1], _0x380363[1]);
-    return [[_0x3c9635, _0x283521], [_0x35ccbc, _0x283521], [_0x35ccbc, _0x474f7e], [_0x3c9635, _0x474f7e]];
-  }
-  ["computeCircleRing"](_0x3db1d4, _0x407628) {
-    const _0x121fab = Cartesian3["distance"](_0x3db1d4, _0x407628), _0x273975 = this["toLonLat"](_0x3db1d4);
-    return this["sampleCircleRing"](_0x273975, _0x121fab);
-  }
-  ["computeArea"](_0x334a06) {
-    const _0x5bad62 = this["requireIndex"](_0x334a06, 0)[1], _0x3dc122 = _0x334a06["map"]((_0x2528fa) => this["projectMeters"](_0x2528fa, _0x5bad62));
-    let _0x3fd38f = 0;
-    for (let _0x2b1738 = 0; _0x2b1738 < _0x3dc122["length"]; _0x2b1738++) {
-      const [_0x14071d, _0x5d845b] = this["requireIndex"](_0x3dc122, _0x2b1738), [_0x128ab5, _0x1c3808] = this["requireIndex"](_0x3dc122, (_0x2b1738 + 1) % _0x3dc122["length"]);
-      _0x3fd38f += _0x14071d * _0x1c3808 - _0x128ab5 * _0x5d845b;
+  // Cesium'un Viewer sinifi, BIZIM InteractionManager/DrawingManager'imizdan
+  // TAMAMEN bagimsiz kendi dahili ScreenSpaceEventHandler'inda KOSULSUZ
+  // olarak bir LEFT_DOUBLE_CLICK handler'i (pickAndTrackObject) baglar:
+  // cift-tikladiginiz ekran konumu o an position'i olan bir Entity'yi (bizim
+  // vertex isaretcilerimiz veya olcum etiketlerimiz gibi) isabet ettirirse
+  // viewer.trackedEntity = o_entity atayip kamerayi o entity'yi takip etmeye
+  // KILITLIYOR (nokta entity'lerin varsayilan takip kamerasi genelde duz/
+  // yataylasmis gorunuyor) -- gercek kullanimda bulundu. Bu, bizim tamamlama
+  // mantigimizdan (finishMultiVertexViaDoubleClick) BAGIMSIZ, ayni fiziksel
+  // cift-tikta ayrica tetikleniyor. Duzeltme: trackedEntity'i sessizce geri
+  // sifirliyoruz -- kamera takibi ancak render dongusunde (postUpdate/
+  // preRender) gorsel etki yapiyor, bu yuzden ayni JS tick'i icinde senkron
+  // sifirlamak gorsel bozulmayi hic ortaya cikmadan engelliyor.
+  resetTrackedEntity() {
+    if (this.viewer.trackedEntity !== void 0) {
+      this.viewer.trackedEntity = void 0;
     }
-    return Math["abs"](_0x3fd38f) / 2;
   }
-  ["computeLength"](_0x5d3732) {
-    let _0xcbf03 = 0;
-    for (let _0x52c48d = 0; _0x52c48d < _0x5d3732["length"] - 1; _0x52c48d++) {
-      _0xcbf03 += Cartesian3["distance"](this["requireIndex"](_0x5d3732, _0x52c48d), this["requireIndex"](_0x5d3732, _0x52c48d + 1));
+  // Ayni dahili handler, cift-tiklanan entity'nin position'i YOKSA (ör.
+  // yuklenmis GeoJSON poligonu) trackedEntity yerine viewer.zoomTo(entity)
+  // cagirir; bu varsayilan HeadingPitchRange ile ~45 derece egimli bir ucus
+  // baslatir -- vektor veri uzerinde cizimi cift-tikla bitirince harita
+  // aniden tilt oluyordu. resetTrackedEntity() bunu yakalayamaz (ucus
+  // asenkron), bu yuzden cizim suresince dahili LEFT_DOUBLE_CLICK handler'i
+  // kaldirilir, oturum bitince geri konur.
+  suspendBuiltInDoubleClick() {
+    if (this.builtInDoubleClickAction !== void 0) return;
+    const cesiumHandler = this.viewer.screenSpaceEventHandler;
+    const action = cesiumHandler.getInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+    if (action === void 0) return;
+    this.builtInDoubleClickAction = action;
+    cesiumHandler.removeInputAction(ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+  }
+  restoreBuiltInDoubleClick() {
+    if (this.builtInDoubleClickAction === void 0) return;
+    this.viewer.screenSpaceEventHandler.setInputAction(
+      this.builtInDoubleClickAction,
+      ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+    );
+    this.builtInDoubleClickAction = void 0;
+  }
+  // Cizim/olcum suresince imlec crosshair; cikista tekrar standart ok (default).
+  setCursor(cursor) {
+    this.viewer.scene.canvas.style.cursor = cursor;
+  }
+  lockCamera() {
+    this.viewer.scene.screenSpaceCameraController.enableRotate = false;
+    this.viewer.scene.screenSpaceCameraController.enableTilt = false;
+  }
+  unlockCamera() {
+    this.viewer.scene.screenSpaceCameraController.enableRotate = true;
+    this.viewer.scene.screenSpaceCameraController.enableTilt = true;
+  }
+  // ── Geometri hesabi ──────────────────────────────────────────────────────
+  buildShape(tool, positions) {
+    const id = crypto.randomUUID();
+    const createdAt = Date.now();
+    if (tool === "point") {
+      const first = this.requireIndex(positions, 0);
+      const coordinates = this.toLonLat(first);
+      return {
+        id,
+        tool,
+        entity: this.viewer.entities.add({
+          position: first,
+          point: { pixelSize: 8, color: Color.CYAN }
+        }),
+        positions,
+        coordinates: [coordinates],
+        geometry: { type: "Point", coordinates },
+        createdAt
+      };
     }
-    return _0xcbf03;
+    if (tool === "circle") return this.buildCircleShape(id, positions, createdAt);
+    if (tool === "rectangle") return this.buildRectangleShape(id, positions, createdAt);
+    if (tool === "polygon") return this.buildPolygonShape(id, positions, createdAt);
+    return this.buildLineShape(id, tool, positions, createdAt);
   }
-  ["projectMeters"](_0x2bca8b, _0x44605f) {
-    const _0xa5b422 = _0x584e42["toRadians"](_0x2bca8b[0]) * Math["cos"](_0x584e42["toRadians"](_0x44605f)) * EARTH_RADIUS_METERS, _0x29c74d = _0x584e42["toRadians"](_0x2bca8b[1]) * EARTH_RADIUS_METERS;
-    return [_0xa5b422, _0x29c74d];
+  buildLineShape(id, tool, positions, createdAt) {
+    const coordinates = positions.map((p) => this.toLonLat(p));
+    return {
+      id,
+      tool,
+      entity: this.viewer.entities.add({
+        polyline: { positions, width: 3, material: Color.CYAN }
+      }),
+      positions,
+      coordinates,
+      geometry: { type: "LineString", coordinates },
+      length: this.computeLength(positions),
+      createdAt
+    };
   }
-  ["offsetMetersToLonLat"](_0x1b0737, _0x363bd, _0x38c868) {
-    const _0x116c47 = _0x1b0737[1] + _0x584e42["toDegrees"](_0x38c868 / EARTH_RADIUS_METERS), _0x4d3c38 = _0x1b0737[0] + _0x584e42["toDegrees"](_0x363bd / (EARTH_RADIUS_METERS * Math["cos"](_0x584e42["toRadians"](_0x1b0737[1]))));
-    return [_0x4d3c38, _0x116c47];
+  buildPolygonShape(id, positions, createdAt) {
+    const coordinates = positions.map((p) => this.toLonLat(p));
+    const firstCoordinate = this.requireIndex(coordinates, 0);
+    const firstPosition = this.requireIndex(positions, 0);
+    const ring = [...coordinates, firstCoordinate];
+    return {
+      id,
+      tool: "polygon",
+      entity: this.viewer.entities.add({
+        polygon: { hierarchy: positions, material: Color.CYAN.withAlpha(0.4) }
+      }),
+      positions,
+      coordinates,
+      geometry: { type: "Polygon", coordinates: [ring] },
+      area: this.computeArea(coordinates),
+      perimeter: this.computeLength([...positions, firstPosition]),
+      createdAt
+    };
   }
-  ["toCartesianFromLonLat"](_0x3a56a8) {
-    return Cartesian3["fromDegrees"](_0x3a56a8[0], _0x3a56a8[1]);
+  buildRectangleShape(id, positions, createdAt) {
+    const p1 = this.requireIndex(positions, 0);
+    const p2 = this.requireIndex(positions, 1);
+    const coordinates = this.computeRectangleCoordinates(p1, p2);
+    const corners = coordinates.map((c) => this.toCartesianFromLonLat(c));
+    const firstCorner = this.requireIndex(corners, 0);
+    return {
+      id,
+      tool: "rectangle",
+      entity: this.viewer.entities.add({
+        polygon: { hierarchy: corners, material: Color.CYAN.withAlpha(0.4) }
+      }),
+      positions: corners,
+      coordinates,
+      geometry: { type: "Polygon", coordinates: [[...coordinates, this.requireIndex(coordinates, 0)]] },
+      area: this.computeArea(coordinates),
+      perimeter: this.computeLength([...corners, firstCorner]),
+      createdAt
+    };
   }
-  ["toCartesian"](_0xc1fc7) {
-    return this["viewer"]["camera"]["pickEllipsoid"](_0xc1fc7, this["scene"]["globe"]["ellipsoid"]);
+  buildCircleShape(id, positions, createdAt) {
+    const center = this.requireIndex(positions, 0);
+    const edge = this.requireIndex(positions, 1);
+    const radius = Cartesian3.distance(center, edge);
+    const ring = this.computeCircleRing(center, edge);
+    const corners = ring.map((c) => this.toCartesianFromLonLat(c));
+    const firstRingPoint = this.requireIndex(ring, 0);
+    return {
+      id,
+      tool: "circle",
+      entity: this.viewer.entities.add({
+        polygon: { hierarchy: corners, material: Color.CYAN.withAlpha(0.4) }
+      }),
+      positions: [center, edge],
+      coordinates: [this.toLonLat(center)],
+      geometry: { type: "Polygon", coordinates: [[...ring, firstRingPoint]] },
+      area: Math.PI * radius * radius,
+      perimeter: 2 * Math.PI * radius,
+      radius,
+      createdAt
+    };
   }
-  ["toLonLat"](_0x3fb498) {
-    const _0x28c761 = Cartographic["fromCartesian"](_0x3fb498);
-    return [_0x584e42["toDegrees"](_0x28c761["longitude"]), _0x584e42["toDegrees"](_0x28c761["latitude"])];
+  sampleCircleRing(center, radiusMeters) {
+    const ring = [];
+    for (let i = 0; i < CIRCLE_SEGMENTS; i++) {
+      const angle = 2 * Math.PI * i / CIRCLE_SEGMENTS;
+      const dx = radiusMeters * Math.cos(angle);
+      const dy = radiusMeters * Math.sin(angle);
+      ring.push(this.offsetMetersToLonLat(center, dx, dy));
+    }
+    return ring;
   }
-  ["requireIndex"](_0x7f87df, _0x2769c3) {
-    const _0x4bd48b = _0x7f87df[_0x2769c3];
-    if (_0x4bd48b === void 0) throw new TucbsError("INTERNAL_INDEX_OUT_OF_RANGE", "DrawingManager: beklenen index (" + _0x2769c3 + ") dizide bulunamadi");
-    return _0x4bd48b;
+  // Iki noktadan eksen-hizali dikdortgenin 4 kosesini (lon/lat) hesaplar --
+  // hem tamamlanmis sekil (buildRectangleShape) HEM canli onizleme
+  // (ensureTempEntity) TEK bu helper'i kullanir (DRY, davranis birebir ayni).
+  computeRectangleCoordinates(p1, p2) {
+    const c1 = this.toLonLat(p1);
+    const c2 = this.toLonLat(p2);
+    const west = Math.min(c1[0], c2[0]);
+    const east = Math.max(c1[0], c2[0]);
+    const south = Math.min(c1[1], c2[1]);
+    const north = Math.max(c1[1], c2[1]);
+    return [
+      [west, south],
+      [east, south],
+      [east, north],
+      [west, north]
+    ];
+  }
+  // Merkez+kenar noktasindan daire cemberini (lon/lat) hesaplar -- hem
+  // tamamlanmis sekil (buildCircleShape) HEM canli onizleme
+  // (ensureTempEntity) TEK bu helper'i kullanir (DRY, davranis birebir ayni).
+  computeCircleRing(center, edge) {
+    const radius = Cartesian3.distance(center, edge);
+    const centerLonLat = this.toLonLat(center);
+    return this.sampleCircleRing(centerLonLat, radius);
+  }
+  // Lambert silindirik esit-alan izdusumu (x = R·boylam, y = R·sin(enlem)) +
+  // shoelace. Izdusum alani korudugundan sonuc cizime hangi koseden
+  // baslandigindan BAGIMSIZDIR (eski esdikdortgen izdusum boylam olcegini ilk
+  // kosenin enleminden aliyordu -> ayni poligon farkli alan veriyordu).
+  // Paralel/meridyen kenarli sekillerde (dikdortgen) kuresel alani tam verir.
+  // Bilesenlerdeki measureGeometry.polygonAreaMeters ile BIREBIR ayni tutulur.
+  computeArea(coordinates) {
+    const projected = coordinates.map((c) => this.projectEqualAreaMeters(c));
+    let sum = 0;
+    for (let i = 0; i < projected.length; i++) {
+      const [x1, y1] = this.requireIndex(projected, i);
+      const [x2, y2] = this.requireIndex(projected, (i + 1) % projected.length);
+      sum += x1 * y2 - x2 * y1;
+    }
+    return Math.abs(sum) / 2;
+  }
+  computeLength(positions) {
+    let total = 0;
+    for (let i = 0; i < positions.length - 1; i++) {
+      total += Cartesian3.distance(
+        this.requireIndex(positions, i),
+        this.requireIndex(positions, i + 1)
+      );
+    }
+    return total;
+  }
+  projectEqualAreaMeters(coordinate) {
+    const x = Math$1.toRadians(coordinate[0]) * EARTH_RADIUS_METERS;
+    const y = Math.sin(Math$1.toRadians(coordinate[1])) * EARTH_RADIUS_METERS;
+    return [x, y];
+  }
+  offsetMetersToLonLat(center, dx, dy) {
+    const lat = center[1] + Math$1.toDegrees(dy / EARTH_RADIUS_METERS);
+    const lon = center[0] + Math$1.toDegrees(
+      dx / (EARTH_RADIUS_METERS * Math.cos(Math$1.toRadians(center[1])))
+    );
+    return [lon, lat];
+  }
+  toCartesianFromLonLat(coordinate) {
+    return Cartesian3.fromDegrees(coordinate[0], coordinate[1]);
+  }
+  toCartesian(screenPos) {
+    return this.viewer.camera.pickEllipsoid(screenPos, this.scene.globe.ellipsoid);
+  }
+  toLonLat(cartesian) {
+    const cartographic = Cartographic.fromCartesian(cartesian);
+    return [
+      Math$1.toDegrees(cartographic.longitude),
+      Math$1.toDegrees(cartographic.latitude)
+    ];
+  }
+  // noUncheckedIndexedAccess altinda dizi erisimini daralt (narrow) eder —
+  // yalnizca uzunluk zaten dogrulanmis dizilerde cagrilir.
+  requireIndex(items, index) {
+    const value = items[index];
+    if (value === void 0) {
+      throw new TucbsError(
+        "INTERNAL_INDEX_OUT_OF_RANGE",
+        `DrawingManager: beklenen index (${index}) dizide bulunamadi`
+      );
+    }
+    return value;
   }
 }
-function trimSlash$1(_0x2712f8) {
-  return _0x2712f8["replace"](/\/+$/, "");
+function trimSlash$1(url) {
+  return url.replace(/\/+$/, "");
 }
 function newClientId() {
-  if (typeof crypto !== "undefined" && typeof crypto["randomUUID"] === "function") return crypto["randomUUID"]();
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
   return "00000000-0000-0000-0000-000000000001";
 }
 class AnalysisManager {
-  constructor(_0x233297) {
+  /** @param options - Başlangıç `apiKey`/`clientId` değerleri. */
+  constructor(options) {
     __privateAdd(this, _AnalysisManager_instances);
     __privateAdd(this, _apiKey2);
-    __privateSet(this, _apiKey2, _0x233297["apiKey"] ?? ""), this["clientId"] = _0x233297["clientId"] ?? newClientId();
+    __privateSet(this, _apiKey2, options.apiKey ?? "");
+    this.clientId = options.clientId ?? newClientId();
   }
-  ["configure"](_0x1e0018) {
-    if (_0x1e0018["apiKey"] !== void 0) __privateSet(this, _apiKey2, _0x1e0018["apiKey"]);
-    if (_0x1e0018["clientId"] !== void 0) this["clientId"] = _0x1e0018["clientId"];
+  /** `apiKey`/`clientId`'yi günceller (verilmeyen alanlar değişmeden kalır). */
+  configure(options) {
+    if (options.apiKey !== void 0) __privateSet(this, _apiKey2, options.apiKey);
+    if (options.clientId !== void 0) this.clientId = options.clientId;
   }
-  get ["configured"]() {
+  /** `apiKey` ve backend adresinin (`getUcbpApiBase()`) ikisinin de dolu olup olmadığı. */
+  get configured() {
     return Boolean(getUcbpApiBase() && __privateGet(this, _apiKey2));
   }
-  async ["buffer"](_0x4e01d2) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/buffer", _0x4e01d2);
+  /**
+   * Tampon analizi: backend'e istek atar, sonuç GeoJSON'unu döndürür.
+   * @throws {AnalysisRequestError} apiKey eksikse, ağ hatası olursa veya backend başarısız/eksik yanıt dönerse.
+   *
+   * @example
+   * ```ts
+   * const result = await map.analysisManager.buffer({
+   *   geojson: someGeoJsonGeometry,
+   *   distanceM: 500,
+   * });
+   * console.log(result.geojson);
+   * ```
+   * Not: `Map.runBuffer()` bu çağrıyı sarıp sonucu doğrudan bir `ManagedLayer`
+   * olarak haritaya ekleyen daha üst-seviye bir kısayoldur.
+   */
+  async buffer(request) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/buffer", request);
   }
-  async ["intersection"](_0x4baaab) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/intersection", _0x4baaab);
+  /**
+   * Kesişim analizi: backend'e istek atar, sonuç GeoJSON'unu döndürür.
+   * @throws {AnalysisRequestError} apiKey eksikse, ağ hatası olursa veya backend başarısız/eksik yanıt dönerse.
+   *
+   * @example
+   * ```ts
+   * const result = await map.analysisManager.intersection({
+   *   geojsonA: someGeoJsonGeometryA,
+   *   geojsonB: someGeoJsonGeometryB,
+   * });
+   * console.log(result.geojson);
+   * ```
+   */
+  async intersection(request) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/intersection", request);
   }
-  async ["boundary"](_0x24b2af) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/boundary", _0x24b2af);
+  /** Sınırlayıcı kutu veya dışbükey zarf. */
+  async boundary(request) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/boundary", request);
   }
-  async ["clip"](_0x781cca) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/clip", _0x781cca);
+  /** Kaynağı ikinci geometriyle kırpar. */
+  async clip(request) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/clip", request);
   }
-  async ["difference"](_0x4fbb44) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/difference", _0x4fbb44);
+  /** İkinci poligonu birinciden çıkarır. */
+  async difference(request) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/difference", request);
   }
-  async ["subtract"](_0x2c7b82) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/subtract", _0x2c7b82);
+  /** Örtüşen parçayı kaynaktan siler. */
+  async subtract(request) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/subtract", request);
   }
-  async ["union"](_0x223a94) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/union", _0x223a94);
+  /** İki poligonu tek alana eritir. */
+  async union(request) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/union", request);
   }
-  async ["wedgeBuffer"](_0x25d974) {
-    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/wedge-buffer", _0x25d974);
+  /** Nokta etrafında açı dilimi. */
+  async wedgeBuffer(request) {
+    return __privateMethod(this, _AnalysisManager_instances, post_fn).call(this, "/vector/wedge-buffer", request);
   }
 }
 _apiKey2 = new WeakMap();
 _AnalysisManager_instances = new WeakSet();
-post_fn = async function(_0x2dbfe7, _0x402f9f) {
-  if (!__privateGet(this, _apiKey2)) throw new AnalysisRequestError("ANALYSIS_API_KEY_MISSING", "apiKey tanımlı değil (tucbs-map apiKey).");
-  const _0xdd5289 = { "clientId": this["clientId"], "object": _0x402f9f }, _0x947c7d = "" + trimSlash$1(getUcbpApiBase()) + _0x2dbfe7;
-  let _0x5a3b00;
+post_fn = async function(path, request) {
+  if (!__privateGet(this, _apiKey2)) {
+    throw new AnalysisRequestError("ANALYSIS_API_KEY_MISSING", "apiKey tanımlı değil (tucbs-map apiKey).");
+  }
+  const body = {
+    clientId: this.clientId,
+    object: request
+  };
+  const url = `${trimSlash$1(getUcbpApiBase())}${path}`;
+  let response;
   try {
-    _0x5a3b00 = await fetch(_0x947c7d, { "method": "POST", "headers": { "Content-Type": "application/json", "X-API-Key": __privateGet(this, _apiKey2) }, "body": JSON["stringify"](_0xdd5289) });
-  } catch (_0x8b8726) {
-    const _0x928808 = _0x8b8726 instanceof Error ? _0x8b8726["message"] : String(_0x8b8726);
-    throw new AnalysisRequestError("ANALYSIS_NETWORK_ERROR", "Ağ hatası: " + _0x928808);
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": __privateGet(this, _apiKey2)
+      },
+      body: JSON.stringify(body)
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new AnalysisRequestError("ANALYSIS_NETWORK_ERROR", `Ağ hatası: ${msg}`);
   }
-  const _0x672b5f = await _0x5a3b00["json"]()["catch"](() => null);
-  if (!_0x5a3b00["ok"]) {
-    const _0x6cb793 = (_0x672b5f == null ? void 0 : _0x672b5f["mesaj"]) || (_0x672b5f == null ? void 0 : _0x672b5f["message"]) || "İstek başarısız (HTTP " + _0x5a3b00["status"] + ")";
-    throw new AnalysisRequestError("ANALYSIS_REQUEST_FAILED", _0x6cb793);
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    const msg = (data == null ? void 0 : data.mesaj) || (data == null ? void 0 : data.message) || `İstek başarısız (HTTP ${response.status})`;
+    throw new AnalysisRequestError("ANALYSIS_REQUEST_FAILED", msg);
   }
-  if ((_0x672b5f == null ? void 0 : _0x672b5f["isSuccess"]) === ![] || (_0x672b5f == null ? void 0 : _0x672b5f["success"]) === ![]) throw new AnalysisRequestError("ANALYSIS_UNSUCCESSFUL", _0x672b5f["mesaj"] || _0x672b5f["message"] || "Analiz başarısız.");
-  const _0x5e1bb0 = _0x672b5f == null ? void 0 : _0x672b5f["object"];
-  if (!(_0x5e1bb0 == null ? void 0 : _0x5e1bb0["geojson"])) throw new AnalysisRequestError("ANALYSIS_RESPONSE_MISSING_GEOJSON", "Yanıtta geojson yok.");
-  return _0x5e1bb0;
+  if ((data == null ? void 0 : data.isSuccess) === false || (data == null ? void 0 : data.success) === false) {
+    throw new AnalysisRequestError("ANALYSIS_UNSUCCESSFUL", data.mesaj || data.message || "Analiz başarısız.");
+  }
+  const result = data == null ? void 0 : data.object;
+  if (!(result == null ? void 0 : result.geojson)) {
+    throw new AnalysisRequestError("ANALYSIS_RESPONSE_MISSING_GEOJSON", "Yanıtta geojson yok.");
+  }
+  return result;
 };
-const FALLBACK_IMAGE_FILENAME = "blue-marble-fallback.jpg", FALLBACK_WORLD_IMAGE = new URL(FALLBACK_IMAGE_FILENAME, import.meta.url)["href"], FALLBACK_DELAY_MS = 3e3, BASEMAP_ERROR_RETRY_LIMIT = 2, BASEMAP_UNAVAILABLE_DELAY_MS = 1e4;
-function watchBasemap(_0x5710bc, _0x4a0c70, _0x20c0c7, _0x347f18, _0x5dde52, _0x50ad53) {
-  let _0xcaef6a = ![], _0x4f25e2 = ![];
-  const _0xab9d69 = window["setTimeout"](() => {
-    if (_0xcaef6a || !_0x4a0c70["isCurrentGeneration"](_0x20c0c7)) return;
-    _0x4a0c70["ensureFallbackBasemap"]();
-  }, FALLBACK_DELAY_MS), _0xb39b6f = window["setTimeout"](() => {
-    if (_0xcaef6a || !_0x4a0c70["isCurrentGeneration"](_0x20c0c7)) return;
-    _0xcaef6a = !![], _0x42f1c5(), _0x4a0c70["setStatus"]("unavailable"), _0x4a0c70["removeBasemapLayer"](), _0x4a0c70["ensureFallbackBasemap"](), _0x4a0c70["emit"]("basemap:error", { "id": _0x347f18 });
-  }, BASEMAP_UNAVAILABLE_DELAY_MS), _0x42f1c5 = () => {
-    _0x4f25e2 = !![], window["clearTimeout"](_0xab9d69), window["clearTimeout"](_0xb39b6f), _0x50ad53["errorEvent"]["removeEventListener"](_0x3eb63e);
-  }, _0x3eb63e = (_0x4be3b4) => {
-    if (_0xcaef6a) return;
-    if (!_0x4a0c70["isCurrentGeneration"](_0x20c0c7)) return;
-    if (!_0x5710bc["imageryLayers"]["contains"](_0x5dde52)) return;
-    if (_0x4be3b4["timesRetried"] < BASEMAP_ERROR_RETRY_LIMIT) {
-      _0x4be3b4["retry"] = !![];
+const FALLBACK_IMAGE_FILENAME = "blue-marble-fallback.jpg";
+const FALLBACK_WORLD_ATTRIBUTION = "NASA Earth Observatory (Blue Marble)";
+const FALLBACK_WORLD_IMAGE = new URL(
+  FALLBACK_IMAGE_FILENAME,
+  import.meta.url
+).href;
+const FALLBACK_DELAY_MS = 3e3;
+const BASEMAP_ERROR_RETRY_LIMIT = 2;
+const BASEMAP_UNAVAILABLE_DELAY_MS = 1e4;
+function watchBasemap(viewer, deps, generation, basemapId, imageryLayer, provider) {
+  let handled = false;
+  let stopped = false;
+  const fallbackTimer = window.setTimeout(() => {
+    if (handled || !deps.isCurrentGeneration(generation)) return;
+    deps.ensureFallbackBasemap();
+  }, FALLBACK_DELAY_MS);
+  const unavailableTimer = window.setTimeout(() => {
+    if (handled || !deps.isCurrentGeneration(generation)) return;
+    handled = true;
+    stopWatching();
+    deps.setStatus("unavailable");
+    deps.removeBasemapLayer();
+    deps.ensureFallbackBasemap();
+    deps.emit("basemap:error", { id: basemapId });
+  }, BASEMAP_UNAVAILABLE_DELAY_MS);
+  const stopWatching = () => {
+    stopped = true;
+    window.clearTimeout(fallbackTimer);
+    window.clearTimeout(unavailableTimer);
+    provider.errorEvent.removeEventListener(onError);
+  };
+  const onError = (error) => {
+    if (handled) return;
+    if (!deps.isCurrentGeneration(generation)) return;
+    if (!viewer.imageryLayers.contains(imageryLayer)) return;
+    if (error.timesRetried < BASEMAP_ERROR_RETRY_LIMIT) {
+      error.retry = true;
       return;
     }
-    _0xcaef6a = !![], _0x42f1c5(), _0x4a0c70["setStatus"]("unavailable"), _0x4a0c70["removeBasemapLayer"](), _0x4a0c70["ensureFallbackBasemap"](), _0x4a0c70["emit"]("basemap:error", { "id": _0x347f18 });
-  }, _0x558c35 = _0x50ad53["requestImage"]["bind"](_0x50ad53);
-  _0x50ad53["requestImage"] = (_0x375a3b, _0x43125e, _0x428e14, _0x1784b) => {
-    const _0x33b139 = _0x558c35(_0x375a3b, _0x43125e, _0x428e14, _0x1784b);
-    if (_0x33b139 && !_0xcaef6a && !_0x4f25e2) _0x33b139["then"](_0x13fcfd, () => void 0);
-    return _0x33b139;
+    handled = true;
+    stopWatching();
+    deps.setStatus("unavailable");
+    deps.removeBasemapLayer();
+    deps.ensureFallbackBasemap();
+    deps.emit("basemap:error", { id: basemapId });
   };
-  const _0x13fcfd = () => {
-    if (_0xcaef6a || _0x4f25e2) return;
-    if (!_0x4a0c70["isCurrentGeneration"](_0x20c0c7)) {
-      _0x42f1c5();
+  const requestImage = provider.requestImage.bind(provider);
+  provider.requestImage = (x, y, level, request) => {
+    const result = requestImage(x, y, level, request);
+    if (result && !handled && !stopped) result.then(onTileLoaded, () => void 0);
+    return result;
+  };
+  const onTileLoaded = () => {
+    if (handled || stopped) return;
+    if (!deps.isCurrentGeneration(generation)) {
+      stopWatching();
       return;
     }
-    _0xcaef6a = !![], _0x42f1c5(), _0x4a0c70["setStatus"]("ready"), _0x4a0c70["clearFallbackBasemap"](), _0x4a0c70["emit"]("basemap:recovered", { "id": _0x347f18 });
+    handled = true;
+    stopWatching();
+    deps.setStatus("ready");
+    deps.clearFallbackBasemap();
+    deps.emit("basemap:recovered", { id: basemapId });
   };
-  return _0x50ad53["errorEvent"]["addEventListener"](_0x3eb63e), _0x42f1c5;
+  provider.errorEvent.addEventListener(onError);
+  return stopWatching;
 }
 const BASEMAP_LAYER_ID = "__tucbs_basemap__";
-function trackProviderRequests(_0x221a5c) {
-  const _0x4c99bc = /* @__PURE__ */ new Set(), _0x3525c4 = _0x221a5c["requestImage"]["bind"](_0x221a5c);
-  return _0x221a5c["requestImage"] = (_0x30fae0, _0xedad27, _0x501851, _0x4e2fc2) => {
-    if (_0x4e2fc2) _0x4c99bc["add"](_0x4e2fc2);
-    const _0x1a157d = _0x3525c4(_0x30fae0, _0xedad27, _0x501851, _0x4e2fc2);
-    if (_0x4e2fc2 && _0x1a157d) {
-      const _0x223711 = () => {
-        _0x4c99bc["delete"](_0x4e2fc2);
+function trackProviderRequests(provider) {
+  const pending = /* @__PURE__ */ new Set();
+  const requestImage = provider.requestImage.bind(provider);
+  provider.requestImage = (x, y, level, request) => {
+    if (request) pending.add(request);
+    const result = requestImage(x, y, level, request);
+    if (request && result) {
+      const done = () => {
+        pending.delete(request);
       };
-      _0x1a157d["then"](_0x223711, _0x223711);
+      result.then(done, done);
     }
-    return _0x1a157d;
-  }, () => {
-    for (const _0x3b776e of _0x4c99bc) _0x3b776e["cancel"]();
-    _0x4c99bc["clear"]();
+    return result;
+  };
+  return () => {
+    for (const request of pending) request.cancel();
+    pending.clear();
   };
 }
 class BasemapController {
-  constructor(_0x19932f, _0x4eb3f2) {
-    this["_basemapGeneration"] = 0, this["_basemapStatus"] = "ready", this["_fallbackBasemapLayer"] = null, this["viewer"] = _0x19932f, this["deps"] = _0x4eb3f2;
+  constructor(viewer, deps) {
+    this._basemapGeneration = 0;
+    this._basemapStatus = "ready";
+    this._fallbackBasemapLayer = null;
+    this.viewer = viewer;
+    this.deps = deps;
   }
-  get ["status"]() {
-    return this["_basemapStatus"];
+  /** Altlık haritanın yükleme durumu (`"loading"`/`"ready"`/`"unavailable"`). */
+  get status() {
+    return this._basemapStatus;
   }
-  get ["currentBasemapId"]() {
-    return this["_currentBasemapId"];
+  /** Yedek dünya görüntüsü haritadaysa kaynak atfı, değilse `null`. */
+  get fallbackAttribution() {
+    return this._fallbackBasemapLayer !== null ? FALLBACK_WORLD_ATTRIBUTION : null;
   }
-  ["set"](_0x466045) {
+  /** ML-03: apiKey rotasyonu sonrasi mevcut altligi yeniden kurmak icin Map'e gerekli. */
+  get currentBasemapId() {
+    return this._currentBasemapId;
+  }
+  /**
+   * Altlık haritayı değiştirir; önceki altlığı, izleyicisini ve bekleyen karo isteklerini kaldırır.
+   *
+   * @param basemap Altlık kimliği ya da seçenekleri; `null` veya `undefined` altlığı kaldırır.
+   */
+  set(basemap) {
     var _a2, _b;
-    (_a2 = this["_stopBasemapWatch"]) == null ? void 0 : _a2.call(this), (_b = this["_cancelBasemapRequests"]) == null ? void 0 : _b.call(this), this["_cancelBasemapRequests"] = void 0, this["deps"]["removeBasemapLayers"](), this["clearFallbackBasemap"]();
-    const _0x32ad2e = ++this["_basemapGeneration"];
-    if (_0x466045 === null || _0x466045 === void 0) {
-      this["_basemapStatus"] = "ready", this["_currentBasemapId"] = void 0;
+    (_a2 = this._stopBasemapWatch) == null ? void 0 : _a2.call(this);
+    (_b = this._cancelBasemapRequests) == null ? void 0 : _b.call(this);
+    this._cancelBasemapRequests = void 0;
+    this.deps.removeBasemapLayers();
+    this.clearFallbackBasemap();
+    const generation = ++this._basemapGeneration;
+    if (basemap === null || basemap === void 0) {
+      this._basemapStatus = "ready";
+      this._currentBasemapId = void 0;
       return;
     }
-    const _0x382b8a = typeof _0x466045 === "string" ? { "id": _0x466045 } : _0x466045;
-    if (!_0x382b8a["id"]) {
-      this["_basemapStatus"] = "ready", this["_currentBasemapId"] = void 0;
+    const resolved = typeof basemap === "string" ? { id: basemap } : basemap;
+    if (!resolved.id) {
+      this._basemapStatus = "ready";
+      this._currentBasemapId = void 0;
       return;
     }
-    this["_basemapStatus"] = "loading", this["_currentBasemapId"] = _0x382b8a["id"];
-    const _0x52a7d9 = this["resolveBasemapUrl"](_0x382b8a), _0x53a5ae = new UrlTemplateImageryProvider({ "url": _0x52a7d9 }), _0x160c5a = trackProviderRequests(_0x53a5ae);
-    this["_cancelBasemapRequests"] = _0x160c5a;
-    const _0x350c08 = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x53a5ae, 0);
-    this["deps"]["addBasemapImageryLayer"](BASEMAP_LAYER_ID, _0x382b8a["id"], _0x350c08), this["_stopBasemapWatch"] = watchBasemap(this["viewer"], { "ensureFallbackBasemap": () => this["ensureFallbackBasemap"](), "clearFallbackBasemap": () => this["clearFallbackBasemap"](), "removeBasemapLayer": () => {
-      _0x160c5a(), this["deps"]["removeLayer"](BASEMAP_LAYER_ID);
-    }, "emit": (_0x2d214a, _0x4d6e63) => this["deps"]["emit"](_0x2d214a, _0x4d6e63), "setStatus": (_0x558a29) => {
-      this["_basemapStatus"] = _0x558a29;
-    }, "isCurrentGeneration": (_0x448fd4) => _0x448fd4 === this["_basemapGeneration"] }, _0x32ad2e, _0x382b8a["id"], _0x350c08, _0x53a5ae);
+    this._basemapStatus = "loading";
+    this._currentBasemapId = resolved.id;
+    const tileUrl = this.resolveBasemapUrl(resolved);
+    const provider = new UrlTemplateImageryProvider({ url: tileUrl });
+    const cancelRequests = trackProviderRequests(provider);
+    this._cancelBasemapRequests = cancelRequests;
+    const imageryLayer = this.viewer.imageryLayers.addImageryProvider(
+      provider,
+      0
+    );
+    this.deps.addBasemapImageryLayer(BASEMAP_LAYER_ID, resolved.id, imageryLayer);
+    this._stopBasemapWatch = watchBasemap(
+      this.viewer,
+      {
+        ensureFallbackBasemap: () => this.ensureFallbackBasemap(),
+        clearFallbackBasemap: () => this.clearFallbackBasemap(),
+        removeBasemapLayer: () => {
+          cancelRequests();
+          this.deps.removeLayer(BASEMAP_LAYER_ID);
+        },
+        emit: (event, payload) => this.deps.emit(event, payload),
+        setStatus: (status) => {
+          this._basemapStatus = status;
+        },
+        isCurrentGeneration: (gen) => gen === this._basemapGeneration
+      },
+      generation,
+      resolved.id,
+      imageryLayer,
+      provider
+    );
   }
-  ["stop"]() {
+  /** Altlık izleyicisini durdurur ve bekleyen karo isteklerini iptal eder; `Map.destroy()` çağırır. */
+  // ML-02: basemap izleyicisi durdurulmazsa, harita bu zamanlayicilar
+  // dolmadan (bkz BASEMAP_UNAVAILABLE_DELAY_MS) yok edilirse unavailableTimer
+  // tetiklenip yok edilmis viewer'a dokunur ve Cesium "This object was
+  // destroyed" hatasi firlatir -- Map.destroy() bunu cagirir.
+  stop() {
     var _a2, _b;
-    (_a2 = this["_stopBasemapWatch"]) == null ? void 0 : _a2.call(this), (_b = this["_cancelBasemapRequests"]) == null ? void 0 : _b.call(this), this["_cancelBasemapRequests"] = void 0;
+    (_a2 = this._stopBasemapWatch) == null ? void 0 : _a2.call(this);
+    (_b = this._cancelBasemapRequests) == null ? void 0 : _b.call(this);
+    this._cancelBasemapRequests = void 0;
   }
-  ["addFallbackBasemap"]() {
-    const _0x73ae8 = new SingleTileImageryProvider({ "url": FALLBACK_WORLD_IMAGE, "tileWidth": 5400, "tileHeight": 2700, "credit": "NASA Earth Observatory (Blue Marble)" }), _0x46b91a = this["viewer"]["imageryLayers"]["addImageryProvider"](_0x73ae8, 0);
-    this["_fallbackBasemapLayer"] = _0x46b91a;
+  // Paket icine gomulu, tum globe'u kaplayan gercek bir dunya goruntusunu
+  // (NASA "Blue Marble", bkz FallbackWorldImagery.ts) TEK bir statik resim
+  // olarak gercek katmanin ALTINA (index 0) ekler -- ag istegi icermez
+  // (data URI), boylece HGM'in tile'lari geldikce ustunu kapatir; hic
+  // gelmezse (dis servis kesintisi) goruntude kalir. UCUNCU TARAF bir tile
+  // servisine (OSM/CARTO vb.) SESSIZCE fallback YAPILMAZ -- bu urun
+  // kurumlara API olarak entegre edildigi icin (ticari/kurumsal yeniden
+  // dagitim) hem OSM'in (operations.osmfoundation.org/policies/tiles) hem
+  // CARTO'nun (carto.com/legal/basemap-terms) kullanim sartlari boyle bir
+  // kullanimi yasakliyor/ayri ticari lisans gerektiriyor -- bkz proje
+  // gecmisi. NASA icerikleri ABD federal hukumet uretimi olarak telife
+  // tabi DEGIL (bkz FallbackWorldImagery.ts), sadece kaynak belirtme
+  // (credit) bekleniyor. SADECE watchBasemap()'teki FALLBACK_DELAY_MS
+  // zamanlayicisi (HGM'den zamaninda yanit gelmedi) veya onError (HGM
+  // acikca basarisiz oldu) cagirir -- ensureFallbackBasemap() SARMALAYICISI
+  // KULLANILMADAN dogrudan cagrilmamali (idempotent degil, ikinci
+  // cagrida katmani ikiye katlar).
+  addFallbackBasemap() {
+    const fallbackProvider = new SingleTileImageryProvider({
+      url: FALLBACK_WORLD_IMAGE,
+      tileWidth: 5400,
+      tileHeight: 2700,
+      credit: FALLBACK_WORLD_ATTRIBUTION
+    });
+    const fallbackLayer = this.viewer.imageryLayers.addImageryProvider(
+      fallbackProvider,
+      0
+    );
+    this._fallbackBasemapLayer = fallbackLayer;
   }
-  ["ensureFallbackBasemap"]() {
-    if (this["_fallbackBasemapLayer"] !== null) return;
+  // addFallbackBasemap()'in idempotent sarmalayicisi -- zaten gosteriliyorsa
+  // ikinci bir katman EKLEMEZ. Yedegin KENDISINDEKI olasi bir hata (ör.
+  // Cesium surum farkindan kaynakli bir yapici hatasi -- bkz bu sorunun daha
+  // once tam da bu sekilde yasandigi proje gecmisi) cagiran tarafi
+  // (zamanlayici veya onError) ASLA etkilememeli, o yuzden try/catch burada.
+  //
+  // NOT (basemap:error BURADA EMIT EDILMEZ): eskiden bu metod hem yedek
+  // gorseli eklerdi HEM DE "basemap:error"i yayardi -- ama bu, SADECE
+  // beklenen surede yanit gelmedigi (bkz FALLBACK_DELAY_MS, watchBasemap
+  // path 0) durumda bile tuketiciye (TucbsBasemapPicker) aninda "erisilemiyor"
+  // banner'i + secim grid'i devre disi gosterecek sekilde yanlis-pozitif
+  // uretiyordu: altlik haritalar arasinda HIZLICA gezinirken HGM bazen
+  // sadece YAVAS yanit veriyor (gercekten kesinti YOK, kullanici bildirimi:
+  // "HGM'e normalde erisebiliyorum ama gezinirken bir anda uyari geldi, ne
+  // alaka") -- 3sn icinde gelmemesi "kalici basarisizlik" ANLAMINA GELMEZ,
+  // sadece "kullaniciyi bombos globe ile birakmamak icin gecici bir gorsel
+  // goster" anlamina gelir. Bu yuzden "basemap:error" ARTIK SADECE gercekten
+  // KESIN basarisizlik anlasilan tek yerden (onError, retry hakki da
+  // tukendikten SONRA) yayilir -- bkz watchBasemap.
+  ensureFallbackBasemap() {
+    if (this._fallbackBasemapLayer !== null) return;
     try {
-      this["addFallbackBasemap"]();
-    } catch (_0x3ed27a) {
-      console["warn"]("[tucbs-core] Basemap yedek goruntusu eklenemedi:", _0x3ed27a);
+      this.addFallbackBasemap();
+    } catch (error) {
+      console.warn("[tucbs-core] Basemap yedek goruntusu eklenemedi:", error);
+    }
+    if (this._fallbackBasemapLayer !== null) {
+      this.deps.emit("basemap:fallback-shown", { attribution: FALLBACK_WORLD_ATTRIBUTION });
     }
   }
-  ["clearFallbackBasemap"]() {
-    this["_fallbackBasemapLayer"] !== null && (this["viewer"]["imageryLayers"]["remove"](this["_fallbackBasemapLayer"], !![]), this["_fallbackBasemapLayer"] = null);
+  clearFallbackBasemap() {
+    if (this._fallbackBasemapLayer !== null) {
+      this.viewer.imageryLayers.remove(this._fallbackBasemapLayer, true);
+      this._fallbackBasemapLayer = null;
+      this.deps.emit("basemap:fallback-hidden", { attribution: FALLBACK_WORLD_ATTRIBUTION });
+    }
   }
-  ["resolveBasemapUrl"](_0x20bd7b) {
-    const _0x56cad1 = (_0x1e1a8f) => {
-      const _0x2c17fa = this["deps"]["getProxyBase"](), _0x3a22af = _0x2c17fa + "https://atlas.harita.gov.tr/" + _0x1e1a8f + "/{z}/{x}/{y}.png";
-      return this["appendTucbsApiKeyQuery"](_0x3a22af);
+  /**
+   * HGM altlık şablonu: proxyservice getByUrl. Cesium header taşımaz;
+   * apiKey varsa kardeş query `tucbsapikey` (tile başına DB yok, proxy cache).
+   * Kapı: `deps.getProxyBase()` (main.js `configureTucbs({ proxyBase })`, yoksa derleme yedeği).
+   */
+  resolveBasemapUrl(basemap) {
+    const proxied = (path) => {
+      const proxyBase = this.deps.getProxyBase();
+      const tile = `${proxyBase}${"https://atlas.harita.gov.tr"}/${path}/{z}/{x}/{y}.png`;
+      return this.appendTucbsApiKeyQuery(tile);
     };
-    switch (_0x20bd7b["id"]) {
+    switch (basemap.id) {
       case "hgm-temel":
-        return _0x56cad1("temel");
+        return proxied("temel");
       case "hgm-ortofoto":
-        return _0x56cad1("ortofotoservis");
+        return proxied("ortofotoservis");
       case "hgm-siyasi":
-        return _0x56cad1("siyasi");
+        return proxied("siyasi");
       case "hgm-yukseklik":
-        return _0x56cad1("yukseklik");
+        return proxied("yukseklik");
       default:
-        return _0x20bd7b["id"];
+        return basemap.id;
     }
   }
-  ["appendTucbsApiKeyQuery"](_0x13c40b) {
-    const _0x2d98c5 = this["deps"]["getApiKey"]();
-    if (!_0x2d98c5) return _0x13c40b;
-    const _0x49c674 = _0x13c40b["includes"]("?") ? "&" : "?";
-    return "" + _0x13c40b + _0x49c674 + "tucbsapikey=" + encodeURIComponent(_0x2d98c5);
+  /** getByUrl `url` paramına karışmadan tucbsapikey ekler; yoksa URL aynı. */
+  appendTucbsApiKeyQuery(url) {
+    const apiKey = this.deps.getApiKey();
+    if (!apiKey) {
+      return url;
+    }
+    const sep = url.includes("?") ? "&" : "?";
+    return `${url}${sep}tucbsapikey=${encodeURIComponent(apiKey)}`;
   }
 }
-function nextFrame(_0x3c99e6) {
-  return new Promise((_0x3f4858) => {
-    const _0x154641 = () => {
-      _0x3c99e6["scene"]["postRender"]["removeEventListener"](_0x154641), _0x3f4858();
+function nextFrame(viewer) {
+  return new Promise((resolve) => {
+    const callback = () => {
+      viewer.scene.postRender.removeEventListener(callback);
+      resolve();
     };
-    _0x3c99e6["scene"]["postRender"]["addEventListener"](_0x154641), _0x3c99e6["scene"]["requestRender"]();
+    viewer.scene.postRender.addEventListener(callback);
+    viewer.scene.requestRender();
   });
 }
-async function captureCanvasBlob(_0x203041, _0x514aab, _0x302e0b) {
-  const _0x26b10b = _0x203041["canvas"];
-  if (typeof _0x26b10b["toBlob"] === "function") return new Promise((_0x4bbcaf, _0x1bae40) => {
-    _0x26b10b["toBlob"]((_0x1919a4) => _0x1919a4 ? _0x4bbcaf(_0x1919a4) : _0x1bae40(new Error("canvas.toBlob basarisiz oldu")), _0x514aab, _0x302e0b);
-  });
-  const _0x11feb7 = _0x26b10b["toDataURL"](_0x514aab, _0x302e0b), _0x1bfc1c = _0x11feb7["split"](",")[1] ?? "", _0x19879f = atob(_0x1bfc1c), _0x195b6f = new Uint8Array(_0x19879f["length"]);
-  for (let _0x98cdbd = 0; _0x98cdbd < _0x19879f["length"]; _0x98cdbd++) _0x195b6f[_0x98cdbd] = _0x19879f["charCodeAt"](_0x98cdbd);
-  return new Blob([_0x195b6f], { "type": _0x514aab });
-}
-function measureGroundMetersPerPixel(_0xef6325) {
-  const _0x16b366 = _0xef6325["scene"], _0xe2f981 = _0xef6325["camera"], _0x463401 = _0xef6325["canvas"], _0x1591e7 = _0x463401["clientWidth"] / 2, _0x11ce1c = _0x463401["clientHeight"] / 2, _0x1f9492 = _0xe2f981["getPickRay"](new Cartesian2(_0x1591e7 - 1, _0x11ce1c)), _0x1342fc = _0xe2f981["getPickRay"](new Cartesian2(_0x1591e7 + 1, _0x11ce1c));
-  if (!_0x1f9492 || !_0x1342fc) return null;
-  const _0x29502f = _0x16b366["globe"]["pick"](_0x1f9492, _0x16b366), _0x37e559 = _0x16b366["globe"]["pick"](_0x1342fc, _0x16b366);
-  if (!_0x29502f || !_0x37e559) return null;
-  return Cartesian3["distance"](_0x29502f, _0x37e559) / 2;
-}
-function toOrientedDestination(_0xa09cde) {
-  return { "destination": Cartesian3["fromDegrees"](_0xa09cde["longitude"], _0xa09cde["latitude"], _0xa09cde["height"]), "orientation": { "heading": _0x584e42["toRadians"](_0xa09cde["heading"] ?? 0), "pitch": _0x584e42["toRadians"](_0xa09cde["pitch"] ?? -90), "roll": _0x584e42["toRadians"](_0xa09cde["roll"] ?? 0) } };
-}
-function setView(_0x15740c, _0x48e4da) {
-  _0x15740c["camera"]["setView"](toOrientedDestination(_0x48e4da));
-}
-function setExtent(_0x4c32b7, _0x12660e) {
-  _0x4c32b7["camera"]["setView"]({ "destination": Rectangle["fromDegrees"](_0x12660e["west"], _0x12660e["south"], _0x12660e["east"], _0x12660e["north"]) });
-}
-function flyTo(_0x2491a0, _0x24d49e) {
-  _0x2491a0["camera"]["flyTo"](toOrientedDestination(_0x24d49e));
-}
-function zoomTo(_0x47a5ab, _0x34ce99, _0x233ee5, _0x1523bc) {
-  _0x47a5ab["camera"]["setView"]({ "destination": Cartesian3["fromDegrees"](_0x34ce99, _0x233ee5, _0x1523bc) });
-}
-async function zoomToLayer(_0x1165dd, _0x5ae1c2) {
-  return _0x1165dd["zoomTo"](_0x5ae1c2["cesiumObject"], new HeadingPitchRange(0, -_0x584e42["PI_OVER_TWO"], 0));
-}
-function trimSlash(_0x18b464) {
-  return _0x18b464["replace"](/\/+$/, "");
-}
-async function validateApiKey(_0x1582f4, _0x15ca32 = getUcbpApiBase()) {
-  if (!_0x1582f4) return;
-  const _0xae96a6 = trimSlash(_0x15ca32) + "/auth/validate";
-  let _0x301338;
-  try {
-    _0x301338 = await fetch(_0xae96a6, { "method": "GET", "headers": { "X-API-Key": _0x1582f4 } });
-  } catch (_0x179cab) {
-    const _0x4fbd8c = _0x179cab instanceof Error ? _0x179cab["message"] : String(_0x179cab);
-    throw new ApiKeyValidationError(_0x4fbd8c);
+async function captureCanvasBlob(viewer, mimeType, quality) {
+  const canvas = viewer.canvas;
+  if (typeof canvas.toBlob === "function") {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => blob ? resolve(blob) : reject(new Error("canvas.toBlob basarisiz oldu")),
+        mimeType,
+        quality
+      );
+    });
   }
-  if (!_0x301338["ok"]) {
-    let _0x3cf83e, _0x1cd07d, _0x45b0ac, _0x4fb50e;
+  const dataUrl = canvas.toDataURL(mimeType, quality);
+  const base64 = dataUrl.split(",")[1] ?? "";
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mimeType });
+}
+function measureGroundMetersPerPixel(viewer) {
+  const scene = viewer.scene;
+  const camera = viewer.camera;
+  const canvas = viewer.canvas;
+  const centerX = canvas.clientWidth / 2;
+  const centerY = canvas.clientHeight / 2;
+  const leftRay = camera.getPickRay(new Cartesian2(centerX - 1, centerY));
+  const rightRay = camera.getPickRay(new Cartesian2(centerX + 1, centerY));
+  if (!leftRay || !rightRay) return null;
+  const leftPoint = scene.globe.pick(leftRay, scene);
+  const rightPoint = scene.globe.pick(rightRay, scene);
+  if (!leftPoint || !rightPoint) return null;
+  return Cartesian3.distance(leftPoint, rightPoint) / 2;
+}
+function toOrientedDestination(cameraOptions) {
+  return {
+    destination: Cartesian3.fromDegrees(
+      cameraOptions.longitude,
+      cameraOptions.latitude,
+      cameraOptions.height
+    ),
+    orientation: {
+      heading: Math$1.toRadians(cameraOptions.heading ?? 0),
+      pitch: Math$1.toRadians(cameraOptions.pitch ?? -90),
+      roll: Math$1.toRadians(cameraOptions.roll ?? 0)
+    }
+  };
+}
+function setView(viewer, cameraOptions) {
+  viewer.camera.setView(toOrientedDestination(cameraOptions));
+}
+function setExtent(viewer, extent) {
+  viewer.camera.setView({
+    destination: Rectangle.fromDegrees(
+      extent.west,
+      extent.south,
+      extent.east,
+      extent.north
+    )
+  });
+}
+function flyTo(viewer, cameraOptions) {
+  viewer.camera.flyTo(toOrientedDestination(cameraOptions));
+}
+function zoomTo(viewer, longitude, latitude, height) {
+  viewer.camera.setView({
+    destination: Cartesian3.fromDegrees(longitude, latitude, height)
+  });
+}
+async function zoomToLayer(viewer, layer) {
+  return viewer.zoomTo(
+    layer.cesiumObject,
+    new HeadingPitchRange(0, -Math$1.PI_OVER_TWO, 0)
+  );
+}
+const DRAW_LAYER_KIND_LABELS = {
+  point: "Nokta",
+  line: "Çizgi",
+  area: "Alan"
+};
+function drawLayerKindOf(tool) {
+  switch (tool) {
+    case "point":
+      return "point";
+    case "polyline":
+    case "freehand":
+      return "line";
+    case "polygon":
+    case "rectangle":
+    case "circle":
+      return "area";
+  }
+}
+const DEFAULT_TITLE_PREFIX = "Çizim";
+function nextDrawLayerTitle(existingTitles) {
+  const used = new Set(existingTitles.map((title) => title.trim().toLocaleLowerCase("tr")));
+  let n = 1;
+  while (used.has(`${DEFAULT_TITLE_PREFIX} ${n}`.toLocaleLowerCase("tr"))) n++;
+  return `${DEFAULT_TITLE_PREFIX} ${n}`;
+}
+function validateDrawLayerTitle(title, existingTitles) {
+  const trimmed = title.trim();
+  if (trimmed === "") return "empty";
+  const key = trimmed.toLocaleLowerCase("tr");
+  return existingTitles.some((t) => t.trim().toLocaleLowerCase("tr") === key) ? "duplicate" : null;
+}
+class DrawingLayerRegistry extends EventEmitter {
+  constructor() {
+    super(...arguments);
+    this.entries = /* @__PURE__ */ new Map();
+    this.shapeLayers = /* @__PURE__ */ new Map();
+    this.seq = 0;
+  }
+  /** Yeni çizim katmanı kaydeder ve onu aktif yapar. */
+  create(title, kind) {
+    const info = { id: `__tucbs_drawing_layer_${++this.seq}__`, title: title.trim(), kind };
+    this.entries.set(info.id, info);
+    this.activeId = info.id;
+    this.emit("drawinglayers:change", { activeId: this.activeId });
+    return info;
+  }
+  /** Verilen kimlikte kayıtlı bir çizim katmanı olup olmadığını döndürür. */
+  has(id) {
+    return this.entries.has(id);
+  }
+  /** Verilen kimlikteki çizim katmanının bilgisini döndürür; kayıtlı değilse `undefined`. */
+  get(id) {
+    return this.entries.get(id);
+  }
+  /** Kayıtlı tüm çizim katmanlarını oluşturulma sırasıyla döndürür (yeni bir dizi). */
+  list() {
+    return [...this.entries.values()];
+  }
+  /** Yalnızca verilen geometri türündeki çizim katmanlarını oluşturulma sırasıyla döndürür. */
+  listByKind(kind) {
+    return this.list().filter((info) => info.kind === kind);
+  }
+  /** Aktif çizim katmanının kimliğini döndürür; aktif katman yoksa `undefined`. */
+  getActiveId() {
+    return this.activeId;
+  }
+  /** Aktif çizim katmanının bilgisini döndürür; aktif katman yoksa `undefined`. */
+  getActive() {
+    return this.activeId === void 0 ? void 0 : this.entries.get(this.activeId);
+  }
+  /** Kayıtlı bir katmanı aktif yapar; bilinmeyen id için `false` döner. */
+  setActive(id) {
+    if (!this.entries.has(id)) return false;
+    if (this.activeId !== id) {
+      this.activeId = id;
+      this.emit("drawinglayers:change", { activeId: this.activeId });
+    }
+    return true;
+  }
+  /** Katmanı ve ona bağlı şekil eşlemelerini siler; aktifse aktif katman kalmaz. */
+  remove(id) {
+    if (!this.entries.delete(id)) return;
+    for (const [shapeId, layerId] of this.shapeLayers) {
+      if (layerId === id) this.shapeLayers.delete(shapeId);
+    }
+    if (this.activeId === id) this.activeId = void 0;
+    this.emit("drawinglayers:change", { activeId: this.activeId });
+  }
+  /** Bir şekli bir çizim katmanına bağlar; şekil zaten bağlıysa eşleme güncellenir. */
+  assignShape(shapeId, layerId) {
+    this.shapeLayers.set(shapeId, layerId);
+  }
+  /** Şeklin bağlı olduğu çizim katmanının kimliğini döndürür; eşleme yoksa `undefined`. */
+  layerOfShape(shapeId) {
+    return this.shapeLayers.get(shapeId);
+  }
+  /** Şeklin katman eşlemesini kaldırır (şekil silindiğinde çağrılır); katmanın kendisi kalır. */
+  releaseShape(shapeId) {
+    this.shapeLayers.delete(shapeId);
+  }
+}
+function drawingLayerNeedsChoice(registry, tool) {
+  const active = registry.getActive();
+  return active === void 0 || active.kind !== drawLayerKindOf(tool);
+}
+async function resolveDrawingLayer(registry, tool, picker) {
+  const kind = drawLayerKindOf(tool);
+  if (!drawingLayerNeedsChoice(registry, tool)) return registry.getActive();
+  const layers = registry.listByKind(kind);
+  const existingTitles = registry.list().map((info) => info.title);
+  const suggestedTitle = nextDrawLayerTitle(existingTitles);
+  let choice;
+  if (picker !== void 0) {
+    choice = await picker({ tool, kind, layers, existingTitles, suggestedTitle });
+  } else {
+    const first = layers[0];
+    choice = first !== void 0 ? { type: "existing", layerId: first.id } : { type: "new", title: suggestedTitle };
+  }
+  if (choice === null) return null;
+  if (choice.type === "existing") {
+    const chosen = registry.get(choice.layerId);
+    if (chosen === void 0 || chosen.kind !== kind) return null;
+    registry.setActive(chosen.id);
+    return chosen;
+  }
+  if (validateDrawLayerTitle(choice.title, existingTitles) !== null) return null;
+  return registry.create(choice.title, kind);
+}
+function trimSlash(url) {
+  return url.replace(/\/+$/, "");
+}
+async function validateApiKey(apiKey, apiBase = getUcbpApiBase()) {
+  if (!apiKey) {
+    return;
+  }
+  const url = `${trimSlash(apiBase)}/auth/validate`;
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "X-API-Key": apiKey
+      }
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new ApiKeyValidationError(msg);
+  }
+  if (!response.ok) {
+    let title;
+    let message;
+    let reason;
+    let detail;
     try {
-      const _0x3d830c = await _0x301338["json"]();
-      _0x3cf83e = _0x3d830c["title"], _0x1cd07d = _0x3d830c["message"] || _0x3d830c["mesaj"], _0x45b0ac = _0x3d830c["reason"], _0x4fb50e = _0x3d830c["detail"];
+      const data = await response.json();
+      title = data.title;
+      message = data.message || data.mesaj;
+      reason = data.reason;
+      detail = data.detail;
     } catch {
     }
-    const _0x4dfbad = {};
-    if (_0x3cf83e !== void 0) _0x4dfbad["title"] = _0x3cf83e;
-    if (_0x45b0ac !== void 0) _0x4dfbad["reason"] = _0x45b0ac;
-    if (_0x4fb50e !== void 0) _0x4dfbad["detail"] = _0x4fb50e;
-    throw new ApiKeyValidationError(_0x1cd07d || "HTTP " + _0x301338["status"], _0x4dfbad);
+    const opts = {};
+    if (title !== void 0) opts.title = title;
+    if (reason !== void 0) opts.reason = reason;
+    if (detail !== void 0) opts.detail = detail;
+    throw new ApiKeyValidationError(
+      message || `HTTP ${response.status}`,
+      opts
+    );
   }
 }
-async function ensureEffectiveApiKeyValid(_0x247523, _0x1ff6c6) {
-  const _0x5dc9e0 = _0x247523 || getGlobalApiKey();
-  if (!_0x5dc9e0) throw new ApiKeyValidationError("Haritayı görüntülemek için geçerli bir apiKey gereklidir.", { "title": "API Anahtarı Eksik", "reason": "missing-key", "code": "API_KEY_MISSING" });
-  await validateApiKey(_0x5dc9e0, _0x1ff6c6);
+async function ensureEffectiveApiKeyValid(instanceApiKey, apiBase) {
+  const effectiveKey = instanceApiKey || getGlobalApiKey();
+  if (!effectiveKey) {
+    throw new ApiKeyValidationError(
+      "Haritayı görüntülemek için geçerli bir apiKey gereklidir.",
+      { title: "API Anahtarı Eksik", reason: "missing-key", code: "API_KEY_MISSING" }
+    );
+  }
+  await validateApiKey(effectiveKey, apiBase);
 }
-const DRAWING_LAYER_ID = "__tucbs_drawing_layer__", DRAWING_LAYER_TITLE = "Çizim Katmanı", MEASURE_LAYER_ID = "__tucbs_measure_layer__", MEASURE_LAYER_TITLE = "Ölçü Katmanı", MAX_ZOOM_DISTANCE_METERS = 25e6, MAX_ZOOM_OUT_SCALE_DENOMINATOR = 25e6, MAX_ZOOM_SCALE_DENOMINATOR = 100, MIN_ZOOM_DISTANCE_METERS = 10, DEFAULT_INITIAL_EXTENT = { "west": 22.94, "south": 34.05, "east": 47.39, "north": 42.7 };
+const MEASURE_LAYER_ID = "__tucbs_measure_layer__";
+const MEASURE_LAYER_TITLE = "Ölçü Katmanı";
+const MAX_ZOOM_DISTANCE_METERS = 25e6;
+const MAX_ZOOM_OUT_SCALE_DENOMINATOR = 25e6;
+const MAX_ZOOM_SCALE_DENOMINATOR = 100;
+const MIN_ZOOM_DISTANCE_METERS = 10;
+const DEFAULT_INITIAL_EXTENT = {
+  west: 22.94,
+  south: 34.05,
+  east: 47.39,
+  north: 42.7
+};
 let Map$1 = (_a = class {
-  constructor(_0xf4d962, _0x341049 = {}) {
+  /**
+   * Haritayı ve içindeki Cesium `Viewer`'ı oluşturur. Sayfada
+   * `window.CESIUM_BASE_URL` tanımlı değilse, paketin derlendiği Cesium
+   * sürümünün jsDelivr CDN klasörü atanır. `Widgets/widgets.css` sayfaya
+   * eklenmemişse o adresten eklenir. Cesium dosyalarını kendiniz
+   * sunuyorsanız `CESIUM_BASE_URL`'i haritadan önce tanımlayın.
+   *
+   * @param container - Haritanın oluşturulacağı DOM elementi veya id'si.
+   * @param options - Başlangıç harita seçenekleri.
+   *
+   * @example
+   * ```ts
+   * const map = new Map(document.getElementById("map-container")!, {
+   *   basemap: "hgm-temel",
+   *   apiKey: "YOUR_API_KEY",
+   *   camera: { longitude: 32.85, latitude: 39.93, height: 500000 },
+   * });
+   * ```
+   */
+  constructor(container, options = {}) {
+    // (4b) Sadece bu Map'in apiKey'i GLOBAL config'e bagimliysa (options.apiKey
+    // verilmediyse) dolu -- configureTucbs() sonradan farkli bir degerle
+    // tekrar cagrilirsa bu instance'i canli guncellemek icin kullanilir. destroy()
+    // icinde cagrilmali, aksi halde registry'de sonsuza dek tutulur.
     __privateAdd(this, _unregisterApiKeyRefresh);
     __privateAdd(this, _removeLodSeamGuard);
     __privateAdd(this, _removeMinZoomScale);
     __privateAdd(this, _removeScaleWheelZoom);
     __privateAdd(this, _apiKey3);
+    __privateAdd(this, _drawingLayerPicker);
+    __privateAdd(this, _drawQueue);
+    __privateSet(this, _drawQueue, Promise.resolve());
+    this.drawingLayers = new DrawingLayerRegistry();
     ensureCesiumRuntime();
-    const _0x585862 = document["createElement"]("div");
-    _0x585862["style"]["display"] = "none", this["viewer"] = new Viewer(_0xf4d962, this["buildViewerOptions"](_0x341049, _0x585862)), this["viewer"]["scene"]["globe"]["baseColor"] = Color["fromCssColorString"]("#a3c6e0"), this["viewer"]["scene"]["screenSpaceCameraController"]["maximumZoomDistance"] = MAX_ZOOM_DISTANCE_METERS, this["viewer"]["scene"]["screenSpaceCameraController"]["minimumZoomDistance"] = MIN_ZOOM_DISTANCE_METERS;
-    const _0xcb89a6 = _0x341049["apiKey"] ?? getGlobalApiKey();
-    __privateSet(this, _apiKey3, _0xcb89a6), this["layerManager"] = new LayerManager(this["viewer"]), this["selectionHighlight"] = new SelectionHighlight(this["viewer"]), this["layerManager"]["configure"]({ ..._0xcb89a6 !== void 0 && { "apiKey": _0xcb89a6 }, ..._0x341049["trustedApiKeyHosts"] !== void 0 && { "trustedApiKeyHosts": _0x341049["trustedApiKeyHosts"] }, ..._0x341049["apiKeyDiscoveryUrl"] !== void 0 && { "apiKeyDiscoveryUrl": _0x341049["apiKeyDiscoveryUrl"] } }), this["interactionManager"] = new InteractionManager(this["viewer"]), this["drawingManager"] = new DrawingManager(this["viewer"], this["interactionManager"]), this["analysisManager"] = new AnalysisManager({ "apiKey": _0xcb89a6 ?? "" }), this["basemapController"] = new BasemapController(this["viewer"], { "removeBasemapLayers": () => this["layerManager"]["_removeBasemapLayers"](), "addBasemapImageryLayer": (_0x1c60d0, _0x48ba88, _0x481a72) => this["layerManager"]["_addBasemapImageryLayer"](_0x1c60d0, _0x48ba88, _0x481a72), "removeLayer": (_0x119ea4) => this["layerManager"]["removeLayer"](_0x119ea4), "emit": (_0x2f3b66, _0x10bbd1) => this["layerManager"]["emit"](_0x2f3b66, _0x10bbd1), "getProxyBase": () => getProxyBase(), "getApiKey": () => __privateGet(this, _apiKey3) }), _0x341049["apiKey"] === void 0 && this["registerGlobalApiKeyRotation"](_0xcb89a6), this["wireShapeSource"]("draw", DRAWING_LAYER_ID, DRAWING_LAYER_TITLE, (_0x2ba24c, _0x420ad3, _0x3bdc46) => this["layerManager"]["_addDrawnShape"](_0x2ba24c, _0x420ad3, _0x3bdc46)), this["wireShapeSource"]("measure", MEASURE_LAYER_ID, MEASURE_LAYER_TITLE, (_0x449ef5, _0x2e88c6, _0x33c8bb) => this["layerManager"]["_addMeasuredShape"](_0x449ef5, _0x2e88c6, _0x33c8bb)), _0x341049["camera"] !== void 0 ? this["setView"](_0x341049["camera"]) : this["setExtent"](_0x341049["initialExtent"] ?? DEFAULT_INITIAL_EXTENT), __privateSet(this, _removeLodSeamGuard, installLodSeamGuard(this["viewer"])), __privateSet(this, _removeMinZoomScale, installMinZoomScale(this["viewer"], MAX_ZOOM_SCALE_DENOMINATOR, MAX_ZOOM_OUT_SCALE_DENOMINATOR)), __privateSet(this, _removeScaleWheelZoom, installScaleWheelZoom(this["viewer"])), this["setBasemap"](_0x341049["basemap"]);
+    const hiddenCreditContainer = document.createElement("div");
+    hiddenCreditContainer.style.display = "none";
+    this.viewer = new Viewer(
+      container,
+      this.buildViewerOptions(options, hiddenCreditContainer)
+    );
+    this.viewer.scene.globe.baseColor = Color.fromCssColorString("#a3c6e0");
+    this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAX_ZOOM_DISTANCE_METERS;
+    this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = MIN_ZOOM_DISTANCE_METERS;
+    const effectiveApiKey = options.apiKey ?? getGlobalApiKey();
+    __privateSet(this, _apiKey3, effectiveApiKey);
+    this.layerManager = new LayerManager(this.viewer);
+    this.selectionHighlight = new SelectionHighlight(this.viewer);
+    this.layerManager.configure({
+      ...effectiveApiKey !== void 0 && { apiKey: effectiveApiKey },
+      ...options.trustedApiKeyHosts !== void 0 && {
+        trustedApiKeyHosts: options.trustedApiKeyHosts
+      },
+      ...options.apiKeyDiscoveryUrl !== void 0 && {
+        apiKeyDiscoveryUrl: options.apiKeyDiscoveryUrl
+      }
+    });
+    this.interactionManager = new InteractionManager(this.viewer);
+    this.drawingManager = new DrawingManager(
+      this.viewer,
+      this.interactionManager
+    );
+    this.analysisManager = new AnalysisManager({
+      apiKey: effectiveApiKey ?? ""
+    });
+    this.basemapController = new BasemapController(this.viewer, {
+      removeBasemapLayers: () => this.layerManager._removeBasemapLayers(),
+      addBasemapImageryLayer: (id, basemapId, layer) => this.layerManager._addBasemapImageryLayer(id, basemapId, layer),
+      removeLayer: (id) => this.layerManager.removeLayer(id),
+      emit: (event, payload) => this.layerManager.emit(event, payload),
+      getProxyBase: () => getProxyBase(),
+      getApiKey: () => __privateGet(this, _apiKey3)
+    });
+    if (options.apiKey === void 0) {
+      this.registerGlobalApiKeyRotation(effectiveApiKey);
+    }
+    this.wireDrawingLayers();
+    this.wireMeasureLayer();
+    if (options.camera !== void 0) {
+      this.setView(options.camera);
+    } else {
+      this.setExtent(options.initialExtent ?? DEFAULT_INITIAL_EXTENT);
+    }
+    __privateSet(this, _removeLodSeamGuard, installLodSeamGuard(this.viewer));
+    __privateSet(this, _removeMinZoomScale, installMinZoomScale(
+      this.viewer,
+      MAX_ZOOM_SCALE_DENOMINATOR,
+      MAX_ZOOM_OUT_SCALE_DENOMINATOR
+    ));
+    __privateSet(this, _removeScaleWheelZoom, installScaleWheelZoom(this.viewer));
+    this.setBasemap(options.basemap);
   }
-  async ["ensureApiKeyValid"]() {
+  /**
+   * apiKey varsa GET /auth/validate (core auth). Yoksa no-op.
+   * Geçersizse throw — TucbsMap ready yerine error event basar.
+   *
+   * @example
+   * ```ts
+   * try {
+   *   await map.ensureApiKeyValid();
+   * } catch (err) {
+   *   console.error("ApiKey geçersiz:", err);
+   * }
+   * ```
+   */
+  async ensureApiKeyValid() {
     await validateApiKey(__privateGet(this, _apiKey3) ?? "", getUcbpApiBase());
   }
-  async ["runBuffer"](_0x45569b, _0x32aca8) {
-    const _0x53b72d = await this["analysisManager"]["buffer"](_0x45569b), _0x48a1fb = (_0x32aca8 == null ? void 0 : _0x32aca8["id"]) ?? "buffer-" + Date["now"](), _0x3e1099 = (_0x32aca8 == null ? void 0 : _0x32aca8["title"]) ?? "Tampon sonucu (" + _0x45569b["distanceM"] + "m)";
-    this["layerManager"]["markAnalysisResult"](_0x48a1fb);
-    const _0x449f9e = await this["layerManager"]["add"]("GEOJSON", { "id": _0x48a1fb, "title": _0x3e1099, "data": _0x53b72d["geojson"], "layerType": "GEOJSON", "clampToGround": !![] });
-    return _0x449f9e;
+  /**
+   * Tampon analizi: AnalysisManager → backend → sonuç GEOJSON katmanı.
+   *
+   * @example
+   * ```ts
+   * const layer = await map.runBuffer({
+   *   geojson: sourceFeature,
+   *   distanceM: 500,
+   * });
+   * console.log("Tampon katmanı eklendi:", layer.id);
+   * ```
+   */
+  async runBuffer(request, layerOpts) {
+    const result = await this.analysisManager.buffer(request);
+    const id = (layerOpts == null ? void 0 : layerOpts.id) ?? `buffer-${Date.now()}`;
+    const title = (layerOpts == null ? void 0 : layerOpts.title) ?? `Tampon sonucu (${request.distanceM}m)`;
+    this.layerManager.markAnalysisResult(id);
+    const layer = await this.layerManager.add("GEOJSON", {
+      id,
+      title,
+      data: result.geojson,
+      layerType: "GEOJSON",
+      clampToGround: true
+    });
+    return layer;
   }
-  async ["runIntersection"](_0x16c58c, _0x3753e8) {
-    const _0x59af1d = await this["analysisManager"]["intersection"](_0x16c58c), _0x2962d4 = (_0x3753e8 == null ? void 0 : _0x3753e8["id"]) ?? "intersection-" + Date["now"](), _0x5c486d = (_0x3753e8 == null ? void 0 : _0x3753e8["title"]) ?? "Kesişim sonucu";
-    this["layerManager"]["markAnalysisResult"](_0x2962d4);
-    const _0x49cd5a = await this["layerManager"]["add"]("GEOJSON", { "id": _0x2962d4, "title": _0x5c486d, "data": _0x59af1d["geojson"], "layerType": "GEOJSON", "clampToGround": !![] });
-    return _0x49cd5a;
+  /**
+   * Kesişim analizi: AnalysisManager → backend → sonuç GEOJSON katmanı.
+   *
+   * @example
+   * ```ts
+   * const layer = await map.runIntersection({
+   *   geojsonA: featureA,
+   *   geojsonB: featureB,
+   * });
+   * console.log("Kesişim katmanı eklendi:", layer.id);
+   * ```
+   */
+  async runIntersection(request, layerOpts) {
+    const result = await this.analysisManager.intersection(request);
+    const id = (layerOpts == null ? void 0 : layerOpts.id) ?? `intersection-${Date.now()}`;
+    const title = (layerOpts == null ? void 0 : layerOpts.title) ?? "Kesişim sonucu";
+    this.layerManager.markAnalysisResult(id);
+    const layer = await this.layerManager.add("GEOJSON", {
+      id,
+      title,
+      data: result.geojson,
+      layerType: "GEOJSON",
+      clampToGround: true
+    });
+    return layer;
   }
-  async ["runBoundary"](_0x384c4e, _0x390bf7) {
-    const _0x5295ee = await this["analysisManager"]["boundary"](_0x384c4e);
-    return this["addAnalysisGeoJson"]((_0x390bf7 == null ? void 0 : _0x390bf7["id"]) ?? "boundary-" + Date["now"](), (_0x390bf7 == null ? void 0 : _0x390bf7["title"]) ?? "Sınır sonucu", _0x5295ee["geojson"]);
+  /** Sınır analizi: worker geometrisini olduğu gibi katmana yazar. */
+  async runBoundary(request, layerOpts) {
+    const result = await this.analysisManager.boundary(request);
+    return this.addAnalysisGeoJson(
+      (layerOpts == null ? void 0 : layerOpts.id) ?? `boundary-${Date.now()}`,
+      (layerOpts == null ? void 0 : layerOpts.title) ?? "Sınır sonucu",
+      result.geojson
+    );
   }
-  async ["runClip"](_0x4bf942, _0x528602) {
-    const _0xdc2a59 = await this["analysisManager"]["clip"](_0x4bf942);
-    return this["addAnalysisGeoJson"]((_0x528602 == null ? void 0 : _0x528602["id"]) ?? "clip-" + Date["now"](), (_0x528602 == null ? void 0 : _0x528602["title"]) ?? "Kırpma sonucu", _0xdc2a59["geojson"]);
+  /** Kırpma: kaynak ve maske. */
+  async runClip(request, layerOpts) {
+    const result = await this.analysisManager.clip(request);
+    return this.addAnalysisGeoJson(
+      (layerOpts == null ? void 0 : layerOpts.id) ?? `clip-${Date.now()}`,
+      (layerOpts == null ? void 0 : layerOpts.title) ?? "Kırpma sonucu",
+      result.geojson
+    );
   }
-  async ["runDifference"](_0x2afb38, _0x572e2a) {
-    const _0x483c75 = await this["analysisManager"]["difference"](_0x2afb38);
-    return this["addAnalysisGeoJson"]((_0x572e2a == null ? void 0 : _0x572e2a["id"]) ?? "difference-" + Date["now"](), (_0x572e2a == null ? void 0 : _0x572e2a["title"]) ?? "Fark sonucu", _0x483c75["geojson"]);
+  /** Fark: ikinci poligon birinciden çıkarılır. */
+  async runDifference(request, layerOpts) {
+    const result = await this.analysisManager.difference(request);
+    return this.addAnalysisGeoJson(
+      (layerOpts == null ? void 0 : layerOpts.id) ?? `difference-${Date.now()}`,
+      (layerOpts == null ? void 0 : layerOpts.title) ?? "Fark sonucu",
+      result.geojson
+    );
   }
-  async ["runSubtract"](_0x5538a0, _0x80a538) {
-    const _0x201ef0 = await this["analysisManager"]["subtract"](_0x5538a0);
-    return this["addAnalysisGeoJson"]((_0x80a538 == null ? void 0 : _0x80a538["id"]) ?? "subtract-" + Date["now"](), (_0x80a538 == null ? void 0 : _0x80a538["title"]) ?? "Çıkarma sonucu", _0x201ef0["geojson"]);
+  /** Çıkarma: örtüşen parça kaynaktan silinir. */
+  async runSubtract(request, layerOpts) {
+    const result = await this.analysisManager.subtract(request);
+    return this.addAnalysisGeoJson(
+      (layerOpts == null ? void 0 : layerOpts.id) ?? `subtract-${Date.now()}`,
+      (layerOpts == null ? void 0 : layerOpts.title) ?? "Çıkarma sonucu",
+      result.geojson
+    );
   }
-  async ["runUnion"](_0x5d4576, _0x3f3129) {
-    const _0x2e97b2 = await this["analysisManager"]["union"](_0x5d4576);
-    return this["addAnalysisGeoJson"]((_0x3f3129 == null ? void 0 : _0x3f3129["id"]) ?? "union-" + Date["now"](), (_0x3f3129 == null ? void 0 : _0x3f3129["title"]) ?? "Birleştir sonucu", _0x2e97b2["geojson"]);
+  /** Birleştir: iki poligon tek alan olur. */
+  async runUnion(request, layerOpts) {
+    const result = await this.analysisManager.union(request);
+    return this.addAnalysisGeoJson(
+      (layerOpts == null ? void 0 : layerOpts.id) ?? `union-${Date.now()}`,
+      (layerOpts == null ? void 0 : layerOpts.title) ?? "Birleştir sonucu",
+      result.geojson
+    );
   }
-  async ["runWedgeBuffer"](_0x2480d7, _0x43638b) {
-    const _0x3ce371 = await this["analysisManager"]["wedgeBuffer"](_0x2480d7);
-    return this["addAnalysisGeoJson"]((_0x43638b == null ? void 0 : _0x43638b["id"]) ?? "wedge-" + Date["now"](), (_0x43638b == null ? void 0 : _0x43638b["title"]) ?? "Kama tampon sonucu", _0x3ce371["geojson"]);
+  /** Kama tampon: açı dilimini katmana yazar. */
+  async runWedgeBuffer(request, layerOpts) {
+    const result = await this.analysisManager.wedgeBuffer(request);
+    return this.addAnalysisGeoJson(
+      (layerOpts == null ? void 0 : layerOpts.id) ?? `wedge-${Date.now()}`,
+      (layerOpts == null ? void 0 : layerOpts.title) ?? "Kama tampon sonucu",
+      result.geojson
+    );
   }
-  async ["addAnalysisGeoJson"](_0x114313, _0x19d846, _0x29b1a4) {
-    return this["layerManager"]["markAnalysisResult"](_0x114313), this["layerManager"]["add"]("GEOJSON", { "id": _0x114313, "title": _0x19d846, "data": _0x29b1a4, "layerType": "GEOJSON", "clampToGround": !![] });
-  }
-  ["setView"](_0x45f11b) {
-    setView(this["viewer"], _0x45f11b);
-  }
-  ["setExtent"](_0x5e9ce6) {
-    setExtent(this["viewer"], _0x5e9ce6);
-  }
-  ["flyTo"](_0x4079c0) {
-    flyTo(this["viewer"], _0x4079c0);
-  }
-  ["zoomTo"](_0xbeb795, _0x392507, _0x5689a0) {
-    zoomTo(this["viewer"], _0xbeb795, _0x392507, _0x5689a0);
-  }
-  ["zoomInStep"]() {
-    scaleZoomStep(this["viewer"], 1);
-  }
-  ["zoomOutStep"]() {
-    scaleZoomStep(this["viewer"], -1);
-  }
-  async ["zoomToLayer"](_0x2b43f8) {
-    return zoomToLayer(this["viewer"], _0x2b43f8);
-  }
-  ["dropMarker"](_0x56b617, _0x385943, _0x2c5d41, _0x1215d3 = {}) {
-    this["clearMarker"](), this["_removeMarker"] = createMarkerOverlay(this["viewer"], _0x56b617, _0x385943, _0x2c5d41, _0x1215d3);
-  }
-  ["clearMarker"]() {
-    var _a2;
-    (_a2 = this["_removeMarker"]) == null ? void 0 : _a2.call(this), this["_removeMarker"] = void 0;
-  }
-  get ["basemapStatus"]() {
-    return this["basemapController"]["status"];
-  }
-  ["setBasemap"](_0x44653a) {
-    this["basemapController"]["set"](_0x44653a);
-  }
-  ["setMode"](_0x35e5a9) {
-    _0x35e5a9 === "2D" ? this["viewer"]["scene"]["morphTo2D"](0) : this["viewer"]["scene"]["morphTo3D"](0);
-  }
-  ["setQuality"](_0x467c55) {
-    const _0x5b2704 = Math["min"](100, Math["max"](0, _0x467c55));
-    this["viewer"]["resolutionScale"] = Math["max"](0.1, _0x5b2704 / 100);
-  }
-  ["resize"]() {
-    this["viewer"]["resize"]();
-  }
-  async ["exportJPEG"](_0x1a908e = "tucbs-harita", _0x128a66 = 0.92) {
-    const _0x447133 = await this["captureScreenshotBlob"](_0x128a66);
-    triggerDownload(_0x447133, _0x1a908e + "-" + Date["now"]() + ".jpg");
-  }
-  async ["captureScreenshotBlob"](_0xaa5a3f = 0.92) {
-    return await nextFrame(this["viewer"]), captureCanvasBlob(this["viewer"], "image/jpeg", _0xaa5a3f);
-  }
-  ["measureGroundMetersPerPixel"]() {
-    return measureGroundMetersPerPixel(this["viewer"]);
-  }
-  ["buildViewerOptions"](_0x18d592, _0x2af829) {
-    return { "timeline": _0x18d592["timeline"] ?? ![], "animation": _0x18d592["animation"] ?? ![], "baseLayerPicker": _0x18d592["baseLayerPicker"] ?? ![], "baseLayer": ![], "geocoder": _0x18d592["geocoder"] ?? ![], "homeButton": _0x18d592["homeButton"] ?? ![], "sceneModePicker": _0x18d592["sceneModePicker"] ?? ![], "navigationHelpButton": _0x18d592["navigationHelpButton"] ?? ![], "infoBox": _0x18d592["infoBox"] ?? ![], "selectionIndicator": _0x18d592["selectionIndicator"] ?? ![], "shadows": _0x18d592["shadows"] ?? ![], "shouldAnimate": _0x18d592["shouldAnimate"] ?? ![], "fullscreenButton": _0x18d592["fullscreenButton"] ?? ![], "creditContainer": _0x2af829, ..._0x18d592["cesiumOptions"] };
-  }
-  ["registerGlobalApiKeyRotation"](_0x48df0f) {
-    _0x48df0f !== void 0 && console["info"]("[@tucbs/core] Bu Map instance'i configureTucbs() global apiKey'ini kullaniyor (kendi apiKey attribute'u/options'u verilmedi). Farkli bir anahtar gerekiyorsa Map/component'e acikca apiKey verin."), __privateSet(this, _unregisterApiKeyRefresh, registerApiKeyRefresh(() => {
-      const _0x5ef394 = getGlobalApiKey();
-      __privateSet(this, _apiKey3, _0x5ef394), this["layerManager"]["configure"]({ ..._0x5ef394 !== void 0 && { "apiKey": _0x5ef394 } }), this["analysisManager"]["configure"]({ "apiKey": _0x5ef394 ?? "" }), void this["ensureApiKeyValid"]()["catch"]((_0x44b1f2) => {
-        console["error"]("[@tucbs/core] apiKey rotasyon validate basarisiz:", _0x44b1f2);
-      }), this["basemapController"]["currentBasemapId"] !== void 0 && this["setBasemap"](this["basemapController"]["currentBasemapId"]);
-    }));
-  }
-  ["wireShapeSource"](_0x5eaaec, _0x4268b6, _0x1cb56d, _0x5a6195) {
-    this["drawingManager"]["on"]("draw:complete", ({ shape: _0x2607ef }) => {
-      if (_0x2607ef["source"] !== _0x5eaaec) return;
-      void _0x5a6195(_0x4268b6, _0x1cb56d, _0x2607ef);
-    }), this["drawingManager"]["on"]("draw:remove", ({ shape: _0x327159 }) => {
-      if (_0x327159["source"] !== _0x5eaaec) return;
-      this["layerManager"]["_removeDrawnShape"](_0x4268b6, _0x327159["entity"]);
+  /** Analiz GeoJSON'unu clamp'li katman olarak ekler. */
+  async addAnalysisGeoJson(id, title, geojson) {
+    this.layerManager.markAnalysisResult(id);
+    return this.layerManager.add("GEOJSON", {
+      id,
+      title,
+      data: geojson,
+      layerType: "GEOJSON",
+      clampToGround: true
     });
   }
-  ["showSelectionHighlight"](_0x4cc4e3) {
-    this["selectionHighlight"]["show"](_0x4cc4e3);
+  // ── Kamera ───────────────────────────────────────────────────────────────
+  /**
+   * Kamerayı verilen konum/açıya anında (uçuş animasyonu olmadan) ayarlar.
+   *
+   * @example
+   * ```ts
+   * map.setView({ longitude: 32.85, latitude: 39.93, height: 500000 });
+   * ```
+   */
+  setView(cameraOptions) {
+    setView(this.viewer, cameraOptions);
   }
-  ["clearSelectionHighlight"]() {
-    this["selectionHighlight"]["clear"]();
+  /**
+   * Nokta yerine bir bölgeyi (ör. Türkiye sınırı) ekrana sığacak şekilde ortalar.
+   *
+   * @example
+   * ```ts
+   * map.setExtent({ west: 26, south: 36, east: 45, north: 42 });
+   * ```
+   */
+  setExtent(extent) {
+    setExtent(this.viewer, extent);
   }
-  ["destroy"]() {
+  /**
+   * Kamerayı verilen konum/açıya uçuş animasyonuyla götürür.
+   *
+   * @example
+   * ```ts
+   * map.flyTo({ longitude: 28.97, latitude: 41.01, height: 20000 });
+   * ```
+   */
+  flyTo(cameraOptions) {
+    flyTo(this.viewer, cameraOptions);
+  }
+  /**
+   * Kamerayı verilen coğrafi konuma (varsayılan yönle) anında ayarlar.
+   *
+   * @example
+   * ```ts
+   * map.zoomTo(35.0, 39.0, 1000000);
+   * ```
+   */
+  zoomTo(longitude, latitude, height) {
+    zoomTo(this.viewer, longitude, latitude, height);
+  }
+  /** Kamerayı bir sonraki olcek basamağına (ör. 1/5.000 → 1/2.500) animasyonlu yaklaştırır; fare tekerleğinin bir çentiğiyle aynıdır. */
+  zoomInStep() {
+    scaleZoomStep(this.viewer, 1);
+  }
+  /** Kamerayı bir sonraki olcek basamağına (ör. 1/2.500 → 1/5.000) animasyonlu uzaklaştırır; fare tekerleğinin bir çentiğiyle aynıdır. */
+  zoomOutStep() {
+    scaleZoomStep(this.viewer, -1);
+  }
+  /** Kamerayı verilen katmanın kapsama alanına (extent'ine) top-down yaklaştırır. */
+  async zoomToLayer(layer) {
+    return zoomToLayer(this.viewer, layer);
+  }
+  // ── Marker ───────────────────────────────────────────────────────────────
+  /**
+   * Verilen konuma tekil bir ikon marker'ı ekler; önceki marker (varsa) kaldırılır.
+   * @param longitude - Boylam (derece).
+   * @param latitude - Enlem (derece).
+   * @param iconUrl - Marker ikonunun URL'si (ör. bir SVG data-URI).
+   * @param options - Opsiyonel. `width`/`height`: ikonun ekrandaki boyutu (CSS px); verilmezse görüntünün
+   *   kendi piksel boyutu kullanılır. Marker, Cesium tuvaline değil harita container'ının üstüne bir `<img>`
+   *   olarak çizilir (bu yüzden `setQuality()` düşük olsa bile keskindir). `anchor`: koordinata oturan nokta —
+   *   `"bottom"` (varsayılan, pin ucu) veya `"center"` (dairesel ikon). Yüksek çözünürlüklü bir görüntüyü küçük göstermek keskinliği artırır.
+   *
+   * @example
+   * ```ts
+   * map.dropMarker(32.85, 39.93, "https://example.com/pin.svg");
+   * map.dropMarker(32.85, 39.93, "https://example.com/pin@8x.png", { width: 30, height: 36 });
+   * ```
+   */
+  // iconUrl caginin sorumlulugu: hangi ikonun kullanilacagi bir UI/tasarim
+  // karari (bkz TucbsGoToCoordinate -- Carbon'un dolu "location" ikonunu bir
+  // SVG data-URI'sine cevirip verir), core paketi @carbon/icons'a bagimli
+  // OLMAMALI -- burasi sadece Cesium billboard'ini kurar. verticalOrigin
+  // BOTTOM: ikonun UCU (Carbon'un LocationFilled path'inde alt-orta nokta)
+  // TAM koordinatta dursun, ikonun ORTASI degil (gercek harita pini gibi).
+  // disableDepthTestDistance ile 3D Tiles/terrain'in ARKASINDA kalsa bile
+  // marker HER ZAMAN gorunur -- LayerManager'in identify highlight'iyla
+  // (bkz. LayerManager.ts ~759) AYNI teknik.
+  dropMarker(longitude, latitude, iconUrl, options = {}) {
+    this.clearMarker();
+    this._removeMarker = createMarkerOverlay(this.viewer, longitude, latitude, iconUrl, options);
+  }
+  /**
+   * `dropMarker()` ile eklenen marker'ı kaldırır (yoksa no-op).
+   *
+   * @example
+   * ```ts
+   * map.clearMarker();
+   * ```
+   */
+  clearMarker() {
+    var _a2;
+    (_a2 = this._removeMarker) == null ? void 0 : _a2.call(this);
+    this._removeMarker = void 0;
+  }
+  // ── Basemap ───────────────────────────────────────────────────────────────
+  /** Altlık haritanın yükleme durumu (`"loading"`/`"ready"`/`"unavailable"`). */
+  get basemapStatus() {
+    return this.basemapController.status;
+  }
+  /**
+   * Yedek dünya görüntüsü (NASA Blue Marble) şu an haritadaysa kaynak atfı, değilse `null`.
+   * Değişimi `layerManager` üzerindeki `basemap:fallback-shown` ve `basemap:fallback-hidden`
+   * olaylarıyla izlenir; olaydan sonra bağlanan bileşen başlangıç durumunu buradan okur.
+   *
+   * @example
+   * ```ts
+   * const credit = map.fallbackAttribution; // "NASA Earth Observatory (Blue Marble)" ya da null
+   * ```
+   */
+  get fallbackAttribution() {
+    return this.basemapController.fallbackAttribution;
+  }
+  /**
+   * Altlık haritayı ayarlar/değiştirir (`null`/`undefined` altlık haritayı tamamen kaldırır).
+   *
+   * @example
+   * ```ts
+   * map.setBasemap("hgm-ortofoto");
+   * ```
+   */
+  setBasemap(basemap) {
+    this.basemapController.set(basemap);
+  }
+  // ── Mod & kalite ─────────────────────────────────────────────────────────
+  /**
+   * Sahne modunu 2D/3D arasında değiştirir (animasyonsuz, anında). 2D'de yere
+   * yapıştırılmış noktalar düz çizilir (Cesium bunları 2D'de yanlış konuma
+   * çizdiği için); 3D'ye dönünce yeniden yere yapıştırılır.
+   */
+  setMode(mode) {
+    if (mode === "2D") {
+      this.viewer.scene.morphTo2D(0);
+    } else {
+      this.viewer.scene.morphTo3D(0);
+    }
+  }
+  /** Render çözünürlük ölçeğini ayarlar (`quality`: 0-100 arası yüzde, Cesium `resolutionScale`'e 0.1-1.0 arasına eşlenir — 0.1 alt sınırdır, aşırı bulanıklığı/performans düşüşünü önler). */
+  setQuality(quality) {
+    const clamped = Math.min(100, Math.max(0, quality));
+    this.viewer.resolutionScale = Math.max(0.1, clamped / 100);
+  }
+  // ── Harita yönetimi ───────────────────────────────────────────────────────
+  /** Harita canvas boyutunu, container'ının güncel boyutuna göre yeniden hesaplar. */
+  resize() {
+    this.viewer.resize();
+  }
+  // ── Disa aktarim ─────────────────────────────────────────────────────────
+  /**
+   * O anki kamera görüntüsünü (harita + tüm entity/feature'lar, UI butonları
+   * hariç) JPEG olarak yakalayıp indirir.
+   * @param filename - İndirilecek dosyanın adı (uzantısız, zaman damgası eklenir).
+   * @param quality - JPEG sıkıştırma kalitesi (0-1).
+   *
+   * @example
+   * ```ts
+   * await map.exportJPEG("harita-goruntusu", 0.95);
+   * ```
+   */
+  // tucbs-react RecordToolPanel.tsx'teki handleDownloadJpg/grabCanvasBlob'dan
+  // PORTE EDILDI.
+  async exportJPEG(filename = "tucbs-harita", quality = 0.92) {
+    const blob = await this.captureScreenshotBlob(quality);
+    triggerDownload(blob, `${filename}-${Date.now()}.jpg`);
+  }
+  /**
+   * O anki kamera görüntüsünü indirmeden bir `Blob` olarak döndürür (ör. bir
+   * `<img>`'e `blob:` URL olarak verilmek üzere).
+   * @param quality - JPEG sıkıştırma kalitesi (0-1).
+   */
+  // TucbsPrintTool icin PORTE EDILDI -- exportJPEG() ile AYNI yakalama mantigini indirme YAPMADAN disari
+  // acar (ör. bir <img>'e blob: URL olarak verilmek uzere).
+  //
+  // FAZ 1.5 KARARI: Faz 1.3/1.4'te burada, capture'i sayfa boyutuna gore
+  // farkli piksel olculerde almak icin container'i GECICI resize edip
+  // kamerayi/FOV'u yeniden sigdiran bir mekanizma vardi. Bu, Yazdir tiklanip
+  // onizleme overlay'i acilmadan ONCE, kullanicinin GORDUGU canli haritada
+  // (henuz hicbir sey onu ORTMEDIGI icin) belirgin bir zoom sicramasina yol
+  // aciyordu (kullanici sikayeti) -- AYRICA farkli sayfa boyutlari icin
+  // her seferinde YENIDEN hesaplanan kamera/FOV konumu, sayfa boyutuna gore
+  // KUCUK ama gercek tutarsizliklar (extent'in "bazen genisleyip bazen
+  // daralmasi") uretiyordu.
+  //
+  // Kullanicinin onerdigi/onayladigi cozum: kameraya/container'a HIC
+  // dokunmadan, o ANKI ekran cozunurlugunde TEK bir goruntu yakalanir.
+  // Farkli sayfa boyutlari icin bu AYNI goruntu sadece BUYUTULUP/KUCULTULUR
+  // -- bu, TucbsPrintTool'daki `<img width=.. height=..>` HTML attribute
+  // mekanizmasi tarafindan zaten OTOMATIK saglaniyor (bkz PrintPreviewBuilder.ts),
+  // EK KOD GEREKTIRMEZ. Sonuc: zoom sicramasi tamamen ortadan kalkar (harita
+  // capture SIRASINDA bile hicbir sekilde degismez); extent TUM sayfa
+  // boyutlarinda MATEMATIKSEL OLARAK BIREBIR AYNI olur (ayni piksel verisi).
+  // Bilinen odun: A0/A1 gibi buyuk sayfalarda ekran cozunurlugu buyuk olcude
+  // buyutuldugunden goruntu netligi azalabilir -- kullaniciya bildirildi.
+  async captureScreenshotBlob(quality = 0.92) {
+    await nextFrame(this.viewer);
+    return captureCanvasBlob(this.viewer, "image/jpeg", quality);
+  }
+  /**
+   * Ekran merkezinde, arazi-farkında (`globe.pick`) ölçülen piksel-başına-yer-mesafesini
+   * (metre) döndürür; harita globe'u göstermiyorsa (ör. açık uzay) `null` döner.
+   */
+  measureGroundMetersPerPixel() {
+    return measureGroundMetersPerPixel(this.viewer);
+  }
+  // Viewer'a verilen kurucu secenekleri (Faz 2, constructor karmasikligi
+  // duzeltmesi).
+  // Buradaki her "?? false" ESLint'in complexity kuralinda AYRI bir dal
+  // sayildigi icin (12 adet) constructor'in KENDI karmasikligina dogrudan
+  // katkida bulunuyordu -- davranis AYNI, sadece ayri bir metoda tasindi.
+  buildViewerOptions(options, hiddenCreditContainer) {
+    return {
+      timeline: options.timeline ?? false,
+      animation: options.animation ?? false,
+      baseLayerPicker: options.baseLayerPicker ?? false,
+      // Cesium, baseLayer verilmezse kendi varsayilan World Imagery katmanini
+      // otomatik ekliyor; bu katman LayerManager'a hic kayitli olmadigindan
+      // setBasemap()/_removeBasemapLayers() onu asla silemiyor ve bizim
+      // basemap'imizin altinda kalici olarak birikiyor. false vererek
+      // basemap yonetimini tamamen setBasemap()'e devrediyoruz (tek basemap garantisi).
+      baseLayer: false,
+      geocoder: options.geocoder ?? false,
+      homeButton: options.homeButton ?? false,
+      sceneModePicker: options.sceneModePicker ?? false,
+      navigationHelpButton: options.navigationHelpButton ?? false,
+      infoBox: options.infoBox ?? false,
+      selectionIndicator: options.selectionIndicator ?? false,
+      shadows: options.shadows ?? false,
+      shouldAnimate: options.shouldAnimate ?? false,
+      fullscreenButton: options.fullscreenButton ?? false,
+      creditContainer: hiddenCreditContainer,
+      ...options.cesiumOptions
+    };
+  }
+  // (4b) apiKey-rotasyon kaydinin gerceklestirilmesi (Faz 3, constructor
+  // karmasikligi duzeltmesi).
+  // SADECE bu Map global apiKey'e bagimliysa (constructor'daki "options.apiKey
+  // === undefined" kontrolunden SONRA) cagrilir.
+  registerGlobalApiKeyRotation(effectiveApiKey) {
+    if (effectiveApiKey !== void 0) {
+      console.info(
+        "[@tucbs/core] Bu Map instance'i configureTucbs() global apiKey'ini kullaniyor (kendi apiKey attribute'u/options'u verilmedi). Farkli bir anahtar gerekiyorsa Map/component'e acikca apiKey verin."
+      );
+    }
+    __privateSet(this, _unregisterApiKeyRefresh, registerApiKeyRefresh(() => {
+      const rotatedKey = getGlobalApiKey();
+      __privateSet(this, _apiKey3, rotatedKey);
+      this.layerManager.configure({
+        ...rotatedKey !== void 0 && { apiKey: rotatedKey }
+      });
+      this.analysisManager.configure({ apiKey: rotatedKey ?? "" });
+      void this.ensureApiKeyValid().catch((err) => {
+        console.error(
+          "[@tucbs/core] apiKey rotasyon validate basarisiz:",
+          err
+        );
+      });
+      if (this.basemapController.currentBasemapId !== void 0) {
+        this.setBasemap(this.basemapController.currentBasemapId);
+      }
+    }));
+  }
+  // Olcu Katmani: draw:complete/draw:remove dinleyicileri (source==="measure").
+  wireMeasureLayer() {
+    this.drawingManager.on("draw:complete", ({ shape }) => {
+      if (shape.source !== "measure") return;
+      void this.layerManager._addMeasuredShape(MEASURE_LAYER_ID, MEASURE_LAYER_TITLE, shape);
+    });
+    this.drawingManager.on("draw:remove", ({ shape }) => {
+      if (shape.source !== "measure") return;
+      this.layerManager._removeDrawnShape(MEASURE_LAYER_ID, shape.entity);
+    });
+  }
+  // Cizim Katmanlari (source==="draw"): biten sekil, aktif katman turuyle
+  // uyumluysa ona; degilse (aktif yok / tur farkli) `drawingLayerPicker`
+  // (diyalog) sorularak secilen/olusturulan katmana yazilir. Picker iptal
+  // ederse sekil atilir (arac cizim modunda kalir). Ardisik bitisler sirayla
+  // islenir ki ayni anda birden fazla diyalog acilmasin.
+  wireDrawingLayers() {
+    this.drawingManager.on("draw:complete", ({ shape }) => {
+      if (shape.source !== "draw") return;
+      __privateSet(this, _drawQueue, __privateGet(this, _drawQueue).then(() => this.placeDrawnShape(shape)).catch((error) => console.error("[tucbs] Çizim katmana eklenemedi:", error)));
+    });
+    this.drawingManager.on("draw:remove", ({ shape }) => {
+      if (shape.source !== "draw") return;
+      const layerId = this.drawingLayers.layerOfShape(shape.id);
+      if (layerId === void 0) return;
+      this.drawingLayers.releaseShape(shape.id);
+      this.layerManager._removeDrawnShape(layerId, shape.entity);
+    });
+    this.layerManager.on("layer:remove", ({ layer }) => this.drawingLayers.remove(layer.id));
+  }
+  // Sahnenin `n` kare cizmesini bekler (render durdurulmus olsa bile bir kare ister); cizim
+  // dongusu calismazsa takilmamak icin zaman asimi vardir.
+  waitForFrames(n) {
+    return new Promise((resolve) => {
+      let remaining = n;
+      const done = () => {
+        remove();
+        window.clearTimeout(timer);
+        resolve();
+      };
+      const remove = this.viewer.scene.postRender.addEventListener(() => {
+        if (--remaining <= 0) done();
+      });
+      const timer = window.setTimeout(done, 300);
+      this.viewer.scene.requestRender();
+    });
+  }
+  async placeDrawnShape(shape) {
+    let endPreview;
+    if (__privateGet(this, _drawingLayerPicker) !== void 0 && drawingLayerNeedsChoice(this.drawingLayers, shape.tool)) {
+      endPreview = this.layerManager._previewDrawnShape(shape);
+      await this.waitForFrames(2);
+    }
+    let target;
+    try {
+      target = await resolveDrawingLayer(this.drawingLayers, shape.tool, __privateGet(this, _drawingLayerPicker));
+    } finally {
+      endPreview == null ? void 0 : endPreview();
+    }
+    if (target === null) {
+      this.drawingManager.removeShape(shape.id);
+      return;
+    }
+    this.drawingLayers.assignShape(shape.id, target.id);
+    const existing = this.layerManager.getLayerById(target.id);
+    if (existing !== void 0 && !existing.cesiumObject.show) {
+      this.layerManager.setVisible(target.id, true);
+    }
+    await this.layerManager._addDrawnShape(target.id, target.title, shape);
+  }
+  /**
+   * Biten bir çizimin hangi Çizim Katmanı'na gideceği belirsizse (aktif katman
+   * yok ya da türü uyuşmuyor) sorulacak seçiciyi (diyalog) ayarlar. Seçici
+   * `null` döndürürse çizim atılır. Ayarlanmazsa uyumlu ilk katman, o da yoksa
+   * otomatik yeni katman kullanılır. `undefined` seçiciyi kaldırır.
+   */
+  setDrawingLayerPicker(picker) {
+    __privateSet(this, _drawingLayerPicker, picker);
+  }
+  /** Seçili geometriyi katman listesine yazmadan kırmızı gösterir. Boş dizi vurguyu kaldırır. */
+  showSelectionHighlight(features) {
+    this.selectionHighlight.show(features);
+  }
+  /** Seçim vurgusunu haritadan kaldırır. */
+  clearSelectionHighlight() {
+    this.selectionHighlight.clear();
+  }
+  /** Tüm alt sistemleri (drawing/interaction/layer manager) ve Cesium `Viewer`'ı yok eder. */
+  destroy() {
     var _a2, _b, _c, _d;
-    this["clearMarker"](), this["selectionHighlight"]["clear"](), this["basemapController"]["stop"](), (_a2 = __privateGet(this, _unregisterApiKeyRefresh)) == null ? void 0 : _a2.call(this), (_b = __privateGet(this, _removeLodSeamGuard)) == null ? void 0 : _b.call(this), (_c = __privateGet(this, _removeMinZoomScale)) == null ? void 0 : _c.call(this), (_d = __privateGet(this, _removeScaleWheelZoom)) == null ? void 0 : _d.call(this), this["drawingManager"]["destroy"](), this["interactionManager"]["destroy"](), this["layerManager"]["destroy"](), this["viewer"]["destroy"]();
+    this.clearMarker();
+    this.selectionHighlight.clear();
+    this.basemapController.stop();
+    (_a2 = __privateGet(this, _unregisterApiKeyRefresh)) == null ? void 0 : _a2.call(this);
+    (_b = __privateGet(this, _removeLodSeamGuard)) == null ? void 0 : _b.call(this);
+    (_c = __privateGet(this, _removeMinZoomScale)) == null ? void 0 : _c.call(this);
+    (_d = __privateGet(this, _removeScaleWheelZoom)) == null ? void 0 : _d.call(this);
+    this.drawingManager.destroy();
+    this.interactionManager.destroy();
+    this.layerManager.destroy();
+    this.viewer.destroy();
   }
-}, _unregisterApiKeyRefresh = new WeakMap(), _removeLodSeamGuard = new WeakMap(), _removeMinZoomScale = new WeakMap(), _removeScaleWheelZoom = new WeakMap(), _apiKey3 = new WeakMap(), _a);
-const HGM_BASEMAP_IDS = ["hgm-temel", "hgm-ortofoto", "hgm-siyasi", "hgm-yukseklik"];
+}, _unregisterApiKeyRefresh = new WeakMap(), _removeLodSeamGuard = new WeakMap(), _removeMinZoomScale = new WeakMap(), _removeScaleWheelZoom = new WeakMap(), _apiKey3 = new WeakMap(), _drawingLayerPicker = new WeakMap(), _drawQueue = new WeakMap(), _a);
+const HGM_BASEMAP_IDS = [
+  "hgm-temel",
+  "hgm-ortofoto",
+  "hgm-siyasi",
+  "hgm-yukseklik"
+];
 export {
   AnalysisManager,
   AnalysisRequestError,
   ApiKeyValidationError,
   DEFAULT_UCBP_API_BASE as DEFAULT_ANALYSIS_API_BASE,
   DEFAULT_INITIAL_EXTENT,
+  DEFAULT_POINT_SYMBOL,
   DEFAULT_UCBP_API_BASE,
+  DRAW_LAYER_KIND_LABELS,
+  DrawingLayerRegistry,
   DrawingManager,
   GeometryError,
   HGM_BASEMAP_IDS,
   InteractionManager,
+  LINE_DASHES,
+  LINE_DASH_LABELS,
   LayerManager,
   LayerOperationError,
   MEASURE_LAYER_ID,
   Map$1 as Map,
   OgcRequestError,
+  POINT_SHAPES,
+  POINT_SHAPE_LABELS,
+  POINT_SIZE_MAX,
+  POINT_SIZE_MIN,
   TucbsError,
   buildCapabilitiesUrl,
+  clampPointSize,
   configureTucbs,
+  dashArray,
   detectServiceType,
+  drawLayerKindOf,
   ensureEffectiveApiKeyValid,
   entityToGeoJSON,
   featureLabel,
+  fetchWcsCoverageDescriptions,
   fetchWcsCoverageExtents,
   getCapabilities,
   getErrorCodes,
   getProxyBase,
   getUcbpApiBase,
+  intersectsServiceExtent,
   measureGround,
+  nextDrawLayerTitle,
   parseCapabilities,
   parseWcsTiffFormat,
   parseWmsTiffFormat,
+  pointSymbolSvg,
   registerApiKeyRefresh,
   snapScaleForDisplay,
   validateApiKey,
+  validateDrawLayerTitle,
   wcsRectangleFor
 };
